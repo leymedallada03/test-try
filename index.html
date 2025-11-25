@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Login — MDRRMO Alitagtag</title><link rel="stylesheet" href="styles.css"/></head>
+<body class="loginBody">
+<div style="max-width:420px;margin:80px auto;padding:18px">
+  <div class="card" style="text-align:center;">
+    <img src="assets/logo.png" alt="logo" style="width:80px;height:80px;margin-bottom:12px"/>
+    <h2>PUROK KALIGTASAN<br/>DRRM ALITAGTAG</h2>
+    <p class="small muted">Authorized Personnel Only</p>
+
+    <div id="loginError" style="display:none;color:#a00;margin:8px 0"></div>
+
+    <form id="loginForm" style="display:grid;gap:8px;margin-top:12px">
+      <input type="text" id="username" placeholder="Username" required style="padding:10px;border-radius:8px"/>
+      <input type="password" id="password" placeholder="Password" required style="padding:10px;border-radius:8px"/>
+      <button type="submit" class="btn">Login</button>
+      <p id="statusText" style="margin-top:10px; font-size:14px; font-weight:bold;"></p>
+    </form>
+  </div>
+</div>
+
+<script src="index.js"></script>
+</body>
+</html>

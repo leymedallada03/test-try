@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MDRRMO Records</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+<div class="page-container">
+
+    <!-- ░░ TOP BAR ░░ -->
+    <header class="topbar">
+        <div class="brand">
+            <img src="assets/MDRRMO Logo.png" class="logo" alt="logo">
+            <div>
+                <div class="title">PUROK KALIGTASAN</div>
+                <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+            </div>
+        </div>
+
+        <div class="user-info">
+            <span id="userName"></span>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </header>
+
+    <!-- ░░ SIDEBAR ░░ -->
+    <aside class="sidebar">
+        <ul>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="dataForm.html">📝 Data Entry</a></li>
+            <li><a href="records.html" class="active">📁 Records</a></li>
+            <li><a href="charts.html">📈 Charts</a></li>
+            <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+        </ul>
+    </aside>
+
+    <!-- ░░ MAIN CONTENT ░░ -->
+    <main class="content-area">
+        <h2>📁 Household Records</h2>
+
+        <!-- Search -->
+        <div class="search-container">
+            <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID...">
+        </div>
+
+        <!-- TABLE WRAPPER -->
+        <div class="records-wrapper">
+            <table class="records-table">
+                <thead>
+                <tr>
+                    <th>Data ID</th>
+                    <th>Barangay</th>
+                    <th>Sitio/Purok</th>
+                    <th>Household Head</th>
+                    <th>Sex</th>
+                    <th>Birthdate</th>
+                    <th>Age</th>
+                    <th>No. of Household Member/s</th>
+
+                    <th>Name of Household Member/s</th>
+                    <th>PWD</th>
+                    <th>Stage</th>
+                    <th>Status</th>
+                    <th>Transportation</th>
+                    <th>Designated Pick-Up Point</th>
+                    <th>Drop-Off Point</th>
+                    <th>Name of Camp</th>
+                    <th>Capacity</th>
+                    <th>Inside Camp</th>
+                    <th>Outside Camp</th>
+                    <th>Reasons</th>
+
+                    <th>TUPAD</th>
+                    <th>Local 4Ps</th>
+                    <th>National 4Ps</th>
+                    <th>Local Social Pension</th>
+                    <th>National Social Pension</th>
+                    <th>Solo Parent Assistance</th>
+                    <th>Cash Subsidy</th>
+                    <th>Relief Goods</th>
+                    <th>AICS</th>
+
+                    <th>Submitted By</th>
+                    <th>Submitted On</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody id="recordsBody"></tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- ░░ EDIT MODAL ░░ -->
+<div id="editModal" class="modal-overlay" style="display:none;">
+
+  <div class="modal-box">
+
+    <h3>Edit Record</h3>
+
+    <form id="editForm">
+      <div class="modal-grid">
+
+        <label>Data ID</label>
+        <input type="text" id="editDataID" readonly>
+
+        <label>Barangay</label>
+        <input type="text" id="editBarangay">
+
+        <label>Sitio / Purok</label>
+        <input type="text" id="editSitio">
+
+        <label>Household Head</label>
+        <input type="text" id="editHead">
+
+        <label>Sex</label>
+        <select id="editSex">
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+
+        <label>Birthdate</label>
+        <input type="date" id="editBirthdate">
+
+        <label>Age</label>
+        <input type="number" id="editAge" readonly>
+
+        <label>No. of Household Member/s</label>
+        <input type="number" id="editTotalMembers">
+
+        <label>Name of Household Member/s</label>
+        <input type="text" id="editMember">
+
+        <label>PWD</label>
+        <select id="editPWD">
+          <option value="">--</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+
+        <label>Stage</label>
+        <input type="text" id="editStage">
+
+        <label>Status</label>
+        <input type="text" id="editStatus">
+
+        <label>Transportation</label>
+        <input type="text" id="editTransport">
+
+        <label>Pickup Point</label>
+        <input type="text" id="editPickup">
+
+        <label>Drop-Off Point</label>
+        <input type="text" id="editDropoff">
+
+        <label>Camp Name</label>
+        <input type="text" id="editCamp">
+
+        <label>Capacity</label>
+        <input type="number" id="editCapacity">
+
+        <label>Inside Camp</label>
+        <input type="number" id="editInside">
+
+        <label>Outside Camp</label>
+        <input type="number" id="editOutside">
+
+        <label>Reasons</label>
+        <input type="text" id="editReason">
+
+        <label>TUPAD</label>
+        <select id="editTupad">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>Local 4Ps</label>
+        <select id="editLocal4">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>National 4Ps</label>
+        <select id="editNat4">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>Local Social Pension</label>
+        <select id="editLocalSP">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>National Social Pension</label>
+        <select id="editNatSP">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>Solo Parent Assistance</label>
+        <select id="editSolo">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>Cash Subsidy</label>
+        <select id="editCash">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>Relief Goods</label>
+        <select id="editRelief">
+          <option value="">--</option><option>Yes</option><option>No</option>
+        </select>
+
+        <label>AICS</label>
+        <input type="text" id="editAICS">
+
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="saveEdit()">Save</button>
+        <button type="button" class="btn danger" onclick="closeEditModal()">Cancel</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<script src="records.js"></script>
+</body>
+</html>

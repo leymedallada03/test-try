@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MDRRMO Charts — Alitagtag</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    /* small additions for charts page */
+    .charts-container{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:18px;
+      margin-top:12px;
+    }
+    .chart-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.86));
+      border-radius:12px;
+      padding:12px;
+      box-shadow:0 8px 24px rgba(6,30,20,0.06);
+    }
+    .chart-card h4{ margin:4px 0 10px 0; font-size:15px; color:var(--green-1) }
+    /* floating menu */
+    .floating-menu{
+      position: fixed;
+      right: 18px;
+      top: 120px;
+      width: 210px;
+      background: rgba(255,255,255,0.98);
+      border-radius: 12px;
+      padding:10px;
+      box-shadow: 0 10px 30px rgba(6,30,20,0.12);
+      z-index: 9999;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .floating-menu h5{ margin:0 0 6px 0; font-size:14px; color:var(--green-1) }
+    .floating-menu .btn{ width:100%; padding:8px; font-weight:700; border-radius:8px; cursor:pointer }
+    .floating-menu .small-desc{ font-size:12px; color:var(--muted) }
+    @media(max-width:980px){
+      .charts-container{ grid-template-columns:1fr; }
+      .floating-menu{ right:10px; top:auto; bottom:16px; width:92%; left:4%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
+        <div><div class="title">PUROK KALIGTASAN/div><div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div></div>
+      </div>
+      <div class="user-info">
+        <span id="userName"></span>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <ul>
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="dataForm.html">📝 Data Entry</a></li>
+        <li><a href="records.html">📁 Records</a></li>
+        <li><a href="charts.html" class="active">📈 Charts</a></li>
+        <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+      </ul>
+    </aside>
+
+    <main class="content-area">
+      <h2>📈 Visualizations</h2>
+      <div class="small muted">Hover to interact. Use floating menu to export/print.</div>
+
+      <div class="charts-container" id="chartsContainer">
+        <div class="chart-card">
+          <h4>1. Evacuees per Barangay</h4>
+          <canvas id="chartBarangay" height="200"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h4>2. Stage Distribution</h4>
+          <canvas id="chartStage" height="200"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h4>3. Persons With Disability (PWD)</h4>
+          <canvas id="chartPWD" height="200"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h4>4. Status Distribution</h4>
+          <canvas id="chartStatus" height="200"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h4>5. Transportation Distribution</h4>
+          <canvas id="chartTransport" height="200"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h4>6. Age Group Distribution</h4>
+          <canvas id="chartAgeGroup" height="200"></canvas>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Floating right-side export menu (Option B) -->
+  <div class="floating-menu" aria-hidden="false">
+    <h5>Export & Print</h5>
+    <button id="btnPrint" class="btn">Print Charts</button>
+    <button id="btnExportPDF" class="btn">Export All → PDF</button>
+    <button id="btnExportPNGs" class="btn">Export All → PNG (ZIP)</button>
+    <div class="small-desc">Pro tip: use PDF for sharing; PNG ZIP for individual images.</div>
+  </div>
+
+  <!-- include the uploaded file (developer note) -->
+  <script src="/mnt/data/users.js"></script>
+
+  <!-- libs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver/2.0.5/FileSaver.min.js"></script>
+
+  <script src="charts.js"></script>
+</body>
+</html>

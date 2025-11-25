@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Users — MDRRMO</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    /* small tweaks for user management layout */
+    .users-grid { display: grid; grid-template-columns: 1fr; gap:16px; align-items:start; }
+    /* For larger screens we will show sidebar-like left controls + right content */
+    @media(min-width:980px){
+      .users-grid { grid-template-columns: 360px 1fr; }
+    }
+    .form-grid.users { display:grid; grid-template-columns:1fr; gap:8px; }
+    .users-table-wrap { overflow-x:auto; }
+    .small-input { padding:10px;border-radius:8px;border:1px solid rgba(6,30,20,0.06); width:100%; }
+    .muted { color: #6b7a70; font-size:13px }
+    .modal-box .form-grid { grid-template-columns: 1fr; }
+    .btn.small { padding:6px 8px; font-size:13px; border-radius:8px; }
+    .danger.small { background: #d9534f; }
+    .actions-cell button { margin-right:6px; }
+
+    /* Panel drawer styles reuse the same class names as member panel */
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: 0;
+      transition: opacity 220ms ease;
+      z-index: 999;
+      display: none;
+    }
+    .panel-overlay.show { display: block; opacity: 1; }
+
+    .drawer-panel {
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100vh;
+      width: 420px;
+      max-width: 94%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
+      box-shadow: -18px 0 40px rgba(6,30,20,0.18);
+      transform: translateX(100%);
+      transition: transform 260ms cubic-bezier(.2,.9,.3,1);
+      z-index: 1000;
+      padding: 14px;
+      overflow:auto;
+    }
+    .drawer-panel.show { transform: translateX(0%); }
+
+    .panel-header {
+      display:flex;align-items:center;gap:10px;margin-bottom:12px;
+    }
+    .panel-header h3 { margin:0; font-size:16px; flex:1; text-align:center; }
+    .panel-body { padding-bottom:16px; }
+    .panel-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+    .drawer-close-btn { background:transparent; border:0; cursor:pointer; font-weight:700; padding:8px; border-radius:8px; }
+    .drawer-back-btn { background:transparent; border:0; cursor:pointer; font-weight:700; padding:8px; border-radius:8px; }
+
+    /* small helper for action column */
+    .actions-cell { white-space:nowrap; display:flex; gap:6px; align-items:center; }
+    /* LOG MODAL FIX */
+#logsModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+#logsModal .modal-box {
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  max-height: 80vh;
+  max-width: 90vw;
+  width: auto;             /* fit content */
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  overflow: hidden;        /* remove bottom scrollbar */
+}
+
+#logsModal table {
+  border-collapse: collapse;
+  width: auto;
+  max-width: 100%;
+}
+
+#logsModal th,
+#logsModal td {
+  white-space: nowrap;     /* shrink width to content */
+  padding: 6px 10px;
+}
+
+#logsModal .table-wrapper {
+  max-height: 60vh;
+  overflow-y: auto;         /* only vertical scroll */
+  overflow-x: hidden;       /* remove horizontal scroll */
+}
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
+        <div>
+          <div class="title">User Management</div>
+          <div class="subtitle">Admin panel</div>
+        </div>
+      </div>
+      <div class="user-info">
+        <span id="userName"></span>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar">
+      <ul>
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="dataForm.html">📝 Data Entry</a></li>
+        <li><a href="records.html">📁 Records</a></li>
+        <li><a href="charts.html">📈 Charts</a></li>
+        <li class="active"><a href="users.html">👥 User Management</a></li>
+      </ul>
+    </aside>
+
+    <main class="content-area">
+      <h2>👥 Users (Admin)</h2>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div class="small muted">Create / Manage system users</div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input id="filterUser" class="small-input" placeholder="Filter username / full name..." style="width:280px"/>
+          <button id="viewLogsBtn" class="btn">View Logs</button>
+          <button id="openAddUser" class="btn">Add User</button>
+        </div>
+      </div>
+
+      <div class="users-grid">
+        <!-- left drawer area (Create user form is a drawer; keep an empty placeholder for layout parity) -->
+        <div>
+          <div class="card" style="height:100%;">
+            <h3>Quick Info</h3>
+            <div class="small muted">Use the button <strong>Add User</strong> to open the slide-in drawer. Click a row's <strong>Edit</strong> to modify a user.</div>
+          </div>
+        </div>
+
+        <!-- users table -->
+        <div>
+          <div class="card">
+            <h3>Existing Users</h3>
+            <div class="users-table-wrap" style="margin-top:10px">
+              <table id="usersTable" class="records-table" style="min-width:700px">
+                <thead>
+                  <tr><th>Username</th><th>Full name</th><th>Role</th><th>Barangay</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="usersBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add / Edit User Drawer overlay + panel (same pattern as Member panel) -->
+  <div id="userPanelOverlay" class="panel-overlay" aria-hidden="true"></div>
+
+  <aside id="userDrawer" class="drawer-panel" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="panel-header">
+      <button id="drawerBack" class="drawer-back-btn btn secondary" title="Close">←</button>
+      <h3 id="drawerTitle">Add New User</h3>
+    </div>
+
+    <div class="panel-body">
+      <form id="userForm" onsubmit="return false;">
+        <div class="form-grid users" style="margin-top:6px;">
+          <div>
+            <label>Username <span class="small">*</span></label>
+            <input id="user_username" class="small-input" required />
+          </div>
+
+          <div>
+            <label>Full name</label>
+            <input id="user_fullname" class="small-input" />
+          </div>
+
+          <div>
+            <label>Role</label>
+            <select id="user_role" class="small-input">
+              <option>Staff</option>
+              <option>Admin</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Assigned Barangay</label>
+            <select id="user_barangay" class="small-input">
+              <option value="">ALL</option>
+              <option>Balagbag</option><option>Concepcion</option><option>Concordia</option><option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option><option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option><option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option><option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option><option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+            </select>
+          </div>
+
+          <div>
+            <label id="passwordLabel">Password</label>
+            <input id="user_password" class="small-input" type="password" placeholder="Password (plaintext)"/>
+          </div>
+
+          <div style="grid-column:1/-1; display:flex; gap:8px; justify-content:flex-end;">
+            <div id="userFormStatus" class="muted" style="align-self:center"></div>
+            <div style="flex:0 0 auto;">
+              <button id="cancelUserDrawer" class="btn secondary" type="button">Cancel</button>
+              <button id="saveUserBtn" class="btn" type="button">Create</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Logs Modal -->
+  <div id="logsModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <h3>Audit Logs</h3>
+      <div style="max-height:60vh;overflow:auto;margin-top:10px">
+        <table class="records-table" id="logsTable">
+          <thead><tr><th>Timestamp</th><th>Action</th><th>Actor</th><th>Target</th><th>TargetID</th><th>Details</th></tr></thead>
+          <tbody id="logsBody"></tbody>
+        </table>
+      </div>
+      <div style="text-align:right;margin-top:10px">
+        <button id="closeLogs" class="btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script src="users.js"></script>
+</body>
+</html>

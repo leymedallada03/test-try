@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dashboard — MDRRMO Alitagtag</title>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div class="page-container">
+
+  <header class="topbar">
+    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
+
+    <div class="brand">
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+      <div>
+        <div class="title">PUROK KALIGTASAN</div>
+        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+      </div>
+    </div>
+
+    <div class="user-info">
+      <span id="userName"></span>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <ul>
+      <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
+      <li><a href="dataForm.html">📝 Data Entry</a></li>
+      <li><a href="records.html">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+    </ul>
+  </aside>
+
+  <main class="content-area" tabindex="-1">
+    <h2>📊 Dashboard Overview</h2>
+
+    <div class="dashboard-cards">
+      <div class="card">
+        <h3>Total Records</h3>
+        <div id="totalRecords" class="card-value">0</div>
+      </div>
+      <div class="card">
++        <h3>Assigned Barangay</h3>
+        <div id="assignedBarangay" class="card-value">---</div>
+      </div>
+      <div class="card">
+        <h3>Last Updated</h3>
+        <div id="lastUpdated" class="card-value">---</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Barangay Distribution</h3>
+      <canvas id="barangayChart" height="120"></canvas>
+    </div>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
+<script>
+/* Page-specific JS */
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!localStorage.getItem("loggedIn")) return window.location.href = "login.html";
+  document.getElementById("assignedBarangay").innerText = localStorage.getItem("assignedBarangay") || '---';
+
+  try {
+    const data = await apiGet({ action: "list" });
+    document.getElementById("totalRecords").innerText = data.length || 0;
+    document.getElementById("lastUpdated").innerText = new Date().toLocaleString();
+
+    // build counts
+    const counts = {};
+    data.forEach(r => { const k = r.Barangay || "Unknown"; counts[k] = (counts[k]||0) + 1; });
+
+    const ctx = document.getElementById("barangayChart").getContext("2d");
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: Object.keys(counts), datasets: [{ label:'Entries', data: Object.values(counts), backgroundColor: '#34b78f' }]},
+      options:{responsive:true}
+    });
+
+  } catch(e){ console.error(e); }
+});
+</script>
+</body>
+</html>
