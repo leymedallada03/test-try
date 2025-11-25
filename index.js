@@ -1,4 +1,4 @@
-/* index.js — FINAL WORKING */
+/* index.js — FIXED FOR GITHUB PAGES (NO CORS ERROR) */
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxtGp2_XKsa31pbZxyKcwHUoq5q_tQlLE6ko9CNK9vlHATFyeIgfJtDzDQxTCN-Sgc7zQ/exec";
 
@@ -34,14 +34,14 @@ async function handleLogin(e) {
     const pwHash = await sha256(password);
 
     try {
+        const form = new FormData();
+        form.append("action", "login");
+        form.append("username", username);
+        form.append("pwHash", pwHash);
+
         const res = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "login",
-                username: username,
-                pwHash: pwHash
-            })
+            body: form   // IMPORTANT: No headers → avoids CORS preflight
         });
 
         const data = await res.json();
