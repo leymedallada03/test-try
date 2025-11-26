@@ -6,7 +6,7 @@
  ******************************************************/
 
 // ===== DYNAMIC API URL (NO MORE HARD-CODED URL) =====
-const API_URL = "https://script.google.com/macros/s/AKfycbw3VCRKGGuCJSZkRPZ0jeWg1A8_66NEIcVh4hSglMuyZv2WAIeZeXMlK75zucZRCbf-Vg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxjeV8tRepnPhKYG7ZfO5O6kkO7r2nUXc23zDgUonHBFvm0K29NGzcUI5qdzOBfbQRclA/exec";
 
 // =====================================================
 
@@ -278,6 +278,7 @@ async function exportAllPNGsZip() {
     alert("ZIP export failed: " + err.message);
   }
 }
+
 
 
 
