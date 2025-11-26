@@ -10,7 +10,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxlnzYAxWm55cAbSRI8D0Pm
 // Guard: ensure logged in
 function ensureLoginOrRedirect() {
   if (!localStorage.getItem("loggedIn")) {
-    window.location.href = "login.html";
+    window.location.href = "index.html";
     return false;
   }
   return true;
@@ -102,5 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 
 
