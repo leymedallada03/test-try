@@ -26,7 +26,7 @@ async function handleLogin(event) {
 
     const msg = document.getElementById("statusText");
     msg.innerText = "Please wait… validating account…";
-    msg.style.color = "orange";
+    msg.style.color = "green";
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
@@ -92,6 +92,7 @@ async function handleLogin(event) {
         msg.style.color = "red";
     }
 }
+
 
 
 
