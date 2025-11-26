@@ -1,4 +1,4 @@
-/* index.js — FIXED FOR GITHUB PAGES (NO CORS ERROR) */
+/* index.js — FINAL WORKING VERSION FOR GITHUB PAGES + APPS SCRIPT */
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxlnzYAxWm55cAbSRI8D0PmMlIbS8lqSLRNB8Sb3iuY8FDQgehDnfck9doEco-lc6zV/exec";
 
@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (form) form.addEventListener("submit", handleLogin);
 });
 
+// --------------------------
+// SHA-256 Hash Function
+// --------------------------
 async function sha256(str) {
     const utf8 = new TextEncoder().encode(str);
     const hashBuffer = await crypto.subtle.digest("SHA-256", utf8);
@@ -15,8 +18,11 @@ async function sha256(str) {
         .join("");
 }
 
-async function handleLogin(e) {
-    e.preventDefault();
+// --------------------------
+// LOGIN HANDLER
+// --------------------------
+async function handleLogin(event) {
+    event.preventDefault();
 
     const msg = document.getElementById("statusText");
     msg.innerText = "Please wait… validating account…";
@@ -34,17 +40,28 @@ async function handleLogin(e) {
     const pwHash = await sha256(password);
 
     try {
-        const form = new FormData();
-        form.append("action", "login");
-        form.append("username", username);
-        form.append("pwHash", pwHash);
+        const formData = new FormData();
+        formData.append("action", "login");
+        formData.append("username", username);
+        formData.append("pwHash", pwHash);
 
-        const res = await fetch(API_URL, {
+        const response = await fetch(API_URL, {
             method: "POST",
-            body: form   // IMPORTANT: No headers → avoids CORS preflight
+            body: formData   // ✔ NO HEADERS → NO CORS ERROR
         });
 
-        const data = await res.json();
+        // If Apps Script returns HTML instead of JSON (error case)
+        const text = await response.text();
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error("Non-JSON response:", text);
+            msg.innerText = "Server error. Contact administrator.";
+            msg.style.color = "red";
+            return;
+        }
 
         if (!data.success) {
             msg.innerText = "Login failed: " + data.message;
@@ -52,6 +69,9 @@ async function handleLogin(e) {
             return;
         }
 
+        // -------------------------------
+        // LOGIN SUCCESS — SAVE SESSION
+        // -------------------------------
         msg.innerText = "Login successful!";
         msg.style.color = "green";
 
@@ -67,10 +87,8 @@ async function handleLogin(e) {
         }, 800);
 
     } catch (err) {
-        console.error(err);
+        console.error("FETCH ERROR:", err);
         msg.innerText = "Connection error. Please contact administrator.";
         msg.style.color = "red";
     }
 }
-
-
