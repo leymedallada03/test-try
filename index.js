@@ -1,6 +1,6 @@
 /* index.js — FINAL WORKING VERSION FOR GITHUB PAGES + APPS SCRIPT */
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwsa7Yagh_YHQHVUz7EGSNHOaJ5erLtk-CRLCRuGxRVRz0WSfn0o_dQm2Dw5UOTlzZ7CA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbw3VCRKGGuCJSZkRPZ0jeWg1A8_66NEIcVh4hSglMuyZv2WAIeZeXMlK75zucZRCbf-Vg/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("loginForm");
@@ -92,6 +92,7 @@ async function handleLogin(event) {
         msg.style.color = "red";
     }
 }
+
 
 
 
