@@ -83,7 +83,7 @@ async function handleLogin(event) {
         localStorage.setItem("pwHash", pwHash);
 
         setTimeout(() => {
-            window.location.href = "dashboard.html";
+            window.location.href = "main.html";
         }, 800);
 
     } catch (err) {
@@ -92,4 +92,5 @@ async function handleLogin(event) {
         msg.style.color = "red";
     }
 }
+
 
