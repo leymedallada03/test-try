@@ -3,7 +3,7 @@
 /* =====================================
    DYNAMIC API URL (NO HARDCODED LINKS)
    ===================================== */
-const API_URL = "https://script.google.com/macros/s/AKfycbxlnzYAxWm55cAbSRI8D0PmMlIbS8lqSLRNB8Sb3iuY8FDQgehDnfck9doEco-lc6zV/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwvsnkQecbpRN2IsWr-MhZoM0Jl8tRubM7t1X8hT7oUjHPPXOZ4UwPntqnrkflWMOscmA/exec";
 
 /* ===================================== */
 
@@ -377,4 +377,5 @@ async function sha256Hex(message){
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
 }
+
 
