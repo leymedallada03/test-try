@@ -4,7 +4,7 @@
    ============================== */
 
 // ======== CONFIG ========
-const API_URL = "https://script.google.com/macros/s/AKfycbxtGp2_XKsa31pbZxyKcwHUoq5q_tQlLE6ko9CNK9vlHATFyeIgfJtDzDQxTCN-Sgc7zQ/exec"; // replace after deployment
+const API_URL = "https://script.google.com/macros/s/AKfycbzGn1DckOjNnCRBGnAjoXRJ_VkfRv8xZnbQQ_I5FdOB1sYHJJKLknbITY6XdFZIug9CEA/exec"; // replace after deployment
 
 // ======== SESSION HANDLING ========
 function saveSession(user) {
@@ -93,3 +93,4 @@ async function submitDataForm(formData) {
 
     alert("Data saved successfully.");
 }
+
