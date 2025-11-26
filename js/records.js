@@ -8,14 +8,14 @@ let EDIT_TARGET = null;   // the row object currently being edited
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!localStorage.getItem("loggedIn")) {
-    window.location.href = "login.html";
+    window.location.href = "index.html";
     return;
   }
 
   document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
 
   const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) logoutBtn.addEventListener("click", () => { localStorage.clear(); location.href = "login.html"; });
+  if (logoutBtn) logoutBtn.addEventListener("click", () => { localStorage.clear(); location.href = "index.html"; });
 
   const search = document.getElementById("searchInput");
   if (search) search.addEventListener("input", (e) => filterTable(e.target.value.trim().toLowerCase()));
@@ -518,3 +518,4 @@ function deriveStageFromAge(ageObj) {
   if (ageObj.years >= 60) return "Elderly";
   return "Adult";
 }
+
