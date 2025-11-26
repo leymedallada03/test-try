@@ -1,6 +1,6 @@
 /* index.js — FIXED FOR GITHUB PAGES (NO CORS ERROR) */
 
-const API_URL = "https://script.google.com/macros/s/AKfycbznS5fEmL0qa-UOeMf4W5KWS8RJNH2VrPlN1b4IJfi25pTGHcjgYZ2wrbsbml_bqDxFOQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxlnzYAxWm55cAbSRI8D0PmMlIbS8lqSLRNB8Sb3iuY8FDQgehDnfck9doEco-lc6zV/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("loginForm");
@@ -72,4 +72,5 @@ async function handleLogin(e) {
         msg.style.color = "red";
     }
 }
+
 
