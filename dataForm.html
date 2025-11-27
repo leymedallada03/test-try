@@ -440,15 +440,7 @@
 </div>
 
 <script>
-/* dataForm - head-first → member slide-panel workflow
-   Fixes applied:
-   - Guarded/removed reference to missing head_stage_select element (no JS crash)
-   - Member collection stores by index (so Back edits previous entries)
-   - onMemberNext writes to collectedMembers[currentMemberIndex] and increments index
-   - onMemberBack loads collectedMembers[currentMemberIndex - 1] for editing
-   - Event listeners are only attached if elements exist
-   - Added 'input' listener for memberCount so preview updates in realtime
-*/
+
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxGJsOvQK_FQFyU39DVGjx6m9z6j4pt7mgRpNWsixjDL7D2QZ9v-5u3U6GYEiHHsAgqiA/exec";
 
@@ -722,3 +714,4 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
