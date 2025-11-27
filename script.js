@@ -66,7 +66,7 @@ async function loginUser() {
 
     if (result.status === "success") {
         saveSession(result.user);
-        window.location.href = "index.html";
+        window.location.href = "dashboard.html";
     } else {
         alert("Invalid login");
     }
@@ -93,6 +93,7 @@ async function submitDataForm(formData) {
 
     alert("Data saved successfully.");
 }
+
 
 
 
