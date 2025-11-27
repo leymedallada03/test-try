@@ -520,34 +520,70 @@ function updateMemberPreview() {
 }
 
 /* -------- MEMBER FORM: COLLECT DATA -------- */
-function collectMemberData() {
-    return {
-        "Name": document.getElementById("memberName").value.trim(),
-        "Sex": document.querySelector("input[name='member_sex']:checked")?.value || "",
-        "Birthdate": document.getElementById("memberBirthdate").value || "",
-        "Age": document.getElementById("memberAge").value || "",
-        "PWD": document.querySelector("input[name='member_pwd']:checked")?.value || "No",
-        "Stage": document.getElementById("memberStage").value || "",
-        "Status": document.getElementById("memberStatus").value || "",
-        "Transportation": document.getElementById("memberTransport").value || "",
-        "PickUp": document.getElementById("memberPickup").value || "",
-        "DropOff": document.getElementById("memberDropoff").value || "",
-        "CampName": document.getElementById("memberCamp").value || "",
-        "Capacity": document.getElementById("memberCampCap").value || "",
-        "InsideCamp": document.getElementById("memberInside").value || "",
-        "OutsideCamp": document.getElementById("memberOutside").value || "",
-        "Reason": document.getElementById("memberReason").value || "",
-        "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
-        "Local4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
-        "National4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
-        "LocalSocialPension": document.getElementById("member_locsp").checked ? "Yes" : "No",
-        "NationalSocialPension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
-        "SoloParent": document.getElementById("member_solo").checked ? "Yes" : "No",
-        "CashSubsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
-        "ReliefGoods": document.getElementById("member_relief").checked ? "Yes" : "No"
-    };
-}
+async function submitHeadAndMembers() {
 
+    // HEAD (Household Head)
+    const head = {
+        "Barangay": document.getElementById("barangay").value,
+        "Sitio / Purok": document.getElementById("sitio").value,
+        "Name of Household Head": document.getElementById("householdHead").value,
+        "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
+        "Birthdate": document.getElementById("householdBirthdate").value,
+        "Age": document.getElementById("householdAge").value,
+        "Stage": document.getElementById("householdStage").value,
+        "No. of Household Member/s": document.getElementById("memberCount").value,
+        "Reasons for Displacement": document.getElementById("reasons").value || "",
+        "Transportation": document.getElementById("head_transport").value || "",
+        "Drop-Off Point": document.getElementById("dropoff").value || "",
+        "Designated Pick-Up Point": document.getElementById("pickup").value || "",
+        "Status": document.getElementById("head_status").value || "",
+        "Name of Camp": document.getElementById("campName").value || "",
+        "Capacity": document.getElementById("capacity").value || "",
+        "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
+        "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
+        "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
+        "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
+        "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
+        "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
+        "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
+        "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
+        "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
+        "AICS": document.getElementById("ass_aics").value || ""
+    };
+
+    // MEMBERS (Slide panel members)
+    const members = collectedMembers;
+
+    // JSON Payload
+    const payload = {
+        action: "createRecord",
+        head: head,
+        members: members,
+        submittedBy: localStorage.getItem("staffName")
+    };
+
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        const data = JSON.parse(text);
+
+        if (data.success) {
+            alert("Record saved successfully!");
+            window.location.href = "records.html";
+        } else {
+            alert("Save failed: " + data.message);
+            console.error(data);
+        }
+
+    } catch (err) {
+        alert("Network error — please try again");
+        console.error(err);
+    }
+}
 /* -------- MEMBER NEXT BUTTON -------- */
 function onMemberNext() {
     const name = document.getElementById("memberName").value.trim();
@@ -686,6 +722,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
