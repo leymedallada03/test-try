@@ -442,7 +442,7 @@
 <script>
 
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxGJsOvQK_FQFyU39DVGjx6m9z6j4pt7mgRpNWsixjDL7D2QZ9v-5u3U6GYEiHHsAgqiA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwoeKPJG-P7ytS_3mtdP0UUlHJFF5AxQPUeHw5uf2_Q3MSaPX6nwrVHUbZv-7Jwo-S8Jw/exec";
 
 /* -------- LOGIN CHECK -------- */
 function ensureLoginOrRedirect() {
@@ -510,7 +510,29 @@ function updateMemberPreview() {
         list.appendChild(li);
     }
 }
+function collectMemberData() {
+    const name = document.getElementById("memberName").value.trim();
+    const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
+    const birthdate = document.getElementById("memberBirthdate").value;
+    const age = computeAge(birthdate);
+    const stage = getStageFromAge(age);
+    const pwd = document.getElementById("memberPWD").checked ? "Yes" : "No";
 
+    return {
+        "Name of Household Member/s": name,
+        "Sex": sex,
+        "Birthdate": birthdate,
+        "Age": age,
+        "Stage": stage,
+        "Persons with Disability (PWD)": pwd,
+        // These columns match your master sheet
+        "Status": "",
+        "Transportation": "",
+        "Drop-Off Point": "",
+        "Designated Pick-Up Point": "",
+        "Reasons for Displacement": ""
+    };
+}
 /* -------- MEMBER FORM: COLLECT DATA -------- */
 async function submitHeadAndMembers() {
 
@@ -561,10 +583,13 @@ async function submitHeadAndMembers() {
     console.log("PAYLOAD:", payload);
 
     try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
+const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+});
 
         const text = await res.text();
         const data = JSON.parse(text);
@@ -613,69 +638,6 @@ function loadMemberForm(i) {
     document.getElementById("memberName").focus();
 }
 
-/* -------------------------
-   FINAL SUBMISSION (HEAD + MEMBERS)
--------------------------- */
-async function submitHeadAndMembers() {
-
-    const record = {
-        "Barangay": document.getElementById("barangay").value,
-        "Sitio / Purok": document.getElementById("sitio").value,
-        "Name of Household Head": document.getElementById("householdHead").value,
-        "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-        "Birthdate": document.getElementById("householdBirthdate").value,
-        "Age": document.getElementById("householdAge").value,
-        "Stage": document.getElementById("householdStage").value,
-        "No. of Household Member/s": document.getElementById("memberCount").value,
-        "Members": collectedMembers,
-        "Reasons for Displacement": document.getElementById("reasons").value || "",
-        "Transportation": document.getElementById("head_transport").value || "",
-        "Drop-Off Point": document.getElementById("dropoff").value || "",
-        "Designated Pick-Up Point": document.getElementById("pickup").value || "",
-        "Status": document.getElementById("head_status").value || "",
-        "Name of Camp": document.getElementById("campName").value || "",
-        "Capacity": document.getElementById("capacity").value || "",
-        "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
-        "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
-        "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
-        "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
-        "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
-        "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
-        "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
-        "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
-        "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
-        "AICS": document.getElementById("ass_aics").value || ""
-    };
-
-    let fd = new FormData();
-    fd.append("action", "createRecord");
-    fd.append("username", localStorage.getItem("username"));
-    fd.append("pwHash", localStorage.getItem("pwHash"));
-    fd.append("record", JSON.stringify(record));   // IMPORTANT
-
-    try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            body: fd
-        });
-
-        const text = await res.text();
-        const data = JSON.parse(text);
-
-        if (data.success) {
-            alert("Record saved successfully!");
-            window.location.href = "records.html";
-        } else {
-            alert("Save failed: " + data.message);
-            console.error(data);
-        }
-
-    } catch (err) {
-        alert("Network error — please try again");
-        console.error(err);
-    }
-}
-
 /* ------------------- INIT ------------------- */
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -721,6 +683,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
