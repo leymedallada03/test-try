@@ -2,365 +2,206 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Records — MDRRMO Alitagtag</title>
-<link rel="stylesheet" href="styles.css"/>
-<style>
-  /* Minimal page styles for cards and modal */
-  body { font-family: system-ui, Arial; margin: 18px; background:#f6faf6; color:#073 */
-  }
-  .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-  .card { background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(6,30,20,0.04); margin-bottom:12px; }
-  .card h3 { margin:0 0 8px 0; font-size:16px; }
-  .meta { font-size:13px; color:#555; margin-bottom:8px; }
-  .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-weight:700 }
-  .btn.primary { background:#0f7a4a; color:#fff }
-  .btn.ghost { background:transparent; color:#0f7a4a; border:1px solid rgba(15,122,74,0.12) }
-  .members { margin-top:8px; border-top:1px dashed #e6efe6; padding-top:8px; }
-  .member-row { padding:8px 0; display:flex; justify-content:space-between; gap:8px; align-items:center; border-bottom:1px solid #f0f6f0; }
-  .muted { color:#666; font-size:13px; }
-  .controls { display:flex; gap:8px; }
+<link rel="stylesheet" href="styles.css" />
 
-  /* modal */
-  .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9999; }
-  .modal.open { display:flex; background:rgba(0,0,0,0.35); }
-  .modal .box { background:#fff; padding:18px; border-radius:10px; width:720px; max-width:96%; max-height:90vh; overflow:auto; }
-  label { display:block; margin:8px 0 4px; font-weight:700; font-size:13px }
-  input, select, textarea { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #d8e6db; }
-  .rowgrid { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; }
+<style>
+  body { background:#f8f9fa; }
+  .records-container { max-width: 1400px; margin: auto; padding: 20px; }
+  table { width:100%; border-collapse: collapse; margin-top:15px; }
+  th, td { padding:8px; border:1px solid #ddd; font-size:14px; }
+  th { background:#004aad; color:white; position:sticky; top:0; z-index:10; }
+  tr:nth-child(even) { background:#f2f2f2; }
+
+  .actions-btn {
+    padding:4px 10px;
+    margin:1px;
+    border:none;
+    cursor:pointer;
+    border-radius:4px;
+    font-size:12px;
+  }
+  .edit-btn { background:#ffc107; color:black; }
+  .delete-btn { background:#dc3545; color:white; }
+  .view-btn { background:#0d6efd; color:white; }
+
+  #loading {
+    background:#0008;
+    color:white;
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    z-index:9999;
+    display:none;
+  }
+
+  .filter-bar {
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  select, input[type=text] {
+    padding:7px;
+    font-size:14px;
+  }
 </style>
+
 </head>
 <body>
-  <div class="top">
-    <h1>Records</h1>
-    <div>
-      <button id="refreshBtn" class="btn ghost">Refresh</button>
-      <button id="newRecordBtn" class="btn primary" onclick="location.href='dataForm.html'">New Entry</button>
-    </div>
+
+<div id="loading">Loading records...</div>
+
+<div class="records-container">
+  <h2>Household Records</h2>
+
+  <div class="filter-bar">
+    <select id="filterBarangay">
+      <option value="">All Barangays</option>
+      <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+      <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+      <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+      <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+      <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+      <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+    </select>
+
+    <select id="filterStage">
+      <option value="">All Stages</option>
+      <option>Child</option>
+      <option>Teen</option>
+      <option>Adult</option>
+      <option>Senior</option>
+    </select>
+
+    <input id="searchBox" type="text" placeholder="Search...">
+
+    <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
   </div>
 
-  <div id="listArea"></div>
-
-  <!-- Edit modal -->
-  <div id="editModal" class="modal" aria-hidden="true">
-    <div class="box">
-      <h3 id="editTitle">Edit Row</h3>
-      <form id="editForm" onsubmit="return false;">
-        <input type="hidden" id="editRowNumber" />
-        <div class="rowgrid">
-          <div>
-            <label>Barangay</label>
-            <input id="editBarangay" />
-          </div>
-          <div>
-            <label>Sitio / Purok</label>
-            <input id="editSitio" />
-          </div>
-          <div>
-            <label>Name of Household Head</label>
-            <input id="editHH" />
-          </div>
-          <div>
-            <label>Name of Household Member/s</label>
-            <input id="editMemberName" />
-          </div>
-          <div>
-            <label>Sex</label>
-            <select id="editSex"><option>Male</option><option>Female</option></select>
-          </div>
-          <div>
-            <label>Birthdate</label>
-            <input id="editBirthdate" type="date"/>
-          </div>
-          <div>
-            <label>Age</label>
-            <input id="editAge" type="number"/>
-          </div>
-          <div>
-            <label>Stage</label>
-            <input id="editStage"/>
-          </div>
-          <div>
-            <label>Persons with Disability (PWD)</label>
-            <select id="editPWD"><option value="">(blank)</option><option>Yes</option><option>No</option></select>
-          </div>
-          <div>
-            <label>Status</label>
-            <input id="editStatus" />
-          </div>
-
-          <!-- Assistance & transport -->
-          <div>
-            <label>Transportation</label>
-            <input id="editTransport" />
-          </div>
-          <div>
-            <label>Designated Pick-Up Point</label>
-            <input id="editPickup" />
-          </div>
-
-          <div>
-            <label>Drop-Off Point</label>
-            <input id="editDropoff" />
-          </div>
-          <div>
-            <label>Name of Camp</label>
-            <input id="editCamp" />
-          </div>
-
-          <div>
-            <label>Capacity</label>
-            <input id="editCapacity" type="number"/>
-          </div>
-          <div>
-            <label>No. Inside Camp</label>
-            <input id="editInside" type="number"/>
-          </div>
-
-          <div>
-            <label>No. Outside Camp</label>
-            <input id="editOutside" type="number"/>
-          </div>
-
-          <div>
-            <label>TUPAD</label>
-            <select id="editTupad"><option value="">(blank)</option><option>Yes</option><option>No</option></select>
-          </div>
-          <div>
-            <label>Cash Subsidy</label>
-            <select id="editCash"><option value="">(blank)</option><option>Yes</option><option>No</option></select>
-          </div>
-
-          <div style="grid-column:1/-1">
-            <label>Relief Goods</label>
-            <select id="editRelief"><option value="">(blank)</option><option>Yes</option><option>No</option></select>
-          </div>
-
-          <div style="grid-column:1/-1">
-            <label>AICS</label>
-            <input id="editAICS" />
-          </div>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
-          <button id="cancelEdit" class="btn ghost">Cancel</button>
-          <button id="saveEdit" class="btn primary">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <table id="recordsTable">
+    <thead id="tableHead"></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; // replace with your /exec URL
+const scriptURL = "YOUR_WEB_APP_URL_HERE"; // MUST REPLACE
 
-// helpers
-function makeFormData(obj){
-  const f = new FormData();
-  for (let k in obj) f.append(k, obj[k]);
-  return f;
+window.onload = () => loadRecords();
+
+function showLoading(show) {
+  document.getElementById('loading').style.display = show ? "flex" : "none";
 }
 
-async function post(action, payload){
-  payload = payload || {};
-  payload.action = action;
+async function loadRecords() {
+  showLoading(true);
+  
+  const filterBarangay = document.getElementById("filterBarangay").value;
+  const filterStage = document.getElementById("filterStage").value;
+  const q = document.getElementById("searchBox").value;
+
+  const body = {
+    action: "getRecords",
+    filterBarangay,
+    filterStage,
+    q
+  };
+
   try {
-    const res = await fetch(API_URL, { method: "POST", body: makeFormData(payload) });
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch(e){ return { success:false, message:"Invalid server response", raw:text }; }
-  } catch(err){
-    return { success:false, message: err.toString() };
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    const raw = await res.text();
+    console.log("RAW:", raw);
+
+    const data = JSON.parse(raw);
+    if (!data.success) {
+      alert(data.message);
+      showLoading(false);
+      return;
+    }
+
+    renderTable(data.header, data.rows);
+    showLoading(false);
+
+  } catch (err) {
+    console.error(err);
+    alert("Error loading records");
+    showLoading(false);
   }
 }
 
-// render households
-async function loadHouseholds(){
-  const area = document.getElementById('listArea');
-  area.innerHTML = '<div class="muted">Loading…</div>';
-  const out = await post('listHouseholds', {});
-  if (!out.success) { area.innerHTML = `<div class="muted">Error: ${out.message}</div>`; return; }
+function renderTable(header, rows) {
+  const thead = document.getElementById("tableHead");
+  const tbody = document.getElementById("tableBody");
 
-  if (!out.households || out.households.length === 0) {
-    area.innerHTML = '<div class="muted">No records.</div>'; return;
-  }
+  thead.innerHTML = "";
+  tbody.innerHTML = "";
 
-  area.innerHTML = '';
+  // build table header
+  let h = "<tr>";
+  header.forEach(col => {
+    h += `<th>${col}</th>`;
+  });
+  h += `<th>Actions</th></tr>`;
+  thead.innerHTML = h;
 
-  out.households.forEach(h => {
-    const card = document.createElement('div');
-    card.className = 'card';
+  // build table rows
+  rows.forEach(r => {
+    let row = "<tr>";
+    header.forEach(col => {
+      row += `<td>${r[col] ?? ""}</td>`;
+    });
 
-    const hhName = h.head && h.head["Name of Household Head"] ? h.head["Name of Household Head"] : '(unknown head)';
-    const meta = `Data ID: ${h.dataID} • Barangay: ${h.head["Barangay"] || ''} • Sitio: ${h.head["Sitio / Purok"] || ''}`;
-
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <h3>${escapeHtml(hhName)}</h3>
-          <div class="meta">${escapeHtml(meta)}</div>
-        </div>
-        <div class="controls">
-          <button class="btn ghost btnExpand">Members (${h.members.length})</button>
-          <button class="btn ghost btnEditHead">Edit Head</button>
-          <button class="btn ghost btnDelete">Delete</button>
-        </div>
-      </div>
-      <div class="members" style="display:none"></div>
+    row += `
+      <td>
+        <button class="actions-btn edit-btn" onclick="editRecord('${r["Data ID"]}')">Edit</button>
+        <button class="actions-btn delete-btn" onclick="deleteRecord('${r["Data ID"]}')">Delete</button>
+      </td>
     `;
 
-    // attach actions
-    const btnExpand = card.querySelector('.btnExpand');
-    const membersDiv = card.querySelector('.members');
-    btnExpand.addEventListener('click', () => {
-      if (membersDiv.style.display === 'none' || membersDiv.style.display === '') {
-        // build member rows
-        membersDiv.innerHTML = '';
-        if (h.members.length === 0) {
-          membersDiv.innerHTML = '<div class="muted">No members recorded</div>';
-        } else {
-          h.members.forEach(m => {
-            const mdiv = document.createElement('div');
-            mdiv.className = 'member-row';
-            mdiv.innerHTML = `
-              <div>
-                <div><strong>${escapeHtml(m["Name of Household Member/s"]||'(no name)')}</strong></div>
-                <div class="muted">${escapeHtml(m["Stage"]||'')} • ${escapeHtml(m["Sex"]||'')}</div>
-                <div class="muted">Row: ${m.__rowNumber || 'n/a'}</div>
-              </div>
-              <div style="display:flex;gap:6px">
-                <button class="btn ghost btnEditMember">Edit</button>
-              </div>
-            `;
-            // edit member
-            mdiv.querySelector('.btnEditMember').addEventListener('click', () => {
-              openEditModal(m.__rowNumber, m);
-            });
-            membersDiv.appendChild(mdiv);
-          });
-        }
-        membersDiv.style.display = 'block';
-        btnExpand.innerText = 'Hide';
-      } else {
-        membersDiv.style.display = 'none';
-        btnExpand.innerText = `Members (${h.members.length})`;
-      }
-    });
-
-    // edit head
-    card.querySelector('.btnEditHead').addEventListener('click', () => {
-      // open edit modal with head row number
-      openEditModal(h.headRowNumber || null, h.head || {});
-    });
-
-    // delete household
-    card.querySelector('.btnDelete').addEventListener('click', async () => {
-      if (!confirm(`Delete household ${h.dataID}? This will remove head + members.`)) return;
-      const res = await post('deleteHousehold', { dataID: h.dataID });
-      if (!res.success) alert('Delete failed: ' + (res.message||''));
-      else { alert('Deleted.'); loadHouseholds(); }
-    });
-
-    area.appendChild(card);
+    row += "</tr>";
+    tbody.innerHTML += row;
   });
 }
 
-// escape helper
-function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-
-/* ---------- Edit modal logic ---------- */
-const editModal = document.getElementById('editModal');
-
-function openEditModal(rowNumber, rowObj){
-  document.getElementById('editRowNumber').value = rowNumber || '';
-  document.getElementById('editTitle').innerText = rowNumber ? `Edit row ${rowNumber}` : 'Edit (no row)';
-  // populate fields from rowObj (keys are header names)
-  document.getElementById('editBarangay').value = rowObj['Barangay'] || '';
-  document.getElementById('editSitio').value = rowObj['Sitio / Purok'] || '';
-  document.getElementById('editHH').value = rowObj['Name of Household Head'] || '';
-  document.getElementById('editMemberName').value = rowObj['Name of Household Member/s'] || '';
-  document.getElementById('editSex').value = rowObj['Sex'] || '';
-  // try normalizing date to yyyy-mm-dd (if value is Date, Apps Script returned serial; we'll keep raw)
-  if (rowObj['Birthdate']) {
-    // if it's a Date string from server it may be ISO — otherwise set as is
-    var b = rowObj['Birthdate'];
-    try {
-      var d = new Date(b);
-      if (!isNaN(d)) {
-        document.getElementById('editBirthdate').value = d.toISOString().slice(0,10);
-      } else {
-        document.getElementById('editBirthdate').value = b;
-      }
-    } catch(e){ document.getElementById('editBirthdate').value = b; }
-  } else document.getElementById('editBirthdate').value = '';
-
-  document.getElementById('editAge').value = rowObj['Age'] || '';
-  document.getElementById('editStage').value = rowObj['Stage'] || '';
-  document.getElementById('editPWD').value = rowObj['Persons with Disability (PWD)'] || '';
-  document.getElementById('editStatus').value = rowObj['Status'] || '';
-  document.getElementById('editTransport').value = rowObj['Transportation'] || '';
-  document.getElementById('editPickup').value = rowObj['Designated Pick-Up Point'] || '';
-  document.getElementById('editDropoff').value = rowObj['Drop-Off Point'] || '';
-  document.getElementById('editCamp').value = rowObj['Name of Camp'] || '';
-  document.getElementById('editCapacity').value = rowObj['Capacity'] || '';
-  document.getElementById('editInside').value = rowObj['No. of Individuals Inside Camp'] || '';
-  document.getElementById('editOutside').value = rowObj['No. of Individuals Outside Camp'] || '';
-  document.getElementById('editTupad').value = rowObj['TUPAD'] || '';
-  document.getElementById('editCash').value = rowObj['Cash Subsidy'] || '';
-  document.getElementById('editRelief').value = rowObj['Relief Goods'] || '';
-  document.getElementById('editAICS').value = rowObj['AICS'] || '';
-
-  editModal.classList.add('open');
+function editRecord(dataID) {
+  localStorage.setItem("edit_dataID", dataID);
+  window.location.href = "edit.html"; // your edit page
 }
 
-document.getElementById('cancelEdit').addEventListener('click', (ev) => {
-  ev.preventDefault();
-  editModal.classList.remove('open');
-});
+async function deleteRecord(dataID) {
+  if (!confirm("Delete entire household with Data ID " + dataID + "?")) return;
 
-document.getElementById('saveEdit').addEventListener('click', async (ev) => {
-  ev.preventDefault();
-  const rowNumber = Number(document.getElementById('editRowNumber').value);
-  if (!rowNumber) { alert('Missing row number'); return; }
+  const body = { action: "deleteHousehold", dataID };
 
-  const updates = {
-    "Barangay": document.getElementById('editBarangay').value,
-    "Sitio / Purok": document.getElementById('editSitio').value,
-    "Name of Household Head": document.getElementById('editHH').value,
-    "Name of Household Member/s": document.getElementById('editMemberName').value,
-    "Sex": document.getElementById('editSex').value,
-    "Birthdate": document.getElementById('editBirthdate').value,
-    "Age": document.getElementById('editAge').value,
-    "Stage": document.getElementById('editStage').value,
-    "Persons with Disability (PWD)": document.getElementById('editPWD').value,
-    "Status": document.getElementById('editStatus').value,
-    "Transportation": document.getElementById('editTransport').value,
-    "Designated Pick-Up Point": document.getElementById('editPickup').value,
-    "Drop-Off Point": document.getElementById('editDropoff').value,
-    "Name of Camp": document.getElementById('editCamp').value,
-    "Capacity": document.getElementById('editCapacity').value,
-    "No. of Individuals Inside Camp": document.getElementById('editInside').value,
-    "No. of Individuals Outside Camp": document.getElementById('editOutside').value,
-    "TUPAD": document.getElementById('editTupad').value,
-    "Cash Subsidy": document.getElementById('editCash').value,
-    "Relief Goods": document.getElementById('editRelief').value,
-    "AICS": document.getElementById('editAICS').value
-  };
+  try {
+    const res = await fetch(scriptURL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    });
 
-  const res = await post('updateRow', { rowNumber: rowNumber, updates: JSON.stringify(updates) });
-  if (!res.success) {
-    alert('Update failed: ' + (res.message||''));
-  } else {
-    alert('Saved.');
-    editModal.classList.remove('open');
-    loadHouseholds();
+    const raw = await res.text();
+    console.log("DELETE RAW:", raw);
+
+    const data = JSON.parse(raw);
+    alert(data.message);
+    loadRecords();
+
+  } catch (err) {
+    alert("Error deleting record");
   }
-});
-
-// refresh
-document.getElementById('refreshBtn').addEventListener('click', loadHouseholds);
-
-// initial load
-loadHouseholds();
+}
 </script>
+
 </body>
 </html>
