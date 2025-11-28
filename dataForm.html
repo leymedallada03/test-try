@@ -481,13 +481,22 @@ function collectMemberDataFromPanel(){
     };
 }
 
-/* when birthdate changes inside member panel, update age & stage fields live */
-document.addEventListener('input', (ev) => {
-    if (ev.target && ev.target.id === 'memberBirthdate') {
-        const age = computeAge(ev.target.value);
-        document.getElementById('memberAge').value = age || '';
-        document.getElementById('memberStage').value = getStageFromAge(age);
-    }
+/* ---------------- AGE & STAGE AUTO UPDATE ---------------- */
+
+// HEAD AUTO UPDATE (correct IDs)
+document.getElementById("householdBirthdate").addEventListener("input", () => {
+    const dob = document.getElementById("householdBirthdate").value;
+    const age = computeAge(dob) || "";
+    document.getElementById("householdAge").value = age;
+    document.getElementById("householdStage").value = getStageFromAge(age) || "";
+});
+
+// MEMBER AUTO UPDATE
+document.getElementById("memberBirthdate").addEventListener("input", () => {
+    const dob = document.getElementById("memberBirthdate").value;
+    const age = computeAge(dob) || "";
+    document.getElementById("memberAge").value = age;
+    document.getElementById("memberStage").value = getStageFromAge(age) || "";
 });
 
 /* -------- panel navigation -------- */
@@ -585,6 +594,7 @@ async function submitHeadAndMembers() {
         "Age": document.getElementById("householdAge").value || "",
         "Stage": document.getElementById("householdStage").value || "",
         "No. of Household Member/s": document.getElementById("memberCount").value || "0",
+        "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "",
         "Reasons for Displacement": document.getElementById("reasons").value || "",
         "Transportation": document.getElementById("head_transport").value || "",
         "Drop-Off Point": document.getElementById("dropoff").value || "",
@@ -684,4 +694,5 @@ async function submitHeadAndMembers() {
 </script>
 </body>
 </html>
+
 
