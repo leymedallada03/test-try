@@ -6,104 +6,29 @@
 <title>Data Entry — MDRRMO Alitagtag</title>
 <link rel="stylesheet" href="styles.css"/>
 <style>
-/* Slide-in member panel (Option C) */
-.member-panel {
-  position: fixed;
-  right: 0;
-  top: 0;
-  height: 100vh;
-  width: 420px;
-  max-width: 96%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98));
-  box-shadow: -18px 0 40px rgba(6,30,20,0.12);
-  transform: translateX(110%);
-  transition: transform 280ms cubic-bezier(.2,.9,.3,1);
-  z-index: 6000;
-  padding: 18px;
-  overflow-y: auto;
-}
+/* (KEEP your existing styles) */
+.member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width: 96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 280ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y: auto; }
 .member-panel.open { transform: translateX(0%); }
 .member-panel .panel-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
 .member-panel h3 { margin:0; font-size:18px; color:var(--green-1); }
-.member-panel .panel-body { margin-top:8px; }
-.member-panel .panel-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-
-.radio-line { display:flex; gap:18px; align-items:center; padding:6px 0; }
-.radio-item { display:flex; align-items:center; gap:6px; font-weight:700; font-size:14px; }
-
-.assist-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px 12px; margin-top:8px; }
-.assist-item { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; }
-
-.panel-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.32);
-  opacity: 0;
-  transition: opacity 200ms;
-  pointer-events: none;
-  z-index: 5900;
-}
+.panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 5900; }
 .panel-overlay.show { opacity: 1; pointer-events: auto; }
-
-@media(max-width:720px){
-  .member-panel { width: 100%; max-width: 100%; }
-}
-
-.member-preview { margin-top:8px; font-size:14px; }
-.member-preview li { margin-bottom:6px; }
-
-.input-inline { display:flex; gap:8px; align-items:center; }
-.small-muted { font-size:13px; color:var(--muted); }
-
-/* small tweak for buttons inside panel to match existing classes */
 .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; }
 .btn.secondary { background: transparent; color: #0f7a4a; border:1px solid rgba(6,30,20,0.06); }
 .card { padding:14px;border-radius:10px;background:#fff;margin-bottom:12px;box-shadow:0 6px 18px rgba(6,30,20,0.04); }
 .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-.form-grid > div { min-width:0; }
-.small { font-size:13px; }
-
-.assist-card {
-  background: #ffffff;
-  border: 1px solid #cfd8dc;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-.assist-card h4 {
-  margin: 0 0 10px 0;
-  font-size: 15px;
-  color: #0b4d28;
-  font-weight: 700;
-}
-
-.assist-card-grid {
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 7px 12px;
-  font-size: 14px;
-}
-
-.assist-card-grid label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.small-muted { font-size:13px; color:var(--muted); }
+.member-preview { margin-top:8px; font-size:14px; }
+.member-preview li { margin-bottom:6px; }
 </style>
 </head>
-
 <body>
 <div class="page-container">
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
+    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
-      <div>
-        <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
-      </div>
+      <div><div class="title">PUROK KALIGTASAN</div><div class="subtitle">DRRMO - Alitagtag</div></div>
     </div>
     <div class="user-info">
       <span id="userName"></span>
@@ -165,7 +90,7 @@
           </div>
 
           <div>
-            <label>Birthdate <span class="small">*</span></label>
+            <label>Birthdate</label>
             <input type="date" id="householdBirthdate" />
           </div>
 
@@ -259,15 +184,15 @@
 
         <hr style="margin:12px 0">
         <h4>Assistance Received (optional)</h4>
-        <div class="assist-grid">
-          <label class="assist-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
-          <label class="assist-item"><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
-          <label class="assist-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
-          <label class="assist-item"><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
-          <label class="assist-item"><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
-          <label class="assist-item"><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
-          <label class="assist-item"><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
-          <label class="assist-item"><input type="checkbox" id="ass_relief"> Relief Goods</label>
+        <div class="form-grid">
+          <label><input type="checkbox" id="ass_tupad"> TUPAD</label>
+          <label><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
+          <label><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
+          <label><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
+          <label><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
+          <label><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
+          <label><input type="checkbox" id="ass_relief"> Relief Goods</label>
+          <label><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
         </div>
 
         <div style="margin-top:8px">
@@ -294,7 +219,6 @@
         <div class="small-muted">Number of members chosen: <strong id="previewCount">0</strong></div>
         <ul id="membersPreview" class="member-preview"></ul>
       </div>
-
     </form>
   </main>
 </div>
@@ -313,50 +237,50 @@
       <div class="form-grid">
         <div>
           <label>Member Name <span class="small">*</span></label>
-          <input type="text" id="memberName" required />
+          <input type="text" id="memberName" class="member-name" required />
         </div>
 
         <div>
           <label>Sex</label>
           <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_sex" value="Male"> Male</label>
-            <label class="radio-item"><input type="radio" name="member_sex" value="Female"> Female</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex"> Male</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Female" class="member-sex"> Female</label>
           </div>
         </div>
 
         <div>
           <label>Birthdate</label>
-          <input type="date" id="memberBirthdate" />
+          <input type="date" id="memberBirthdate" class="member-birthdate" />
         </div>
 
         <div>
           <label>Age</label>
-          <input type="number" id="memberAge" readonly />
+          <input type="number" id="memberAge" class="member-age" readonly />
         </div>
 
         <div>
           <label>PWD</label>
           <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
-            <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked> No</label>
+            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" class="member-pwd"> Yes</label>
+            <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked class="member-pwd"> No</label>
           </div>
         </div>
 
         <div>
           <label>Stage</label>
-          <input type="text" id="memberStage" readonly />
+          <input type="text" id="memberStage" class="member-stage" readonly />
         </div>
 
         <div>
           <label>Status</label>
-          <select id="memberStatus">
+          <select id="memberStatus" class="member-status">
             <option value="">Select...</option><option>With Sickness</option><option>Pregnant</option>
           </select>
         </div>
 
         <div>
           <label>Transportation</label>
-          <select id="memberTransport">
+          <select id="memberTransport" class="member-transport">
             <option value="">Select...</option>
             <option>Individual with Transportation</option>
             <option>Individual needing Transportation</option>
@@ -364,70 +288,65 @@
         </div>
 
         <div>
-          <label>Pick-Up Point</label>
-          <input type="text" id="memberPickup"/>
+          <label>Designated Pick-Up Point</label>
+          <input type="text" id="memberPickup" class="member-pickup"/>
         </div>
 
         <div>
           <label>Drop-Off Point</label>
-          <input type="text" id="memberDropoff"/>
+          <input type="text" id="memberDropoff" class="member-dropoff"/>
         </div>
 
         <div>
-          <label>Camp Name</label>
-          <input type="text" id="memberCamp"/>
+          <label>Name of Camp</label>
+          <input type="text" id="memberCamp" class="member-camp"/>
         </div>
 
         <div>
           <label>Capacity</label>
-          <input type="number" id="memberCampCap" min="0"/>
+          <input type="number" id="memberCampCap" class="member-cap" min="0"/>
         </div>
 
         <div>
-          <label>Inside Camp</label>
-          <input type="number" id="memberInside" min="0"/>
+          <label>No. of Individuals Inside Camp</label>
+          <input type="number" id="memberInside" class="member-inside" min="0"/>
         </div>
 
         <div>
-          <label>Outside Camp</label>
-          <input type="number" id="memberOutside" min="0"/>
+          <label>No. of Individuals Outside Camp</label>
+          <input type="number" id="memberOutside" class="member-outside" min="0"/>
         </div>
 
         <div>
           <label>Reason</label>
-          <select id="memberReason"><option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option></select>
+          <select id="memberReason" class="member-reason">
+            <option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option>
+          </select>
         </div>
 
-<div style="grid-column:1/-1">
+        <div style="grid-column:1/-1; margin-top:8px">
+          <h4 style="margin:6px 0 8px 0">Government Support</h4>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
+            <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
+            <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
+            <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
+            <label><input type="checkbox" id="member_locsp" class="member_locsp"> Local Social Pension</label>
+            <label><input type="checkbox" id="member_intlsp" class="member_intlsp"> National Social Pension</label>
+            <label><input type="checkbox" id="member_solo" class="member_solo"> Solo Parent Assistance</label>
+            <label><input type="checkbox" id="member_cash" class="member_cash"> Cash Subsidy</label>
+            <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
+          </div>
 
-  <!-- Government Support Section -->
-  <div class="assist-card">
-    <h4>Government Support</h4>
-
-    <div class="assist-card-grid">
-      <label><input type="checkbox" id="member_tupad"> TUPAD</label>
-      <label><input type="checkbox" id="member_local4ps"> Local 4Ps</label>
-      <label><input type="checkbox" id="member_intl4ps"> National 4Ps</label>
-      <label><input type="checkbox" id="member_locsp"> Local Social Pension</label>
-      <label><input type="checkbox" id="member_intlsp"> National Social Pension</label>
-      <label><input type="checkbox" id="member_solo"> Solo Parent Assistance</label>
-    </div>
-
-    <div class="sub-section-title">Financial & Goods</div>
-  </div>
-
-  <!-- Relief Goods Section -->
-  <div class="assist-card">
-    <h4>Relief Goods</h4>
-
-    <div class="assist-card-grid">
-      <label><input type="checkbox" id="member_cash"> Cash Subsidy</label>
-      <label><input type="checkbox" id="member_relief"> Relief Goods</label>
-    </div>
-  </div>
-
-</div>
-</div>
+          <div style="margin-top:8px">
+            <label>AICS (if any)</label>
+            <select id="memberAics" class="member_aics">
+              <option value="">None</option>
+              <option>Shelter Assistance</option>
+              <option>Burial</option>
+              <option>Scholarship</option>
+            </select>
+          </div>
+        </div>
 
       </div>
 
@@ -440,11 +359,15 @@
 </div>
 
 <script>
+/*
+  FINAL merged client-side script.
+  - Uses FormData POST (no Content-Type header) so Apps Script receives e.parameter.
+  - head and members JSON fields match spreadsheet headers used by createRecord.
+*/
 
+const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; // <-- keep updated to your deployment
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
-
-/* -------- LOGIN CHECK -------- */
+/* -------- helpers -------- */
 function ensureLoginOrRedirect() {
     if (!localStorage.getItem("loggedIn")) {
         window.location.href = "index.html";
@@ -452,28 +375,17 @@ function ensureLoginOrRedirect() {
     }
     return true;
 }
-
-/* -------- AGE / STAGE HELPERS -------- */
 function computeAge(dateStr) {
     if (!dateStr) return null;
     const d = new Date(dateStr);
     if (isNaN(d)) return null;
-
     const now = new Date();
     let age = now.getFullYear() - d.getFullYear();
-
-    if (
-        now.getMonth() < d.getMonth() ||
-        (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())
-    ) {
-        age--;
-    }
-
+    if (now.getMonth() < d.getMonth() || (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
     return age;
 }
-
 function getStageFromAge(age) {
-    if (age === null || age === undefined) return "";
+    if (age === null || age === undefined || age === "") return "";
     if (age <= 1) return "Infant";
     if (age <= 12) return "Children";
     if (age <= 17) return "School Children";
@@ -481,71 +393,198 @@ function getStageFromAge(age) {
     return "Adult";
 }
 
-/* -------- PANEL VARIABLES -------- */
+/* -------- member panel state -------- */
 let membersToCollect = 0;
 let currentMemberIndex = 0;
-let collectedMembers = [];
+let collectedMembers = []; // each entry is an object whose keys match Master sheet columns
 
-/* -------- OPEN/CLOSE PANEL -------- */
-function openPanel() {
-    document.getElementById("memberPanel").classList.add("open");
-    document.getElementById("panelOverlay").classList.add("show");
-}
-function closePanel() {
-    document.getElementById("memberPanel").classList.remove("open");
-    document.getElementById("panelOverlay").classList.remove("show");
-}
+/* -------- UI helpers -------- */
+function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
+function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
 
-/* -------- PREVIEW UPDATE -------- */
-function updateMemberPreview() {
+function updateMemberPreview(){
     const n = parseInt(document.getElementById("memberCount").value || 0);
     document.getElementById("previewCount").innerText = n;
     const list = document.getElementById("membersPreview");
     list.innerHTML = "";
-
     for (let i = 0; i < n; i++) {
-        let li = document.createElement("li");
         const mem = collectedMembers[i];
-        li.innerText = mem ? `Member #${i+1} — ${mem["Name"]}` : `Member #${i+1}`;
+        const li = document.createElement('li');
+        li.innerText = mem ? `#${i+1} — ${mem["Name of Household Member/s"] || mem["Name"] || "—"}` : `#${i+1} — (empty)`;
         list.appendChild(li);
     }
 }
-function collectMemberData() {
+
+/* fill member panel form from existing member (for edit in panel) */
+function fillMemberPanel(idx){
+    const mem = collectedMembers[idx] || {};
+    document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
+    // sex radios
+    Array.from(document.getElementsByName("member_sex")).forEach(r => r.checked = (r.value === (mem["Sex"] || "")));
+    document.getElementById("memberBirthdate").value = mem["Birthdate"] || "";
+    document.getElementById("memberAge").value = mem["Age"] || "";
+    document.getElementById("memberStage").value = mem["Stage"] || "";
+    // status/transport/pickup/dropoff
+    document.getElementById("memberStatus").value = mem["Status"] || "";
+    document.getElementById("memberTransport").value = mem["Transportation"] || "";
+    document.getElementById("memberPickup").value = mem["Designated Pick-Up Point"] || "";
+    document.getElementById("memberDropoff").value = mem["Drop-Off Point"] || "";
+    document.getElementById("memberCamp").value = mem["Name of Camp"] || "";
+    document.getElementById("memberCampCap").value = mem["Capacity"] || "";
+    document.getElementById("memberInside").value = mem["No. of Individuals Inside Camp"] || "";
+    document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || "";
+    document.getElementById("memberReason").value = mem["Reasons for Displacement"] || "";
+    // checks
+    document.getElementById("member_tupad").checked = (mem["TUPAD"] === "Yes");
+    document.getElementById("member_local4ps").checked = (mem["Local 4Ps"] === "Yes");
+    document.getElementById("member_intl4ps").checked = (mem["National 4Ps"] === "Yes");
+    document.getElementById("member_locsp").checked = (mem["Local Social Pension"] === "Yes");
+    document.getElementById("member_intlsp").checked = (mem["National Social Pension"] === "Yes");
+    document.getElementById("member_solo").checked = (mem["Solo Parent Assistance"] === "Yes");
+    document.getElementById("member_relief").checked = (mem["Relief Goods"] === "Yes");
+    document.getElementById("member_cash").checked = (mem["Cash Subsidy"] === "Yes");
+    document.getElementById("memberAics").value = mem["AICS"] || "";
+}
+
+/* collect data from panel inputs into the exact Master sheet column keys */
+function collectMemberDataFromPanel(){
     const name = document.getElementById("memberName").value.trim();
     const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
-    const birthdate = document.getElementById("memberBirthdate").value;
+    const birthdate = document.getElementById("memberBirthdate").value || "";
     const age = computeAge(birthdate);
     const stage = getStageFromAge(age);
-    const pwd = document.getElementById("memberPWD").checked ? "Yes" : "No";
-
     return {
         "Name of Household Member/s": name,
         "Sex": sex,
         "Birthdate": birthdate,
-        "Age": age,
+        "Age": age != null ? age : "",
         "Stage": stage,
-        "Persons with Disability (PWD)": pwd,
-        // These columns match your master sheet
-        "Status": "",
-        "Transportation": "",
-        "Drop-Off Point": "",
-        "Designated Pick-Up Point": "",
-        "Reasons for Displacement": ""
+        "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
+        "Status": document.getElementById("memberStatus").value || "",
+        "Transportation": document.getElementById("memberTransport").value || "",
+        "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
+        "Drop-Off Point": document.getElementById("memberDropoff").value || "",
+        "Name of Camp": document.getElementById("memberCamp").value || "",
+        "Capacity": document.getElementById("memberCampCap").value || "",
+        "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
+        "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
+        "Reasons for Displacement": document.getElementById("memberReason").value || "",
+        "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
+        "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
+        "National 4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
+        "Local Social Pension": document.getElementById("member_locsp").checked ? "Yes" : "No",
+        "National Social Pension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
+        "Solo Parent Assistance": document.getElementById("member_solo").checked ? "Yes" : "No",
+        "Relief Goods": document.getElementById("member_relief").checked ? "Yes" : "No",
+        "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
+        "AICS": document.getElementById("memberAics").value || ""
     };
 }
-/* -------- MEMBER FORM: COLLECT DATA -------- */
-async function submitHeadAndMembers() {
 
-    // Build HEAD object
+/* when birthdate changes inside member panel, update age & stage fields live */
+document.addEventListener('input', (ev) => {
+    if (ev.target && ev.target.id === 'memberBirthdate') {
+        const age = computeAge(ev.target.value);
+        document.getElementById('memberAge').value = age || '';
+        document.getElementById('memberStage').value = getStageFromAge(age);
+    }
+});
+
+/* -------- panel navigation -------- */
+document.getElementById && document.addEventListener('DOMContentLoaded', () => {
+    // populate user name
+    if (!ensureLoginOrRedirect()) return;
+    document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
+
+    // reset behavior
+    document.getElementById("resetBtn").addEventListener('click', () => {
+        document.getElementById("headForm").reset();
+        document.getElementById("membersPreview").innerHTML = "";
+        collectedMembers = [];
+        updateMemberPreview();
+    });
+
+    // next button (head -> members)
+    document.getElementById("nextToMembers").addEventListener('click', () => {
+        const barangay = document.getElementById("barangay").value.trim();
+        const sitio = document.getElementById("sitio").value.trim();
+        const headName = document.getElementById("householdHead").value.trim();
+        if (!barangay || !sitio || !headName) {
+            alert("Please fill Barangay, Sitio/Purok and Name of Household Head.");
+            return;
+        }
+        membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
+        collectedMembers = []; currentMemberIndex = 0;
+        updateMemberPreview();
+        if (membersToCollect === 0) {
+            // directly submit head-only
+            submitHeadAndMembers();
+            return;
+        }
+        // open first member panel
+        fillMemberPanel(0); // populate with blank or existing
+        document.getElementById('panelTitle').innerText = `Member 1 of ${membersToCollect}`;
+        openPanel();
+    });
+
+    // panel close/back
+    document.getElementById("panelClose").addEventListener('click', () => { closePanel(); });
+    document.getElementById("memberBack").addEventListener('click', () => {
+        // if editing previous, save it to collectedMembers and step back, else just close
+        if (currentMemberIndex > 0) {
+            // save current into array
+            collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
+            currentMemberIndex--;
+            fillMemberPanel(currentMemberIndex);
+            document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
+            updateMemberPreview();
+        } else {
+            closePanel();
+        }
+    });
+
+    // save & next in panel
+    document.getElementById("memberNext").addEventListener('click', () => {
+        // validate name
+        const name = document.getElementById("memberName").value.trim();
+        if (!name) { alert("Please enter member's name."); return; }
+
+        // collect and store
+        collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
+        updateMemberPreview();
+
+        currentMemberIndex++;
+        if (currentMemberIndex >= membersToCollect) {
+            // done with members -> close panel & submit
+            closePanel();
+            submitHeadAndMembers();
+            return;
+        }
+        // load next
+        fillMemberPanel(currentMemberIndex);
+        document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
+    });
+
+    // live update head birthdate → age/stage
+    document.getElementById("householdBirthdate").addEventListener("change", () => {
+        const age = computeAge(document.getElementById("householdBirthdate").value);
+        document.getElementById("householdAge").value = age || '';
+        document.getElementById("householdStage").value = getStageFromAge(age) || '';
+    });
+});
+
+/* -------- submit head + members -------- */
+async function submitHeadAndMembers() {
+    // Build HEAD object that matches sheet header names exactly
     const head = {
-        "Barangay": document.getElementById("barangay").value,
-        "Sitio / Purok": document.getElementById("sitio").value,
-        "Name of Household Head": document.getElementById("householdHead").value,
+        "Barangay": document.getElementById("barangay").value || "",
+        "Sitio / Purok": document.getElementById("sitio").value || "",
+        "Name of Household Head": document.getElementById("householdHead").value || "",
         "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-        "Birthdate": document.getElementById("householdBirthdate").value,
-        "Age": document.getElementById("householdAge").value,
-        "Stage": document.getElementById("householdStage").value,
-        "No. of Household Member/s": document.getElementById("memberCount").value,
+        "Birthdate": document.getElementById("householdBirthdate").value || "",
+        "Age": document.getElementById("householdAge").value || "",
+        "Stage": document.getElementById("householdStage").value || "",
+        "No. of Household Member/s": document.getElementById("memberCount").value || "0",
         "Reasons for Displacement": document.getElementById("reasons").value || "",
         "Transportation": document.getElementById("head_transport").value || "",
         "Drop-Off Point": document.getElementById("dropoff").value || "",
@@ -562,111 +601,86 @@ async function submitHeadAndMembers() {
         "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
         "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
         "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
+        "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
         "AICS": document.getElementById("ass_aics").value || ""
     };
 
-    const members = collectedMembers || [];
+    // Ensure collectedMembers length matches memberCount — if user skipped some, keep blanks
+    const expected = parseInt(document.getElementById("memberCount").value || 0);
+    const members = collectedMembers.slice(0); // shallow copy
+    for (let i = 0; i < expected; i++) {
+        if (!members[i]) {
+            // create an empty member with at least name blank
+            members[i] = {
+                "Name of Household Member/s": "",
+                "Sex": "",
+                "Birthdate": "",
+                "Age": "",
+                "Stage": "",
+                "Persons with Disability (PWD)": "No",
+                "Status": "",
+                "Transportation": "",
+                "Designated Pick-Up Point": "",
+                "Drop-Off Point": "",
+                "Name of Camp": "",
+                "Capacity": "",
+                "No. of Individuals Inside Camp": "",
+                "No. of Individuals Outside Camp": "",
+                "Reasons for Displacement": "",
+                "TUPAD": "No",
+                "Local 4Ps": "No",
+                "National 4Ps": "No",
+                "Local Social Pension": "No",
+                "National Social Pension": "No",
+                "Solo Parent Assistance": "No",
+                "Relief Goods": "No",
+                "Cash Subsidy": "No",
+                "AICS": ""
+            };
+        }
+    }
 
-    // FormData payload (backend expects FormData)
+    // Build FormData (Apps Script expects FormData or e.parameter)
     const form = new FormData();
     form.append("action", "createRecord");
     form.append("head", JSON.stringify(head));
     form.append("members", JSON.stringify(members));
-    form.append("submittedBy", localStorage.getItem("staffName") || "Unknown");
+    form.append("submittedBy", localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown");
+
+    // Disable UI while submitting
+    const submitBtn = document.getElementById("nextToMembers");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Saving...";
 
     try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec", {
-            method: "POST",
-            body: form
-        });
+        console.log("SUBMIT payload head:", head);
+        console.log("SUBMIT payload members:", members);
 
+        const res = await fetch(API_URL, { method: "POST", body: form });
         const text = await res.text();
         console.log("RAW RESPONSE:", text);
 
         let data;
         try { data = JSON.parse(text); }
-        catch (err) {
-            alert("Invalid response from server");
-            console.error(err);
-            return;
-        }
+        catch (err) { throw new Error("Invalid response from server"); }
 
         if (data.success) {
-            alert("Record saved successfully!");
+            alert("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
+            // clear form or redirect
             window.location.href = "records.html";
         } else {
-            alert("Save failed: " + data.message);
-            console.error("ERROR:", data);
+            alert("Save failed: " + (data.message || "Unknown error"));
+            console.error("SAVE ERROR:", data);
         }
 
     } catch (err) {
-        alert("Network error — please try again");
-        console.error(err);
+        console.error("SUBMIT ERROR:", err);
+        alert("Network / Server error. Check console.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Save → Next Members";
     }
 }
-
-/* -------- LOAD MEMBER FORM -------- */
-function loadMemberForm(i) {
-    document.getElementById("panelTitle").innerText = `Member ${i+1} of ${membersToCollect}`;
-    document.getElementById("memberForm").reset();
-
-    document.getElementById("memberName").focus();
-}
-
-/* ------------------- INIT ------------------- */
-document.addEventListener("DOMContentLoaded", function () {
-
-    if (!ensureLoginOrRedirect()) return;
-
-    document.getElementById("userName").innerText =
-        localStorage.getItem("staffName");
-
-    // Handle head birthdate → age
-    document.getElementById("householdBirthdate").addEventListener("change", () => {
-        const age = computeAge(document.getElementById("householdBirthdate").value);
-        document.getElementById("householdAge").value = age;
-        document.getElementById("householdStage").value = getStageFromAge(age);
-    });
-
-    document.getElementById("memberCount").addEventListener("input", updateMemberPreview);
-
-    document.getElementById("nextToMembers").addEventListener("click", () => {
-        const barangay = document.getElementById("barangay").value;
-        const sitio = document.getElementById("sitio").value;
-        const head = document.getElementById("householdHead").value;
-
-        if (!barangay || !sitio || !head) {
-            alert("Please fill out required fields.");
-            return;
-        }
-
-        membersToCollect = parseInt(document.getElementById("memberCount").value);
-        collectedMembers = [];
-        currentMemberIndex = 0;
-
-        if (membersToCollect === 0) {
-            submitHeadAndMembers();
-        } else {
-            openPanel();
-            loadMemberForm(0);
-        }
-    });
-
-    document.getElementById("memberNext").addEventListener("click", onMemberNext);
-
-});
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
