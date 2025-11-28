@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Edit Household — MDRRMO Alitagtag</title>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  /* Minimal overrides so form looks like dataForm */
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding:18px; }
+  .btn{padding:8px 12px;border-radius:8px;cursor:pointer;}
+  .panel { max-width:1000px;margin:0 auto; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <h2>Edit Household</h2>
+  <div id="status" style="margin-bottom:10px;color:#333;"></div>
+
+  <!-- reuse simplified head form; keys must match Master header names -->
+  <form id="headForm" onsubmit="return false;">
+    <label>Barangay</label>
+    <select id="barangay"></select><br/>
+
+    <label>Sitio / Purok</label>
+    <input id="sitio"/><br/>
+
+    <label>Name of Household Head</label>
+    <input id="householdHead"/><br/>
+
+    <label>Sex</label>
+    <input type="radio" name="head_sex" value="Male"> Male
+    <input type="radio" name="head_sex" value="Female"> Female<br/>
+
+    <label>Birthdate</label><input id="householdBirthdate" type="date"/><br/>
+    <label>Age</label><input id="householdAge" readonly/><br/>
+    <label>Stage</label><input id="householdStage" readonly/><br/>
+
+    <label>No. of Household Member/s</label><input id="memberCount" type="number" min="0"/><br/>
+
+    <label>Head PWD</label>
+    <input type="radio" name="head_pwd" value="Yes"> Yes
+    <input type="radio" name="head_pwd" value="No"> No<br/>
+
+    <!-- assistance & camp fields -->
+    <label>Transportation</label><input id="head_transport"/><br/>
+    <label>Designated Pick-Up Point</label><input id="pickup"/><br/>
+    <label>Drop-Off Point</label><input id="dropoff"/><br/>
+    <label>Status</label><input id="head_status"/><br/>
+    <label>Camp Name</label><input id="campName"/><br/>
+    <label>Capacity</label><input id="capacity" type="number"/><br/>
+    <label>Inside Camp</label><input id="insideCamp" type="number"/><br/>
+    <label>Outside Camp</label><input id="outsideCamp" type="number"/><br/>
+
+    <div style="margin-top:10px">
+      <button id="openMembers" class="btn">Edit Members</button>
+      <button id="saveAll" class="btn">Save changes</button>
+      <a id="backToRecords" href="records.html" class="btn">Back</a>
+    </div>
+  </form>
+
+  <hr/>
+  <div id="membersArea" style="display:none;">
+    <h3>Members</h3>
+    <div id="membersList"></div>
+    <button id="addMemberBtn" class="btn">Add member</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "<?=API_URL?>"; // replace with your script URL string, e.g. "https://script.google.com/macros/s/XXX/exec";
+
+function qs(id){ return document.getElementById(id); }
+function computeAge(dateStr){
+  if(!dateStr) return "";
+  const d=new Date(dateStr); if(isNaN(d)) return "";
+  const now=new Date(); let age=now.getFullYear()-d.getFullYear();
+  if(now.getMonth()<d.getMonth() || (now.getMonth()===d.getMonth() && now.getDate()<d.getDate())) age--;
+  return age;
+}
+function getStageFromAge(age){
+  if(age===""||age==null) return "";
+  age = Number(age);
+  if(age<=1) return "Infant";
+  if(age<=12) return "Children";
+  if(age<=17) return "School Children";
+  if(age>=60) return "Elderly";
+  return "Adult";
+}
+
+let currentHousehold = null; // will hold the loaded household object from listHouseholds
+let newMembers = []; // members added client-side (no rowNumber)
+let deletedMemberRowNumbers = []; // rows to delete
+let editedMemberMap = {}; // rowNumber => edits
+
+// Load dataID from URL
+const params = new URLSearchParams(location.search);
+const dataID = params.get("dataID");
+if(!dataID){
+  qs("status").innerText = "No dataID provided in URL. Open edit page via records list.";
+} else {
+  loadHousehold(dataID);
+}
+
+// load household using listHouseholds and find matching dataID
+async function loadHousehold(dataID){
+  qs("status").innerText = "Loading household...";
+  try{
+    const form = new FormData();
+    form.append("action", "listHouseholds");
+    const res = await fetch(API_URL, { method: "POST", body: form });
+    const txt = await res.text();
+    const out = JSON.parse(txt);
+    if(!out.success){ qs("status").innerText = "Failed: "+(out.message||""); return; }
+
+    // find household
+    const found = (out.households||[]).find(h=>String(h.dataID)===String(dataID));
+    if(!found){ qs("status").innerText = "Household not found"; return; }
+    currentHousehold = found;
+    fillHeadForm(found.head);
+    renderMembers(found.members);
+    qs("status").innerText = "Loaded dataID: "+dataID;
+  } catch(err){
+    console.error(err);
+    qs("status").innerText = "Error loading household.";
+  }
+}
+
+function fillHeadForm(head){
+  if(!head) return;
+  // map fields: these must match your master header keys
+  qs("barangay").value = head["Barangay"] || "";
+  qs("sitio").value = head["Sitio / Purok"] || "";
+  qs("householdHead").value = head["Name of Household Head"] || "";
+  const sex = head["Sex"] || "";
+  if(sex==="Male") document.querySelector("input[name='head_sex'][value='Male']").checked=true;
+  if(sex==="Female") document.querySelector("input[name='head_sex'][value='Female']").checked=true;
+  qs("householdBirthdate").value = head["Birthdate"] || "";
+  qs("householdAge").value = head["Age"] || "";
+  qs("householdStage").value = head["Stage"] || "";
+  qs("memberCount").value = head["No. of Household Member/s"] || 0;
+  const pwd = head["Persons with Disability (PWD)"] || "";
+  if(pwd==="Yes") document.querySelector("input[name='head_pwd'][value='Yes']").checked=true;
+  if(pwd==="No") document.querySelector("input[name='head_pwd'][value='No']").checked=true;
+  qs("head_transport").value = head["Transportation"] || "";
+  qs("pickup").value = head["Designated Pick-Up Point"] || "";
+  qs("dropoff").value = head["Drop-Off Point"] || "";
+  qs("head_status").value = head["Status"] || "";
+  qs("campName").value = head["Name of Camp"] || "";
+  qs("capacity").value = head["Capacity"] || "";
+  qs("insideCamp").value = head["No. of Individuals Inside Camp"] || "";
+  qs("outsideCamp").value = head["No. of Individuals Outside Camp"] || "";
+}
+
+// render members (existing)
+function renderMembers(members){
+  const container = qs("membersList");
+  container.innerHTML = "";
+  (members || []).forEach((m, idx) => {
+    const div = document.createElement("div");
+    div.className = "memberRow";
+    div.dataset.rowNumber = m.__rowNumber || "";
+    div.innerHTML = `
+      <div>
+        <strong>${m["Name of Household Member/s"]||"(no name)"}</strong> — ${m["Sex"]||""}
+        <button class="editBtn">Edit</button>
+        <button class="delBtn">Delete</button>
+      </div>
+      <div class="memberDetails" style="display:none;">
+        <label>Name <input class="m_name" value="${escapeHtml(m["Name of Household Member/s"]||"")}" /></label>
+        <label>Sex <input class="m_sex" value="${escapeHtml(m["Sex"]||"")}" /></label>
+        <label>Birthdate <input class="m_birth" type="date" value="${escapeHtml(m["Birthdate"]||"")}" /></label>
+        <label>Age <input class="m_age" readonly value="${escapeHtml(m["Age"]||"")}" /></label>
+        <label>Stage <input class="m_stage" readonly value="${escapeHtml(m["Stage"]||"")}" /></label>
+        <label>PWD <input class="m_pwd" value="${escapeHtml(m["Persons with Disability (PWD)"]||"")}" /></label>
+        <div style="margin-top:6px">
+          <button class="saveMemberBtn">Save member</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+
+    // wire buttons
+    div.querySelector(".editBtn").addEventListener("click", () => {
+      const d = div.querySelector(".memberDetails");
+      d.style.display = d.style.display === "none" ? "block" : "none";
+    });
+    div.querySelector(".delBtn").addEventListener("click", async () => {
+      if(!confirm("Delete this member? This removes the row from Master and barangay sheet.")) return;
+      const rn = Number(div.dataset.rowNumber);
+      if(rn) {
+        const form = new FormData();
+        form.append("action","deleteRow");
+        form.append("rowNumber", rn);
+        const res = await fetch(API_URL, { method: "POST", body: form });
+        const txt = await res.text(); const data = JSON.parse(txt);
+        if(data.success){
+          div.remove();
+          qs("status").innerText = "Member deleted.";
+        } else {
+          alert("Delete failed: " + (data.message||""));
+        }
+      } else {
+        // row had no rowNumber (shouldn't happen) just remove from DOM
+        div.remove();
+      }
+    });
+
+    // save member edits
+    div.querySelector(".saveMemberBtn").addEventListener("click", async () => {
+      const rn = Number(div.dataset.rowNumber);
+      if(!rn){ alert("Missing rowNumber for this member"); return; }
+      const updates = {};
+      updates["Name of Household Member/s"] = div.querySelector(".m_name").value;
+      updates["Sex"] = div.querySelector(".m_sex").value;
+      updates["Birthdate"] = div.querySelector(".m_birth").value;
+      updates["Age"] = div.querySelector(".m_age").value;
+      updates["Stage"] = div.querySelector(".m_stage").value;
+      updates["Persons with Disability (PWD)"] = div.querySelector(".m_pwd").value;
+      // call updateRow
+      const form = new FormData();
+      form.append("action","updateRow");
+      form.append("rowNumber", rn);
+      form.append("updates", JSON.stringify(updates));
+      const res = await fetch(API_URL, { method:"POST", body: form});
+      const txt = await res.text(); const out=JSON.parse(txt);
+      if(out.success){ qs("status").innerText = "Member updated"; } else { alert("Update failed: "+(out.message||"")); }
+    });
+
+    // wire birth->age auto compute
+    const birthInput = div.querySelector(".m_birth");
+    birthInput.addEventListener("change", () => {
+      const age = computeAge(birthInput.value);
+      div.querySelector(".m_age").value = age || "";
+      div.querySelector(".m_stage").value = getStageFromAge(age);
+    });
+  });
+}
+
+// Add member button -> show a minimal add form
+qs("addMemberBtn").addEventListener("click", () => {
+  const m = { "Name of Household Member/s":"", "Sex":"", "Birthdate":"", "Age":"","Stage":"", "Persons with Disability (PWD)":"No" };
+  newMembers.push(m);
+  renderNewMembers();
+  qs("membersArea").style.display = "block";
+});
+
+function renderNewMembers(){
+  const container = qs("membersList");
+  // append simple forms for newMembers at end
+  newMembers.forEach((m, i) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div>
+        <strong>New member</strong>
+        <button class="removeNew">Remove</button>
+      </div>
+      <label>Name <input class="nm_name" value="${escapeHtml(m["Name of Household Member/s"]||"")}" /></label>
+      <label>Sex <input class="nm_sex" value="${escapeHtml(m["Sex"]||"")}" /></label>
+      <label>Birthdate <input class="nm_birth" type="date" value="${escapeHtml(m["Birthdate"]||"")}" /></label>
+      <label>Age <input class="nm_age" readonly value="${escapeHtml(m["Age"]||"")}" /></label>
+      <label>Stage <input class="nm_stage" readonly value="${escapeHtml(m["Stage"]||"")}" /></label>
+      <div><button class="saveNew">Save new member</button></div>
+    `;
+    container.appendChild(div);
+
+    div.querySelector(".removeNew").addEventListener("click", () => {
+      container.removeChild(div);
+      newMembers.splice(i,1);
+    });
+
+    div.querySelector(".saveNew").addEventListener("click", () => {
+      m["Name of Household Member/s"] = div.querySelector(".nm_name").value;
+      m["Sex"] = div.querySelector(".nm_sex").value;
+      m["Birthdate"] = div.querySelector(".nm_birth").value;
+      m["Age"] = div.querySelector(".nm_age").value;
+      m["Stage"] = div.querySelector(".nm_stage").value;
+      // keep m in newMembers; user will later press Save changes to append
+      qs("status").innerText = "New member saved locally. Click Save changes to send to server.";
+    });
+
+    // birth->age for new
+    div.querySelector(".nm_birth").addEventListener("change", (ev)=>{
+      const age = computeAge(ev.target.value);
+      div.querySelector(".nm_age").value = age || "";
+      div.querySelector(".nm_stage").value = getStageFromAge(age);
+    });
+  });
+}
+
+
+// Save all changes (head + members + append new members)
+qs("saveAll").addEventListener("click", async () => {
+  if(!currentHousehold) { alert("No household loaded"); return; }
+
+  qs("status").innerText = "Saving head changes...";
+  // prepare head updates (we will update head row using updateRow)
+  var headUpdates = {};
+  headUpdates["Barangay"] = qs("barangay").value;
+  headUpdates["Sitio / Purok"] = qs("sitio").value;
+  headUpdates["Name of Household Head"] = qs("householdHead").value;
+  headUpdates["Sex"] = document.querySelector("input[name='head_sex']:checked")?.value || "";
+  headUpdates["Birthdate"] = qs("householdBirthdate").value || "";
+  headUpdates["Age"] = qs("householdAge").value || "";
+  headUpdates["Stage"] = qs("householdStage").value || "";
+  headUpdates["No. of Household Member/s"] = qs("memberCount").value || "";
+  headUpdates["Persons with Disability (PWD)"] = document.querySelector("input[name='head_pwd']:checked")?.value || "";
+  headUpdates["Transportation"] = qs("head_transport").value || "";
+  headUpdates["Designated Pick-Up Point"] = qs("pickup").value || "";
+  headUpdates["Drop-Off Point"] = qs("dropoff").value || "";
+  headUpdates["Status"] = qs("head_status").value || "";
+  headUpdates["Name of Camp"] = qs("campName").value || "";
+  headUpdates["Capacity"] = qs("capacity").value || "";
+  headUpdates["No. of Individuals Inside Camp"] = qs("insideCamp").value || "";
+  headUpdates["No. of Individuals Outside Camp"] = qs("outsideCamp").value || "";
+
+  // CALL updateRow for head (headRowNumber available on currentHousehold.headRowNumber)
+  const headRowNumber = currentHousehold.headRowNumber;
+  if(!headRowNumber){ alert("Missing head row number"); return; }
+
+  try{
+    const form = new FormData();
+    form.append("action", "updateRow");
+    form.append("rowNumber", headRowNumber);
+    form.append("updates", JSON.stringify(headUpdates));
+    const resp = await fetch(API_URL, { method:"POST", body: form });
+    const txt = await resp.text(); const out = JSON.parse(txt);
+    if(!out.success) { alert("Head update failed: "+(out.message||"")); return; }
+  } catch(err){
+    console.error(err);
+    alert("Failed to update head row");
+    return;
+  }
+
+  // Append NEW members if any
+  if(newMembers.length > 0){
+    qs("status").innerText = "Appending new members...";
+    const form2 = new FormData();
+    form2.append("action","appendMembers");
+    form2.append("dataID", currentHousehold.dataID);
+    form2.append("members", JSON.stringify(newMembers));
+    form2.append("submittedBy", localStorage.getItem("staffName")||"");
+    const r2 = await fetch(API_URL, { method:"POST", body: form2 });
+    const t2 = await r2.text(); const o2 = JSON.parse(t2);
+    if(!o2.success) { alert("Append members failed: "+(o2.message||"")); return; }
+  }
+
+  qs("status").innerText = "Saved changes. Reloading...";
+  setTimeout(()=>location.reload(),800);
+});
+
+// toggle members area
+qs("openMembers").addEventListener("click",(ev)=>{ ev.preventDefault(); qs("membersArea").style.display="block"; });
+
+function escapeHtml(s){ return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+</script>
+</body>
+</html>
