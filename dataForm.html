@@ -543,8 +543,12 @@ async function submitHeadAndMembers() {
         "AICS": document.getElementById("ass_aics").value || ""
     };
 
+    // 🔍 DEBUG
+    console.log("HEAD:", head);
+
     // MEMBERS (Slide panel members)
-    const members = collectedMembers;
+    const members = collectedMembers || [];
+    console.log("MEMBERS:", members);
 
     // JSON Payload
     const payload = {
@@ -553,6 +557,8 @@ async function submitHeadAndMembers() {
         members: members,
         submittedBy: localStorage.getItem("staffName")
     };
+
+    console.log("PAYLOAD:", payload);
 
     try {
         const res = await fetch(API_URL, {
@@ -576,6 +582,7 @@ async function submitHeadAndMembers() {
         console.error(err);
     }
 }
+  
 /* -------- MEMBER NEXT BUTTON -------- */
 function onMemberNext() {
     const name = document.getElementById("memberName").value.trim();
@@ -714,5 +721,6 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
