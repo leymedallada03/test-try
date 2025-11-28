@@ -442,7 +442,7 @@
 <script>
 
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzOs-b-PZXhsEIGhhBSQhBJqyd7DFNX7VNMb37VXGaC1Yha2V58kbYIRLOnGMZRscaseg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
 /* -------- LOGIN CHECK -------- */
 function ensureLoginOrRedirect() {
@@ -536,77 +536,86 @@ function collectMemberData() {
 /* -------- MEMBER FORM: COLLECT DATA -------- */
 async function submitHeadAndMembers() {
 
-    // HEAD (Household Head)
+    const scriptURL = "YOUR_DEPLOYMENT_URL_HERE"; // <-- paste new deployment URL
+
+    // -----------------------------
+    // 1) Collect HEAD data
+    // -----------------------------
     const head = {
-        "Barangay": document.getElementById("barangay").value,
-        "Sitio / Purok": document.getElementById("sitio").value,
-        "Name of Household Head": document.getElementById("householdHead").value,
-        "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-        "Birthdate": document.getElementById("householdBirthdate").value,
-        "Age": document.getElementById("householdAge").value,
-        "Stage": document.getElementById("householdStage").value,
-        "No. of Household Member/s": document.getElementById("memberCount").value,
-        "Reasons for Displacement": document.getElementById("reasons").value || "",
-        "Transportation": document.getElementById("head_transport").value || "",
-        "Drop-Off Point": document.getElementById("dropoff").value || "",
-        "Designated Pick-Up Point": document.getElementById("pickup").value || "",
-        "Status": document.getElementById("head_status").value || "",
-        "Name of Camp": document.getElementById("campName").value || "",
-        "Capacity": document.getElementById("capacity").value || "",
-        "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
-        "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
-        "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
-        "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
-        "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
-        "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
-        "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
-        "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
-        "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
-        "AICS": document.getElementById("ass_aics").value || ""
+        barangay: document.getElementById("barangay").value,
+        sitio: document.getElementById("sitio").value,
+        householdHead: document.getElementById("householdHead").value,
+        sex: document.querySelector("input[name='head_sex']:checked")?.value || "",
+        birthdate: document.getElementById("householdBirthdate").value,
+        age: document.getElementById("householdAge").value,
+        stage: document.getElementById("householdStage").value,
+        memberCount: document.getElementById("memberCount").value,
+        reasons: document.getElementById("reasons").value || "",
+        transportation: document.getElementById("head_transport").value || "",
+        dropoff: document.getElementById("dropoff").value || "",
+        pickup: document.getElementById("pickup").value || "",
+        status: document.getElementById("head_status").value || "",
+        campName: document.getElementById("campName").value || "",
+        capacity: document.getElementById("capacity").value || "",
+        insideCamp: document.getElementById("insideCamp").value || "",
+        outsideCamp: document.getElementById("outsideCamp").value || "",
+        tupad: document.getElementById("ass_tupad").checked ? "Yes" : "No",
+        local4ps: document.getElementById("ass_local4ps").checked ? "Yes" : "No",
+        national4ps: document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
+        localPension: document.getElementById("ass_locsp").checked ? "Yes" : "No",
+        nationalPension: document.getElementById("ass_intlsp").checked ? "Yes" : "No",
+        soloParent: document.getElementById("ass_solo").checked ? "Yes" : "No",
+        relief: document.getElementById("ass_relief").checked ? "Yes" : "No",
+        aics: document.getElementById("ass_aics").value || ""
     };
 
-    // 🔍 DEBUG
-    console.log("HEAD:", head);
+    // -----------------------------
+    // 2) Collect MEMBERS
+    // -----------------------------
+    let members = [];
+    document.querySelectorAll(".member-row").forEach(row => {
+        members.push({
+            name: row.querySelector(".member-name").value,
+            sex: row.querySelector(".member-sex").value,
+            birthdate: row.querySelector(".member-birthdate").value,
+            age: row.querySelector(".member-age").value,
+            pwd: row.querySelector(".member-pwd").checked ? "Yes" : "No"
+        });
+    });
 
-    // MEMBERS (Slide panel members)
-    const members = collectedMembers || [];
-    console.log("MEMBERS:", members);
-
-    // JSON Payload
+    // -----------------------------
+    // 3) Build request payload
+    // -----------------------------
     const payload = {
-        action: "createRecord",
+        mode: "saveHead",
         head: head,
-        members: members,
-        submittedBy: localStorage.getItem("staffName")
+        members: members
     };
 
-    console.log("PAYLOAD:", payload);
-
+    // -----------------------------
+    // 4) Send to Google Apps Script
+    // -----------------------------
     try {
-const res = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-});
+        const response = await fetch(scriptURL, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
 
-        const text = await res.text();
-        const data = JSON.parse(text);
+        const result = await response.json();
 
-        if (data.success) {
-            alert("Record saved successfully!");
-            window.location.href = "records.html";
+        if (result.result === "success") {
+            alert("Saved successfully!");
         } else {
-            alert("Save failed: " + data.message);
-            console.error(data);
+            alert("Saving failed: " + result.error);
         }
 
     } catch (err) {
-        alert("Network error — please try again");
-        console.error(err);
+        alert("Network error: " + err);
     }
 }
+
   
 /* -------- MEMBER NEXT BUTTON -------- */
 function onMemberNext() {
@@ -683,6 +692,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>
+
 
 
 
