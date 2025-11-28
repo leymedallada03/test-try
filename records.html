@@ -90,7 +90,7 @@
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; // MUST REPLACE
+const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
 window.onload = () => loadRecords();
 
@@ -98,47 +98,42 @@ function showLoading(show) {
   document.getElementById('loading').style.display = show ? "flex" : "none";
 }
 
-async function loadRecords() {
+/* --------------------------------------------------
+   JSONP LOADER FOR LIST
+-------------------------------------------------- */
+function loadRecords() {
   showLoading(true);
-  
-  const filterBarangay = document.getElementById("filterBarangay").value;
-  const filterStage = document.getElementById("filterStage").value;
-  const q = document.getElementById("searchBox").value;
 
-  const body = {
-    action: "getRecords",
-    filterBarangay,
-    filterStage,
-    q
-  };
+  const brgy = encodeURIComponent(document.getElementById("filterBarangay").value);
+  const stage = encodeURIComponent(document.getElementById("filterStage").value);
+  const q = encodeURIComponent(document.getElementById("searchBox").value);
 
-  try {
-    const res = await fetch(scriptURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
+  const url =
+    `${API_URL}?action=getRecords&filterBarangay=${brgy}&filterStage=${stage}&q=${q}&callback=recordsLoaded`;
 
-    const raw = await res.text();
-    console.log("RAW:", raw);
+  const script = document.createElement("script");
+  script.src = url;
 
-    const data = JSON.parse(raw);
-    if (!data.success) {
-      alert(data.message);
-      showLoading(false);
-      return;
-    }
-
-    renderTable(data.header, data.rows);
-    showLoading(false);
-
-  } catch (err) {
-    console.error(err);
-    alert("Error loading records");
-    showLoading(false);
-  }
+  document.body.appendChild(script);
 }
 
+/* --------------------------------------------------
+   JSONP CALLBACK
+-------------------------------------------------- */
+function recordsLoaded(data) {
+  showLoading(false);
+
+  if (!data.success) {
+    alert("Error: " + data.message);
+    return;
+  }
+
+  renderTable(data.header, data.rows);
+}
+
+/* --------------------------------------------------
+   RENDER TABLE
+-------------------------------------------------- */
 function renderTable(header, rows) {
   const thead = document.getElementById("tableHead");
   const tbody = document.getElementById("tableBody");
@@ -146,20 +141,14 @@ function renderTable(header, rows) {
   thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  // build table header
   let h = "<tr>";
-  header.forEach(col => {
-    h += `<th>${col}</th>`;
-  });
-  h += `<th>Actions</th></tr>`;
+  header.forEach(col => h += `<th>${col}</th>`);
+  h += "<th>Actions</th></tr>";
   thead.innerHTML = h;
 
-  // build table rows
   rows.forEach(r => {
     let row = "<tr>";
-    header.forEach(col => {
-      row += `<td>${r[col] ?? ""}</td>`;
-    });
+    header.forEach(col => row += `<td>${r[col] ?? ""}</td>`);
 
     row += `
       <td>
@@ -173,36 +162,35 @@ function renderTable(header, rows) {
   });
 }
 
+/* --------------------------------------------------
+   EDIT RECORD
+-------------------------------------------------- */
 function editRecord(dataID) {
   localStorage.setItem("edit_dataID", dataID);
-  window.location.href = "edit.html"; // your edit page
+  window.location.href = "edit.html";
 }
 
-async function deleteRecord(dataID) {
-  if (!confirm("Delete entire household with Data ID " + dataID + "?")) return;
+/* --------------------------------------------------
+   DELETE via JSONP
+-------------------------------------------------- */
+function deleteRecord(dataID) {
+  if (!confirm("Are you sure you want to delete Data ID " + dataID + "?")) return;
 
-  const body = { action: "deleteHousehold", dataID };
+  showLoading(true);
 
-  try {
-    const res = await fetch(scriptURL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(body)
-    });
+  const url = `${API_URL}?action=deleteHousehold&dataID=${dataID}&callback=deleteDone`;
 
-    const raw = await res.text();
-    console.log("DELETE RAW:", raw);
+  const script = document.createElement("script");
+  script.src = url;
+  document.body.appendChild(script);
+}
 
-    const data = JSON.parse(raw);
-    alert(data.message);
-    loadRecords();
-
-  } catch (err) {
-    alert("Error deleting record");
-  }
+function deleteDone(res) {
+  showLoading(false);
+  alert(res.message);
+  loadRecords();
 }
 </script>
 
 </body>
 </html>
-
