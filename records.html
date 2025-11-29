@@ -6,65 +6,147 @@
 <title>MDRRMO Records</title>
 <link rel="stylesheet" href="styles.css" />
 <style>
-/* --- Layout + UI --- */
-.page-container { display:block; }
-.topbar { display:flex; align-items:center; gap:12px; padding:12px; background:#f7f9f7; border-bottom:1px solid #eee; }
-.brand { display:flex; gap:10px; align-items:center; }
-.logo { width:44px; height:44px; object-fit:contain; }
-.content-area { padding:18px; }
-.search-row { display:flex; gap:10px; justify-content:flex-end; align-items:center; margin-bottom:12px; }
+.search-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
 
-/* search box + buttons on right */
-.search-container { display:flex; gap:8px; align-items:center; }
-.search-container input { padding:8px 12px; min-width:280px; border-radius:8px; border:1px solid #ccc; }
+.search-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
-/* records container */
-.records-wrapper { overflow:auto; border:1px solid #eee; border-radius:8px; background:#fff; }
-.records-table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:1100px; }
-.records-table th, .records-table td { padding:10px 8px; border-bottom:1px solid #f0f0f0; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
-.records-table thead th { background:#fafafa; position:sticky; top:0; z-index:20; border-bottom:2px solid #e6e6e6; }
+.search-container input {
+  padding: 8px 12px;
+  min-width: 260px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
 
-/* sticky actions column on right */
-.actions-col { position:sticky; right:0; background:inherit; z-index:15; }
+/* Wrapper */
+.records-wrapper {
+  overflow: auto;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  margin-top: 10px;
+}
 
-/* sticky checkbox column at left */
-.select-col { position:sticky; left:0; background:inherit; z-index:15; }
+/* Table */
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
 
-/* colors based on member count (head rows only) */
-.mem-small { background:#d4f6ff; }
-.mem-normal { background:#d9ffd9; }
-.mem-large { background:#fff7c2; }
-.mem-critical { background:#ffd6d6; }
+.records-table th,
+.records-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
 
-/* highlight */
-.hl { background: #ffe27a; padding: 1px 2px; border-radius:2px; }
+.records-table thead th {
+  background: #f4f7f4;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
 
-/* member rows styling (collapsible) */
-.member-row { display:table-row; background:#fff; }
-.member-row.hidden { display:none; }
-.member-row td { padding-left:28px; font-size:0.95em; color:#333; }
+/* Sticky columns */
+.select-col {
+  position: sticky;
+  left: 0;
+  z-index: 25;
+  background: #fff;
+}
 
-/* misc */
-.icon-btn { border:0; padding:6px 8px; border-radius:6px; cursor:pointer; background:transparent; }
-.controls { display:flex; gap:8px; align-items:center; }
-.kv { color:#666; font-size:13px; margin-left:8px; }
+.actions-col {
+  position: sticky;
+  right: 0;
+  z-index: 25;
+  background: #fff;
+}
 
-/* pagination */
-#paginationArea { margin-top:12px; text-align:center; }
-.page-btn { padding:6px 10px; margin:0 4px; border-radius:6px; border:1px solid #d0d0d0; background:#fff; cursor:pointer; }
-.page-btn.active { background:#0f7a4a; color:#fff; font-weight:700; }
+/* Color coding */
+.mem-small { background: #d4f6ff; }
+.mem-normal { background: #d9ffd9; }
+.mem-large { background: #fff7c2; }
+.mem-critical { background: #ffd6d6; }
 
-/* export buttons */
-.btn { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; background:linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; font-weight:600; }
-.btn.secondary { background:#fff; color:#0f7a4a; border:1px solid rgba(6,30,20,0.08); font-weight:600; }
+/* Member rows */
+.member-row {
+  background: #fff;
+}
+.member-row.hidden {
+  display: none;
+}
+.member-row td {
+  padding-left: 25px;
+  font-size: 0.95em;
+  color: #444;
+}
 
-/* counts */
-.top-stats { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
+/* Highlight */
+.hl {
+  background: #ffeb8a;
+  border-radius: 3px;
+}
 
-/* responsive */
-@media (max-width:880px){
-  .search-container input { min-width:160px; }
-  .records-table { min-width:900px; }
+/* Buttons */
+.icon-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.btn {
+  border-radius: 7px;
+  padding: 7px 14px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(90deg,#0f7a4a,#34b78f);
+}
+
+.btn.secondary {
+  background: #fff;
+  color: #0f7a4a;
+  border: 1px solid #0f7a4a;
+}
+
+/* Stats */
+.top-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Pagination */
+#paginationArea {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  margin: 0 3px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: #0f7a4a;
+  color: white;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -467,4 +549,5 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
