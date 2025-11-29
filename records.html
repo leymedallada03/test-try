@@ -236,30 +236,33 @@
   </aside>
 
   <!-- ░░ MAIN CONTENT ░░ -->
-  <main class="content-area">
+  <main class="content-area" tabindex="-1">
 
     <h2>📁 Household Records</h2>
 
-    <!-- STATS (Right-aligned like other pages) -->
-    <div class="new-stats">
+    <!-- Right-Aligned Stats (Matches main.html spacing) -->
+    <div class="new-stats" style="margin-bottom:18px; display:flex; justify-content:flex-end; gap:18px;">
         <span>Rows: <strong class="green" id="rowCount">0</strong></span>
         <span>Matches: <strong class="green" id="matchCount">0</strong></span>
         <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
     </div>
 
-    <!-- SEARCH + FILTER + ACTIONS (Unified layout) -->
-    <div class="records-toolbar">
+    <!-- Toolbar (Matches layout style of other pages) -->
+    <div class="records-toolbar" style="
+        display:flex; justify-content:space-between; 
+        align-items:center; margin-bottom:18px; flex-wrap:wrap;
+    ">
 
-        <!-- CENTER SEARCH -->
-        <div class="toolbar-center">
+        <!-- Center Search Box -->
+        <div style="flex:1; display:flex; justify-content:center;">
             <input id="searchInput" class="search-box"
-                   placeholder="Search by Barangay / Name / Data ID..." />
+                placeholder="Search by Barangay / Name / Data ID..." />
         </div>
 
-        <!-- RIGHT ACTIONS -->
-        <div class="toolbar-right">
+        <!-- Right Controls -->
+        <div style="display:flex; align-items:center; gap:12px;">
 
-            <!-- BARANGAY SELECT -->
+            <!-- Barangay Dropdown -->
             <select id="filterBarangay" class="brgy-dropdown">
                 <option value="">All Barangays</option>
                 <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
@@ -270,14 +273,14 @@
                 <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
             </select>
 
-            <!-- REFRESH BUTTON -->
+            <!-- Refresh Icon -->
             <button id="refreshBtn" class="icon-btn-lg icon-refresh" title="Refresh">
                 <svg width="22" height="22" viewBox="0 0 24 24">
                     <path d="M12 6V3L8 7l4 4V8c2.2 0 4 1.8 4 4 0 .7-.2 1.4-.5 2l1.5 1.3c.6-.9 1-2 1-3.3 0-3.3-2.7-6-6-6zm-4.5 2C6.9 8.9 6 10.4 6 12c0 3.3 2.7 6 6 6v3l4-4-4-4v3c-2.2 0-4-1.8-4-4 0-.7.2-1.4.5-2L7.5 8z"></path>
                 </svg>
             </button>
 
-            <!-- EXPORT -->
+            <!-- Export Dropdown -->
             <div class="export-wrapper">
                 <button id="exportMenuBtn" class="icon-btn-lg">📤</button>
                 <div id="exportDropdown" class="export-dropdown hidden">
@@ -288,7 +291,7 @@
         </div>
     </div>
 
-    <!-- TABLE WRAPPER -->
+    <!-- Table Container (Matches padding + shadow style of your site) -->
     <div class="records-wrapper">
         <table id="recordsTable" class="records-table">
             <thead id="tableHead"></thead>
@@ -296,8 +299,8 @@
         </table>
     </div>
 
-    <!-- PAGINATION -->
-    <div id="paginationArea"></div>
+    <!-- Pagination Centered -->
+    <div id="paginationArea" style="margin-top:18px; text-align:center;"></div>
 
 </main>
 
@@ -705,6 +708,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
