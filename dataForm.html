@@ -370,7 +370,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xs
 /* -------- helpers -------- */
 function ensureLoginOrRedirect() {
     if (!localStorage.getItem("loggedIn")) {
-        window.location.href = "index.html";
+        window.location.href = "main.html";
         return false;
     }
     return true;
@@ -694,5 +694,6 @@ async function submitHeadAndMembers() {
 </script>
 </body>
 </html>
+
 
 
