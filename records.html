@@ -532,19 +532,26 @@ function editRecord(id){
   localStorage.setItem("edit_dataID",id);
   window.location.href="edit.html";
 }
-async function deleteRecord(id){
-  if(!confirm("Delete household "+id+"?")) return;
-  try{
-    const res=await fetch(SCRIPT_URL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({action:"deleteHousehold",dataID:id})
-    });
-    const json=JSON.parse(await res.text());
-    alert(json.message||"Deleted");
-    loadRecords();
-  }catch(e){ alert("Delete failed"); }
+function deleteHousehold(dataID) {
+  if (!confirm("Are you sure you want to delete this household?")) return;
+
+  const form = new FormData();
+  form.append("action", "deleteHousehold");
+  form.append("dataID", dataID);
+
+  fetch(SCRIPT_URL, { method: "POST", body: form })
+    .then(res => res.json())
+    .then(json => {
+      if (json.success) {
+        alert("Deleted successfully");
+        loadRecords(); // refresh table
+      } else {
+        alert("Delete failed: " + json.message);
+      }
+    })
+    .catch(err => alert("Error: " + err));
 }
+
 
 /* ========================= EXPORT ========================= */
 function groupsToCSV(g){
@@ -606,6 +613,7 @@ window.addEventListener("DOMContentLoaded",()=>{
 
 </body>
 </html>
+
 
 
 
