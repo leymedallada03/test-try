@@ -10,7 +10,7 @@
 <body>
 <div class="page-container">
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
+    <button id="menuToggle" class="menu-btn">☰</button>
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
       <div>
@@ -22,68 +22,65 @@
       <span id="userName"></span>
       <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
-    </header>
+  </header>
 
-    <!-- ░░ SIDEBAR ░░ -->
-    <aside class="sidebar">
-        <ul>
-            <li><a href="dashboard.html">📊 Dashboard</a></li>
-            <li><a href="dataForm.html">📝 Data Entry</a></li>
-            <li><a href="records.html" class="active">📁 Records</a></li>
-            <li><a href="charts.html">📈 Charts</a></li>
-            <li class="admin-only"><a href="users.html">👥 User Management</a></li>
-        </ul>
-    </aside>
-<div id="loading">Loading records...</div>
-    <!-- ░░ MAIN CONTENT ░░ -->
-    <main class="content-area">
-        <h2>📁 Household Records</h2>
-        
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <ul>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="dataForm.html">📝 Data Entry</a></li>
+      <li><a href="records.html" class="active">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+    </ul>
+  </aside>
 
-        <!-- Search -->
-        <div class="search-container">
-            <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID...">
-        </div>
+  <div id="loading">Loading records...</div>
 
-        <!-- TABLE WRAPPER -->
-        <div class="records-container">
-  <h2>Household Records</h2>
+  <!-- MAIN CONTENT -->
+  <main class="content-area">
+    <h2>📁 Household Records</h2>
 
-  <div class="filter-bar">
-    <select id="filterBarangay">
-      <option value="">All Barangays</option>
-      <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-      <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
-      <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
-      <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
-      <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
-      <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
-    </select>
-
-    <select id="filterStage">
-      <option value="">All Stages</option>
-      <option>Child</option>
-      <option>Teen</option>
-      <option>Adult</option>
-      <option>Senior</option>
-    </select>
-
+    <!-- GLOBAL SEARCH -->
     <div class="search-container">
-    <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID...">
-</div>
+      <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID...">
+    </div>
 
-    <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
-  </div>
+    <!-- FILTER BAR -->
+    <div class="records-container">
+      <div class="filter-bar">
 
-<div class="records-wrapper">
-    <table id="recordsTable" class="records-table">
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
-    </table>
-</div>
+        <select id="filterBarangay">
+          <option value="">All Barangays</option>
+          <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+          <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+          <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+          <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+          <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+          <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+        </select>
+
+        <select id="filterStage">
+          <option value="">All Stages</option>
+          <option>Child</option>
+          <option>Teen</option>
+          <option>Adult</option>
+          <option>Senior</option>
+        </select>
+
+        <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
+      </div>
+
+      <div class="records-wrapper">
+        <table id="recordsTable" class="records-table">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; 
+const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
 window.onload = () => loadRecords();
 
@@ -91,24 +88,22 @@ function showLoading(show) {
   document.getElementById('loading').style.display = show ? "flex" : "none";
 }
 
-// --------------------
-// JSONP LOADER
-// --------------------
 function loadRecords() {
   showLoading(true);
 
   const filterBarangay = encodeURIComponent(document.getElementById("filterBarangay").value);
   const filterStage = encodeURIComponent(document.getElementById("filterStage").value);
-  const q = encodeURIComponent(document.getElementById("searchBox").value);
+  const q = encodeURIComponent(document.getElementById("searchInput").value);
 
   const callbackName = "recordsLoaded_" + Date.now();
-
   window[callbackName] = recordsLoaded;
 
   const url = `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
 
   const s = document.createElement("script");
   s.src = url;
+
+  s.onload = () => s.remove();
   s.onerror = () => {
     alert("Error loading records (JSONP failed)");
     showLoading(false);
@@ -117,12 +112,7 @@ function loadRecords() {
   document.body.appendChild(s);
 }
 
-// --------------------
-// JSONP CALLBACK
-// --------------------
 function recordsLoaded(response) {
-  console.log("JSONP RESPONSE:", response);
-
   if (!response || !response.success) {
     alert("Failed to load records");
     showLoading(false);
@@ -133,9 +123,6 @@ function recordsLoaded(response) {
   showLoading(false);
 }
 
-// --------------------
-// RENDER TABLE
-// --------------------
 function renderTable(header, rows) {
   const thead = document.getElementById("tableHead");
   const tbody = document.getElementById("tableBody");
@@ -143,15 +130,11 @@ function renderTable(header, rows) {
   thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  // ----- BUILD HEADER -----
   let h = "<tr>";
-  header.forEach(col => {
-    h += `<th>${col}</th>`;
-  });
-  h += `<th style="min-width:120px;">Actions</th></tr>`;
+  header.forEach(col => h += `<th>${col}</th>`);
+  h += `<th>Actions</th></tr>`;
   thead.innerHTML = h;
 
-  // ----- BUILD BODY -----
   rows.forEach(r => {
     let row = "<tr>";
 
@@ -160,28 +143,21 @@ function renderTable(header, rows) {
     });
 
     row += `
-      <td class="actions-cell">
-        <button class="icon-btn" onclick="editRecord('${r["Data ID"]}')" title="Edit">✏️</button>
-        <button class="icon-btn" onclick="deleteRecord('${r["Data ID"]}')" title="Delete">🗑️</button>
+      <td>
+        <button class="icon-btn" onclick="editRecord('${r["Data ID"]}')">✏️</button>
+        <button class="icon-btn" onclick="deleteRecord('${r["Data ID"]}')">🗑️</button>
       </td>
-    `;
+    </tr>`;
 
-    row += "</tr>";
     tbody.innerHTML += row;
   });
 }
 
-// --------------------
-// EDIT
-// --------------------
 function editRecord(dataID) {
   localStorage.setItem("edit_dataID", dataID);
   window.location.href = "edit.html";
 }
 
-// --------------------
-// DELETE
-// --------------------
 async function deleteRecord(dataID) {
   if (!confirm("Delete household " + dataID + "?")) return;
 
@@ -190,28 +166,19 @@ async function deleteRecord(dataID) {
   try {
     const res = await fetch(scriptURL, {
       method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(body)
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(body)
     });
 
-    const raw = await res.text();
-    console.log("DELETE RAW:", raw);
-
-    const data = JSON.parse(raw);
+    const data = JSON.parse(await res.text());
     alert(data.message);
 
     loadRecords();
-
   } catch (err) {
     alert("Delete failed");
   }
 }
-    
 </script>
 
 </body>
 </html>
-
-
-
-
