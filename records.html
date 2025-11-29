@@ -38,30 +38,23 @@
 }
 
 /* Icon Buttons */
-.icon-btn {
+.icon-btn-lg {
   border:none;
   background:none;
   cursor:pointer;
-  padding:4px;      /* smaller to match row height */
-  border-radius:6px;
+  padding:6px;
+  border-radius:8px;
+  transition:0.15s;
 }
-
+.icon-btn-lg:hover { background:#e8ffee; }
 .icon-btn svg,
 .icon-btn img {
-  width:16px;       /* small icons for table */
+  width:16px;          /* smaller icons */
   height:16px;
-}
-
-.icon-btn:hover {
-  background:#eef9ff;
 }
 
 /* Refresh Icon Color */
 .icon-refresh svg path { fill:#0A8A15; }
-#exportMenuBtn, icon-refresh {
-  font-size:24px;       /* bigger 📤 icon */
-  padding:10px !important;
-}
 
 /* Export Dropdown */
 .export-wrapper { position:relative; }
@@ -99,9 +92,9 @@
 
 .records-table th,
 .records-table td {
-  padding:6px 8px;       /* smaller row height */
-  font-size:14px;        /* standard text size */
-  line-height:1.25;      /* tighter vertical spacing */
+  padding:10px;
+  border-bottom:1px solid #eee;
+  white-space:nowrap;
 }
 
 .records-table thead th {
@@ -135,22 +128,9 @@
 .member-row { background:white; }
 .member-row.hidden { display:none; }
 .member-row td {
-  padding-left:22px;     /* indent only */
-  font-size:14px;        /* SAME as main rows */
-  padding-top:6px;
-  padding-bottom:6px;
-}
-.members-toggle-btn {
-  padding:4px 6px;
-  font-size:14px;        /* EXACT size as data text */
-  background:none;
-  border:none;
-  cursor:pointer;
-  color:#0a6a9a;
-}
-
-.members-toggle-btn:hover {
-  text-decoration:underline;
+  padding-left:25px;
+  font-size:0.95em;
+  color:#444;
 }
 
 /* Search highlight */
@@ -173,6 +153,18 @@
   background:#0f7a4a;
   color:white;
   font-weight:bold;
+}
+.members-toggle-btn {
+  padding:2px 4px;
+  font-size:12px;        /* EXACT size as data text */
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#0a6a9a;
+}
+
+.members-toggle-btn:hover {
+  text-decoration:underline;
 }
 </style>
 </head>
@@ -438,11 +430,15 @@ function renderPage(){
     });
 
     // Members toggle
-    const mtd=document.createElement("td");
-    mtd.className="actions-col";
-    mtd.innerHTML=
-      `<button class="icon-btn" onclick="toggleMembers('${group.dataID}')">▸ ${memCount} members</button>`;
-    tr.appendChild(mtd);
+   const mtd = document.createElement("td");
+mtd.className = "actions-col members-cell";
+
+mtd.innerHTML =
+  `<button class="members-toggle-btn" onclick="toggleMembers('${group.dataID}')">
+     ▸ ${memCount} members
+   </button>`;
+
+tr.appendChild(mtd);
 
     // Actions
     const atd=document.createElement("td");
@@ -607,4 +603,5 @@ window.addEventListener("DOMContentLoaded",()=>{
 
 </body>
 </html>
+
 
