@@ -1,299 +1,456 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MDRRMO Records</title>
-    <link rel="stylesheet" href="styles.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MDRRMO Records</title>
+<link rel="stylesheet" href="styles.css" />
 <style>
-/* HIGHLIGHT STYLE */
-.hl {
-  background: yellow;
-  padding: 1px 2px;
-}
+/* --- Layout + UI --- */
+.page-container { display:block; }
+.topbar { display:flex; align-items:center; gap:12px; padding:12px; background:#f7f9f7; border-bottom:1px solid #eee; }
+.brand { display:flex; gap:10px; align-items:center; }
+.logo { width:44px; height:44px; object-fit:contain; }
+.content-area { padding:18px; }
+.search-row { display:flex; gap:10px; justify-content:flex-end; align-items:center; margin-bottom:12px; }
 
-/* PAGINATION STYLES */
-#paginationArea {
-  margin-top: 12px;
-  text-align: center;
-}
-.page-btn {
-  padding: 6px 12px;
-  margin: 0 3px;
-  border: 1px solid #888;
-  background: #fff;
-  cursor: pointer;
-  border-radius: 6px;
-}
-.page-btn.active {
-  background: #007bff;
-  color: #fff;
-  font-weight: bold;
+/* search box + buttons on right */
+.search-container { display:flex; gap:8px; align-items:center; }
+.search-container input { padding:8px 12px; min-width:280px; border-radius:8px; border:1px solid #ccc; }
+
+/* records container */
+.records-wrapper { overflow:auto; border:1px solid #eee; border-radius:8px; background:#fff; }
+.records-table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:1100px; }
+.records-table th, .records-table td { padding:10px 8px; border-bottom:1px solid #f0f0f0; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
+.records-table thead th { background:#fafafa; position:sticky; top:0; z-index:20; border-bottom:2px solid #e6e6e6; }
+
+/* sticky actions column on right */
+.actions-col { position:sticky; right:0; background:inherit; z-index:15; }
+
+/* sticky checkbox column at left */
+.select-col { position:sticky; left:0; background:inherit; z-index:15; }
+
+/* colors based on member count (head rows only) */
+.mem-small { background:#d4f6ff; }
+.mem-normal { background:#d9ffd9; }
+.mem-large { background:#fff7c2; }
+.mem-critical { background:#ffd6d6; }
+
+/* highlight */
+.hl { background: #ffe27a; padding: 1px 2px; border-radius:2px; }
+
+/* member rows styling (collapsible) */
+.member-row { display:table-row; background:#fff; }
+.member-row.hidden { display:none; }
+.member-row td { padding-left:28px; font-size:0.95em; color:#333; }
+
+/* misc */
+.icon-btn { border:0; padding:6px 8px; border-radius:6px; cursor:pointer; background:transparent; }
+.controls { display:flex; gap:8px; align-items:center; }
+.kv { color:#666; font-size:13px; margin-left:8px; }
+
+/* pagination */
+#paginationArea { margin-top:12px; text-align:center; }
+.page-btn { padding:6px 10px; margin:0 4px; border-radius:6px; border:1px solid #d0d0d0; background:#fff; cursor:pointer; }
+.page-btn.active { background:#0f7a4a; color:#fff; font-weight:700; }
+
+/* export buttons */
+.btn { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; background:linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; font-weight:600; }
+.btn.secondary { background:#fff; color:#0f7a4a; border:1px solid rgba(6,30,20,0.08); font-weight:600; }
+
+/* counts */
+.top-stats { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
+
+/* responsive */
+@media (max-width:880px){
+  .search-container input { min-width:160px; }
+  .records-table { min-width:900px; }
 }
 </style>
 </head>
-
 <body>
 <div class="page-container">
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn">☰</button>
     <div class="brand">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo" />
       <div>
-        <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+        <div style="font-weight:700">PUROK KALIGTASAN</div>
+        <div style="font-size:13px;color:#666">Disaster Risk Reduction & Management Office - Alitagtag</div>
       </div>
     </div>
-    <div class="user-info">
-      <span id="userName"></span>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+
+    <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+      <div id="userName" style="color:#333"></div>
     </div>
   </header>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <ul>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-      <li><a href="dataForm.html">📝 Data Entry</a></li>
-      <li><a href="records.html" class="active">📁 Records</a></li>
-      <li><a href="charts.html">📈 Charts</a></li>
-      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
-    </ul>
-  </aside>
-
-  <div id="loading">Loading records...</div>
-
-  <!-- MAIN CONTENT -->
   <main class="content-area">
     <h2>📁 Household Records</h2>
 
-    <!-- GLOBAL SEARCH -->
-    <div class="search-container">
-      <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID...">
+    <div class="top-stats">
+      <div class="kv">Rows: <strong id="rowCount">0</strong></div>
+      <div class="kv">Matches: <strong id="matchCount">0</strong></div>
+      <div class="kv">Selected: <strong id="selectedCount">0</strong></div>
     </div>
-      <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
 
-    <!-- FILTER BAR -->
-    <div class="records-container">
-      <div class="filter-bar">
-
-        <select id="filterBarangay">
-          <option value="">All Barangays</option>
-          <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-          <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
-          <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
-          <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
-          <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
-          <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
-        </select>
+    <div class="search-row">
+      <div style="flex:1; display:flex; align-items:center; gap:12px;">
+        <div>
+          <label>Barangay:</label>
+          <select id="filterBarangay" style="padding:6px 8px; border-radius:6px; border:1px solid #ccc;">
+            <option value="">All Barangays</option>
+            <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+            <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+            <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+            <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+            <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+            <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+          </select>
+        </div>
       </div>
 
-<div class="records-wrapper">
-    <table id="recordsTable" class="records-table">
-      <thead id="tableHead"></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-
-    <!-- Pagination buttons will appear here -->
-    <div id="paginationArea"></div>
-</div>
+      <div class="search-container">
+        <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID..." />
+        <button id="refreshBtn" class="btn secondary">Refresh</button>
+        <div class="controls">
+          <button id="exportAllBtn" class="btn" title="Export all rows">Export All</button>
+          <button id="exportSelBtn" class="btn" title="Export selected rows">Export Selected</button>
+        </div>
+      </div>
     </div>
 
+    <div style="height:10px;"></div>
+
+    <div class="records-wrapper" id="tableWrapper">
+      <table id="recordsTable" class="records-table" role="grid" aria-label="Records table">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="paginationArea"></div>
+  </main>
+</div>
+
+<div id="loading" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(255,255,255,0.7); z-index:9999;">
+  <div style="background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,0.08)">Loading records…</div>
+</div>
+
 <script>
-const scriptURL =
-  "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+/* =============== CONFIG =============== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-// PAGINATION
-let allRows = [];
-let currentHeader = [];
+/* =============== STATE =============== */
+let rawRows = [];           // full flat rows from API
+let grouped = {};          // dataID => { head: {...}, members: [...] }
+let header = [];           // header array
 let currentPage = 1;
-let rowsPerPage = 25;
+const rowsPerPage = 25;
+let selectedIds = new Set();
 
-// AUTO LOAD + SEARCH + BARANGAY FILTER
-window.onload = () => {
-  loadRecords();
+/* =============== UTIL =============== */
+function showLoading(show){ document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
+function computeKeywordRegex(q){ if(!q) return null; const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&'); return new RegExp(esc,'gi'); }
+function highlightText(text, q){ if(!q) return escapeHtml(text); const re = computeKeywordRegex(q); return escapeHtml(text).replace(re, m => `<span class="hl">${m}</span>`); }
+function escapeHtml(s){ return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
 
-  // Auto search while typing
-  let typingTimer;
-  document.getElementById("searchInput").addEventListener("input", () => {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(loadRecords, 300);
-  });
-
-  // Auto barangay filter
-  document.getElementById("filterBarangay").addEventListener("change", loadRecords);
-};
-
-function showLoading(show) {
-  document.getElementById("loading").style.display = show ? "flex" : "none";
+/* =============== JSONP LOADER =============== */
+function jsonpGet(params, cb){
+  const ts = Date.now();
+  const cbName = 'cb_' + ts + '_' + Math.floor(Math.random()*1000);
+  window[cbName] = function(resp){ try{ cb(null, resp); } finally { try{ delete window[cbName]; }catch(e){} } };
+  const q = `action=getRecords&filterBarangay=${encodeURIComponent(params.filterBarangay||'')}&filterStage=${encodeURIComponent(params.filterStage||'')}&q=${encodeURIComponent(params.q||'')}&callback=${cbName}`;
+  const s = document.createElement('script');
+  s.src = SCRIPT_URL + '?' + q;
+  s.onerror = function(){ cb(new Error('JSONP failed')); try{ delete window[cbName]; }catch(e){} };
+  s.onload = function(){ s.remove(); };
+  document.body.appendChild(s);
 }
 
-// --------------------------------------------------
-// LOAD DATA (SAFE JSONP)
-// --------------------------------------------------
-function loadRecords() {
+/* =============== LOAD & GROUPING =============== */
+function loadRecords(){
   showLoading(true);
+  const filterBarangay = document.getElementById('filterBarangay').value || '';
+  const q = document.getElementById('searchInput').value || '';
 
-  const barangay = encodeURIComponent(document.getElementById("filterBarangay").value);
-  const q = encodeURIComponent(document.getElementById("searchInput").value);
-
-  const callbackName = "cb_" + Date.now();
-  window[callbackName] = function (response) {
-    delete window[callbackName]; // cleanup
-    recordsLoaded(response);
-  };
-
-  const url =
-    `${scriptURL}?action=getRecords&filterBarangay=${barangay}` +
-    `&filterStage=&q=${q}&callback=${callbackName}`;
-
-  const script = document.createElement("script");
-  script.src = url;
-  script.onerror = () => {
+  jsonpGet({ filterBarangay, filterStage: '', q }, function(err, resp){
     showLoading(false);
-    alert("Error loading records (JSONP failed)");
-  };
-  document.body.appendChild(script);
+    if(err){ alert('Failed to load records'); console.error(err); return; }
+    if(!resp || !resp.success){ alert('Failed to load records: ' + (resp && resp.message)); return; }
 
-  // clean old script tags
-  setTimeout(() => script.remove(), 5000);
+    header = resp.header || [];
+    rawRows = resp.rows || [];
+    // group by Data ID
+    grouped = {};
+    for (let r of rawRows){
+      const id = String(r['Data ID'] || '');
+      if(!id) continue;
+      if(!grouped[id]) grouped[id] = { dataID: id, head: null, members: [] };
+      const memberName = r['Name of Household Member/s'];
+      const isHead = (!memberName || String(memberName).trim() === '');
+      if(isHead && !grouped[id].head){
+        grouped[id].head = r;
+        // store original row number if present
+        grouped[id].head.__rowNumber = r.__rowNumber || null;
+      } else {
+        grouped[id].members.push(r);
+      }
+    }
+    // fallback: if a group has no head, choose first member as head (keeps behavior stable)
+    for (let id in grouped){
+      if(!grouped[id].head && grouped[id].members.length>0){
+        grouped[id].head = grouped[id].members.shift();
+      }
+    }
+
+    // keep sorted array for stable pagination (by numeric Data ID)
+    const keys = Object.keys(grouped).sort((a,b)=> Number(a)-Number(b));
+    // recreate array-of-groups
+    const groupsArr = keys.map(k => grouped[k]);
+
+    // store as array for pagination/render functions
+    window.__groupsArr = groupsArr;
+    currentPage = 1;
+    selectedIds.clear();
+    renderPage();
+    renderPagination();
+    updateCounts();
+  });
 }
 
-// --------------------------------------------------
-// JSONP CALLBACK
-// --------------------------------------------------
-function recordsLoaded(response) {
-  if (!response || !response.success) {
-    alert("Failed to load records");
-    showLoading(false);
-    return;
+/* =============== RENDERING =============== */
+function renderPage(){
+  const tbody = document.getElementById('tableBody');
+  const thead = document.getElementById('tableHead');
+  tbody.innerHTML = '';
+  thead.innerHTML = '';
+
+  // build header row (include select column + actions)
+  let ths = '<tr>';
+  ths += `<th class="select-col"><input id="selectAll" type="checkbox" title="Select all on page"></th>`;
+  header.forEach(h => ths += `<th>${escapeHtml(h)}</th>`);
+  ths += `<th class="actions-col">Members</th>`;
+  ths += `<th class="actions-col">Actions</th>`;
+  ths += '</tr>';
+  thead.innerHTML = ths;
+
+  const groupsArr = window.__groupsArr || [];
+  const total = groupsArr.length;
+  const start = (currentPage-1)*rowsPerPage;
+  const slice = groupsArr.slice(start, start + rowsPerPage);
+
+  const q = (document.getElementById('searchInput').value || '').trim();
+
+  for (let group of slice){
+    const head = group.head || {};
+    const members = group.members || [];
+    const memCount = members.length;
+    // choose color class
+    const cls = (memCount <= 1) ? 'mem-small' : (memCount <=4 ? 'mem-normal' : (memCount <=7 ? 'mem-large' : 'mem-critical'));
+
+    // build head row
+    let tr = document.createElement('tr');
+    tr.className = cls + ' head-row';
+    tr.dataset.dataId = group.dataID;
+
+    // SELECT checkbox (left sticky)
+    const tdSelect = document.createElement('td');
+    tdSelect.className = 'select-col';
+    const chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.className = 'row-select';
+    chk.dataset.dataId = group.dataID;
+    chk.addEventListener('change', onRowSelectChange);
+    if(selectedIds.has(group.dataID)) chk.checked = true;
+    tdSelect.appendChild(chk);
+    tr.appendChild(tdSelect);
+
+    // main columns in header order
+    for (let col of header){
+      const td = document.createElement('td');
+      let txt = head[col] !== undefined && head[col] !== null ? String(head[col]) : '';
+      // show members count in a dedicated column 'No. of Household Member/s' if exists
+      if(col === 'No. of Household Member/s'){
+        txt = String((head[col]||'') + (memCount ? ` (+${memCount})` : ''));
+      }
+      td.innerHTML = highlightText(txt, q);
+      tr.appendChild(td);
+    }
+
+    // Members count / toggle cell
+    const tdMembers = document.createElement('td');
+    tdMembers.className = 'actions-col';
+    tdMembers.innerHTML = `<button class="icon-btn" title="Toggle members" onclick="toggleMembers('${group.dataID}')">▸ ${memCount} member${memCount!==1?'s':''}</button>`;
+    tr.appendChild(tdMembers);
+
+    // Actions cell
+    const tdActions = document.createElement('td');
+    tdActions.className = 'actions-col';
+    tdActions.innerHTML = `
+      <button class="icon-btn" title="Edit" onclick="editRecord('${group.dataID}')">✏️</button>
+      <button class="icon-btn" title="Delete" onclick="deleteRecord('${group.dataID}')">🗑️</button>
+    `;
+    tr.appendChild(tdActions);
+
+    tbody.appendChild(tr);
+
+    // append member rows (collapsible)
+    for (let m of members){
+      const mrt = document.createElement('tr');
+      mrt.className = 'member-row';
+      mrt.dataset.parent = group.dataID;
+      // blank cell for selection column
+      const tdEmpty = document.createElement('td'); tdEmpty.innerHTML = ''; mrt.appendChild(tdEmpty);
+      // add columns in header order
+      for (let col of header){
+        const td = document.createElement('td');
+        td.innerHTML = highlightText(String(m[col] || ''), q);
+        mrt.appendChild(td);
+      }
+      // two small cells for alignment
+      const tdM = document.createElement('td'); tdM.innerText = ''; mrt.appendChild(tdM);
+      const tdA = document.createElement('td'); tdA.innerHTML = ''; mrt.appendChild(tdA);
+
+      tbody.appendChild(mrt);
+    }
   }
 
-  currentHeader = response.header || [];
-  allRows = response.rows || [];
-  currentPage = 1;
+  // wire selectAll checkbox
+  const selectAll = document.getElementById('selectAll');
+  if(selectAll){
+    selectAll.checked = slice.every(g => selectedIds.has(g.dataID));
+    selectAll.onchange = function(){ slice.forEach(g => {
+      const cb = document.querySelector(`input.row-select[data-data-id="${g.dataID}"]`);
+      if(cb){ cb.checked = selectAll.checked; if(selectAll.checked) selectedIds.add(g.dataID); else selectedIds.delete(g.dataID); }
+    }); updateSelectedCount(); };
+  }
 
-  renderPage();
-  renderPagination();
-
-  showLoading(false);
+  updateCounts();
 }
 
-// --------------------------------------------------
-// PAGINATION
-// --------------------------------------------------
-function getPagedRows() {
-  const start = (currentPage - 1) * rowsPerPage;
-  return allRows.slice(start, start + rowsPerPage);
+/* =============== TOGGLE MEMBERS =============== */
+function toggleMembers(dataID){
+  const rows = document.querySelectorAll(`tr.member-row[data-parent="${dataID}"]`);
+  if(!rows || rows.length===0) return;
+  const isHidden = rows[0].classList.contains('hidden');
+  rows.forEach(r => r.classList.toggle('hidden', !isHidden)); // if currently hidden -> show (remove 'hidden' = false)
 }
 
-function changePage(p) {
-  const max = Math.ceil(allRows.length / rowsPerPage);
-  if (p < 1 || p > max) return;
+/* =============== PAGINATION =============== */
+function renderPagination(){
+  const groupsArr = window.__groupsArr || [];
+  const totalPages = Math.max(1, Math.ceil(groupsArr.length / rowsPerPage));
+  const div = document.getElementById('paginationArea');
+  let html = '';
+  if(totalPages <= 1){ div.innerHTML = ''; return; }
+  html += `<button class="page-btn" onclick="changePage(${currentPage-1})">⬅ Prev</button>`;
+  // show limited page numbers for readability
+  const start = Math.max(1, currentPage - 3);
+  const end = Math.min(totalPages, currentPage + 3);
+  for(let i = start; i <= end; i++){
+    html += `<button class="page-btn ${i===currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" onclick="changePage(${currentPage+1})">Next ➡</button>`;
+  div.innerHTML = html;
+}
+
+function changePage(p){
+  const groupsArr = window.__groupsArr || [];
+  const totalPages = Math.max(1, Math.ceil(groupsArr.length / rowsPerPage));
+  if(p < 1 || p > totalPages) return;
   currentPage = p;
   renderPage();
   renderPagination();
 }
 
-// --------------------------------------------------
-// SEARCH HIGHLIGHT
-// --------------------------------------------------
-function highlightText(text, keyword) {
-  if (!keyword) return text;
-  keyword = keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-  return text.replace(new RegExp(`(${keyword})`, "gi"), `<span class="hl">$1</span>`);
+/* =============== COUNTS & SELECTION =============== */
+function updateCounts(){
+  const groupsArr = window.__groupsArr || [];
+  document.getElementById('rowCount').innerText = groupsArr.length || 0;
+  // match count = filtered rows count (we used filter on server), so equal to groups length
+  document.getElementById('matchCount').innerText = groupsArr.length || 0;
+  document.getElementById('selectedCount').innerText = selectedIds.size || 0;
 }
 
-// --------------------------------------------------
-// RENDER PAGE
-// --------------------------------------------------
-function renderPage() {
-  const tbody = document.getElementById("tableBody");
-  const thead = document.getElementById("tableHead");
-  const keyword = document.getElementById("searchInput").value.trim();
-
-  tbody.innerHTML = "";
-  thead.innerHTML = "";
-
-  // Header
-  let headerHTML = "<tr>";
-  currentHeader.forEach(col => headerHTML += `<th>${col}</th>`);
-  headerHTML += "<th>Actions</th></tr>";
-  thead.innerHTML = headerHTML;
-
-  // Rows
-  getPagedRows().forEach(r => {
-    let row = "<tr>";
-
-    currentHeader.forEach(col => {
-      let val = String(r[col] ?? "");
-      val = highlightText(val, keyword);
-      row += `<td>${val}</td>`;
-    });
-
-    row += `
-      <td>
-        <button class="icon-btn" onclick="editRecord('${r["Data ID"]}')">✏️</button>
-        <button class="icon-btn" onclick="deleteRecord('${r["Data ID"]}')">🗑️</button>
-      </td>
-    </tr>`;
-
-    tbody.innerHTML += row;
-  });
+function onRowSelectChange(e){
+  const id = e.target.dataset.dataId;
+  if(!id) return;
+  if(e.target.checked) selectedIds.add(id); else selectedIds.delete(id);
+  updateSelectedCount();
 }
+function updateSelectedCount(){ document.getElementById('selectedCount').innerText = selectedIds.size; }
 
-// --------------------------------------------------
-// PAGINATION BUTTONS
-// --------------------------------------------------
-function renderPagination() {
-  const div = document.getElementById("paginationArea");
-  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+/* =============== EDIT / DELETE =============== */
+function editRecord(dataID){ localStorage.setItem('edit_dataID', dataID); window.location.href = 'edit.html'; }
 
-  if (totalPages <= 1) {
-    div.innerHTML = "";
-    return;
-  }
-
-  let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})">⬅ Prev</button>`;
-
-  for (let i = 1; i <= totalPages; i++) {
-    html += `<button class="page-btn ${i === currentPage ? "active" : ""}" onclick="changePage(${i})">${i}</button>`;
-  }
-
-  html += `<button class="page-btn" onclick="changePage(${currentPage + 1})">Next ➡</button>`;
-  div.innerHTML = html;
-}
-
-// --------------------------------------------------
-// ACTIONS
-// --------------------------------------------------
-function editRecord(dataID) {
-  localStorage.setItem("edit_dataID", dataID);
-  window.location.href = "edit.html";
-}
-
-async function deleteRecord(dataID) {
-  if (!confirm("Delete household " + dataID + "?")) return;
-
+async function deleteRecord(dataID){
+  if(!confirm('Delete household ' + dataID + '?')) return;
   try {
-    const res = await fetch(scriptURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "deleteHousehold", dataID })
-    });
-
-    const data = await res.json();
-    alert(data.message);
+    const res = await fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'deleteHousehold', dataID }) });
+    const text = await res.text();
+    const json = JSON.parse(text);
+    alert(json.message || 'Deleted');
     loadRecords();
-  } catch (err) {
-    alert("Delete failed");
-  }
+  } catch(err){ console.error(err); alert('Delete failed'); }
 }
+
+/* =============== EXPORT (CSV) =============== */
+function rowsToCSV(groups){
+  // flatten header (we will include header columns once)
+  const cols = header.slice(); // clone
+  const csvRows = [];
+  csvRows.push(cols.map(c => `"${c.replace(/"/g,'""')}"`).join(','));
+  for (let g of groups){
+    // head row
+    const head = g.head || {};
+    const headCells = cols.map(c => `"${String(head[c]||'').replace(/"/g,'""')}"`);
+    csvRows.push(headCells.join(','));
+    // member rows
+    for (let m of (g.members||[])){
+      const cells = cols.map(c => `"${String(m[c]||'').replace(/"/g,'""')}"`);
+      csvRows.push(cells.join(','));
+    }
+  }
+  return csvRows.join('\r\n');
+}
+function downloadCSV(filename, content){
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+document.getElementById('exportAllBtn').addEventListener('click', () => {
+  const groupsArr = window.__groupsArr || [];
+  if(!groupsArr.length){ alert('No rows to export'); return; }
+  const csv = rowsToCSV(groupsArr);
+  downloadCSV('mdrrmo_records_all.csv', csv);
+});
+
+document.getElementById('exportSelBtn').addEventListener('click', () => {
+  const groupsArr = window.__groupsArr || [];
+  const sel = groupsArr.filter(g => selectedIds.has(g.dataID));
+  if(sel.length === 0){ alert('No households selected'); return; }
+  const csv = rowsToCSV(sel);
+  downloadCSV('mdrrmo_records_selected.csv', csv);
+});
+
+/* =============== UI BINDINGS =============== */
+document.getElementById('refreshBtn').addEventListener('click', () => loadRecords());
+document.getElementById('filterBarangay').addEventListener('change', () => loadRecords());
+let typingTimer;
+document.getElementById('searchInput').addEventListener('input', () => {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => { loadRecords(); }, 300);
+});
+
+/* =============== INIT =============== */
+window.addEventListener('DOMContentLoaded', () => {
+  // populate user (if available)
+  document.getElementById('userName').innerText = localStorage.getItem('staffName') || '';
+
+  loadRecords();
+});
 </script>
 </body>
 </html>
-
-
-
-
-
