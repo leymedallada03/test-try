@@ -38,18 +38,30 @@
 }
 
 /* Icon Buttons */
-.icon-btn-lg {
+.icon-btn {
   border:none;
   background:none;
   cursor:pointer;
-  padding:6px;
-  border-radius:8px;
-  transition:0.15s;
+  padding:4px;      /* smaller to match row height */
+  border-radius:6px;
 }
-.icon-btn-lg:hover { background:#e8ffee; }
+
+.icon-btn svg,
+.icon-btn img {
+  width:16px;       /* small icons for table */
+  height:16px;
+}
+
+.icon-btn:hover {
+  background:#eef9ff;
+}
 
 /* Refresh Icon Color */
 .icon-refresh svg path { fill:#0A8A15; }
+#exportMenuBtn, icon-refresh {
+  font-size:24px;       /* bigger 📤 icon */
+  padding:10px !important;
+}
 
 /* Export Dropdown */
 .export-wrapper { position:relative; }
@@ -87,9 +99,9 @@
 
 .records-table th,
 .records-table td {
-  padding:10px;
-  border-bottom:1px solid #eee;
-  white-space:nowrap;
+  padding:6px 8px;       /* smaller row height */
+  font-size:14px;        /* standard text size */
+  line-height:1.25;      /* tighter vertical spacing */
 }
 
 .records-table thead th {
@@ -123,9 +135,22 @@
 .member-row { background:white; }
 .member-row.hidden { display:none; }
 .member-row td {
-  padding-left:25px;
-  font-size:0.95em;
-  color:#444;
+  padding-left:22px;     /* indent only */
+  font-size:14px;        /* SAME as main rows */
+  padding-top:6px;
+  padding-bottom:6px;
+}
+.members-toggle-btn {
+  padding:4px 6px;
+  font-size:14px;        /* EXACT size as data text */
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#0a6a9a;
+}
+
+.members-toggle-btn:hover {
+  text-decoration:underline;
 }
 
 /* Search highlight */
@@ -582,3 +607,4 @@ window.addEventListener("DOMContentLoaded",()=>{
 
 </body>
 </html>
+
