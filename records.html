@@ -1,233 +1,123 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>MDRRMO Records</title>
-<link rel="stylesheet" href="styles.css" />
-
+<link rel="stylesheet" href="styles.css"/>
 <style>
-/* ============================================================
-   ★ Only page-specific CSS (NO layout overrides)
-   ============================================================ */
+/* ====== Unified page-specific CSS (keeps main layout intact) ====== */
+.page-container { display:block; }
+.content-area { padding:18px; }
+.logo { width:44px;height:44px;object-fit:contain; }
 
+/* top stats (right aligned) */
+.top-stats { display:flex; justify-content:flex-end; gap:18px; margin-bottom:18px; font-size:14px; }
 .green { color:#0f7a4a; font-weight:700; }
 
-/* Toolbar */
-.records-toolbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  margin-bottom:18px;
-}
+/* toolbar - center search + right controls */
+.records-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
 .toolbar-center { flex:1; display:flex; justify-content:center; }
-.toolbar-right { display:flex; align-items:center; gap:12px; }
+.search-box { padding:8px 12px; border-radius:8px; border:1px solid #bbb; min-width:300px; }
 
-.search-box {
-  padding:8px 12px;
-  border-radius:8px;
-  border:1px solid #bbb;
-  min-width:260px;
-}
+/* right controls */
+.toolbar-right { display:flex; align-items:center; gap:10px; }
+.brgy-dropdown { padding:8px 10px; border-radius:8px; border:1px solid #ccc; }
 
-.brgy-dropdown {
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
+/* icon buttons */
+.icon-btn-lg { border:0; background:none; cursor:pointer; padding:8px; border-radius:8px; transition:0.12s; display:inline-flex; align-items:center; justify-content:center; }
+.icon-btn-lg:hover { background:#eefef6; }
 
-/* Icon Buttons */
-.icon-btn-lg {
-  border:none;
-  background:none;
-  cursor:pointer;
-  padding:2px;
-  border-radius:4px;
-  transition:0.15s;
-}
-.icon-btn-lg:hover { background:#e8ffee; }
-.icon-btn svg,
-.icon-btn img {
-  width:4px;          /* smaller icons */
-  height:4px;
-}
+/* SVG sizing */
+.icon-btn-lg svg { width:26px; height:26px; }
 
-/* Refresh Icon Color */
-.icon-refresh svg path { fill:#0A8A15; }
-
-/* Export Dropdown */
+/* export menu */
 .export-wrapper { position:relative; }
-.export-dropdown {
-  position:absolute;
-  right:0; top:36px;
-  background:white;
-  border:1px solid #ccc;
-  border-radius:8px;
-  padding:6px 0;
-  width:150px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.12);
-  z-index:9999;
-}
-.export-dropdown div {
-  padding:10px 14px;
-  cursor:pointer;
-}
-.export-dropdown div:hover { background:#effff5; }
+.export-dropdown { position:absolute; right:0; top:44px; background:#fff; border:1px solid #ddd; border-radius:8px; padding:6px 0; width:180px; box-shadow:0 8px 24px rgba(0,0,0,0.08); z-index:9999; }
+.export-dropdown div { padding:10px 14px; cursor:pointer; }
+.export-dropdown div:hover { background:#f3fff6; }
 .hidden { display:none; }
 
-/* Table */
-.records-wrapper {
-  overflow:auto;
-  border-radius:10px;
-  background:#fff;
-  box-shadow:0 2px 5px rgba(0,0,0,0.05);
-}
+/* table */
+.records-wrapper { overflow:auto; border-radius:10px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.05); margin-top:10px; }
+.records-table { width:100%; border-collapse:collapse; min-width:1100px; }
+.records-table th, .records-table td { padding:8px 10px; border-bottom:1px solid #eee; white-space:nowrap; vertical-align:middle; font-size:13px; }
+.records-table thead th { background:#f4f7f4; position:sticky; top:0; z-index:20; }
 
-.records-table {
-  width:100%;
-  border-collapse:collapse;
-  min-width:1100px;
-}
+/* sticky columns */
+.select-col { position:sticky; left:0; background:#fff; z-index:25; padding-left:12px; padding-right:12px; }
+.actions-col { position:sticky; right:0; background:#fff; z-index:25; padding-left:10px; padding-right:10px; }
 
-.records-table th,
-.records-table td {
-  padding:10px;
-  border-bottom:1px solid #eee;
-  white-space:nowrap;
-   height: 30px;
-}
+/* member rows style same size as head rows */
+.member-row td { padding-left:25px; font-size:13px; color:#444; }
 
-.records-table thead th {
-  background:#f4f7f4;
-  position:sticky;
-  top:0;
-  z-index:20;
-}
+/* smaller icons for inline actions */
+.icon-small { font-size:14px; padding:6px; border-radius:6px; background:none; border:0; cursor:pointer; }
 
-.select-col {
-  position:sticky;
-  left:0;
-  background:#fff;
-  z-index:25;
-}
+/* members toggle button */
+.members-toggle-btn { padding:4px 6px; font-size:13px; background:none; border:0; color:#0a6a9a; cursor:pointer; }
+.members-toggle-btn:hover { text-decoration:underline; }
 
-.actions-col {
-  position:sticky;
-  right:0;
-  background:#fff;
-  z-index:25;
-}
+/* row color coding */
+.mem-small { background:#f7fdff; }
+.mem-normal { background:#f7fff7; }
+.mem-large { background:#fffdf0; }
+.mem-critical { background:#fff5f5; }
 
-/* Color Coding */
-.mem-small { background:#d4f6ff; }
-.mem-normal { background:#d9ffd9; }
-.mem-large { background:#fff7c2; }
-.mem-critical { background:#ffd6d6; }
-
-/* Member rows */
-.member-row { background:white; }
-.member-row.hidden { display:none; }
-.member-row td {
-  padding-left:25px;
-  font-size:13px;     /* exact same as main rows */
-  color:#444;
-}
-
-/* Search highlight */
-.hl {
-  background:#ffeb8a;
-  border-radius:3px;
-}
-
-/* Pagination */
+/* pagination */
 #paginationArea { text-align:center; margin-top:16px; }
-.page-btn {
-  padding:6px 12px;
-  margin:0 3px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  background:white;
-  cursor:pointer;
-}
-.page-btn.active {
-  background:#0f7a4a;
-  color:white;
-  font-weight:bold;
-}
-.members-toggle-btn {
-  padding:2px 4px;
-  font-size:12px;        /* EXACT size as data text */
-  background:none;
-  border:none;
-  cursor:pointer;
-  color:#0a6a9a;
-}
+.page-btn { padding:6px 10px; margin:0 4px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+.page-btn.active { background:#0f7a4a; color:#fff; }
 
-.members-toggle-btn:hover {
-  text-decoration:underline;
-}
-.rowCOunt,.matchCount,.selectedCount {
-   font-size:10px;  
+/* small utilities */
+.hl { background:#ffeb8a; border-radius:3px; padding:0 2px; }
 </style>
 </head>
-
 <body>
 <div class="page-container">
 
-  <!-- TOPBAR -->
+  <!-- topbar -->
   <header class="topbar">
     <button id="menuToggle" class="menu-btn">☰</button>
-
     <div class="brand">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo" />
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
       <div>
         <div class="title">PUROK KALIGTASAN</div>
         <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
       </div>
     </div>
-
     <div class="user-info">
       <span id="userName"></span>
       <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
   </header>
 
-  <!-- SIDEBAR -->
+  <!-- sidebar -->
   <aside class="sidebar">
     <ul>
       <li><a href="dashboard.html">📊 Dashboard</a></li>
       <li><a href="dataForm.html">📝 Data Entry</a></li>
       <li><a href="records.html" class="active">📁 Records</a></li>
       <li><a href="charts.html">📈 Charts</a></li>
-      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
     </ul>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  <!-- main -->
   <main class="content-area" tabindex="-1">
-
     <h2>📁 Household Records</h2>
 
-    <!-- Stats -->
-    <div class="top-stats" style="display:flex; justify-content:flex-end; gap:18px; margin-bottom:18px;">
+    <div class="top-stats">
       <span>Rows: <strong class="green" id="rowCount">0</strong></span>
       <span>Matches: <strong class="green" id="matchCount">0</strong></span>
       <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
     </div>
 
-    <!-- Toolbar -->
     <div class="records-toolbar">
-
-      <!-- Center Search -->
       <div class="toolbar-center">
-        <input id="searchInput" class="search-box"
-               placeholder="Search by Barangay / Name / Data ID..." />
+        <input id="searchInput" class="search-box" placeholder="Search by Barangay / Name / Data ID..." />
       </div>
 
-      <!-- Right Controls -->
       <div class="toolbar-right">
-
         <select id="filterBarangay" class="brgy-dropdown">
           <option value="">All Barangays</option>
           <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
@@ -238,393 +128,263 @@
           <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
         </select>
 
-        <!-- Refresh -->
+        <!-- Refresh (SVG icon) -->
         <button id="refreshBtn" class="icon-btn-lg icon-refresh" title="Refresh">
-          <svg width="22" height="22" viewBox="0 0 24 24">
-            <path d="M12 6V3L8 7l4 4V8c2.2 0 4 1.8 4 4 0 .7-.2 1.4-.5 2l1.5 1.3c.6-.9 1-2 1-3.3 0-3.3-2.7-6-6-6zm-4.5 2C6.9 8.9 6 10.4 6 12c0 3.3 2.7 6 6 6v3l4-4-4-4v3c-2.2 0-4-1.8-4-4 0-.7.2-1.4.5-2L7.5 8z"></path>
+          <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+            <path d="M12 6V3L8 7l4 4V8c2.2 0 4 1.8 4 4 0 .7-.2 1.4-.5 2l1.5 1.3c.6-.9 1-2 1-3.3 0-3.3-2.7-6-6-6zm-4.5 2C6.9 8.9 6 10.4 6 12c0 3.3 2.7 6 6 6v3l4-4-4-4v3c-2.2 0-4-1.8-4-4 0-.7.2-1.4.5-2L7.5 8z" fill="#0A8A15"/>
           </svg>
         </button>
 
-        <!-- Export Menu -->
+        <!-- Export menu -->
         <div class="export-wrapper">
-          <button id="exportMenuBtn" class="icon-btn-lg">📤</button>
+          <button id="exportMenuBtn" class="icon-btn-lg" title="Export">
+            <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+              <path d="M12 3v10M5 10l7 7 7-7" stroke="#0f7a4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </button>
           <div id="exportDropdown" class="export-dropdown hidden">
-            <div onclick="exportAll()">Export All</div>
-            <div onclick="exportSelected()">Export Selected</div>
+            <div id="exportAll">Export All</div>
+            <div id="exportSelected">Export Selected</div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- TABLE WRAPPER -->
-    <div class="records-wrapper">
-      <table id="recordsTable" class="records-table">
+    <div class="records-wrapper" id="tableWrapper">
+      <table id="recordsTable" class="records-table" role="grid" aria-label="Records table">
         <thead id="tableHead"></thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
 
-    <!-- Pagination -->
     <div id="paginationArea"></div>
-
   </main>
 </div>
 
-<!-- Loading Overlay -->
-<div id="loading"
-     style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(255,255,255,0.7); z-index:9999;">
-  <div style="background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.08);">
-    Loading records…
-  </div>
+<!-- loading overlay -->
+<div id="loading" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(255,255,255,0.7); z-index:9999;">
+  <div style="background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,0.08)">Loading records…</div>
 </div>
 
-<!-- ============================================================
-     EMBEDDED JAVASCRIPT
-     (Your full functional JS preserved and cleaned)
-============================================================== -->
 <script>
-/* ========================= CONFIG ========================= */
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+/* ================= CONFIG ================= */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-/* ========================= STATE ========================= */
-let rawRows = [];
-let grouped = {};
-let header = [];
-let selectedIds = new Set();
-let groupsArr = [];
-let rowsPerPage = 25;
-let currentPage = 1;
+/* ================ STATE ================= */
+let header = [], rawRows = [], grouped = {}, groupsArr = [], selectedIds = new Set();
+let currentPage = 1, rowsPerPage = 25;
 
-/* ========================= UTIL ========================= */
-function escapeHtml(s) {
-  return String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
-}
-function computeKeywordRegex(q){
-  if(!q) return null;
-  const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g,"\\$&");
-  return new RegExp(esc,"gi");
-}
-function highlight(text,q){
-  if(!q) return escapeHtml(text);
-  const re = computeKeywordRegex(q);
-  return escapeHtml(text).replace(re,m=>`<span class="hl">${m}</span>`);
-}
-function showLoading(s){
-  document.getElementById("loading").style.display = s ? "flex" : "none";
+/* ================ UTIL ================== */
+function showLoading(s){ document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function computeKeywordRegex(q){ if(!q) return null; const esc=q.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&'); return new RegExp(esc,'gi'); }
+function highlight(text,q){ if(!q) return escapeHtml(text); const re=computeKeywordRegex(q); return escapeHtml(text).replace(re,m=>`<span class="hl">${m}</span>`); }
+
+/* ============== JSONP for GAS ============== */
+function jsonpGet(params, cb){
+  const ts = Date.now(), cbName = 'cb_'+ts+'_'+Math.floor(Math.random()*1000);
+  window[cbName] = function(resp){ try{ cb(null,resp); } finally { try{ delete window[cbName]; }catch(e){} } };
+  const q = `action=getRecords&filterBarangay=${encodeURIComponent(params.filterBarangay||'')}&q=${encodeURIComponent(params.q||'')}&callback=${cbName}`;
+  const s = document.createElement('script'); s.src = SCRIPT_URL + '?' + q;
+  s.onerror = ()=>cb(new Error('JSONP failed')); s.onload = ()=>s.remove(); document.body.appendChild(s);
 }
 
-/* ========================= JSONP LOADER ========================= */
-function jsonpGet(params,cb){
-  const ts = Date.now();
-  const cbName = "cb_" + ts + "_" + Math.floor(Math.random()*1000);
-  window[cbName] = function(resp){
-    cb(null,resp);
-    delete window[cbName];
-  };
-  const q =
-    `action=getRecords`+
-    `&filterBarangay=${encodeURIComponent(params.filterBarangay||"")}`+
-    `&q=${encodeURIComponent(params.q||"")}`+
-    `&callback=${cbName}`;
-  const s = document.createElement("script");
-  s.src = `${SCRIPT_URL}?${q}`;
-  s.onerror = ()=>cb(new Error("JSONP failed"));
-  s.onload = ()=>s.remove();
-  document.body.appendChild(s);
-}
-
-/* ========================= LOAD + GROUP ========================= */
+/* ============== LOAD & GROUP ================= */
 function loadRecords(){
   showLoading(true);
-  const brgy = document.getElementById("filterBarangay").value||"";
-  const q = document.getElementById("searchInput").value||"";
-
-  jsonpGet({filterBarangay:brgy,q},(err,resp)=>{
+  const brgy = document.getElementById('filterBarangay').value || '';
+  const q = document.getElementById('searchInput').value || '';
+  jsonpGet({ filterBarangay: brgy, q }, function(err, resp){
     showLoading(false);
-    if(err || !resp || !resp.success){
-      alert("Failed to load records"); return;
-    }
-    header = resp.header||[];
-    rawRows = resp.rows||[];
+    if(err || !resp || !resp.success){ alert('Failed to load records'); console.error(err, resp); return; }
+    header = resp.header || [];
+    rawRows = resp.rows || [];
+    // group by Data ID
     grouped = {};
-
     rawRows.forEach(r=>{
-      const id = String(r["Data ID"]||"");
+      const id = String(r['Data ID'] || '');
       if(!id) return;
-      if(!grouped[id]) grouped[id]={dataID:id,head:null,members:[]};
-      const isHead = !r["Name of Household Member/s"];
-      if(isHead && !grouped[id].head) grouped[id].head=r;
+      if(!grouped[id]) grouped[id] = { dataID: id, head: null, members: [] };
+      const memberName = r['Name of Household Member/s'];
+      const isHead = (!memberName || String(memberName).trim() === '');
+      if(isHead && !grouped[id].head) { grouped[id].head = r; grouped[id].head.__rowNumber = r.__rowNumber || null; }
       else grouped[id].members.push(r);
     });
-
-    Object.keys(grouped).forEach(id=>{
-      if(!grouped[id].head && grouped[id].members.length>0)
-        grouped[id].head = grouped[id].members.shift();
-    });
-
-    const keys = Object.keys(grouped).sort((a,b)=>Number(a)-Number(b));
-    groupsArr = keys.map(id=>grouped[id]);
-
-    currentPage = 1;
-    selectedIds.clear();
-    renderPage();
-    renderPagination();
-    updateCounts();
+    // fallback: if no head, take first member
+    Object.keys(grouped).forEach(id => { if(!grouped[id].head && grouped[id].members.length) grouped[id].head = grouped[id].members.shift(); });
+    groupsArr = Object.keys(grouped).sort((a,b)=>Number(a)-Number(b)).map(k=>grouped[k]);
+    currentPage = 1; selectedIds.clear();
+    renderPage(); renderPagination(); updateCounts();
   });
 }
 
-/* ========================= RENDER TABLE ========================= */
+/* ============== RENDERING =============== */
 function renderPage(){
-  const tbody = document.getElementById("tableBody");
-  const thead = document.getElementById("tableHead");
-  tbody.innerHTML = "";
-  thead.innerHTML = "";
+  const tbody = document.getElementById('tableBody'), thead = document.getElementById('tableHead');
+  tbody.innerHTML = ''; thead.innerHTML = '';
+  // header row
+  let ths = '<tr><th class="select-col"><input id="selectAll" type="checkbox" /></th>';
+  header.forEach(h => ths += `<th>${escapeHtml(h)}</th>`);
+  ths += '<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>';
+  thead.innerHTML = ths;
 
-  // Header
-  let th = "<tr>";
-  th += `<th class="select-col"><input id="selectAll" type="checkbox"></th>`;
-  header.forEach(c=>th+=`<th>${escapeHtml(c)}</th>`);
-  th += `<th class="actions-col">Members</th>`;
-  th += `<th class="actions-col">Actions</th>`;
-  th+="</tr>";
-  thead.innerHTML = th;
-
-  const start=(currentPage-1)*rowsPerPage;
-  const slice=groupsArr.slice(start,start+rowsPerPage);
-  const q=document.getElementById("searchInput").value||"";
+  const start = (currentPage-1)*rowsPerPage, slice = groupsArr.slice(start, start+rowsPerPage);
+  const q = (document.getElementById('searchInput').value||'').trim();
 
   slice.forEach(group=>{
-    const head=group.head||{};
-    const mem=group.members||[];
-    const memCount=mem.length;
+    const head = group.head || {}, members = group.members || [], memCount = members.length;
+    const cls = memCount <= 1 ? 'mem-small' : memCount <=4 ? 'mem-normal' : memCount<=7 ? 'mem-large' : 'mem-critical';
+    const tr = document.createElement('tr'); tr.className = cls; tr.dataset.dataId = group.dataID;
 
-    const cls =
-      memCount<=1 ? "mem-small" :
-      memCount<=4 ? "mem-normal" :
-      memCount<=7 ? "mem-large" : "mem-critical";
+    // select col
+    const tdSel = document.createElement('td'); tdSel.className = 'select-col';
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.className='row-select'; cb.dataset.dataId = group.dataID;
+    cb.checked = selectedIds.has(group.dataID); cb.addEventListener('change', onRowSelectChange);
+    tdSel.appendChild(cb); tr.appendChild(tdSel);
 
-    const tr=document.createElement("tr");
-    tr.className=cls;
-
-    // Select
-    const tdSel=document.createElement("td");
-    tdSel.className="select-col";
-    const cb=document.createElement("input");
-    cb.type="checkbox";
-    cb.dataset.dataId=group.dataID;
-    cb.className="row-select";
-    cb.checked=selectedIds.has(group.dataID);
-    cb.addEventListener("change",onSelect);
-    tdSel.appendChild(cb);
-    tr.appendChild(tdSel);
-
-    // Data columns
+    // data columns
     header.forEach(col=>{
-      const td=document.createElement("td");
-      let val=head[col]||"";
-      if(col==="No. of Household Member/s")
-        val = `${val} (+${memCount})`;
-      td.innerHTML=highlight(val,q);
+      const td = document.createElement('td');
+      let txt = head[col] !== undefined && head[col] !== null ? String(head[col]) : '';
+      if(col === 'No. of Household Member/s') txt = String((head[col]||'') + (memCount ? ` (+${memCount})` : ''));
+      td.innerHTML = highlight(txt, q);
       tr.appendChild(td);
     });
 
-    // Members toggle
-   const mtd = document.createElement("td");
-mtd.className = "actions-col members-cell";
+    // members toggle
+    const tdMembers = document.createElement('td'); tdMembers.className='actions-col';
+    tdMembers.innerHTML = `<button class="members-toggle-btn" onclick="toggleMembers('${group.dataID}')">▸ ${memCount} member${memCount!==1?'s':''}</button>`;
+    tr.appendChild(tdMembers);
 
-mtd.innerHTML =
-  `<button class="members-toggle-btn" onclick="toggleMembers('${group.dataID}')">
-     ▸ ${memCount} members
-   </button>`;
-
-tr.appendChild(mtd);
-
-    // Actions
-    const atd=document.createElement("td");
-    atd.className="actions-col";
-    atd.innerHTML=
-      `<button class="icon-btn" onclick="editRecord('${group.dataID}')">✏️</button>
-       <button class="icon-btn" onclick="deleteRecord('${group.dataID}')">🗑️</button>`;
-    tr.appendChild(atd);
+    // actions
+    const tdAct = document.createElement('td'); tdAct.className='actions-col';
+    tdAct.innerHTML = `<button class="icon-small" title="Edit" onclick="editRecord('${group.dataID}')">✏️</button>
+                       <button class="icon-small" title="Delete" onclick="deleteHouseholdConfirm('${group.dataID}')">🗑️</button>`;
+    tr.appendChild(tdAct);
 
     tbody.appendChild(tr);
 
-    // Member rows
-    mem.forEach(m=>{
-      const mr=document.createElement("tr");
-      mr.className="member-row hidden";
-      mr.dataset.parent=group.dataID;
-
-      mr.appendChild(document.createElement("td"));
-
+    // member rows
+    members.forEach(m=>{
+      const mr = document.createElement('tr'); mr.className='member-row hidden'; mr.dataset.parent = group.dataID;
+      // blank select cell
+      const tdBlank = document.createElement('td'); tdBlank.innerHTML = ''; mr.appendChild(tdBlank);
       header.forEach(col=>{
-        const td=document.createElement("td");
-        td.innerHTML=highlight(m[col]||"",q);
-        mr.appendChild(td);
+        const td = document.createElement('td'); td.innerHTML = highlight(String(m[col]||''), q); mr.appendChild(td);
       });
-
-      mr.appendChild(document.createElement("td"));
-      mr.appendChild(document.createElement("td"));
-
+      // two small blank cells to align
+      mr.appendChild(document.createElement('td'));
+      mr.appendChild(document.createElement('td'));
       tbody.appendChild(mr);
     });
   });
 
-  const selectAll=document.getElementById("selectAll");
-  selectAll.checked=slice.every(g=>selectedIds.has(g.dataID));
-  selectAll.addEventListener("change",()=>{
-    slice.forEach(g=>{
-      if(selectAll.checked) selectedIds.add(g.dataID);
-      else selectedIds.delete(g.dataID);
-    });
-    renderPage();
-  });
+  // selectAll wiring
+  const selectAll = document.getElementById('selectAll');
+  selectAll.checked = slice.every(g => selectedIds.has(g.dataID));
+  selectAll.onchange = function(){ slice.forEach(g => {
+    if(this.checked) selectedIds.add(g.dataID); else selectedIds.delete(g.dataID);
+  }); renderPage(); updateCounts(); };
 
   updateCounts();
 }
 
-/* ========================= TOGGLE MEMBERS ========================= */
-function toggleMembers(id){
-  document.querySelectorAll(`tr.member-row[data-parent="${id}"]`)
-    .forEach(r=>r.classList.toggle("hidden"));
+/* ============== TOGGLE MEMBERS =============== */
+function toggleMembers(dataID){
+  const rows = document.querySelectorAll(`tr.member-row[data-parent="${dataID}"]`);
+  if(!rows || rows.length===0) return;
+  const hidden = rows[0].classList.contains('hidden');
+  rows.forEach(r => r.classList.toggle('hidden', !hidden));
 }
 
-/* ========================= PAGINATION ========================= */
+/* ============== PAGINATION =============== */
 function renderPagination(){
-  const div=document.getElementById("paginationArea");
-  const total=Math.max(1,Math.ceil(groupsArr.length/rowsPerPage));
-  if(total<=1){ div.innerHTML=""; return; }
+  const div = document.getElementById('paginationArea');
+  const totalPages = Math.max(1, Math.ceil(groupsArr.length / rowsPerPage));
+  if(totalPages <= 1){ div.innerHTML = ''; return; }
+  let html = `<button class="page-btn" onclick="changePage(${currentPage-1})">⬅ Prev</button>`;
+  const start = Math.max(1, currentPage-3), end = Math.min(totalPages, currentPage+3);
+  for(let i=start;i<=end;i++) html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="changePage(${i})">${i}</button>`;
+  html += `<button class="page-btn" onclick="changePage(${currentPage+1})">Next ➡</button>`;
+  div.innerHTML = html;
+}
+function changePage(p){ const total = Math.max(1, Math.ceil(groupsArr.length / rowsPerPage)); if(p<1||p>total) return; currentPage = p; renderPage(); renderPagination(); }
 
-  let h=`<button class="page-btn" onclick="changePage(${currentPage-1})">⬅ Prev</button>`;
-  for(let i=1;i<=total;i++){
-    h+=`<button class="page-btn ${i===currentPage?"active":""}" onclick="changePage(${i})">${i}</button>`;
-  }
-  h+=`<button class="page-btn" onclick="changePage(${currentPage+1})">Next ➡</button>`;
-  div.innerHTML=h;
-}
-function changePage(p){
-  const total=Math.ceil(groupsArr.length/rowsPerPage);
-  if(p<1||p>total) return;
-  currentPage=p;
-  renderPage();
-  renderPagination();
-}
+/* ============== COUNTS & SELECTION =============== */
+function updateCounts(){ document.getElementById('rowCount').innerText = groupsArr.length || 0; document.getElementById('matchCount').innerText = groupsArr.length || 0; document.getElementById('selectedCount').innerText = selectedIds.size || 0; }
+function onRowSelectChange(e){ const id = e.target.dataset.dataId; if(!id) return; if(e.target.checked) selectedIds.add(id); else selectedIds.delete(id); updateCounts(); }
 
-/* ========================= COUNTS ========================= */
-function updateCounts(){
-  document.getElementById("rowCount").innerText=groupsArr.length;
-  document.getElementById("matchCount").innerText=groupsArr.length;
-  document.getElementById("selectedCount").innerText=selectedIds.size;
-}
-function onSelect(e){
-  const id=e.target.dataset.dataId;
-  if(e.target.checked) selectedIds.add(id);
-  else selectedIds.delete(id);
-  updateCounts();
+/* ============== EDIT / DELETE =============== */
+function editRecord(dataID){ localStorage.setItem('edit_dataID', dataID); window.location.href = 'edit.html'; }
+
+function deleteHouseholdConfirm(dataID){
+  if(!confirm('Delete household ' + dataID + '? This will remove rows from Master and barangay sheet.')) return;
+  deleteHousehold(dataID);
 }
 
-/* ========================= EDIT / DELETE ========================= */
-function editRecord(id){
-  localStorage.setItem("edit_dataID",id);
-  window.location.href="edit.html";
-}
-function deleteHousehold(dataID) {
-  if (!confirm("Are you sure you want to delete this household?")) return;
-
+/* new deleteHousehold using FormData (matches your GAS doPost handler) */
+function deleteHousehold(dataID){
   const form = new FormData();
-  form.append("action", "deleteHousehold");
-  form.append("dataID", dataID);
-
-  fetch(SCRIPT_URL, { method: "POST", body: form })
-    .then(res => res.json())
+  form.append('action','deleteHousehold');
+  form.append('dataID', dataID);
+  showLoading(true);
+  fetch(SCRIPT_URL, { method:'POST', body: form })
+    .then(r => r.json())
     .then(json => {
-      if (json.success) {
-        alert("Deleted successfully");
-        loadRecords(); // refresh table
-      } else {
-        alert("Delete failed: " + json.message);
-      }
+      showLoading(false);
+      if(json.success){ alert(json.message || 'Deleted'); loadRecords(); }
+      else alert('Delete failed: ' + (json.message || JSON.stringify(json)));
     })
-    .catch(err => alert("Error: " + err));
+    .catch(err => { showLoading(false); alert('Delete error: ' + err); console.error(err); });
 }
 
-
-/* ========================= EXPORT ========================= */
-function groupsToCSV(g){
-  const cols=header.slice();
-  const rows=[];
-  rows.push(cols.map(c=>`"${c.replace(/"/g,'""')}"`).join(","));
-  g.forEach(gp=>{
-    const h=gp.head||{};
-    rows.push(cols.map(c=>`"${String(h[c]||"").replace(/"/g,'""')}"`).join(","));
-    gp.members.forEach(m=>{
-      rows.push(cols.map(c=>`"${String(m[c]||"").replace(/"/g,'""')}"`).join(","));
-    });
+/* ============== EXPORT =============== */
+function rowsToCSV(groups){
+  const cols = header.slice();
+  const out = [ cols.map(c => `"${c.replace(/"/g,'""')}"`).join(',') ];
+  groups.forEach(g=>{
+    const h = g.head || {};
+    out.push(cols.map(c => `"${String(h[c]||'').replace(/"/g,'""')}"`).join(','));
+    (g.members||[]).forEach(m => out.push(cols.map(c => `"${String(m[c]||'').replace(/"/g,'""')}"`).join(',')));
   });
-  return rows.join("\r\n");
+  return out.join('\r\n');
 }
-function downloadCSV(name,txt){
-  const blob=new Blob([txt],{type:"text/csv;charset=utf-8;"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url; a.download=name; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),500);
-}
-function exportAll(){
-  if(!groupsArr.length) return alert("Nothing to export.");
-  downloadCSV("mdrrmo_records_all.csv",groupsToCSV(groupsArr));
-}
-function exportSelected(){
-  const sel=groupsArr.filter(g=>selectedIds.has(g.dataID));
-  if(!sel.length) return alert("No selected households.");
-  downloadCSV("mdrrmo_records_selected.csv",groupsToCSV(sel));
+function downloadCSV(filename,content){
+  const blob = new Blob([content], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 600);
 }
 
-/* ========================= EVENTS ========================= */
-document.getElementById("filterBarangay").onchange=loadRecords;
-document.getElementById("refreshBtn").onclick=loadRecords;
-
-let typeTimer;
-document.getElementById("searchInput").addEventListener("input",()=>{
-  clearTimeout(typeTimer);
-  typeTimer=setTimeout(loadRecords,300);
+/* UI wiring for export menu */
+document.getElementById('exportMenuBtn').addEventListener('click', ()=> document.getElementById('exportDropdown').classList.toggle('hidden'));
+document.getElementById('exportAll').addEventListener('click', ()=> {
+  if(!groupsArr.length) return alert('Nothing to export');
+  downloadCSV('mdrrmo_records_all.csv', rowsToCSV(groupsArr));
+  document.getElementById('exportDropdown').classList.add('hidden');
+});
+document.getElementById('exportSelected').addEventListener('click', ()=> {
+  const sel = groupsArr.filter(g => selectedIds.has(g.dataID));
+  if(!sel.length) return alert('No households selected');
+  downloadCSV('mdrrmo_records_selected.csv', rowsToCSV(sel));
+  document.getElementById('exportDropdown').classList.add('hidden');
 });
 
-/* Export menu */
-const menu=document.getElementById("exportMenuBtn");
-const menuBox=document.getElementById("exportDropdown");
-menu.onclick=()=>menuBox.classList.toggle("hidden");
-document.addEventListener("click",e=>{
-  if(!menu.contains(e.target)&&!menuBox.contains(e.target))
-    menuBox.classList.add("hidden");
+/* ============== EVENTS =============== */
+document.getElementById('filterBarangay').addEventListener('change', loadRecords);
+document.getElementById('refreshBtn').addEventListener('click', loadRecords);
+document.getElementById('searchInput').addEventListener('input', (()=>{ let t; return e => { clearTimeout(t); t = setTimeout(loadRecords, 300); };})());
+
+document.addEventListener('click', e=>{
+  const menu = document.getElementById('exportMenuBtn'), box = document.getElementById('exportDropdown');
+  if(menu && box && !menu.contains(e.target) && !box.contains(e.target)) box.classList.add('hidden');
 });
 
-/* ========================= INIT ========================= */
-window.addEventListener("DOMContentLoaded",()=>{
-  document.getElementById("userName").innerText =
-    localStorage.getItem("staffName") || "";
+/* ============== INIT =============== */
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('userName').innerText = localStorage.getItem('staffName') || '';
   loadRecords();
 });
 </script>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
