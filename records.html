@@ -90,7 +90,7 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; 
 
 window.onload = () => loadRecords();
 
@@ -98,42 +98,51 @@ function showLoading(show) {
   document.getElementById('loading').style.display = show ? "flex" : "none";
 }
 
-/* --------------------------------------------------
-   JSONP LOADER FOR LIST
--------------------------------------------------- */
+// --------------------
+// JSONP LOADER
+// --------------------
 function loadRecords() {
   showLoading(true);
 
-  const brgy = encodeURIComponent(document.getElementById("filterBarangay").value);
-  const stage = encodeURIComponent(document.getElementById("filterStage").value);
+  const filterBarangay = encodeURIComponent(document.getElementById("filterBarangay").value);
+  const filterStage = encodeURIComponent(document.getElementById("filterStage").value);
   const q = encodeURIComponent(document.getElementById("searchBox").value);
 
-  const url =
-    `${API_URL}?action=getRecords&filterBarangay=${brgy}&filterStage=${stage}&q=${q}&callback=recordsLoaded`;
+  const callbackName = "recordsLoaded_" + Date.now();
 
-  const script = document.createElement("script");
-  script.src = url;
+  window[callbackName] = recordsLoaded;
 
-  document.body.appendChild(script);
+  const url = `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
+
+  const s = document.createElement("script");
+  s.src = url;
+  s.onerror = () => {
+    alert("Error loading records (JSONP failed)");
+    showLoading(false);
+  };
+
+  document.body.appendChild(s);
 }
 
-/* --------------------------------------------------
-   JSONP CALLBACK
--------------------------------------------------- */
-function recordsLoaded(data) {
-  showLoading(false);
+// --------------------
+// JSONP CALLBACK
+// --------------------
+function recordsLoaded(response) {
+  console.log("JSONP RESPONSE:", response);
 
-  if (!data.success) {
-    alert("Error: " + data.message);
+  if (!response || !response.success) {
+    alert("Failed to load records");
+    showLoading(false);
     return;
   }
 
-  renderTable(data.header, data.rows);
+  renderTable(response.header, response.rows);
+  showLoading(false);
 }
 
-/* --------------------------------------------------
-   RENDER TABLE
--------------------------------------------------- */
+// --------------------
+// RENDER TABLE
+// --------------------
 function renderTable(header, rows) {
   const thead = document.getElementById("tableHead");
   const tbody = document.getElementById("tableBody");
@@ -141,14 +150,21 @@ function renderTable(header, rows) {
   thead.innerHTML = "";
   tbody.innerHTML = "";
 
+  // header row
   let h = "<tr>";
-  header.forEach(col => h += `<th>${col}</th>`);
-  h += "<th>Actions</th></tr>";
+  header.forEach(col => {
+    h += `<th>${col}</th>`;
+  });
+  h += `<th>Actions</th></tr>`;
   thead.innerHTML = h;
 
+  // data rows
   rows.forEach(r => {
     let row = "<tr>";
-    header.forEach(col => row += `<td>${r[col] ?? ""}</td>`);
+
+    header.forEach(col => {
+      row += `<td>${r[col] ?? ""}</td>`;
+    });
 
     row += `
       <td>
@@ -162,35 +178,43 @@ function renderTable(header, rows) {
   });
 }
 
-/* --------------------------------------------------
-   EDIT RECORD
--------------------------------------------------- */
+// --------------------
+// EDIT
+// --------------------
 function editRecord(dataID) {
   localStorage.setItem("edit_dataID", dataID);
   window.location.href = "edit.html";
 }
 
-/* --------------------------------------------------
-   DELETE via JSONP
--------------------------------------------------- */
-function deleteRecord(dataID) {
-  if (!confirm("Are you sure you want to delete Data ID " + dataID + "?")) return;
+// --------------------
+// DELETE
+// --------------------
+async function deleteRecord(dataID) {
+  if (!confirm("Delete household " + dataID + "?")) return;
 
-  showLoading(true);
+  const body = { action: "deleteHousehold", dataID };
 
-  const url = `${API_URL}?action=deleteHousehold&dataID=${dataID}&callback=deleteDone`;
+  try {
+    const res = await fetch(scriptURL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    });
 
-  const script = document.createElement("script");
-  script.src = url;
-  document.body.appendChild(script);
-}
+    const raw = await res.text();
+    console.log("DELETE RAW:", raw);
 
-function deleteDone(res) {
-  showLoading(false);
-  alert(res.message);
-  loadRecords();
+    const data = JSON.parse(raw);
+    alert(data.message);
+
+    loadRecords();
+
+  } catch (err) {
+    alert("Delete failed");
+  }
 }
 </script>
 
 </body>
 </html>
+
