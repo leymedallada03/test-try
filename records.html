@@ -79,8 +79,134 @@
   </table>
 </div>
 
-<script src="js/records.js"></script>
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; 
+
+window.onload = () => loadRecords();
+
+function showLoading(show) {
+  document.getElementById('loading').style.display = show ? "flex" : "none";
+}
+
+// --------------------
+// JSONP LOADER
+// --------------------
+function loadRecords() {
+  showLoading(true);
+
+  const filterBarangay = encodeURIComponent(document.getElementById("filterBarangay").value);
+  const filterStage = encodeURIComponent(document.getElementById("filterStage").value);
+  const q = encodeURIComponent(document.getElementById("searchBox").value);
+
+  const callbackName = "recordsLoaded_" + Date.now();
+
+  window[callbackName] = recordsLoaded;
+
+  const url = `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
+
+  const s = document.createElement("script");
+  s.src = url;
+  s.onerror = () => {
+    alert("Error loading records (JSONP failed)");
+    showLoading(false);
+  };
+
+  document.body.appendChild(s);
+}
+
+// --------------------
+// JSONP CALLBACK
+// --------------------
+function recordsLoaded(response) {
+  console.log("JSONP RESPONSE:", response);
+
+  if (!response || !response.success) {
+    alert("Failed to load records");
+    showLoading(false);
+    return;
+  }
+
+  renderTable(response.header, response.rows);
+  showLoading(false);
+}
+
+// --------------------
+// RENDER TABLE
+// --------------------
+function renderTable(header, rows) {
+  const thead = document.getElementById("tableHead");
+  const tbody = document.getElementById("tableBody");
+
+  thead.innerHTML = "";
+  tbody.innerHTML = "";
+
+  // header row
+  let h = "<tr>";
+  header.forEach(col => {
+    h += `<th>${col}</th>`;
+  });
+  h += `<th>Actions</th></tr>`;
+  thead.innerHTML = h;
+
+  // data rows
+  rows.forEach(r => {
+    let row = "<tr>";
+
+    header.forEach(col => {
+      row += `<td>${r[col] ?? ""}</td>`;
+    });
+
+    row += `
+      <td>
+        <button class="actions-btn edit-btn" onclick="editRecord('${r["Data ID"]}')">Edit</button>
+        <button class="actions-btn delete-btn" onclick="deleteRecord('${r["Data ID"]}')">Delete</button>
+      </td>
+    `;
+
+    row += "</tr>";
+    tbody.innerHTML += row;
+  });
+}
+
+// --------------------
+// EDIT
+// --------------------
+function editRecord(dataID) {
+  localStorage.setItem("edit_dataID", dataID);
+  window.location.href = "edit.html";
+}
+
+// --------------------
+// DELETE
+// --------------------
+async function deleteRecord(dataID) {
+  if (!confirm("Delete household " + dataID + "?")) return;
+
+  const body = { action: "deleteHousehold", dataID };
+
+  try {
+    const res = await fetch(scriptURL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    });
+
+    const raw = await res.text();
+    console.log("DELETE RAW:", raw);
+
+    const data = JSON.parse(raw);
+    alert(data.message);
+
+    loadRecords();
+
+  } catch (err) {
+    alert("Delete failed");
+  }
+}
+</script>
+
 </body>
 </html>
+
 
 
