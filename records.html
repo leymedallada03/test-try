@@ -182,17 +182,25 @@
   <main class="content-area">
     <h2>📁 Household Records</h2>
 
-    <div class="top-stats">
-      <div class="kv">Rows: <strong id="rowCount">0</strong></div>
-      <div class="kv">Matches: <strong id="matchCount">0</strong></div>
-      <div class="kv">Selected: <strong id="selectedCount">0</strong></div>
+<div class="top-stats new-stats">
+    <span>Rows: <strong class="green" id="rowCount">0</strong></span>
+    <span>Matches: <strong class="green" id="matchCount">0</strong></span>
+    <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
+</div>
+
+<!-- SEARCH + CONTROLS ROW -->
+<div class="records-header">
+
+    <!-- CENTER SEARCH -->
+    <div class="search-center">
+        <input id="searchInput" type="text" class="search-box"
+               placeholder="Search by Barangay / Name / Data ID..." />
     </div>
 
-    <div class="search-row">
-      <div style="flex:1; display:flex; align-items:center; gap:12px;">
-        <div>
-          <label>Barangay:</label>
-          <select id="filterBarangay" style="padding:6px 8px; border-radius:6px; border:1px solid #ccc;">
+    <!-- RIGHT SIDE CONTROLS -->
+    <div class="right-controls">
+
+        <select id="filterBarangay" class="brgy-dropdown">
             <option value="">All Barangays</option>
             <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
             <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
@@ -200,19 +208,19 @@
             <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
             <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
             <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
-          </select>
-        </div>
-      </div>
+        </select>
 
-      <div class="search-container">
-        <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID..." />
-        <button id="refreshBtn" class="btn secondary">Refresh</button>
-        <div class="controls">
-          <button id="exportAllBtn" class="btn" title="Export all rows">Export All</button>
-          <button id="exportSelBtn" class="btn" title="Export selected rows">Export Selected</button>
-        </div>
-      </div>
+        <!-- Refresh Icon -->
+        <button id="refreshBtn" class="icon-btn-lg" title="Refresh">🔄</button>
+
+        <!-- Export All Icon -->
+        <button id="exportAllBtn" class="icon-btn-lg" title="Export All">⬇📄</button>
+
+        <!-- Export Selected Icon -->
+        <button id="exportSelBtn" class="icon-btn-lg" title="Export Selected">⬇✔</button>
     </div>
+
+</div>
 
     <div style="height:10px;"></div>
 
@@ -549,5 +557,6 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
