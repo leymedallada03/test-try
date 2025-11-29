@@ -7,103 +7,76 @@
 <link rel="stylesheet" href="styles.css" />
 
 <style>
-/* ========================= GENERAL LAYOUT ========================= */
-.page-container { display:block; }
-.content-area { padding:18px; }
-.logo { width:44px; height:44px; object-fit:contain; }
+/* ============================================================
+   ★ Only page-specific CSS (NO layout overrides)
+   ============================================================ */
 
-/* ========================= TOP STATS ========================= */
-.new-stats {
-  display:flex;
-  justify-content:flex-end;
-  gap:18px;
-  font-size:14px;
-  margin-bottom:10px;
-}
 .green { color:#0f7a4a; font-weight:700; }
 
-/* ========================= SEARCH + CONTROLS ========================= */
-.records-header {
+/* Toolbar */
+.records-toolbar {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:12px;
   flex-wrap:wrap;
+  margin-bottom:18px;
 }
-
-.search-center {
-  flex:1;
-  display:flex;
-  justify-content:center;
-}
+.toolbar-center { flex:1; display:flex; justify-content:center; }
+.toolbar-right { display:flex; align-items:center; gap:12px; }
 
 .search-box {
   padding:8px 12px;
   border-radius:8px;
   border:1px solid #bbb;
-  min-width:280px;
-}
-
-.right-controls {
-  display:flex;
-  align-items:center;
-  gap:10px;
+  min-width:260px;
 }
 
 .brgy-dropdown {
-  padding:7px 10px;
+  padding:8px 10px;
   border-radius:8px;
   border:1px solid #ccc;
 }
 
-/* ========================= ICON BUTTONS ========================= */
+/* Icon Buttons */
 .icon-btn-lg {
   border:none;
   background:none;
   cursor:pointer;
   padding:6px;
-  font-size:22px;
   border-radius:8px;
   transition:0.15s;
 }
 .icon-btn-lg:hover { background:#e8ffee; }
 
-/* SVG refresh icon color */
-.icon-refresh svg path {
-  fill:#0A8A15;
-}
+/* Refresh Icon Color */
+.icon-refresh svg path { fill:#0A8A15; }
 
-/* ========================= EXPORT MENU ========================= */
+/* Export Dropdown */
 .export-wrapper { position:relative; }
-
 .export-dropdown {
   position:absolute;
-  right:0;
-  top:36px;
+  right:0; top:36px;
   background:white;
   border:1px solid #ccc;
   border-radius:8px;
   padding:6px 0;
   width:150px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.12);
   z-index:9999;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
 .export-dropdown div {
   padding:10px 14px;
   cursor:pointer;
 }
-.export-dropdown div:hover {
-  background:#effff5;
-}
+.export-dropdown div:hover { background:#effff5; }
 .hidden { display:none; }
 
-/* ========================= RECORDS TABLE ========================= */
+/* Table */
 .records-wrapper {
   overflow:auto;
   border-radius:10px;
   background:#fff;
   box-shadow:0 2px 5px rgba(0,0,0,0.05);
-  margin-top:10px;
 }
 
 .records-table {
@@ -126,7 +99,6 @@
   z-index:20;
 }
 
-/* Sticky left & right columns */
 .select-col {
   position:sticky;
   left:0;
@@ -141,13 +113,13 @@
   z-index:25;
 }
 
-/* ========================= COLOR CODING ========================= */
+/* Color Coding */
 .mem-small { background:#d4f6ff; }
 .mem-normal { background:#d9ffd9; }
 .mem-large { background:#fff7c2; }
 .mem-critical { background:#ffd6d6; }
 
-/* ========================= MEMBER ROWS ========================= */
+/* Member rows */
 .member-row { background:white; }
 .member-row.hidden { display:none; }
 .member-row td {
@@ -156,17 +128,14 @@
   color:#444;
 }
 
-/* ========================= HIGHLIGHT ========================= */
+/* Search highlight */
 .hl {
   background:#ffeb8a;
   border-radius:3px;
 }
 
-/* ========================= PAGINATION ========================= */
-#paginationArea {
-  text-align:center;
-  margin-top:15px;
-}
+/* Pagination */
+#paginationArea { text-align:center; margin-top:16px; }
 .page-btn {
   padding:6px 12px;
   margin:0 3px;
@@ -180,38 +149,18 @@
   color:white;
   font-weight:bold;
 }
-  .records-toolbar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin:12px 0 18px 0;
-  flex-wrap:wrap;
-}
-
-.toolbar-center {
-  flex:1;
-  display:flex;
-  justify-content:center;
-}
-
-.toolbar-right {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
 </style>
 </head>
 
 <body>
 <div class="page-container">
 
-  <!-- ░░ TOPBAR ░░ -->
+  <!-- TOPBAR -->
   <header class="topbar">
     <button id="menuToggle" class="menu-btn">☰</button>
 
     <div class="brand">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo" />
       <div>
         <div class="title">PUROK KALIGTASAN</div>
         <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
@@ -224,307 +173,273 @@
     </div>
   </header>
 
-  <!-- ░░ SIDEBAR ░░ -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-      <ul>
-          <li><a href="dashboard.html">📊 Dashboard</a></li>
-          <li><a href="dataForm.html">📝 Data Entry</a></li>
-          <li><a href="records.html" class="active">📁 Records</a></li>
-          <li><a href="charts.html">📈 Charts</a></li>
-          <li class="admin-only"><a href="users.html">👥 User Management</a></li>
-      </ul>
+    <ul>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="dataForm.html">📝 Data Entry</a></li>
+      <li><a href="records.html" class="active">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+    </ul>
   </aside>
 
-  <!-- ░░ MAIN CONTENT ░░ -->
+  <!-- MAIN CONTENT -->
   <main class="content-area" tabindex="-1">
 
     <h2>📁 Household Records</h2>
 
-    <!-- Right-Aligned Stats (Matches main.html spacing) -->
-    <div class="new-stats" style="margin-bottom:18px; display:flex; justify-content:flex-end; gap:18px;">
-        <span>Rows: <strong class="green" id="rowCount">0</strong></span>
-        <span>Matches: <strong class="green" id="matchCount">0</strong></span>
-        <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
+    <!-- Stats -->
+    <div class="top-stats" style="display:flex; justify-content:flex-end; gap:18px; margin-bottom:18px;">
+      <span>Rows: <strong class="green" id="rowCount">0</strong></span>
+      <span>Matches: <strong class="green" id="matchCount">0</strong></span>
+      <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
     </div>
 
-    <!-- Toolbar (Matches layout style of other pages) -->
-    <div class="records-toolbar" style="
-        display:flex; justify-content:space-between; 
-        align-items:center; margin-bottom:18px; flex-wrap:wrap;
-    ">
+    <!-- Toolbar -->
+    <div class="records-toolbar">
 
-        <!-- Center Search Box -->
-        <div style="flex:1; display:flex; justify-content:center;">
-            <input id="searchInput" class="search-box"
-                placeholder="Search by Barangay / Name / Data ID..." />
+      <!-- Center Search -->
+      <div class="toolbar-center">
+        <input id="searchInput" class="search-box"
+               placeholder="Search by Barangay / Name / Data ID..." />
+      </div>
+
+      <!-- Right Controls -->
+      <div class="toolbar-right">
+
+        <select id="filterBarangay" class="brgy-dropdown">
+          <option value="">All Barangays</option>
+          <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+          <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+          <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+          <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+          <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+          <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+        </select>
+
+        <!-- Refresh -->
+        <button id="refreshBtn" class="icon-btn-lg icon-refresh" title="Refresh">
+          <svg width="22" height="22" viewBox="0 0 24 24">
+            <path d="M12 6V3L8 7l4 4V8c2.2 0 4 1.8 4 4 0 .7-.2 1.4-.5 2l1.5 1.3c.6-.9 1-2 1-3.3 0-3.3-2.7-6-6-6zm-4.5 2C6.9 8.9 6 10.4 6 12c0 3.3 2.7 6 6 6v3l4-4-4-4v3c-2.2 0-4-1.8-4-4 0-.7.2-1.4.5-2L7.5 8z"></path>
+          </svg>
+        </button>
+
+        <!-- Export Menu -->
+        <div class="export-wrapper">
+          <button id="exportMenuBtn" class="icon-btn-lg">📤</button>
+          <div id="exportDropdown" class="export-dropdown hidden">
+            <div onclick="exportAll()">Export All</div>
+            <div onclick="exportSelected()">Export Selected</div>
+          </div>
         </div>
 
-        <!-- Right Controls -->
-        <div style="display:flex; align-items:center; gap:12px;">
-
-            <!-- Barangay Dropdown -->
-            <select id="filterBarangay" class="brgy-dropdown">
-                <option value="">All Barangays</option>
-                <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-                <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
-                <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
-                <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
-                <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
-                <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
-            </select>
-
-            <!-- Refresh Icon -->
-            <button id="refreshBtn" class="icon-btn-lg icon-refresh" title="Refresh">
-                <svg width="22" height="22" viewBox="0 0 24 24">
-                    <path d="M12 6V3L8 7l4 4V8c2.2 0 4 1.8 4 4 0 .7-.2 1.4-.5 2l1.5 1.3c.6-.9 1-2 1-3.3 0-3.3-2.7-6-6-6zm-4.5 2C6.9 8.9 6 10.4 6 12c0 3.3 2.7 6 6 6v3l4-4-4-4v3c-2.2 0-4-1.8-4-4 0-.7.2-1.4.5-2L7.5 8z"></path>
-                </svg>
-            </button>
-
-            <!-- Export Dropdown -->
-            <div class="export-wrapper">
-                <button id="exportMenuBtn" class="icon-btn-lg">📤</button>
-                <div id="exportDropdown" class="export-dropdown hidden">
-                    <div onclick="exportAll()">Export All</div>
-                    <div onclick="exportSelected()">Export Selected</div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <!-- Table Container (Matches padding + shadow style of your site) -->
+    <!-- TABLE WRAPPER -->
     <div class="records-wrapper">
-        <table id="recordsTable" class="records-table">
-            <thead id="tableHead"></thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+      <table id="recordsTable" class="records-table">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
     </div>
 
-    <!-- Pagination Centered -->
-    <div id="paginationArea" style="margin-top:18px; text-align:center;"></div>
+    <!-- Pagination -->
+    <div id="paginationArea"></div>
 
-</main>
+  </main>
+</div>
 
-<!-- LOADING OVERLAY -->
-<div id="loading" style="
-  display:none; position:fixed; inset:0;
-  align-items:center; justify-content:center;
-  background:rgba(255,255,255,0.7); z-index:9999;">
-  <div style="background:#fff;padding:18px;border-radius:10px;
-       box-shadow:0 6px 24px rgba(0,0,0,0.08);">
-       Loading records…
+<!-- Loading Overlay -->
+<div id="loading"
+     style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(255,255,255,0.7); z-index:9999;">
+  <div style="background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.08);">
+    Loading records…
   </div>
 </div>
 
-<!-- =============== SCRIPTS =============== -->
+<!-- ============================================================
+     EMBEDDED JAVASCRIPT
+     (Your full functional JS preserved and cleaned)
+============================================================== -->
 <script>
-/* ============================================================
-   CONFIG
-============================================================ */
+/* ========================= CONFIG ========================= */
 const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-/* ============================================================
-   STATE
-============================================================ */
+/* ========================= STATE ========================= */
 let rawRows = [];
 let grouped = {};
 let header = [];
-let currentPage = 1;
-const rowsPerPage = 25;
 let selectedIds = new Set();
 let groupsArr = [];
+let rowsPerPage = 25;
+let currentPage = 1;
 
-/* ============================================================
-   UTILITIES
-============================================================ */
-function showLoading(show) {
-  document.getElementById("loading").style.display = show ? "flex" : "none";
-}
-
+/* ========================= UTIL ========================= */
 function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;",
-    '"': "&quot;", "'": "&#39;"
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
-
-function computeKeywordRegex(q) {
-  if (!q) return null;
-  const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-  return new RegExp(esc, "gi");
+function computeKeywordRegex(q){
+  if(!q) return null;
+  const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g,"\\$&");
+  return new RegExp(esc,"gi");
 }
-
-function highlightText(text, q) {
-  if (!q) return escapeHtml(text);
+function highlight(text,q){
+  if(!q) return escapeHtml(text);
   const re = computeKeywordRegex(q);
-  return escapeHtml(text).replace(re, m => `<span class="hl">${m}</span>`);
+  return escapeHtml(text).replace(re,m=>`<span class="hl">${m}</span>`);
+}
+function showLoading(s){
+  document.getElementById("loading").style.display = s ? "flex" : "none";
 }
 
-/* ============================================================
-   JSONP LOADER (for GAS)
-============================================================ */
-function jsonpGet(params, cb) {
+/* ========================= JSONP LOADER ========================= */
+function jsonpGet(params,cb){
   const ts = Date.now();
-  const cbName = "cb_" + ts + "_" + Math.floor(Math.random() * 1000);
-
-  window[cbName] = function (resp) {
-    cb(null, resp);
+  const cbName = "cb_" + ts + "_" + Math.floor(Math.random()*1000);
+  window[cbName] = function(resp){
+    cb(null,resp);
     delete window[cbName];
   };
-
-  const query =
-    `action=getRecords` +
-    `&filterBarangay=${encodeURIComponent(params.filterBarangay || "")}` +
-    `&filterStage=` +
-    `&q=${encodeURIComponent(params.q || "")}` +
+  const q =
+    `action=getRecords`+
+    `&filterBarangay=${encodeURIComponent(params.filterBarangay||"")}`+
+    `&q=${encodeURIComponent(params.q||"")}`+
     `&callback=${cbName}`;
-
-  const script = document.createElement("script");
-  script.src = `${SCRIPT_URL}?${query}`;
-  script.onerror = () => cb(new Error("JSONP failed"));
-  script.onload = () => script.remove();
-  document.body.appendChild(script);
+  const s = document.createElement("script");
+  s.src = `${SCRIPT_URL}?${q}`;
+  s.onerror = ()=>cb(new Error("JSONP failed"));
+  s.onload = ()=>s.remove();
+  document.body.appendChild(s);
 }
 
-/* ============================================================
-   LOAD + GROUP
-============================================================ */
-function loadRecords() {
+/* ========================= LOAD + GROUP ========================= */
+function loadRecords(){
   showLoading(true);
+  const brgy = document.getElementById("filterBarangay").value||"";
+  const q = document.getElementById("searchInput").value||"";
 
-  const filterBarangay = document.getElementById("filterBarangay").value || "";
-  const q = document.getElementById("searchInput").value || "";
-
-  jsonpGet({ filterBarangay, q }, (err, resp) => {
+  jsonpGet({filterBarangay:brgy,q},(err,resp)=>{
     showLoading(false);
-
-    if (err || !resp || !resp.success) {
-      alert("Failed to load records");
-      console.error(err);
-      return;
+    if(err || !resp || !resp.success){
+      alert("Failed to load records"); return;
     }
-
-    header = resp.header || [];
-    rawRows = resp.rows || [];
-
+    header = resp.header||[];
+    rawRows = resp.rows||[];
     grouped = {};
-    rawRows.forEach(r => {
-      const id = String(r["Data ID"] || "");
-      if (!id) return;
 
-      if (!grouped[id]) grouped[id] = { dataID: id, head: null, members: [] };
-
+    rawRows.forEach(r=>{
+      const id = String(r["Data ID"]||"");
+      if(!id) return;
+      if(!grouped[id]) grouped[id]={dataID:id,head:null,members:[]};
       const isHead = !r["Name of Household Member/s"];
-      if (isHead && !grouped[id].head) grouped[id].head = r;
+      if(isHead && !grouped[id].head) grouped[id].head=r;
       else grouped[id].members.push(r);
     });
 
-    // fallback: make 1st member the head if missing
-    Object.keys(grouped).forEach(id => {
-      if (!grouped[id].head && grouped[id].members.length > 0)
+    Object.keys(grouped).forEach(id=>{
+      if(!grouped[id].head && grouped[id].members.length>0)
         grouped[id].head = grouped[id].members.shift();
     });
 
-    const keys = Object.keys(grouped).sort((a, b) => Number(a) - Number(b));
-    groupsArr = keys.map(id => grouped[id]);
+    const keys = Object.keys(grouped).sort((a,b)=>Number(a)-Number(b));
+    groupsArr = keys.map(id=>grouped[id]);
 
     currentPage = 1;
     selectedIds.clear();
-
     renderPage();
     renderPagination();
     updateCounts();
   });
 }
 
-/* ============================================================
-   RENDER PAGE
-============================================================ */
-function renderPage() {
+/* ========================= RENDER TABLE ========================= */
+function renderPage(){
   const tbody = document.getElementById("tableBody");
   const thead = document.getElementById("tableHead");
   tbody.innerHTML = "";
   thead.innerHTML = "";
 
-  // ---- HEADER ----
-  let headRow = "<tr>";
-  headRow += `<th class="select-col"><input id="selectAll" type="checkbox"></th>`;
-  header.forEach(col => headRow += `<th>${escapeHtml(col)}</th>`);
-  headRow += `<th class="actions-col">Members</th>`;
-  headRow += `<th class="actions-col">Actions</th>`;
-  headRow += "</tr>";
-  thead.innerHTML = headRow;
+  // Header
+  let th = "<tr>";
+  th += `<th class="select-col"><input id="selectAll" type="checkbox"></th>`;
+  header.forEach(c=>th+=`<th>${escapeHtml(c)}</th>`);
+  th += `<th class="actions-col">Members</th>`;
+  th += `<th class="actions-col">Actions</th>`;
+  th+="</tr>";
+  thead.innerHTML = th;
 
-  const start = (currentPage - 1) * rowsPerPage;
-  const slice = groupsArr.slice(start, start + rowsPerPage);
-  const keyword = (document.getElementById("searchInput").value || "").trim();
+  const start=(currentPage-1)*rowsPerPage;
+  const slice=groupsArr.slice(start,start+rowsPerPage);
+  const q=document.getElementById("searchInput").value||"";
 
-  slice.forEach(group => {
-    const head = group.head || {};
-    const members = group.members || [];
-    const memCount = members.length;
+  slice.forEach(group=>{
+    const head=group.head||{};
+    const mem=group.members||[];
+    const memCount=mem.length;
 
     const cls =
-      memCount <= 1 ? "mem-small" :
-      memCount <= 4 ? "mem-normal" :
-      memCount <= 7 ? "mem-large" : "mem-critical";
+      memCount<=1 ? "mem-small" :
+      memCount<=4 ? "mem-normal" :
+      memCount<=7 ? "mem-large" : "mem-critical";
 
-    const tr = document.createElement("tr");
-    tr.className = cls;
+    const tr=document.createElement("tr");
+    tr.className=cls;
 
-    // checkbox
-    const tdSel = document.createElement("td");
-    tdSel.className = "select-col";
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.dataset.dataId = group.dataID;
-    cb.className = "row-select";
-    cb.checked = selectedIds.has(group.dataID);
-    cb.addEventListener("change", onRowSelect);
+    // Select
+    const tdSel=document.createElement("td");
+    tdSel.className="select-col";
+    const cb=document.createElement("input");
+    cb.type="checkbox";
+    cb.dataset.dataId=group.dataID;
+    cb.className="row-select";
+    cb.checked=selectedIds.has(group.dataID);
+    cb.addEventListener("change",onSelect);
     tdSel.appendChild(cb);
     tr.appendChild(tdSel);
 
-    // columns
-    header.forEach(col => {
-      const td = document.createElement("td");
-      let txt = head[col] ?? "";
-      if (col === "No. of Household Member/s") {
-        txt = `${txt} (+${memCount})`;
-      }
-      td.innerHTML = highlightText(txt, keyword);
+    // Data columns
+    header.forEach(col=>{
+      const td=document.createElement("td");
+      let val=head[col]||"";
+      if(col==="No. of Household Member/s")
+        val = `${val} (+${memCount})`;
+      td.innerHTML=highlight(val,q);
       tr.appendChild(td);
     });
 
     // Members toggle
-    const tdMem = document.createElement("td");
-    tdMem.className = "actions-col";
-    tdMem.innerHTML =
-      `<button class="icon-btn" onclick="toggleMembers('${group.dataID}')">
-         ▸ ${memCount} members
-       </button>`;
-    tr.appendChild(tdMem);
+    const mtd=document.createElement("td");
+    mtd.className="actions-col";
+    mtd.innerHTML=
+      `<button class="icon-btn" onclick="toggleMembers('${group.dataID}')">▸ ${memCount} members</button>`;
+    tr.appendChild(mtd);
 
     // Actions
-    const tdAct = document.createElement("td");
-    tdAct.className = "actions-col";
-    tdAct.innerHTML =
+    const atd=document.createElement("td");
+    atd.className="actions-col";
+    atd.innerHTML=
       `<button class="icon-btn" onclick="editRecord('${group.dataID}')">✏️</button>
        <button class="icon-btn" onclick="deleteRecord('${group.dataID}')">🗑️</button>`;
-    tr.appendChild(tdAct);
+    tr.appendChild(atd);
 
     tbody.appendChild(tr);
 
-    // ---- MEMBER ROWS ----
-    members.forEach(m => {
-      const mr = document.createElement("tr");
-      mr.className = "member-row hidden";
-      mr.dataset.parent = group.dataID;
+    // Member rows
+    mem.forEach(m=>{
+      const mr=document.createElement("tr");
+      mr.className="member-row hidden";
+      mr.dataset.parent=group.dataID;
 
-      mr.appendChild(document.createElement("td")); // blank for select column
+      mr.appendChild(document.createElement("td"));
 
-      header.forEach(col => {
-        const td = document.createElement("td");
-        td.innerHTML = highlightText(m[col] || "", keyword);
+      header.forEach(col=>{
+        const td=document.createElement("td");
+        td.innerHTML=highlight(m[col]||"",q);
         mr.appendChild(td);
       });
 
@@ -535,12 +450,11 @@ function renderPage() {
     });
   });
 
-  /* SELECT ALL */
-  const selectAll = document.getElementById("selectAll");
-  selectAll.checked = slice.every(g => selectedIds.has(g.dataID));
-  selectAll.addEventListener("change", () => {
-    slice.forEach(g => {
-      if (selectAll.checked) selectedIds.add(g.dataID);
+  const selectAll=document.getElementById("selectAll");
+  selectAll.checked=slice.every(g=>selectedIds.has(g.dataID));
+  selectAll.addEventListener("change",()=>{
+    slice.forEach(g=>{
+      if(selectAll.checked) selectedIds.add(g.dataID);
       else selectedIds.delete(g.dataID);
     });
     renderPage();
@@ -549,166 +463,122 @@ function renderPage() {
   updateCounts();
 }
 
-/* ============================================================
-   TOGGLE MEMBER ROWS
-============================================================ */
-function toggleMembers(id) {
+/* ========================= TOGGLE MEMBERS ========================= */
+function toggleMembers(id){
   document.querySelectorAll(`tr.member-row[data-parent="${id}"]`)
-    .forEach(r => r.classList.toggle("hidden"));
+    .forEach(r=>r.classList.toggle("hidden"));
 }
 
-/* ============================================================
-   PAGINATION
-============================================================ */
-function renderPagination() {
-  const div = document.getElementById("paginationArea");
-  const total = Math.max(1, Math.ceil(groupsArr.length / rowsPerPage));
-  if (total <= 1) {
-    div.innerHTML = "";
-    return;
-  }
+/* ========================= PAGINATION ========================= */
+function renderPagination(){
+  const div=document.getElementById("paginationArea");
+  const total=Math.max(1,Math.ceil(groupsArr.length/rowsPerPage));
+  if(total<=1){ div.innerHTML=""; return; }
 
-  let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})">⬅ Prev</button>`;
-  for (let i = 1; i <= total; i++) {
-    html += `<button class="page-btn ${i === currentPage ? "active" : ""}" onclick="changePage(${i})">${i}</button>`;
+  let h=`<button class="page-btn" onclick="changePage(${currentPage-1})">⬅ Prev</button>`;
+  for(let i=1;i<=total;i++){
+    h+=`<button class="page-btn ${i===currentPage?"active":""}" onclick="changePage(${i})">${i}</button>`;
   }
-  html += `<button class="page-btn" onclick="changePage(${currentPage + 1})">Next ➡</button>`;
-  div.innerHTML = html;
+  h+=`<button class="page-btn" onclick="changePage(${currentPage+1})">Next ➡</button>`;
+  div.innerHTML=h;
 }
-
-function changePage(p) {
-  const total = Math.ceil(groupsArr.length / rowsPerPage);
-  if (p < 1 || p > total) return;
-  currentPage = p;
+function changePage(p){
+  const total=Math.ceil(groupsArr.length/rowsPerPage);
+  if(p<1||p>total) return;
+  currentPage=p;
   renderPage();
   renderPagination();
 }
 
-/* ============================================================
-   COUNTERS
-============================================================ */
-function updateCounts() {
-  document.getElementById("rowCount").innerText = groupsArr.length;
-  document.getElementById("matchCount").innerText = groupsArr.length;
-  document.getElementById("selectedCount").innerText = selectedIds.size;
+/* ========================= COUNTS ========================= */
+function updateCounts(){
+  document.getElementById("rowCount").innerText=groupsArr.length;
+  document.getElementById("matchCount").innerText=groupsArr.length;
+  document.getElementById("selectedCount").innerText=selectedIds.size;
 }
-
-function onRowSelect(e) {
-  const id = e.target.dataset.dataId;
-  if (e.target.checked) selectedIds.add(id);
+function onSelect(e){
+  const id=e.target.dataset.dataId;
+  if(e.target.checked) selectedIds.add(id);
   else selectedIds.delete(id);
   updateCounts();
 }
 
-/* ============================================================
-   EDIT / DELETE
-============================================================ */
-function editRecord(id) {
-  localStorage.setItem("edit_dataID", id);
-  window.location.href = "edit.html";
+/* ========================= EDIT / DELETE ========================= */
+function editRecord(id){
+  localStorage.setItem("edit_dataID",id);
+  window.location.href="edit.html";
 }
-
-async function deleteRecord(id) {
-  if (!confirm("Delete household " + id + "?")) return;
-
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "deleteHousehold", dataID: id })
+async function deleteRecord(id){
+  if(!confirm("Delete household "+id+"?")) return;
+  try{
+    const res=await fetch(SCRIPT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"deleteHousehold",dataID:id})
     });
-
-    const data = JSON.parse(await res.text());
-    alert(data.message || "Deleted");
+    const json=JSON.parse(await res.text());
+    alert(json.message||"Deleted");
     loadRecords();
-
-  } catch (err) {
-    alert("Delete failed");
-  }
+  }catch(e){ alert("Delete failed"); }
 }
 
-/* ============================================================
-   EXPORT FUNCTIONS
-============================================================ */
-function groupsToCSV(groups) {
-  const cols = header.slice();
-  const csv = [];
-
-  csv.push(cols.map(c => `"${c.replace(/"/g, '""')}"`).join(","));
-
-  groups.forEach(g => {
-    const h = g.head || {};
-    csv.push(cols.map(c => `"${String(h[c] || "").replace(/"/g, '""')}"`).join(","));
-
-    g.members.forEach(m => {
-      csv.push(cols.map(c => `"${String(m[c] || "").replace(/"/g, '""')}"`).join(","));
+/* ========================= EXPORT ========================= */
+function groupsToCSV(g){
+  const cols=header.slice();
+  const rows=[];
+  rows.push(cols.map(c=>`"${c.replace(/"/g,'""')}"`).join(","));
+  g.forEach(gp=>{
+    const h=gp.head||{};
+    rows.push(cols.map(c=>`"${String(h[c]||"").replace(/"/g,'""')}"`).join(","));
+    gp.members.forEach(m=>{
+      rows.push(cols.map(c=>`"${String(m[c]||"").replace(/"/g,'""')}"`).join(","));
     });
   });
-
-  return csv.join("\r\n");
+  return rows.join("\r\n");
+}
+function downloadCSV(name,txt){
+  const blob=new Blob([txt],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+function exportAll(){
+  if(!groupsArr.length) return alert("Nothing to export.");
+  downloadCSV("mdrrmo_records_all.csv",groupsToCSV(groupsArr));
+}
+function exportSelected(){
+  const sel=groupsArr.filter(g=>selectedIds.has(g.dataID));
+  if(!sel.length) return alert("No selected households.");
+  downloadCSV("mdrrmo_records_selected.csv",groupsToCSV(sel));
 }
 
-function downloadCSV(name, content) {
-  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
+/* ========================= EVENTS ========================= */
+document.getElementById("filterBarangay").onchange=loadRecords;
+document.getElementById("refreshBtn").onclick=loadRecords;
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.click();
-
-  setTimeout(() => URL.revokeObjectURL(url), 500);
-}
-
-function exportAll() {
-  if (!groupsArr.length) return alert("Nothing to export.");
-  downloadCSV("mdrrmo_records_all.csv", groupsToCSV(groupsArr));
-}
-
-function exportSelected() {
-  const selected = groupsArr.filter(g => selectedIds.has(g.dataID));
-  if (!selected.length) return alert("No selected households.");
-  downloadCSV("mdrrmo_records_selected.csv", groupsToCSV(selected));
-}
-
-/* ============================================================
-   UI EVENTS
-============================================================ */
-document.getElementById("refreshBtn").onclick = loadRecords;
-
-document.getElementById("filterBarangay").onchange = loadRecords;
-
-let typingTimer;
-document.getElementById("searchInput").addEventListener("input", () => {
-  clearTimeout(typingTimer);
-  typingTimer = setTimeout(loadRecords, 300);
+let typeTimer;
+document.getElementById("searchInput").addEventListener("input",()=>{
+  clearTimeout(typeTimer);
+  typeTimer=setTimeout(loadRecords,300);
 });
 
-/* EXPORT MENU */
-const menuBtn = document.getElementById("exportMenuBtn");
-const dropdown = document.getElementById("exportDropdown");
-
-menuBtn.onclick = () => dropdown.classList.toggle("hidden");
-
-document.addEventListener("click", e => {
-  if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
-    dropdown.classList.add("hidden");
-  }
+/* Export menu */
+const menu=document.getElementById("exportMenuBtn");
+const menuBox=document.getElementById("exportDropdown");
+menu.onclick=()=>menuBox.classList.toggle("hidden");
+document.addEventListener("click",e=>{
+  if(!menu.contains(e.target)&&!menuBox.contains(e.target))
+    menuBox.classList.add("hidden");
 });
 
-/* ============================================================
-   INIT
-============================================================ */
-window.addEventListener("DOMContentLoaded", () => {
+/* ========================= INIT ========================= */
+window.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("userName").innerText =
     localStorage.getItem("staffName") || "";
-
   loadRecords();
 });
 </script>
+
 </body>
 </html>
-
-
-
-
