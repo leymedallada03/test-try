@@ -68,15 +68,18 @@
       <option>Senior</option>
     </select>
 
-    <input id="searchBox" type="text" placeholder="Search...">
+    <div class="search-container">
+    <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID...">
+</div>
 
     <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
   </div>
 
-  <table id="recordsTable">
-    <thead id="tableHead"></thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+<div class="records-wrapper">
+    <table id="recordsTable" class="records-table">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+    </table>
 </div>
 
 <script>
@@ -140,15 +143,15 @@ function renderTable(header, rows) {
   thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  // header row
+  // ----- BUILD HEADER -----
   let h = "<tr>";
   header.forEach(col => {
     h += `<th>${col}</th>`;
   });
-  h += `<th>Actions</th></tr>`;
+  h += `<th style="min-width:120px;">Actions</th></tr>`;
   thead.innerHTML = h;
 
-  // data rows
+  // ----- BUILD BODY -----
   rows.forEach(r => {
     let row = "<tr>";
 
@@ -157,9 +160,9 @@ function renderTable(header, rows) {
     });
 
     row += `
-      <td>
-        <button class="actions-btn edit-btn" onclick="editRecord('${r["Data ID"]}')">Edit</button>
-        <button class="actions-btn delete-btn" onclick="deleteRecord('${r["Data ID"]}')">Delete</button>
+      <td class="actions-cell">
+        <button class="icon-btn" onclick="editRecord('${r["Data ID"]}')" title="Edit">✏️</button>
+        <button class="icon-btn" onclick="deleteRecord('${r["Data ID"]}')" title="Delete">🗑️</button>
       </td>
     `;
 
@@ -203,10 +206,12 @@ async function deleteRecord(dataID) {
     alert("Delete failed");
   }
 }
+    
 </script>
 
 </body>
 </html>
+
 
 
 
