@@ -45,6 +45,7 @@
     <div class="search-container">
       <input id="searchInput" type="text" placeholder="Search by Barangay / Name / Data ID...">
     </div>
+      <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
 
     <!-- FILTER BAR -->
     <div class="records-container">
@@ -59,15 +60,6 @@
           <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
           <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
         </select>
-
-        <select id="filterStage">
-          <option value="">All Stages</option>
-          <option>Child</option>
-          <option>Teen</option>
-          <option>Adult</option>
-          <option>Senior</option>
-        </select>
-
         <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
       </div>
 
@@ -182,3 +174,4 @@ async function deleteRecord(dataID) {
 
 </body>
 </html>
+
