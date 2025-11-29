@@ -1,231 +1,26 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Edit Household — MDRRMO Alitagtag</title>
-<link rel="stylesheet" href="styles.css" />
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Login — MDRRMO Alitagtag</title><link rel="stylesheet" href="styles.css"/></head>
+<body class="loginBody">
+<div style="max-width:420px;margin:80px auto;padding:18px">
+  <div class="card" style="text-align:center;">
+    <img src="assets/logo.png" alt="logo" style="width:85px;height:85px;margin-bottom:12px"/>
+    <h2>PUROK KALIGTASAN<br/>ALITAGTAG MDRRMO</h2>
+    <p class="small muted">Authorized Personnel Only</p>
 
-<style>
-    body { background:#f8f9fa; padding:20px; }
-    .card { background:white; padding:20px; border-radius:10px; margin-bottom:20px; }
-    input, select { width:100%; padding:8px; margin:5px 0 10px; }
-    table { width:100%; margin-top:10px; border-collapse:collapse; }
-    th, td { border:1px solid #ccc; padding:8px; }
-    th { background:#004aad; color:white; }
-    .btn { padding:10px 15px; border:none; cursor:pointer; border-radius:6px; }
-    .btn-save { background:#0d6efd; color:white; }
-    .btn-delete { background:#dc3545; color:white; }
-    .btn-back { background:#6c757d; color:white; }
-</style>
-</head>
-<body>
+    <div id="loginError" style="display:none;color:#a00;margin:8px 0"></div>
 
-<h2>Edit Household Record</h2>
-
-<button class="btn btn-back" onclick="goBack()">← Back to Records</button>
-<br><br>
-
-<div id="loading" style="display:none;font-size:18px;color:#004aad;">Loading record...</div>
-
-<!-- HEAD CARD -->
-<div class="card" id="headCard">
-    <h3>Household Head</h3>
-    <div id="headFields"></div>
+    <form id="loginForm" style="display:grid;gap:8px;margin-top:12px">
+      <p id="statusText" style="margin-bottom:10px; font-size:14px;"></p>
+      <input type="text" id="username" placeholder="Username" required style="padding:10px;border-radius:8px"/>
+      <input type="password" id="password" placeholder="Password" required style="padding:10px;border-radius:8px"/>
+      <button type="submit" class="btn" style="margin-bottom:10px">Login</button>
+    </form>
+  </div>
 </div>
 
-<!-- MEMBERS TABLE -->
-<div class="card">
-    <h3>Household Members</h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th><th>Sex</th><th>Birthdate</th><th>Age</th>
-                <th>Stage</th><th>Status</th><th>PWD</th><th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="membersTable"></tbody>
-    </table>
-</div>
-
-<button class="btn btn-save" onclick="saveAll()">💾 Save All Changes</button>
-
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
-
-let dataID = localStorage.getItem("edit_dataID");
-let header = [];
-let headRowNumber = null;
-let members = [];
-
-if (!dataID) {
-    alert("Missing Data ID");
-    goBack();
-}
-
-window.onload = () => loadRecord();
-
-/* -----------------------------
-   LOAD FULL HOUSEHOLD RECORD
-------------------------------*/
-async function loadRecord() {
-    document.getElementById("loading").style.display = "block";
-
-    const callbackName = "editLoad_" + Date.now();
-
-    window[callbackName] = function(data) {
-        delete window[callbackName];
-        document.getElementById("loading").style.display = "none";
-
-        if (!data.success) {
-            alert("Failed to load record.");
-            return;
-        }
-
-        const households = data.households || [];
-        const record = households.find(h => String(h.dataID) === String(dataID));
-
-        if (!record) {
-            alert("Record not found");
-            goBack();
-            return;
-        }
-
-        header = data.header;
-        headRowNumber = record.headRowNumber;
-        members = record.members || [];
-
-        renderHead(record.head);
-        renderMembers(members);
-    };
-
-    const url = scriptURL + "?action=listHouseholds&callback=" + callbackName;
-
-    const s = document.createElement("script");
-    s.src = url;
-    document.body.appendChild(s);
-}
-
-/* -----------------------------
-   RENDER HEAD FIELDS
-------------------------------*/
-function renderHead(head) {
-    const container = document.getElementById("headFields");
-    container.innerHTML = "";
-
-    for (const key in head) {
-        if (key === "Data ID" || key === "Submitted On") continue;
-
-        container.innerHTML += `
-            <label><b>${key}</b></label>
-            <input id="head_${key}" value="${head[key] ?? ""}">
-        `;
-    }
-}
-
-/* -----------------------------
-   RENDER MEMBERS
-------------------------------*/
-function renderMembers(list) {
-    const tbody = document.getElementById("membersTable");
-    tbody.innerHTML = "";
-
-    list.forEach((m, i) => {
-        tbody.innerHTML += `
-            <tr>
-                <td><input id="m_${i}_Name" value="${m['Name of Household Member/s'] || ''}"></td>
-                <td><input id="m_${i}_Sex" value="${m['Sex'] || ''}"></td>
-                <td><input id="m_${i}_Birthdate" value="${m['Birthdate'] || ''}"></td>
-                <td><input id="m_${i}_Age" value="${m['Age'] || ''}"></td>
-                <td><input id="m_${i}_Stage" value="${m['Stage'] || ''}"></td>
-                <td><input id="m_${i}_Status" value="${m['Status'] || ''}"></td>
-                <td><input id="m_${i}_PWD" value="${m['Persons with Disability (PWD)'] || ''}"></td>
-                <td>
-                    <button class="btn btn-delete" onclick="deleteMember(${i})">Delete</button>
-                </td>
-            </tr>
-        `;
-    });
-}
-
-/* -----------------------------
-   DELETE A MEMBER (LOCAL ONLY)
-------------------------------*/
-function deleteMember(i) {
-    if (!confirm("Delete this member?")) return;
-    members.splice(i, 1);
-    renderMembers(members);
-}
-
-/* -----------------------------
-   SAVE CHANGES (HEAD + MEMBERS)
-------------------------------*/
-async function saveAll() {
-    if (!confirm("Save all changes?")) return;
-
-    // Build HEAD update object
-    let updates = {};
-    document.querySelectorAll("#headFields input").forEach(inp => {
-        const key = inp.id.replace("head_", "");
-        updates[key] = inp.value;
-    });
-
-    // Send head update
-    await fetch(scriptURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            action: "updateRow",
-            rowNumber: headRowNumber,
-            updates
-        })
-    });
-
-    // Rebuild members fully
-    const updatedMembers = [];
-    members.forEach((m, i) => {
-        updatedMembers.push({
-            "Name of Household Member/s": document.getElementById(`m_${i}_Name`).value,
-            "Sex": document.getElementById(`m_${i}_Sex`).value,
-            "Birthdate": document.getElementById(`m_${i}_Birthdate`).value,
-            "Age": document.getElementById(`m_${i}_Age`).value,
-            "Stage": document.getElementById(`m_${i}_Stage`).value,
-            "Status": document.getElementById(`m_${i}_Status`).value,
-            "Persons with Disability (PWD)": document.getElementById(`m_${i}_PWD`).value
-        });
-    });
-
-    // Delete all old members first
-    await fetch(scriptURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            action: "deleteHousehold",
-            dataID
-        })
-    });
-
-    // Recreate head + members
-    await fetch(scriptURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            action: "createRecord",
-            head: updates,
-            members: updatedMembers,
-            submittedBy: updates["Submitted By"] || ""
-        })
-    });
-
-    alert("Saved successfully!");
-    goBack();
-}
-
-/* ----------------------------- */
-function goBack() { window.location.href = "records.html"; }
-/* ----------------------------- */
-</script>
-
+<script src="index.js"></script>
 </body>
 </html>
+
+
