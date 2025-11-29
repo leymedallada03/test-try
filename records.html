@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MDRRMO Records</title>
     <link rel="stylesheet" href="styles.css" />
+<style>
+/* HIGHLIGHT STYLE */
+.hl {
+  background: yellow;
+  padding: 1px 2px;
+}
+
+/* PAGINATION STYLES */
+#paginationArea {
+  margin-top: 12px;
+  text-align: center;
+}
+.page-btn {
+  padding: 6px 12px;
+  margin: 0 3px;
+  border: 1px solid #888;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.page-btn.active {
+  background: #007bff;
+  color: #fff;
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
@@ -74,7 +100,7 @@
     </div>
 
 <script>
-const scriptURL = 
+const scriptURL =
   "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
 // PAGINATION
@@ -83,56 +109,59 @@ let currentHeader = [];
 let currentPage = 1;
 let rowsPerPage = 25;
 
-// AUTO LOAD
+// AUTO LOAD + SEARCH + BARANGAY FILTER
 window.onload = () => {
-  document.getElementById("filterBarangay").addEventListener("change", loadRecords);
+  loadRecords();
 
-  // live search
+  // Auto search while typing
   let typingTimer;
   document.getElementById("searchInput").addEventListener("input", () => {
     clearTimeout(typingTimer);
     typingTimer = setTimeout(loadRecords, 300);
   });
+
+  // Auto barangay filter
+  document.getElementById("filterBarangay").addEventListener("change", loadRecords);
 };
 
 function showLoading(show) {
   document.getElementById("loading").style.display = show ? "flex" : "none";
 }
 
-// ----------------------------------------------
-// LOAD DATA (JSONP)
-// ----------------------------------------------
+// --------------------------------------------------
+// LOAD DATA (SAFE JSONP)
+// --------------------------------------------------
 function loadRecords() {
   showLoading(true);
 
-  const filterBarangay = encodeURIComponent(
-    document.getElementById("filterBarangay").value
-  );
-  const filterStage = ""; // not used
+  const barangay = encodeURIComponent(document.getElementById("filterBarangay").value);
   const q = encodeURIComponent(document.getElementById("searchInput").value);
 
-  const callbackName = "recordsLoaded_" + Date.now();
-  window[callbackName] = recordsLoaded;
-
-  const url =
-    `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}` +
-    `&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
-
-  const s = document.createElement("script");
-  s.src = url;
-
-  s.onload = () => s.remove();
-  s.onerror = () => {
-    alert("Error loading records (JSONP failed)");
-    showLoading(false);
+  const callbackName = "cb_" + Date.now();
+  window[callbackName] = function (response) {
+    delete window[callbackName]; // cleanup
+    recordsLoaded(response);
   };
 
-  document.body.appendChild(s);
+  const url =
+    `${scriptURL}?action=getRecords&filterBarangay=${barangay}` +
+    `&filterStage=&q=${q}&callback=${callbackName}`;
+
+  const script = document.createElement("script");
+  script.src = url;
+  script.onerror = () => {
+    showLoading(false);
+    alert("Error loading records (JSONP failed)");
+  };
+  document.body.appendChild(script);
+
+  // clean old script tags
+  setTimeout(() => script.remove(), 5000);
 }
 
-// ----------------------------------------------
+// --------------------------------------------------
 // JSONP CALLBACK
-// ----------------------------------------------
+// --------------------------------------------------
 function recordsLoaded(response) {
   if (!response || !response.success) {
     alert("Failed to load records");
@@ -140,8 +169,8 @@ function recordsLoaded(response) {
     return;
   }
 
-  currentHeader = response.header;
-  allRows = response.rows;
+  currentHeader = response.header || [];
+  allRows = response.rows || [];
   currentPage = 1;
 
   renderPage();
@@ -150,35 +179,34 @@ function recordsLoaded(response) {
   showLoading(false);
 }
 
-// ----------------------------------------------
-// PAGINATION HELPERS
-// ----------------------------------------------
+// --------------------------------------------------
+// PAGINATION
+// --------------------------------------------------
 function getPagedRows() {
   const start = (currentPage - 1) * rowsPerPage;
   return allRows.slice(start, start + rowsPerPage);
 }
 
 function changePage(p) {
-  const totalPages = Math.ceil(allRows.length / rowsPerPage);
-  if (p < 1 || p > totalPages) return;
+  const max = Math.ceil(allRows.length / rowsPerPage);
+  if (p < 1 || p > max) return;
   currentPage = p;
   renderPage();
   renderPagination();
 }
 
-// ----------------------------------------------
-// HIGHLIGHT SEARCH
-// ----------------------------------------------
+// --------------------------------------------------
+// SEARCH HIGHLIGHT
+// --------------------------------------------------
 function highlightText(text, keyword) {
   if (!keyword) return text;
   keyword = keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-  const regex = new RegExp(`(${keyword})`, "gi");
-  return text.replace(regex, `<span class="hl">$1</span>`);
+  return text.replace(new RegExp(`(${keyword})`, "gi"), `<span class="hl">$1</span>`);
 }
 
-// ----------------------------------------------
+// --------------------------------------------------
 // RENDER PAGE
-// ----------------------------------------------
+// --------------------------------------------------
 function renderPage() {
   const tbody = document.getElementById("tableBody");
   const thead = document.getElementById("tableHead");
@@ -187,19 +215,19 @@ function renderPage() {
   tbody.innerHTML = "";
   thead.innerHTML = "";
 
-  // HEADER
-  let h = "<tr>";
-  currentHeader.forEach(col => (h += `<th>${col}</th>`));
-  h += `<th>Actions</th></tr>`;
-  thead.innerHTML = h;
+  // Header
+  let headerHTML = "<tr>";
+  currentHeader.forEach(col => headerHTML += `<th>${col}</th>`);
+  headerHTML += "<th>Actions</th></tr>";
+  thead.innerHTML = headerHTML;
 
-  // ROWS
-  const rows = getPagedRows();
-  rows.forEach(r => {
+  // Rows
+  getPagedRows().forEach(r => {
     let row = "<tr>";
+
     currentHeader.forEach(col => {
-      let val = r[col] ?? "";
-      val = highlightText(String(val), keyword);
+      let val = String(r[col] ?? "");
+      val = highlightText(val, keyword);
       row += `<td>${val}</td>`;
     });
 
@@ -207,21 +235,20 @@ function renderPage() {
       <td>
         <button class="icon-btn" onclick="editRecord('${r["Data ID"]}')">✏️</button>
         <button class="icon-btn" onclick="deleteRecord('${r["Data ID"]}')">🗑️</button>
-      </td>`;
-    row += "</tr>";
+      </td>
+    </tr>`;
 
     tbody.innerHTML += row;
   });
 }
 
-// ----------------------------------------------
+// --------------------------------------------------
 // PAGINATION BUTTONS
-// ----------------------------------------------
+// --------------------------------------------------
 function renderPagination() {
   const div = document.getElementById("paginationArea");
-  if (!div) return;
-
   const totalPages = Math.ceil(allRows.length / rowsPerPage);
+
   if (totalPages <= 1) {
     div.innerHTML = "";
     return;
@@ -237,9 +264,9 @@ function renderPagination() {
   div.innerHTML = html;
 }
 
-// ----------------------------------------------
+// --------------------------------------------------
 // ACTIONS
-// ----------------------------------------------
+// --------------------------------------------------
 function editRecord(dataID) {
   localStorage.setItem("edit_dataID", dataID);
   window.location.href = "edit.html";
@@ -248,54 +275,24 @@ function editRecord(dataID) {
 async function deleteRecord(dataID) {
   if (!confirm("Delete household " + dataID + "?")) return;
 
-  const body = { action: "deleteHousehold", dataID };
-
   try {
     const res = await fetch(scriptURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ action: "deleteHousehold", dataID })
     });
 
-    const data = JSON.parse(await res.text());
+    const data = await res.json();
     alert(data.message);
-
     loadRecords();
   } catch (err) {
     alert("Delete failed");
   }
 }
 </script>
-
-<style>
-/* HIGHLIGHT STYLE */
-.hl {
-  background: yellow;
-  padding: 1px 2px;
-}
-
-/* PAGINATION STYLES */
-#paginationArea {
-  margin-top: 12px;
-  text-align: center;
-}
-.page-btn {
-  padding: 6px 12px;
-  margin: 0 3px;
-  border: 1px solid #888;
-  background: #fff;
-  cursor: pointer;
-  border-radius: 6px;
-}
-.page-btn.active {
-  background: #007bff;
-  color: #fff;
-  font-weight: bold;
-}
-</style>
-
 </body>
 </html>
+
 
 
 
