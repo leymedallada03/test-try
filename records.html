@@ -74,7 +74,16 @@
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-window.onload = () => loadRecords();
+window.onload = () => {
+  loadRecords();
+
+  // auto filter while typing
+  let typingTimer;
+  document.getElementById("searchInput").addEventListener("input", () => {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(loadRecords, 300);
+  });
+};
 
 function showLoading(show) {
   document.getElementById('loading').style.display = show ? "flex" : "none";
@@ -84,13 +93,14 @@ function loadRecords() {
   showLoading(true);
 
   const filterBarangay = encodeURIComponent(document.getElementById("filterBarangay").value);
-  const filterStage = encodeURIComponent(document.getElementById("filterStage").value);
+  const filterStage = "";  // removed stage filter
   const q = encodeURIComponent(document.getElementById("searchInput").value);
 
   const callbackName = "recordsLoaded_" + Date.now();
   window[callbackName] = recordsLoaded;
 
-  const url = `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
+  const url =
+    `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
 
   const s = document.createElement("script");
   s.src = url;
@@ -174,4 +184,5 @@ async function deleteRecord(dataID) {
 
 </body>
 </html>
+
 
