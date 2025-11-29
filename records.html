@@ -63,21 +63,32 @@
         <button onclick="loadRecords()" class="actions-btn view-btn">Refresh</button>
       </div>
 
-      <div class="records-wrapper">
-        <table id="recordsTable" class="records-table">
-          <thead id="tableHead"></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
+<div class="records-wrapper">
+    <table id="recordsTable" class="records-table">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <!-- Pagination buttons will appear here -->
+    <div id="paginationArea"></div>
+</div>
     </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+const scriptURL = 
+  "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
+// PAGINATION
+let allRows = [];
+let currentHeader = [];
+let currentPage = 1;
+let rowsPerPage = 25;
+
+// AUTO LOAD
 window.onload = () => {
   loadRecords();
 
-  // auto filter while typing
+  // live search
   let typingTimer;
   document.getElementById("searchInput").addEventListener("input", () => {
     clearTimeout(typingTimer);
@@ -86,21 +97,27 @@ window.onload = () => {
 };
 
 function showLoading(show) {
-  document.getElementById('loading').style.display = show ? "flex" : "none";
+  document.getElementById("loading").style.display = show ? "flex" : "none";
 }
 
+// ----------------------------------------------
+// LOAD DATA (JSONP)
+// ----------------------------------------------
 function loadRecords() {
   showLoading(true);
 
-  const filterBarangay = encodeURIComponent(document.getElementById("filterBarangay").value);
-  const filterStage = "";  // removed stage filter
+  const filterBarangay = encodeURIComponent(
+    document.getElementById("filterBarangay").value
+  );
+  const filterStage = ""; // not used
   const q = encodeURIComponent(document.getElementById("searchInput").value);
 
   const callbackName = "recordsLoaded_" + Date.now();
   window[callbackName] = recordsLoaded;
 
   const url =
-    `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
+    `${scriptURL}?action=getRecords&filterBarangay=${filterBarangay}` +
+    `&filterStage=${filterStage}&q=${q}&callback=${callbackName}`;
 
   const s = document.createElement("script");
   s.src = url;
@@ -114,6 +131,9 @@ function loadRecords() {
   document.body.appendChild(s);
 }
 
+// ----------------------------------------------
+// JSONP CALLBACK
+// ----------------------------------------------
 function recordsLoaded(response) {
   if (!response || !response.success) {
     alert("Failed to load records");
@@ -121,40 +141,106 @@ function recordsLoaded(response) {
     return;
   }
 
-  renderTable(response.header, response.rows);
+  currentHeader = response.header;
+  allRows = response.rows;
+  currentPage = 1;
+
+  renderPage();
+  renderPagination();
+
   showLoading(false);
 }
 
-function renderTable(header, rows) {
-  const thead = document.getElementById("tableHead");
+// ----------------------------------------------
+// PAGINATION HELPERS
+// ----------------------------------------------
+function getPagedRows() {
+  const start = (currentPage - 1) * rowsPerPage;
+  return allRows.slice(start, start + rowsPerPage);
+}
+
+function changePage(p) {
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderPage();
+  renderPagination();
+}
+
+// ----------------------------------------------
+// HIGHLIGHT SEARCH
+// ----------------------------------------------
+function highlightText(text, keyword) {
+  if (!keyword) return text;
+  keyword = keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+  const regex = new RegExp(`(${keyword})`, "gi");
+  return text.replace(regex, `<span class="hl">$1</span>`);
+}
+
+// ----------------------------------------------
+// RENDER PAGE
+// ----------------------------------------------
+function renderPage() {
   const tbody = document.getElementById("tableBody");
+  const thead = document.getElementById("tableHead");
+  const keyword = document.getElementById("searchInput").value.trim();
 
-  thead.innerHTML = "";
   tbody.innerHTML = "";
+  thead.innerHTML = "";
 
+  // HEADER
   let h = "<tr>";
-  header.forEach(col => h += `<th>${col}</th>`);
+  currentHeader.forEach(col => (h += `<th>${col}</th>`));
   h += `<th>Actions</th></tr>`;
   thead.innerHTML = h;
 
+  // ROWS
+  const rows = getPagedRows();
   rows.forEach(r => {
     let row = "<tr>";
-
-    header.forEach(col => {
-      row += `<td>${r[col] ?? ""}</td>`;
+    currentHeader.forEach(col => {
+      let val = r[col] ?? "";
+      val = highlightText(String(val), keyword);
+      row += `<td>${val}</td>`;
     });
 
     row += `
       <td>
         <button class="icon-btn" onclick="editRecord('${r["Data ID"]}')">✏️</button>
         <button class="icon-btn" onclick="deleteRecord('${r["Data ID"]}')">🗑️</button>
-      </td>
-    </tr>`;
+      </td>`;
+    row += "</tr>";
 
     tbody.innerHTML += row;
   });
 }
 
+// ----------------------------------------------
+// PAGINATION BUTTONS
+// ----------------------------------------------
+function renderPagination() {
+  const div = document.getElementById("paginationArea");
+  if (!div) return;
+
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  if (totalPages <= 1) {
+    div.innerHTML = "";
+    return;
+  }
+
+  let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})">⬅ Prev</button>`;
+
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="page-btn ${i === currentPage ? "active" : ""}" onclick="changePage(${i})">${i}</button>`;
+  }
+
+  html += `<button class="page-btn" onclick="changePage(${currentPage + 1})">Next ➡</button>`;
+  div.innerHTML = html;
+}
+
+// ----------------------------------------------
+// ACTIONS
+// ----------------------------------------------
 function editRecord(dataID) {
   localStorage.setItem("edit_dataID", dataID);
   window.location.href = "edit.html";
@@ -167,8 +253,8 @@ async function deleteRecord(dataID) {
 
   try {
     const res = await fetch(scriptURL, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
 
@@ -182,7 +268,35 @@ async function deleteRecord(dataID) {
 }
 </script>
 
+<style>
+/* HIGHLIGHT STYLE */
+.hl {
+  background: yellow;
+  padding: 1px 2px;
+}
+
+/* PAGINATION STYLES */
+#paginationArea {
+  margin-top: 12px;
+  text-align: center;
+}
+.page-btn {
+  padding: 6px 12px;
+  margin: 0 3px;
+  border: 1px solid #888;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.page-btn.active {
+  background: #007bff;
+  color: #fff;
+  font-weight: bold;
+}
+</style>
+
 </body>
 </html>
+
 
 
