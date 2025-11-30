@@ -1,209 +1,368 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Edit Household — MDRRMO Alitagtag</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MDRRMO — Edit Household (Uniform)</title>
 <link rel="stylesheet" href="styles.css"/>
 <style>
-/* Minimal page-specific CSS — keeps main layout consistent */
-.member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width:96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 280ms cubic-bezier(.2,.9,.3,1); z-index:6000; padding:18px; overflow-y:auto; }
+/* ====== Reuse the same look & feel as your dataForm basis ====== */
+/* (styles kept compact - same as your provided template) */
+
+.member-panel {
+  position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width: 96%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98));
+  box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%);
+  transition: transform 280ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y:auto;
+}
 .member-panel.open { transform: translateX(0%); }
-.panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index:5900; }
+.member-panel .panel-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.member-panel h3 { margin:0; font-size:18px; color:var(--green-1,#0f7a4a); }
+.member-panel .panel-body { margin-top:8px; }
+.member-panel .panel-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+
+.panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 5900; }
 .panel-overlay.show { opacity: 1; pointer-events: auto; }
+
+.radio-line { display:flex; gap:18px; align-items:center; padding:6px 0; }
+.radio-item { display:flex; align-items:center; gap:6px; font-weight:700; font-size:14px; }
 
 .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; }
 .btn.secondary { background: transparent; color: #0f7a4a; border:1px solid rgba(6,30,20,0.06); }
-
 .card { padding:14px;border-radius:10px;background:#fff;margin-bottom:12px;box-shadow:0 6px 18px rgba(6,30,20,0.04); }
 .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
 .small-muted { font-size:13px; color:#666; }
-.member-preview { margin-top:8px; font-size:14px; }
-.member-preview li { margin-bottom:6px; }
-.actions-row { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-.panel-header { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
-.panel-body { padding-bottom:18px; }
+.brand .logo { width:44px; height:44px; object-fit:contain; }
+.green { color:#0f7a4a; font-weight:700; }
+
+.records-toolbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:18px; }
+.toolbar-center { flex:1; display:flex; justify-content:center; }
+.toolbar-right { display:flex; align-items:center; gap:12px; }
+
+.search-box { padding:8px 12px; border-radius:8px; border:1px solid #bbb; min-width:260px; }
+.brgy-dropdown { padding:8px 10px; border-radius:8px; border:1px solid #ccc; }
+
+.icon-btn-lg { border:none; background:none; cursor:pointer; padding:8px; border-radius:8px; transition:0.15s; display:inline-flex; align-items:center; justify-content:center; font-size:18px; }
+.icon-btn-lg:hover { background:#e8ffee; }
+.icon-btn { border:0; background:none; cursor:pointer; padding:6px; border-radius:6px; }
+.icon-refresh svg path { fill:#0A8A15; }
+
+.export-wrapper { position:relative; }
+.export-dropdown { position:absolute; right:0; top:36px; background:white; border:1px solid #ccc; border-radius:8px; padding:6px 0; width:170px; box-shadow:0 4px 12px rgba(0,0,0,0.12); z-index:9999; }
+.export-dropdown div { padding:10px 14px; cursor:pointer; }
+.export-dropdown div:hover { background:#effff5; }
+.hidden { display:none; }
+
+.records-wrapper { overflow:auto; border-radius:10px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+.records-table { width:100%; border-collapse:collapse; min-width:1100px; font-size:13px; }
+.records-table th, .records-table td { padding:8px 10px; border-bottom:1px solid #eee; white-space:nowrap; height:36px; vertical-align:middle; }
+.records-table thead th { background:#f4f7f4; position:sticky; top:0; z-index:20; font-weight:700; }
+.select-col { position:sticky; left:0; background:#fff; z-index:25; padding-left:12px; }
+.actions-col { position:sticky; right:0; background:#fff; z-index:25; }
+.mem-small { background:#d4f6ff; } .mem-normal { background:#d9ffd9; } .mem-large { background:#fff7c2; } .mem-critical { background:#ffd6d6; }
+.member-row { background:white; } .member-row.hidden { display:none; } .member-row td { padding-left:20px; font-size:13px; color:#444; height:36px; }
+.members-toggle-btn { padding:4px 6px; font-size:13px; background:none; border:none; cursor:pointer; color:#0a6a9a; }
+.members-toggle-btn:hover { text-decoration:underline; }
+
+@media(max-width:900px){ .form-grid { grid-template-columns:1fr; } .member-panel{ width:100%; } }
 </style>
 </head>
 <body>
 <div class="page-container">
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn">☰</button>
-    <div class="brand">
+    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
+    <div class="brand" style="display:flex;align-items:center;gap:12px;">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
-      <div><div class="title">PUROK KALIGTASAN</div><div class="subtitle">DRRMO - Alitagtag</div></div>
+      <div>
+        <div class="title">PUROK KALIGTASAN</div>
+        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+      </div>
     </div>
-    <div class="user-info"><span id="userName"></span><button id="logoutBtn" class="logout-btn">Logout</button></div>
+    <div class="user-info" style="margin-left:auto;">
+      <span id="userName"></span>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
   </header>
 
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <ul>
       <li><a href="dashboard.html">📊 Dashboard</a></li>
       <li><a href="dataForm.html">📝 Data Entry</a></li>
       <li><a href="records.html">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
     </ul>
   </aside>
 
-  <main class="content-area">
-    <h2>Edit Household</h2>
+  <main class="content-area" tabindex="-1">
+    <h2>📁 Household Records — Edit (Uniform)</h2>
 
-    <form id="editHeadForm" onsubmit="return false;">
+    <div class="top-stats" style="display:flex; justify-content:flex-end; gap:18px; margin-bottom:12px;">
+      <span>Rows: <strong class="green" id="rowCount">0</strong></span>
+      <span>Matches: <strong class="green" id="matchCount">0</strong></span>
+      <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
+    </div>
+
+    <div class="records-toolbar">
+      <div class="toolbar-center">
+        <input id="searchInput" class="search-box" placeholder="Search by Barangay / Name / Data ID..." />
+      </div>
+
+      <div class="toolbar-right">
+        <select id="filterBarangay" class="brgy-dropdown">
+          <option value="">All Barangays</option>
+          <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+          <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+          <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+          <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+          <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+          <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+        </select>
+
+        <button id="refreshBtn" class="icon-btn-lg icon-refresh" title="Refresh">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 6V3L8 7l4 4V8c2.2 0 4 1.8 4 4 0 .7-.2 1.4-.5 2l1.5 1.3c.6-.9 1-2 1-3.3 0-3.3-2.7-6-6-6zm-4.5 2C6.9 8.9 6 10.4 6 12c0 3.3 2.7 6 6 6v3l4-4-4-4v3c-2.2 0-4-1.8-4-4 0-.7.2-1.4.5-2L7.5 8z"></path></svg>
+        </button>
+
+        <div class="export-wrapper">
+          <button id="exportMenuBtn" class="icon-btn-lg" title="Export">📤</button>
+          <div id="exportDropdown" class="export-dropdown hidden">
+            <div onclick="exportAll()">Export All</div>
+            <div onclick="exportSelected()">Export Selected</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="records-wrapper">
+      <table id="recordsTable" class="records-table" aria-describedby="tableDescription">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="paginationArea"></div>
+  </main>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(255,255,255,0.75); z-index:9999;">
+  <div style="background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.08);">Loading records…</div>
+</div>
+
+<!-- Panel overlay -->
+<div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
+
+<!-- Edit slide-in panel (head first, then members) -->
+<div id="editPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Edit household panel">
+  <div class="panel-header">
+    <button id="panelClose" class="btn secondary" title="Close panel">←</button>
+    <h3 id="panelTitle">Edit Household</h3>
+  </div>
+
+  <div class="panel-body">
+    <form id="editForm" onsubmit="return false;">
+      <!-- Head editing -->
       <div class="card">
-        <h3>Household Head — Edit</h3>
+        <h4>Household Head — Edit</h4>
         <div class="form-grid">
           <div>
             <label>Barangay</label>
-            <select id="barangay"><option value="">Select Barangay...</option><option>Balagbag</option><option>Concepcion</option><option>Concordia</option><option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option><option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option><option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option><option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option><option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option></select>
+            <select id="edit_barangay">
+              <option value="">Select Barangay...</option>
+              <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+              <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+              <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+              <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+              <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+              <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+            </select>
           </div>
           <div>
             <label>Sitio / Purok</label>
-            <select id="sitio"><option value="">Select...</option><option>Purok I</option><option>Purok II</option><option>Purok III</option><option>Purok IV</option><option>Purok V</option><option>Purok VI</option><option>Purok VII</option></select>
+            <select id="edit_sitio">
+              <option value="">Select...</option>
+              <option>Purok I</option><option>Purok II</option><option>Purok III</option>
+              <option>Purok IV</option><option>Purok V</option><option>Purok VI</option>
+              <option>Purok VII</option>
+            </select>
           </div>
 
           <div>
             <label>Name of Household Head</label>
-            <input type="text" id="householdHead" />
+            <input type="text" id="edit_householdHead"/>
           </div>
-
           <div>
             <label>Sex</label>
-            <div class="radio-line"><label><input type="radio" name="head_sex" value="Male"> Male</label> <label><input type="radio" name="head_sex" value="Female"> Female</label></div>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Male"> Male</label>
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
+            </div>
           </div>
 
           <div>
             <label>Birthdate</label>
-            <input type="date" id="householdBirthdate" />
+            <input type="date" id="edit_householdBirthdate"/>
           </div>
-
           <div>
             <label>Age</label>
-            <input type="number" id="householdAge" readonly />
+            <input type="number" id="edit_householdAge" readonly/>
           </div>
 
           <div>
             <label>Stage</label>
-            <input type="text" id="householdStage" readonly />
+            <input type="text" id="edit_householdStage" readonly/>
           </div>
-
           <div>
             <label>No. of Household Member/s</label>
-            <input type="number" id="memberCount" min="0" value="0" />
-            <div class="small-muted">Set to 0 if no other members.</div>
+            <input type="number" id="edit_memberCount" min="0" value="0"/>
           </div>
         </div>
 
-        <hr style="margin:12px 0">
-        <h4>Health and Status</h4>
+        <hr style="margin:12px 0;">
+        <h4>Health & Transport</h4>
         <div class="form-grid">
           <div>
             <label>Persons with Disability (PWD)</label>
-            <div class="radio-line"><label><input type="radio" name="head_pwd" value="Yes"> Yes</label> <label><input type="radio" name="head_pwd" value="No"> No</label></div>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="No"> No</label>
+            </div>
           </div>
           <div>
             <label>Status</label>
-            <select id="head_status"><option value="">Select...</option><option>With Sickness</option><option>Pregnant</option><option>Others</option></select>
+            <select id="edit_head_status"><option value="">Select...</option><option>With Sickness</option><option>Pregnant</option><option>Others</option></select>
           </div>
           <div>
             <label>Transportation</label>
-            <select id="head_transport"><option value="">Select...</option><option>Individual with Transportation</option><option>Individual needing Transportation</option></select>
+            <select id="edit_head_transport"><option value="">Select...</option><option>Individual with Transportation</option><option>Individual needing Transportation</option></select>
           </div>
         </div>
 
-        <hr style="margin:12px 0">
-        <h4>Pickup / Transport / Camp Details</h4>
+        <hr style="margin:12px 0;">
+        <h4>Pickup / Camp</h4>
         <div class="form-grid">
-          <div><label>Designated Pick-Up Point</label><input id="pickup" /></div>
-          <div><label>Drop-Off Point</label><input id="dropoff" /></div>
-          <div><label>Name of Camp</label><input id="campName" /></div>
-          <div><label>Capacity</label><input type="number" id="capacity" min="0" /></div>
-          <div><label>No. of Individuals Inside Camp</label><input type="number" id="insideCamp" min="0" /></div>
-          <div><label>No. of Individuals Outside Camp</label><input type="number" id="outsideCamp" min="0" /></div>
+          <div><label>Designated Pick-Up Point</label><input id="edit_pickup"/></div>
+          <div><label>Drop-Off Point</label><input id="edit_dropoff"/></div>
+          <div><label>Name of Camp</label><input id="edit_campName"/></div>
+          <div><label>Capacity</label><input type="number" id="edit_capacity" min="0"/></div>
+          <div><label>No. Inside Camp</label><input type="number" id="edit_insideCamp" min="0"/></div>
+          <div><label>No. Outside Camp</label><input type="number" id="edit_outsideCamp" min="0"/></div>
         </div>
 
-        <div style="margin-top:12px">
-          <label>Reasons for Displacement</label>
-          <select id="reasons"><option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option></select>
-        </div>
-
-        <hr style="margin:12px 0">
-        <h4>Assistance Received</h4>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <label><input type="checkbox" id="ass_tupad"> TUPAD</label>
-          <label><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
-          <label><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
-          <label><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
-          <label><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
-          <label><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
-          <label><input type="checkbox" id="ass_relief"> Relief Goods</label>
-          <label><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
-        </div>
-
-        <div style="margin-top:8px">
-          <label>AICS</label>
-          <select id="ass_aics"><option value="">None</option><option>Shelter Assistance</option><option>Burial</option><option>Scholarship</option></select>
-        </div>
-
-        <div class="actions-row">
-          <button id="saveBtn" class="btn">Save changes</button>
-          <button id="cancelBtn" type="button" class="btn secondary">Cancel</button>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+          <button id="startSequenceBtn" class="btn">Next → Members (Start sequence)</button>
+          <button id="saveEditBtn" class="btn">Save changes</button>
+          <button id="cancelEditBtn" class="btn secondary" type="button">Cancel</button>
         </div>
       </div>
 
+      <!-- Members preview + edit controls -->
       <div class="card">
         <h4>Members</h4>
-        <div class="small-muted">Count: <strong id="previewCount">0</strong></div>
-        <ul id="membersPreview" class="member-preview"></ul>
+        <div class="small-muted">Count: <strong id="edit_previewCount">0</strong></div>
+        <ul id="edit_membersPreview" class="member-preview"></ul>
+        <div style="display:flex;gap:8px; margin-top:10px; justify-content:flex-end;">
+          <button id="edit_addMember" class="btn secondary" type="button">Add / Edit Members</button>
+        </div>
       </div>
     </form>
-  </main>
+  </div>
 </div>
 
-<div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
-
+<!-- Member sequential panel -->
 <div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
   <div class="panel-header">
-    <button id="panelClose" class="btn secondary">←</button>
-    <h3 id="panelTitle">Member 1 of N</h3>
+    <button id="memberPanelClose" class="btn secondary" title="Close panel">←</button>
+    <h3 id="memberPanelTitle">Member 1 of N</h3>
   </div>
+
   <div class="panel-body">
     <form id="memberForm" onsubmit="return false;">
       <div class="form-grid">
         <div>
           <label>Member Name <span class="small">*</span></label>
-          <input type="text" id="memberName" class="member-name" required />
+          <input type="text" id="memberName" class="member-name" />
         </div>
+
         <div>
           <label>Sex</label>
-          <div class="radio-line"><label><input type="radio" name="member_sex" value="Male"> Male</label><label><input type="radio" name="member_sex" value="Female"> Female</label></div>
-        </div>
-        <div><label>Birthdate</label><input type="date" id="memberBirthdate" class="member-birthdate" /></div>
-        <div><label>Age</label><input type="number" id="memberAge" class="member-age" readonly /></div>
-        <div><label>PWD</label><div class="radio-line"><label><input type="radio" name="member_pwd" value="Yes"> Yes</label><label><input type="radio" name="member_pwd" value="No"> No</label></div></div>
-        <div><label>Stage</label><input type="text" id="memberStage" class="member-stage" readonly /></div>
-        <div><label>Status</label><select id="memberStatus" class="member-status"><option value="">Select...</option><option>With Sickness</option><option>Pregnant</option></select></div>
-        <div><label>Transportation</label><select id="memberTransport" class="member-transport"><option value="">Select...</option><option>Individual with Transportation</option><option>Individual needing Transportation</option></select></div>
-        <div><label>Designated Pick-Up Point</label><input id="memberPickup" class="member-pickup"/></div>
-        <div><label>Drop-Off Point</label><input id="memberDropoff" class="member-dropoff"/></div>
-        <div><label>Name of Camp</label><input id="memberCamp" class="member-camp"/></div>
-        <div><label>Capacity</label><input type="number" id="memberCampCap" class="member-cap" min="0"/></div>
-        <div><label>No. Inside Camp</label><input type="number" id="memberInside" class="member-inside" min="0"/></div>
-        <div><label>No. Outside Camp</label><input type="number" id="memberOutside" class="member-outside" min="0"/></div>
-        <div style="grid-column:1/-1;margin-top:8px">
-          <h4 style="margin:6px 0 8px 0">Government Support</h4>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
-            <label><input type="checkbox" id="member_tupad"> TUPAD</label>
-            <label><input type="checkbox" id="member_local4ps"> Local 4Ps</label>
-            <label><input type="checkbox" id="member_intl4ps"> National 4Ps</label>
-            <label><input type="checkbox" id="member_locsp"> Local Social Pension</label>
-            <label><input type="checkbox" id="member_intlsp"> National Social Pension</label>
-            <label><input type="checkbox" id="member_solo"> Solo Parent Assistance</label>
-            <label><input type="checkbox" id="member_relief"> Relief Goods</label>
-            <label><input type="checkbox" id="member_cash"> Cash Subsidy</label>
+          <div class="radio-line">
+            <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex"> Male</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Female" class="member-sex"> Female</label>
           </div>
-          <div style="margin-top:8px"><label>AICS</label><select id="memberAics"><option value="">None</option><option>Shelter Assistance</option><option>Burial</option><option>Scholarship</option></select></div>
         </div>
+
+        <div>
+          <label>Birthdate</label>
+          <input type="date" id="memberBirthdate" class="member-birthdate"/>
+        </div>
+
+        <div>
+          <label>Age</label>
+          <input type="number" id="memberAge" class="member-age" readonly/>
+        </div>
+
+        <div>
+          <label>PWD</label>
+          <div class="radio-line">
+            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" class="member-pwd"> Yes</label>
+            <label class="radio-item"><input type="radio" name="member_pwd" value="No" class="member-pwd"> No</label>
+          </div>
+        </div>
+
+        <div>
+          <label>Stage</label>
+          <input type="text" id="memberStage" class="member-stage" readonly/>
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select id="memberStatus" class="member-status"><option value="">Select...</option><option>With Sickness</option><option>Pregnant</option></select>
+        </div>
+
+        <div>
+          <label>Transportation</label>
+          <select id="memberTransport" class="member-transport"><option value="">Select...</option><option>Individual with Transportation</option><option>Individual needing Transportation</option></select>
+        </div>
+
+        <div>
+          <label>Designated Pick-Up Point</label>
+          <input id="memberPickup" class="member-pickup"/>
+        </div>
+
+        <div>
+          <label>Drop-Off Point</label>
+          <input id="memberDropoff" class="member-dropoff"/>
+        </div>
+
+        <div>
+          <label>Name of Camp</label>
+          <input id="memberCamp" class="member-camp"/>
+        </div>
+
+        <div>
+          <label>Capacity</label>
+          <input type="number" id="memberCampCap" class="member-cap" min="0"/>
+        </div>
+
+        <div>
+          <label>No. Inside Camp</label>
+          <input type="number" id="memberInside" class="member-inside" min="0"/>
+        </div>
+
+        <div>
+          <label>No. Outside Camp</label>
+          <input type="number" id="memberOutside" class="member-outside" min="0"/>
+        </div>
+
+        <div style="grid-column:1/-1;">
+          <label>Reason</label>
+          <select id="memberReason" class="member-reason"><option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option></select>
+        </div>
+
       </div>
 
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <div class="panel-actions" style="margin-top:10px;">
         <button id="memberBack" class="btn secondary" type="button">Back</button>
         <button id="memberNext" class="btn" type="button">Save & Next</button>
       </div>
@@ -212,379 +371,678 @@
 </div>
 
 <script>
-/* ========== CONFIG ========== */
+/* ========================= CONFIG ========================= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-/* ========== HELPERS: date normalizer, age & stage ========== */
-function fixDateFormat(raw){
-  if(!raw) return "";
-  raw = String(raw).trim();
-  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-  if(raw.includes(' ')) raw = raw.split(' ')[0];
-  let parts;
-  if(raw.includes('/')){
-    parts = raw.split('/');
-    if(parts.length===3){
-      const a = parts.map(p=>p.padStart(2,'0'));
-      const p1 = parseInt(a[0],10), p2 = parseInt(a[1],10);
-      const y = a[2];
-      if(p1>12) return `${y}-${a[1]}-${a[0]}`; // DD/MM/YYYY
-      if(p2>12) return `${y}-${a[0]}-${a[1]}`; // MM/DD/YYYY
-      return `${a[2]}-${a[1]}-${a[0]}`; // ambiguous -> assume DD/MM/YYYY
-    }
-  }
-  if(raw.includes('-')){
-    parts = raw.split('-');
-    if(parts.length===3){
-      const a = parts.map(p=>p.padStart(2,'0'));
-      const p1 = parseInt(a[0],10), p2 = parseInt(a[1],10);
-      const y = a[2];
-      if(p1>12) return `${y}-${a[1]}-${a[0]}`;
-      if(p2>12) return `${y}-${a[0]}-${a[1]}`;
-      return `${a[2]}-${a[1]}-${a[0]}`;
-    }
-  }
-  return "";
-}
-function computeAge(dateStr){
-  if(!dateStr) return "";
-  const d = new Date(dateStr);
-  if(isNaN(d)) return "";
-  const now = new Date();
-  let age = now.getFullYear() - d.getFullYear();
-  if(now.getMonth() < d.getMonth() || (now.getMonth()===d.getMonth() && now.getDate() < d.getDate())) age--;
-  return age;
-}
-function getStageFromAge(age){
-  if(age===''||age===null||age===undefined) return "";
-  const a = Number(age);
-  if(isNaN(a)) return "";
-  if(a<=1) return "Infant";
-  if(a<=12) return "Children";
-  if(a<=17) return "School Children";
-  if(a>=60) return "Elderly";
-  return "Adult";
-}
+/* ========================= STATE ========================= */
+let rawRows = [];
+let grouped = {};
+let header = [];
+let groupsArr = [];
+let selectedIds = new Set();
+let currentPage = 1;
+const rowsPerPage = 25;
 
-/* ========== STATE ========== */
+/* Edit state */
 let editDataID = null;
-let collectedMembers = []; // array of member objects
-let currentMemberIndex = 0;
+let editHead = {};           // object for head when editing
+let editMembers = [];        // array of member objects when editing
+let memberEditIndex = 0;     // index currently editing in sequential member panel
+let sequenceMode = false;    // true when "startSequenceBtn" initiated (auto-save after last member)
 
-/* ========== DOM shortcuts ========== */
-const previewCount = () => document.getElementById('previewCount');
-const membersPreviewUL = () => document.getElementById('membersPreview');
+/* ========================= UTILITIES ========================= */
+function showLoading(show){ document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
+function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function computeKeywordRegex(q){ if(!q) return null; const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g,"\\$&"); return new RegExp(esc,"gi"); }
+function highlight(text,q){ if(!q) return escapeHtml(text); const re=computeKeywordRegex(q); return escapeHtml(text).replace(re,m=>`<span class="hl">${m}</span>`); }
 
-/* ========== member preview UI ========== */
-function updateMemberPreview(){
-  const n = Number(document.getElementById('memberCount').value || 0);
-  previewCount().innerText = n;
-  const ul = membersPreviewUL();
+/* ---------- DATE PARSING / FORMATTING ---------- */
+/* Convert various sheet date string formats to yyyy-mm-dd suitable for <input type="date"> */
+function toInputDate(val){
+  if(!val && val !== 0) return '';
+  // If it's a Date object (GAS occasionally serializes dates), handle it
+  if(typeof val === 'object' && val instanceof Date){
+    const d = val;
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  }
+  let s = String(val).trim();
+  // strip time if present
+  if(s.indexOf(' ') !== -1) s = s.split(' ')[0];
+
+  // handle formats:
+  // 1) DD/MM/YYYY (common in your sheet) -> convert to yyyy-mm-dd
+  // 2) MM/DD/YYYY or MM/DD/YYYY HH:MM:SS -> detect ambiguous: if first number >12 => treat as DD/MM/YYYY
+  // 3) ISO YYYY-MM-DD
+  // 4) Other strings -> try Date parse
+
+  // ISO yyyy-mm-dd
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // slash separated
+  if(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(s)){
+    const parts = s.split('/');
+    let p1 = parseInt(parts[0],10), p2 = parseInt(parts[1],10), p3 = parseInt(parts[2],10);
+    if(p3 < 100) p3 += 2000;
+    let day, month, year = p3;
+    if(p1 > 12 && p2 <= 12){
+      // DD/MM/YYYY
+      day = p1; month = p2;
+    } else if(p2 > 12 && p1 <=12){
+      // MM/DD/YYYY but p2 > 12 is unlikely - fallback
+      month = p1; day = p2;
+    } else {
+      // both <=12 -> ambiguous. Heuristic: your headers & earlier note say sheet uses DD/MM/YYYY; prefer DD/MM/YYYY
+      // However if p1<=12 and p2>12 we already handled. So assume DD/MM/YYYY when ambiguous.
+      day = p1; month = p2;
+    }
+    month = String(month).padStart(2,'0'); day = String(day).padStart(2,'0');
+    return `${year}-${month}-${day}`;
+  }
+
+  // Try Date parse fallback
+  const dt = new Date(s);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dt.getFullYear()}-${mm}-${dd}`;
+  }
+  return '';
+}
+
+/* Convert yyyy-mm-dd (from input) to DD/MM/YYYY string for saving to sheet */
+function toSheetDateFormat(inputVal){
+  if(!inputVal) return '';
+  // inputVal expected 'yyyy-mm-dd'
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
+    const [y,m,d] = inputVal.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  // fallback: try parse
+  const dt = new Date(inputVal);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dd}/${mm}/${dt.getFullYear()}`;
+  }
+  return inputVal;
+}
+
+/* Age & Stage helpers */
+function computeAgeFromBirthdate(dateStr){
+  if(!dateStr) return null;
+  const b = new Date(dateStr);
+  if(isNaN(b)) return null;
+  const now = new Date();
+  let years = now.getFullYear() - b.getFullYear();
+  const m = now.getMonth() - b.getMonth();
+  if(m < 0 || (m === 0 && now.getDate() < b.getDate())) years--;
+  if(years <= 0){
+    const months = (now.getFullYear() - b.getFullYear())*12 + (now.getMonth() - b.getMonth());
+    return { years: 0, months: Math.max(0, months) };
+  }
+  return { years };
+}
+function deriveStageFromAge(ageObj){
+  if(!ageObj) return '';
+  if(ageObj.years === 0){
+    const months = ageObj.months || 0;
+    if(months <= 10) return 'Infant';
+    return 'Children';
+  }
+  if(ageObj.years <= 17) return 'School Children';
+  if(ageObj.years >= 60) return 'Elderly';
+  return 'Adult';
+}
+
+/* ========================= JSONP loader for GAS (getRecords) ========================= */
+function jsonpGet(params, cb){
+  const ts = Date.now();
+  const cbName = 'cb_' + ts + '_' + Math.floor(Math.random()*1000);
+  window[cbName] = function(resp){ cb(null, resp); delete window[cbName]; };
+  const q = `action=getRecords&filterBarangay=${encodeURIComponent(params.filterBarangay||'')}&filterStage=${encodeURIComponent(params.filterStage||'')}&q=${encodeURIComponent(params.q||'')}&callback=${cbName}`;
+  const s = document.createElement('script');
+  s.src = `${SCRIPT_URL}?${q}`;
+  s.onerror = ()=>cb(new Error('JSONP failed'));
+  s.onload = ()=>s.remove();
+  document.body.appendChild(s);
+}
+
+/* ========================= Load + group ========================= */
+function loadRecords(){
+  showLoading(true);
+  const filterBarangay = document.getElementById('filterBarangay').value || '';
+  const q = document.getElementById('searchInput').value || '';
+
+  jsonpGet({ filterBarangay, q }, (err, resp) => {
+    showLoading(false);
+    if(err || !resp || !resp.success){ alert('Failed to load records'); console.error(err); return; }
+    header = resp.header || [];
+    rawRows = resp.rows || [];
+    grouped = {};
+
+    rawRows.forEach(r=>{
+      const id = String(r['Data ID'] || '');
+      if(!id) return;
+      if(!grouped[id]) grouped[id] = { dataID: id, head: null, members: [] };
+      const isHead = !r['Name of Household Member/s'] || String(r['Name of Household Member/s']).trim() === '';
+      if(isHead && !grouped[id].head) grouped[id].head = r;
+      else grouped[id].members.push(r);
+    });
+
+    Object.keys(grouped).forEach(id=>{
+      if(!grouped[id].head && grouped[id].members.length>0) grouped[id].head = grouped[id].members.shift();
+    });
+
+    const keys = Object.keys(grouped).sort((a,b)=> Number(a) - Number(b));
+    groupsArr = keys.map(k => grouped[k]);
+
+    currentPage = 1;
+    selectedIds.clear();
+    renderPage();
+    renderPagination();
+    updateCounts();
+  });
+}
+
+/* ========================= Render table ========================= */
+function renderPage(){
+  const tbody = document.getElementById('tableBody');
+  const thead = document.getElementById('tableHead');
+  tbody.innerHTML = '';
+  thead.innerHTML = '';
+
+  // header row
+  let hdr = '<tr>';
+  hdr += `<th class="select-col"><input id="selectAll" type="checkbox"></th>`;
+  header.forEach(h => hdr += `<th>${escapeHtml(h)}</th>`);
+  hdr += `<th class="actions-col">Members</th>`;
+  hdr += `<th class="actions-col">Actions</th>`;
+  hdr += '</tr>';
+  thead.innerHTML = hdr;
+
+  const start = (currentPage - 1) * rowsPerPage;
+  const slice = groupsArr.slice(start, start + rowsPerPage);
+  const keyword = (document.getElementById('searchInput').value || '').trim();
+
+  slice.forEach(group => {
+    const head = group.head || {};
+    const members = group.members || [];
+    const memCount = members.length;
+
+    const cls = memCount <= 1 ? 'mem-small' : memCount <= 4 ? 'mem-normal' : memCount <= 7 ? 'mem-large' : 'mem-critical';
+    const tr = document.createElement('tr');
+    tr.className = cls;
+
+    // select col
+    const tdSel = document.createElement('td'); tdSel.className = 'select-col';
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.className='row-select'; cb.dataset.dataId = group.dataID;
+    cb.checked = selectedIds.has(group.dataID);
+    cb.addEventListener('change', onRowSelect);
+    tdSel.appendChild(cb); tr.appendChild(tdSel);
+
+    // data columns (head values)
+    header.forEach(col=>{
+      const td = document.createElement('td');
+      let txt = head[col] ?? '';
+      if(col === 'No. of Household Member/s') txt = `${txt} (+${memCount})`;
+      td.innerHTML = highlight(txt, keyword);
+      tr.appendChild(td);
+    });
+
+    // members toggle
+    const tdMem = document.createElement('td'); tdMem.className = 'actions-col';
+    tdMem.innerHTML = `<button class="members-toggle-btn" onclick="toggleMembers('${group.dataID}')">▸ ${memCount} members</button>`;
+    tr.appendChild(tdMem);
+
+    // actions
+    const tdAct = document.createElement('td'); tdAct.className = 'actions-col';
+    tdAct.innerHTML = `<button title="Edit" class="icon-btn" onclick="onEditClick('${group.dataID}')"><span class="action-icon">✏️</span></button>
+                       <button title="Delete" class="icon-btn" onclick="onDeleteClick('${group.dataID}')"><span class="action-icon">🗑️</span></button>`;
+    tr.appendChild(tdAct);
+
+    tbody.appendChild(tr);
+
+    // member rows (hidden by default)
+    members.forEach(m => {
+      const mr = document.createElement('tr');
+      mr.className = 'member-row hidden';
+      mr.dataset.parent = group.dataID;
+      mr.appendChild(document.createElement('td')); // blank select col
+      header.forEach(col=>{
+        const td = document.createElement('td');
+        td.innerHTML = highlight(m[col] || '', keyword);
+        mr.appendChild(td);
+      });
+      mr.appendChild(document.createElement('td'));
+      mr.appendChild(document.createElement('td'));
+      tbody.appendChild(mr);
+    });
+  });
+
+  // selectAll behavior
+  const selectAll = document.getElementById('selectAll');
+  if(selectAll){
+    selectAll.checked = slice.every(g => selectedIds.has(g.dataID));
+    selectAll.onchange = ()=>{ slice.forEach(g => { if(selectAll.checked) selectedIds.add(g.dataID); else selectedIds.delete(g.dataID); }); renderPage(); };
+  }
+
+  updateCounts();
+}
+
+/* toggle members rows */
+function toggleMembers(id){
+  document.querySelectorAll(`tr.member-row[data-parent="${id}"]`).forEach(r => r.classList.toggle('hidden'));
+}
+
+/* pagination */
+function renderPagination(){
+  const div = document.getElementById('paginationArea');
+  const total = Math.max(1, Math.ceil(groupsArr.length / rowsPerPage));
+  if(total <= 1){ div.innerHTML = ''; return; }
+  let html = `<button class="page-btn" onclick="changePage(${currentPage-1})">⬅ Prev</button>`;
+  for(let i=1;i<=total;i++) html += `<button class="page-btn ${i===currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+  html += `<button class="page-btn" onclick="changePage(${currentPage+1})">Next ➡</button>`;
+  div.innerHTML = html;
+}
+function changePage(p){ const total = Math.ceil(groupsArr.length / rowsPerPage); if(p<1||p>total) return; currentPage = p; renderPage(); renderPagination(); }
+
+/* counts */
+function updateCounts(){ document.getElementById('rowCount').innerText = groupsArr.length; document.getElementById('matchCount').innerText = groupsArr.length; document.getElementById('selectedCount').innerText = selectedIds.size; }
+function onRowSelect(e){ const id = e.target.dataset.dataId; if(e.target.checked) selectedIds.add(id); else selectedIds.delete(id); updateCounts(); }
+
+/* ========================= Delete (FormData POST) ========================= */
+function onDeleteClick(dataID){
+  if(!confirm('Delete household ' + dataID + '?')) return;
+  const fd = new FormData();
+  fd.append('action','deleteHousehold');
+  fd.append('dataID', dataID);
+  fetch(SCRIPT_URL, { method: 'POST', body: fd })
+    .then(r => r.text())
+    .then(txt => {
+      let json;
+      try { json = JSON.parse(txt); } catch(e){ throw new Error('Invalid server response'); }
+      if(json.success){
+        alert(json.message || 'Deleted');
+        loadRecords();
+      } else {
+        alert('Delete failed: ' + (json.message || JSON.stringify(json)));
+      }
+    }).catch(err => {
+      console.error('Delete error', err);
+      alert('Delete failed — see console');
+    });
+}
+
+/* ========================= Edit flow ========================= */
+function onEditClick(dataID){
+  const group = grouped[dataID] || groupsArr.find(g => g.dataID === dataID);
+  if(!group){ alert('Record not found'); return; }
+
+  editDataID = dataID;
+  editHead = Object.assign({}, group.head || {});
+  editMembers = (group.members || []).map(m => Object.assign({}, m));
+
+  // Prefill edit head
+  document.getElementById('edit_barangay').value = editHead['Barangay'] || '';
+  document.getElementById('edit_sitio').value = editHead['Sitio / Purok'] || '';
+  document.getElementById('edit_householdHead').value = editHead['Name of Household Head'] || '';
+  Array.from(document.getElementsByName('edit_head_sex')).forEach(r => r.checked = (r.value === (editHead['Sex'] || '')));
+  // birthdate -> date input
+  document.getElementById('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
+  updateEditHeadAgeStage();
+  document.getElementById('edit_memberCount').value = editHead['No. of Household Member/s'] || (editMembers.length || 0);
+  Array.from(document.getElementsByName('edit_head_pwd')).forEach(r => r.checked = (r.value === (editHead['Persons with Disability (PWD)'] || 'No')));
+  document.getElementById('edit_head_status').value = editHead['Status'] || '';
+  document.getElementById('edit_head_transport').value = editHead['Transportation'] || '';
+  document.getElementById('edit_pickup').value = editHead['Designated Pick-Up Point'] || '';
+  document.getElementById('edit_dropoff').value = editHead['Drop-Off Point'] || '';
+  document.getElementById('edit_campName').value = editHead['Name of Camp'] || '';
+  document.getElementById('edit_capacity').value = editHead['Capacity'] || '';
+  document.getElementById('edit_insideCamp').value = editHead['No. of Individuals Inside Camp'] || '';
+  document.getElementById('edit_outsideCamp').value = editHead['No. of Individuals Outside Camp'] || '';
+
+  // update member preview
+  updateEditMembersPreview();
+
+  // open panel and focus first head input
+  openEditPanel();
+  setTimeout(()=> document.getElementById('edit_householdHead').focus(), 120);
+}
+
+/* open/close edit panel */
+function openEditPanel(){ document.getElementById('editPanel').classList.add('open'); document.getElementById('panelOverlay').classList.add('show'); }
+function closeEditPanel(){ document.getElementById('editPanel').classList.remove('open'); document.getElementById('panelOverlay').classList.remove('show'); }
+
+/* update head age/stage */
+function updateEditHeadAgeStage(){
+  const d = document.getElementById('edit_householdBirthdate').value;
+  const ageObj = computeAgeFromBirthdate(d);
+  if(!ageObj){ document.getElementById('edit_householdAge').value = ''; document.getElementById('edit_householdStage').value = ''; return; }
+  document.getElementById('edit_householdAge').value = (ageObj.years === 0 ? 0 : ageObj.years);
+  document.getElementById('edit_householdStage').value = deriveStageFromAge(ageObj);
+}
+
+/* members preview */
+function updateEditMembersPreview(){
+  const ul = document.getElementById('edit_membersPreview');
   ul.innerHTML = '';
+  const n = editMembers.length || 0;
+  document.getElementById('edit_previewCount').innerText = n;
   for(let i=0;i<n;i++){
     const li = document.createElement('li');
-    const mem = collectedMembers[i];
-    li.innerText = mem && mem['Name of Household Member/s'] ? `#${i+1} — ${mem['Name of Household Member/s']}` : `#${i+1} — (empty)`;
+    const m = editMembers[i] || {};
+    li.textContent = `#${i+1} — ${m['Name of Household Member/s'] || '(empty)'}`;
     li.style.cursor = 'pointer';
-    li.onclick = ()=>{ currentMemberIndex = i; fillMemberPanel(i); document.getElementById('panelTitle').innerText = `Member ${i+1} of ${n}`; openPanel(); };
+    li.onclick = () => { memberEditIndex = i; openMemberPanelForEdit(i); };
     ul.appendChild(li);
   }
 }
 
-/* ========== fill head form ========== */
-function fillHeadForm(headObj){
-  if(!headObj) return;
-  document.getElementById('barangay').value = headObj['Barangay'] || '';
-  document.getElementById('sitio').value = headObj['Sitio / Purok'] || '';
-  document.getElementById('householdHead').value = headObj['Name of Household Head'] || '';
-  Array.from(document.getElementsByName('head_sex')).forEach(r => r.checked = (r.value === (headObj['Sex']||'')));
-  document.getElementById('householdBirthdate').value = fixDateFormat(headObj['Birthdate']||'');
-  document.getElementById('householdAge').value = headObj['Age'] || computeAge(document.getElementById('householdBirthdate').value) || '';
-  document.getElementById('householdStage').value = headObj['Stage'] || getStageFromAge(document.getElementById('householdAge').value) || '';
-  document.getElementById('memberCount').value = headObj['No. of Household Member/s'] || 0;
-  document.getElementById('pickup').value = headObj['Designated Pick-Up Point'] || '';
-  document.getElementById('dropoff').value = headObj['Drop-Off Point'] || '';
-  document.getElementById('campName').value = headObj['Name of Camp'] || '';
-  document.getElementById('capacity').value = headObj['Capacity'] || '';
-  document.getElementById('insideCamp').value = headObj['No. of Individuals Inside Camp'] || '';
-  document.getElementById('outsideCamp').value = headObj['No. of Individuals Outside Camp'] || '';
-  document.getElementById('reasons').value = headObj['Reasons for Displacement'] || '';
-  document.querySelector(`input[name="head_pwd"][value="${headObj['Persons with Disability (PWD)'] || 'No'}"]`)?.setAttribute('checked','checked');
-  document.getElementById('head_status').value = headObj['Status'] || '';
-  document.getElementById('head_transport').value = headObj['Transportation'] || '';
-  document.getElementById('ass_tupad').checked = (headObj['TUPAD'] === 'Yes');
-  document.getElementById('ass_local4ps').checked = (headObj['Local 4Ps'] === 'Yes');
-  document.getElementById('ass_intl4ps').checked = (headObj['National 4Ps'] === 'Yes');
-  document.getElementById('ass_locsp').checked = (headObj['Local Social Pension'] === 'Yes');
-  document.getElementById('ass_intlsp').checked = (headObj['National Social Pension'] === 'Yes');
-  document.getElementById('ass_solo').checked = (headObj['Solo Parent Assistance'] === 'Yes');
-  document.getElementById('ass_relief').checked = (headObj['Relief Goods'] === 'Yes');
-  document.getElementById('ass_cash').checked = (headObj['Cash Subsidy'] === 'Yes');
-  document.getElementById('ass_aics').value = headObj['AICS'] || '';
-}
+/* Add/Edit Members button - ensure array size & open at index 0 */
+document.getElementById('edit_addMember').addEventListener('click', () => {
+  const expected = Number(document.getElementById('edit_memberCount').value || 0);
+  while(editMembers.length < expected) editMembers.push(createEmptyMember());
+  if(editMembers.length === 0) editMembers.push(createEmptyMember());
+  memberEditIndex = 0;
+  openMemberPanelForEdit(memberEditIndex);
+});
 
-/* ========== member panel fill ========== */
-function fillMemberPanel(idx){
-  const mem = collectedMembers[idx] || {};
-  document.getElementById('memberName').value = mem['Name of Household Member/s'] || '';
-  Array.from(document.getElementsByName('member_sex')).forEach(r => r.checked = (r.value === (mem['Sex']||'')));
-  document.getElementById('memberBirthdate').value = fixDateFormat(mem['Birthdate']||'');
-  document.getElementById('memberAge').value = mem['Age'] || computeAge(document.getElementById('memberBirthdate').value) || '';
-  document.getElementById('memberStage').value = mem['Stage'] || getStageFromAge(document.getElementById('memberAge').value) || '';
-  document.querySelector(`input[name="member_pwd"][value="${mem['Persons with Disability (PWD)'] || 'No'}"]`)?.setAttribute('checked','checked');
-  document.getElementById('memberStatus').value = mem['Status'] || '';
-  document.getElementById('memberTransport').value = mem['Transportation'] || '';
-  document.getElementById('memberPickup').value = mem['Designated Pick-Up Point'] || '';
-  document.getElementById('memberDropoff').value = mem['Drop-Off Point'] || '';
-  document.getElementById('memberCamp').value = mem['Name of Camp'] || '';
-  document.getElementById('memberCampCap').value = mem['Capacity'] || '';
-  document.getElementById('memberInside').value = mem['No. of Individuals Inside Camp'] || '';
-  document.getElementById('memberOutside').value = mem['No. of Individuals Outside Camp'] || '';
-  document.getElementById('memberReason').value = mem['Reasons for Displacement'] || '';
-  document.getElementById('member_tupad').checked = (mem['TUPAD'] === 'Yes');
-  document.getElementById('member_local4ps').checked = (mem['Local 4Ps'] === 'Yes');
-  document.getElementById('member_intl4ps').checked = (mem['National 4Ps'] === 'Yes');
-  document.getElementById('member_locsp').checked = (mem['Local Social Pension'] === 'Yes');
-  document.getElementById('member_intlsp').checked = (mem['National Social Pension'] === 'Yes');
-  document.getElementById('member_solo').checked = (mem['Solo Parent Assistance'] === 'Yes');
-  document.getElementById('member_relief').checked = (mem['Relief Goods'] === 'Yes');
-  document.getElementById('member_cash').checked = (mem['Cash Subsidy'] === 'Yes');
-  document.getElementById('memberAics').value = mem['AICS'] || '';
-}
-
-/* ========== collect member from panel ========== */
-function collectMemberFromPanel(){
-  const name = document.getElementById('memberName').value.trim();
-  const sex = document.querySelector('input[name="member_sex"]:checked')?.value || '';
-  const birthdate = document.getElementById('memberBirthdate').value || '';
-  const age = computeAge(birthdate) || '';
-  const stage = getStageFromAge(age) || '';
+/* create empty member */
+function createEmptyMember(){
   return {
-    "Name of Household Member/s": name,
-    "Sex": sex,
-    "Birthdate": birthdate,
-    "Age": age,
-    "Stage": stage,
-    "Persons with Disability (PWD)": (document.querySelector('input[name="member_pwd"]:checked')?.value || 'No'),
-    "Status": document.getElementById('memberStatus').value || '',
-    "Transportation": document.getElementById('memberTransport').value || '',
-    "Designated Pick-Up Point": document.getElementById('memberPickup').value || '',
-    "Drop-Off Point": document.getElementById('memberDropoff').value || '',
-    "Name of Camp": document.getElementById('memberCamp').value || '',
-    "Capacity": document.getElementById('memberCampCap').value || '',
-    "No. of Individuals Inside Camp": document.getElementById('memberInside').value || '',
-    "No. of Individuals Outside Camp": document.getElementById('memberOutside').value || '',
-    "Reasons for Displacement": document.getElementById('memberReason').value || '',
-    "TUPAD": document.getElementById('member_tupad').checked ? 'Yes' : 'No',
-    "Local 4Ps": document.getElementById('member_local4ps').checked ? 'Yes' : 'No',
-    "National 4Ps": document.getElementById('member_intl4ps').checked ? 'Yes' : 'No',
-    "Local Social Pension": document.getElementById('member_locsp').checked ? 'Yes' : 'No',
-    "National Social Pension": document.getElementById('member_intlsp').checked ? 'Yes' : 'No',
-    "Solo Parent Assistance": document.getElementById('member_solo').checked ? 'Yes' : 'No',
-    "Relief Goods": document.getElementById('member_relief').checked ? 'Yes' : 'No',
-    "Cash Subsidy": document.getElementById('member_cash').checked ? 'Yes' : 'No',
-    "AICS": document.getElementById('memberAics').value || ''
+    'Name of Household Member/s':'',
+    'Sex':'',
+    'Birthdate':'',
+    'Age':'',
+    'Stage':'',
+    'Persons with Disability (PWD)':'No',
+    'Status':'',
+    'Transportation':'',
+    'Designated Pick-Up Point':'',
+    'Drop-Off Point':'',
+    'Name of Camp':'',
+    'Capacity':'',
+    'No. of Individuals Inside Camp':'',
+    'No. of Individuals Outside Camp':'',
+    'Reasons for Displacement':'',
+    'TUPAD':'No','Local 4Ps':'No','National 4Ps':'No',
+    'Local Social Pension':'No','National Social Pension':'No','Solo Parent Assistance':'No',
+    'Cash Subsidy':'No','Relief Goods':'No','AICS':''
   };
 }
 
-/* ========== JSONP helper ========== */
-function jsonpGetRecords(params, cb){
-  const ts = Date.now(), cbName = 'cb_records_' + ts + '_' + Math.floor(Math.random()*1000);
-  window[cbName] = function(resp){ try{ cb(null, resp); } finally{ try{ delete window[cbName]; }catch(e){} } };
-  const q = `action=getRecords&filterBarangay=${encodeURIComponent(params.filterBarangay||'')}&filterStage=${encodeURIComponent(params.filterStage||'')}&q=${encodeURIComponent(params.q||'')}&callback=${cbName}`;
-  const s = document.createElement('script'); s.src = SCRIPT_URL + '?' + q; s.onerror = ()=>{ cb(new Error('JSONP failed')) }; document.body.appendChild(s);
+/* open memberPanel for edit */
+function openMemberPanelForEdit(index){
+  const total = editMembers.length;
+  document.getElementById('memberPanelTitle').innerText = `Member ${index+1} of ${total}`;
+  fillMemberPanelFromEdit(index);
+  document.getElementById('memberPanel').classList.add('open');
+  document.getElementById('panelOverlay').classList.add('show');
 }
 
-/* ========== load household for edit ========== */
-function loadHouseholdForEdit(){
-  editDataID = localStorage.getItem('edit_dataID');
-  if(!editDataID){ alert('No edit_dataID found. Open an entry from records page first.'); return; }
-
-  jsonpGetRecords({}, (err, data) => {
-    if(err || !data || !data.success){ alert('Failed to load data'); console.error(err, data); return; }
-    const rows = (data.rows || []).filter(r => String(r['Data ID']) === String(editDataID));
-    if(!rows.length){ alert('No rows found for Data ID ' + editDataID); return; }
-
-    // head row (prefer blank member name)
-    let headRow = rows.find(r => !r['Name of Household Member/s'] || String(r['Name of Household Member/s']).trim()==='');
-    if(!headRow) headRow = rows[0];
-    const members = rows.filter(r => r['Name of Household Member/s'] && String(r['Name of Household Member/s']).trim() !== '');
-
-    fillHeadForm(headRow);
-
-    collectedMembers = members.map(m => ({
-      "Name of Household Member/s": m["Name of Household Member/s"] || '',
-      "Sex": m["Sex"] || '',
-      "Birthdate": fixDateFormat(m["Birthdate"] || ''),
-      "Age": m["Age"] || '',
-      "Stage": m["Stage"] || '',
-      "Persons with Disability (PWD)": m["Persons with Disability (PWD)"] || 'No',
-      "Status": m["Status"] || '',
-      "Transportation": m["Transportation"] || '',
-      "Designated Pick-Up Point": m["Designated Pick-Up Point"] || '',
-      "Drop-Off Point": m["Drop-Off Point"] || '',
-      "Name of Camp": m["Name of Camp"] || '',
-      "Capacity": m["Capacity"] || '',
-      "No. of Individuals Inside Camp": m["No. of Individuals Inside Camp"] || '',
-      "No. of Individuals Outside Camp": m["No. of Individuals Outside Camp"] || '',
-      "Reasons for Displacement": m["Reasons for Displacement"] || '',
-      "TUPAD": m["TUPAD"] || 'No',
-      "Local 4Ps": m["Local 4Ps"] || 'No',
-      "National 4Ps": m["National 4Ps"] || 'No',
-      "Local Social Pension": m["Local Social Pension"] || 'No',
-      "National Social Pension": m["National Social Pension"] || 'No',
-      "Solo Parent Assistance": m["Solo Parent Assistance"] || 'No',
-      "Cash Subsidy": m["Cash Subsidy"] || 'No',
-      "Relief Goods": m["Relief Goods"] || 'No',
-      "AICS": m["AICS"] || ''
-    }));
-
-    // ensure collectedMembers matches memberCount
-    const expected = Number(document.getElementById('memberCount').value || 0);
-    while(collectedMembers.length < expected) collectedMembers.push({
-      "Name of Household Member/s":'', "Sex":'', "Birthdate": '', "Age": '', "Stage": '', "Persons with Disability (PWD)": "No",
-      "Status": '', "Transportation": '', "Designated Pick-Up Point": '', "Drop-Off Point": '', "Name of Camp": '', "Capacity": '',
-      "No. of Individuals Inside Camp": '', "No. of Individuals Outside Camp": '', "Reasons for Displacement": '', "TUPAD": 'No',
-      "Local 4Ps": 'No', "National 4Ps": 'No', "Local Social Pension": 'No', "National Social Pension": 'No', "Solo Parent Assistance": 'No',
-      "Cash Subsidy": 'No', "Relief Goods": 'No', "AICS": ''
-    });
-
-    updateMemberPreview();
-  });
+/* fill member panel fields from editMembers[index] */
+function fillMemberPanelFromEdit(idx){
+  const m = editMembers[idx] || createEmptyMember();
+  document.getElementById('memberName').value = m['Name of Household Member/s'] || '';
+  Array.from(document.getElementsByName('member_sex')).forEach(r => r.checked = (r.value === (m['Sex'] || '')));
+  document.getElementById('memberBirthdate').value = toInputDate(m['Birthdate'] || '');
+  updateMemberAgeStage();
+  Array.from(document.getElementsByName('member_pwd')).forEach(r => r.checked = (r.value === (m['Persons with Disability (PWD)'] || 'No')));
+  document.getElementById('memberStage').value = m['Stage'] || '';
+  document.getElementById('memberStatus').value = m['Status'] || '';
+  document.getElementById('memberTransport').value = m['Transportation'] || '';
+  document.getElementById('memberPickup').value = m['Designated Pick-Up Point'] || '';
+  document.getElementById('memberDropoff').value = m['Drop-Off Point'] || '';
+  document.getElementById('memberCamp').value = m['Name of Camp'] || '';
+  document.getElementById('memberCampCap').value = m['Capacity'] || '';
+  document.getElementById('memberInside').value = m['No. of Individuals Inside Camp'] || '';
+  document.getElementById('memberOutside').value = m['No. of Individuals Outside Camp'] || '';
+  document.getElementById('memberReason').value = m['Reasons for Displacement'] || '';
+  // support checkboxes for assistance if present in your sheet (safe check)
+  document.getElementById('member_tupad') && (document.getElementById('member_tupad').checked = (m['TUPAD'] === 'Yes'));
+  document.getElementById('member_local4ps') && (document.getElementById('member_local4ps').checked = (m['Local 4Ps'] === 'Yes'));
+  document.getElementById('member_intl4ps') && (document.getElementById('member_intl4ps').checked = (m['National 4Ps'] === 'Yes'));
+  document.getElementById('member_locsp') && (document.getElementById('member_locsp').checked = (m['Local Social Pension'] === 'Yes'));
+  document.getElementById('member_intlsp') && (document.getElementById('member_intlsp').checked = (m['National Social Pension'] === 'Yes'));
+  document.getElementById('member_solo') && (document.getElementById('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes'));
+  document.getElementById('member_cash') && (document.getElementById('member_cash').checked = (m['Cash Subsidy'] === 'Yes'));
+  document.getElementById('member_relief') && (document.getElementById('member_relief').checked = (m['Relief Goods'] === 'Yes'));
+  document.getElementById('memberAics') && (document.getElementById('memberAics').value = m['AICS'] || '');
 }
 
-/* ========== panel controls ========== */
-function openPanel(){ document.getElementById('memberPanel').classList.add('open'); document.getElementById('panelOverlay').classList.add('show'); }
-function closePanel(){ document.getElementById('memberPanel').classList.remove('open'); document.getElementById('panelOverlay').classList.remove('show'); }
+/* collect member panel into editMembers[index] */
+function collectMemberPanelToEdit(){
+  const name = document.getElementById('memberName').value.trim();
+  const sex = document.querySelector("input[name='member_sex']:checked")?.value || '';
+  const birthdate_input = document.getElementById('memberBirthdate').value || '';
+  const birth_for_sheet = toSheetDateFormat(birthdate_input); // DD/MM/YYYY
+  const age = document.getElementById('memberAge').value || '';
+  const stage = document.getElementById('memberStage').value || '';
+  const pwd = document.querySelector("input[name='member_pwd']:checked")?.value || 'No';
+  const obj = {
+    'Name of Household Member/s': name,
+    'Sex': sex,
+    'Birthdate': birth_for_sheet,
+    'Age': age,
+    'Stage': stage,
+    'Persons with Disability (PWD)': pwd,
+    'Status': document.getElementById('memberStatus').value || '',
+    'Transportation': document.getElementById('memberTransport').value || '',
+    'Designated Pick-Up Point': document.getElementById('memberPickup').value || '',
+    'Drop-Off Point': document.getElementById('memberDropoff').value || '',
+    'Name of Camp': document.getElementById('memberCamp').value || '',
+    'Capacity': document.getElementById('memberCampCap').value || '',
+    'No. of Individuals Inside Camp': document.getElementById('memberInside').value || '',
+    'No. of Individuals Outside Camp': document.getElementById('memberOutside').value || '',
+    'Reasons for Displacement': document.getElementById('memberReason').value || '',
+    'TUPAD': (document.getElementById('member_tupad') && document.getElementById('member_tupad').checked) ? 'Yes' : 'No',
+    'Local 4Ps': (document.getElementById('member_local4ps') && document.getElementById('member_local4ps').checked) ? 'Yes' : 'No',
+    'National 4Ps': (document.getElementById('member_intl4ps') && document.getElementById('member_intl4ps').checked) ? 'Yes' : 'No',
+    'Local Social Pension': (document.getElementById('member_locsp') && document.getElementById('member_locsp').checked) ? 'Yes' : 'No',
+    'National Social Pension': (document.getElementById('member_intlsp') && document.getElementById('member_intlsp').checked) ? 'Yes' : 'No',
+    'Solo Parent Assistance': (document.getElementById('member_solo') && document.getElementById('member_solo').checked) ? 'Yes' : 'No',
+    'Cash Subsidy': (document.getElementById('member_cash') && document.getElementById('member_cash').checked) ? 'Yes' : 'No',
+    'Relief Goods': (document.getElementById('member_relief') && document.getElementById('member_relief').checked) ? 'Yes' : 'No',
+    'AICS': (document.getElementById('memberAics') && document.getElementById('memberAics').value) ? document.getElementById('memberAics').value : ''
+  };
+  editMembers[memberEditIndex] = obj;
+}
 
-/* ========== events ========== */
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('userName').innerText = localStorage.getItem('staffName') || '';
-
-  // auto age/stage for head
-  document.getElementById('householdBirthdate').addEventListener('input', ()=>{
-    const a = computeAge(document.getElementById('householdBirthdate').value);
-    document.getElementById('householdAge').value = a;
-    document.getElementById('householdStage').value = getStageFromAge(a);
-  });
-
-  // auto age/stage for member panel
-  document.getElementById('memberBirthdate').addEventListener('input', ()=>{
-    const a = computeAge(document.getElementById('memberBirthdate').value);
-    document.getElementById('memberAge').value = a;
-    document.getElementById('memberStage').value = getStageFromAge(a);
-  });
-
-  // panel buttons
-  document.getElementById('panelClose').addEventListener('click', closePanel);
-  document.getElementById('memberBack').addEventListener('click', ()=>{
-    collectedMembers[currentMemberIndex] = collectMemberFromPanel();
-    if(currentMemberIndex>0){
-      currentMemberIndex--;
-      fillMemberPanel(currentMemberIndex);
-      document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${document.getElementById('memberCount').value}`;
-      updateMemberPreview();
-    } else {
-      closePanel();
+/* next/back in member panel */
+document.getElementById('memberNext').addEventListener('click', ()=> {
+  const name = document.getElementById('memberName').value.trim();
+  if(!name){ alert('Please enter member name'); return; }
+  collectMemberPanelToEdit();
+  memberEditIndex++;
+  if(memberEditIndex >= editMembers.length){
+    // finished all
+    document.getElementById('memberPanel').classList.remove('open');
+    updateEditMembersPreview();
+    if(sequenceMode){
+      // if sequence mode is active, automatically save
+      sequenceMode = false;
+      saveEditedHousehold(true); // silent reload after save
     }
-  });
-
-  document.getElementById('memberNext').addEventListener('click', ()=>{
-    const name = document.getElementById('memberName').value.trim();
-    if(!name){ alert('Please enter member name'); return; }
-    collectedMembers[currentMemberIndex] = collectMemberFromPanel();
-    updateMemberPreview();
-    currentMemberIndex++;
-    const total = Number(document.getElementById('memberCount').value || 0);
-    if(currentMemberIndex >= total){ closePanel(); return; }
-    fillMemberPanel(currentMemberIndex);
-    document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${total}`;
-  });
-
-  document.getElementById('memberCount').addEventListener('change', ()=>{
-    const expected = Number(document.getElementById('memberCount').value || 0);
-    if(collectedMembers.length > expected) collectedMembers = collectedMembers.slice(0, expected);
-    while(collectedMembers.length < expected) collectedMembers.push({
-      "Name of Household Member/s":'', "Sex":'', "Birthdate": '', "Age": '', "Stage": '', "Persons with Disability (PWD)": "No",
-      "Status": '', "Transportation": '', "Designated Pick-Up Point": '', "Drop-Off Point": '', "Name of Camp": '', "Capacity": '',
-      "No. of Individuals Inside Camp": '', "No. of Individuals Outside Camp": '', "Reasons for Displacement": '', "TUPAD": 'No',
-      "Local 4Ps": 'No', "National 4Ps": 'No', "Local Social Pension": 'No', "National Social Pension": 'No', "Solo Parent Assistance": 'No',
-      "Cash Subsidy": 'No', "Relief Goods": 'No', "AICS": ''
-    });
-    updateMemberPreview();
-  });
-
-  document.getElementById('cancelBtn').addEventListener('click', ()=>{ window.location.href = 'records.html'; });
-
-  // save changes (updateHousehold)
-  document.getElementById('saveBtn').addEventListener('click', async ()=>{
-    // collect head fields (all editable)
-    const head = {
-      "Barangay": document.getElementById('barangay').value || '',
-      "Sitio / Purok": document.getElementById('sitio').value || '',
-      "Name of Household Head": document.getElementById('householdHead').value || '',
-      "Sex": document.querySelector('input[name="head_sex"]:checked')?.value || '',
-      "Birthdate": document.getElementById('householdBirthdate').value || '',
-      "Age": document.getElementById('householdAge').value || '',
-      "Stage": document.getElementById('householdStage').value || '',
-      "No. of Household Member/s": Number(document.getElementById('memberCount').value || 0),
-      "Persons with Disability (PWD)": (document.querySelector('input[name="head_pwd"]:checked')?.value || 'No'),
-      "Status": document.getElementById('head_status').value || '',
-      "Transportation": document.getElementById('head_transport').value || '',
-      "Designated Pick-Up Point": document.getElementById('pickup').value || '',
-      "Drop-Off Point": document.getElementById('dropoff').value || '',
-      "Name of Camp": document.getElementById('campName').value || '',
-      "Capacity": document.getElementById('capacity').value || '',
-      "No. of Individuals Inside Camp": document.getElementById('insideCamp').value || '',
-      "No. of Individuals Outside Camp": document.getElementById('outsideCamp').value || '',
-      "Reasons for Displacement": document.getElementById('reasons').value || '',
-      "TUPAD": document.getElementById('ass_tupad').checked ? 'Yes' : 'No',
-      "Local 4Ps": document.getElementById('ass_local4ps').checked ? 'Yes' : 'No',
-      "National 4Ps": document.getElementById('ass_intl4ps').checked ? 'Yes' : 'No',
-      "Local Social Pension": document.getElementById('ass_locsp').checked ? 'Yes' : 'No',
-      "National Social Pension": document.getElementById('ass_intlsp').checked ? 'Yes' : 'No',
-      "Solo Parent Assistance": document.getElementById('ass_solo').checked ? 'Yes' : 'No',
-      "Relief Goods": document.getElementById('ass_relief').checked ? 'Yes' : 'No',
-      "Cash Subsidy": document.getElementById('ass_cash').checked ? 'Yes' : 'No',
-      "AICS": document.getElementById('ass_aics').value || ''
-    };
-
-    // ensure members length
-    const expected = Number(document.getElementById('memberCount').value || 0);
-    while(collectedMembers.length < expected) collectedMembers.push({
-      "Name of Household Member/s":'', "Sex":'', "Birthdate": '', "Age": '', "Stage": '', "Persons with Disability (PWD)": "No",
-      "Status": '', "Transportation": '', "Designated Pick-Up Point": '', "Drop-Off Point": '', "Name of Camp": '', "Capacity": '',
-      "No. of Individuals Inside Camp": '', "No. of Individuals Outside Camp": '', "Reasons for Displacement": '', "TUPAD": 'No',
-      "Local 4Ps": 'No', "National 4Ps": 'No', "Local Social Pension": 'No', "National Social Pension": 'No', "Solo Parent Assistance": 'No',
-      "Cash Subsidy": 'No', "Relief Goods": 'No', "AICS": ''
-    });
-
-    // build form data
-    const form = new FormData();
-    form.append('action','updateHousehold');
-    form.append('dataID', editDataID);
-    form.append('head', JSON.stringify(head));
-    form.append('members', JSON.stringify(collectedMembers));
-    form.append('submittedBy', localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown');
-
-    const btn = document.getElementById('saveBtn'); btn.disabled=true; btn.innerText='Saving...';
-    try{
-      const res = await fetch(SCRIPT_URL, { method:'POST', body: form });
-      const text = await res.text();
-      const json = JSON.parse(text);
-      if(!json.success){ alert('Save failed: ' + (json.message || JSON.stringify(json))); console.error(json); }
-      else { alert('Household updated (Data ID: ' + editDataID + ')'); window.location.href = 'records.html'; }
-    }catch(err){ console.error(err); alert('Network/server error'); }
-    finally{ btn.disabled=false; btn.innerText='Save changes'; }
-  });
-
-  // finally load the record
-  loadHouseholdForEdit();
+    return;
+  }
+  // else show next
+  fillMemberPanelFromEdit(memberEditIndex);
+  document.getElementById('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`;
 });
 
-/* ========== panel open/close functions ========== */
-function openPanel(){ document.getElementById('memberPanel').classList.add('open'); document.getElementById('panelOverlay').classList.add('show'); }
-function closePanel(){ document.getElementById('memberPanel').classList.remove('open'); document.getElementById('panelOverlay').classList.remove('show'); }
+document.getElementById('memberBack').addEventListener('click', ()=> {
+  collectMemberPanelToEdit();
+  if(memberEditIndex > 0){
+    memberEditIndex--;
+    fillMemberPanelFromEdit(memberEditIndex);
+    document.getElementById('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`;
+  } else {
+    // back to edit panel head
+    document.getElementById('memberPanel').classList.remove('open');
+    updateEditMembersPreview();
+  }
+});
+
+document.getElementById('memberPanelClose').addEventListener('click', ()=> {
+  if(confirm('Close member entry? Unsaved member edits will be kept in panel preview.')) {
+    document.getElementById('memberPanel').classList.remove('open');
+    updateEditMembersPreview();
+  }
+});
+
+/* member birthdate -> age & stage */
+document.getElementById('memberBirthdate').addEventListener('change', updateMemberAgeStage);
+function updateMemberAgeStage(){
+  const date = document.getElementById('memberBirthdate').value;
+  const ageObj = computeAgeFromBirthdate(date);
+  if(!ageObj){ document.getElementById('memberAge').value=''; document.getElementById('memberStage').value=''; return; }
+  document.getElementById('memberAge').value = (ageObj.years === 0 ? 0 : ageObj.years);
+  document.getElementById('memberStage').value = deriveStageFromAge(ageObj);
+}
+
+/* edit head birthdate change */
+document.getElementById('edit_householdBirthdate').addEventListener('change', updateEditHeadAgeStage);
+
+/* cancel and close edit panel */
+document.getElementById('cancelEditBtn').addEventListener('click', ()=> {
+  if(confirm('Discard changes and close?')) closeEditPanel();
+});
+document.getElementById('panelClose').addEventListener('click', ()=> {
+  if(confirm('Discard changes and close?')) closeEditPanel();
+});
+document.getElementById('panelOverlay').addEventListener('click', ()=> {
+  if(document.getElementById('memberPanel').classList.contains('open')) return;
+  if(confirm('Close edit panel? Unsaved changes will be lost.')) closeEditPanel();
+});
+
+/* ---------- Start Sequence button: begin the head->members auto sequence ---------- */
+document.getElementById('startSequenceBtn').addEventListener('click', (ev)=>{
+  ev.preventDefault();
+  // update head object before member edits
+  collectHeadFromEditForm();
+  // ensure editMembers matches expected count
+  const expected = Number(document.getElementById('edit_memberCount').value || 0);
+  while(editMembers.length < expected) editMembers.push(createEmptyMember());
+  if(editMembers.length === 0){
+    // nothing to edit -> save immediately
+    saveEditedHousehold(true);
+    return;
+  }
+  sequenceMode = true;
+  memberEditIndex = 0;
+  openMemberPanelForEdit(memberEditIndex);
+});
+
+/* collect head fields helper */
+function collectHeadFromEditForm(){
+  // gather head but do not send yet
+  const bd_input = document.getElementById('edit_householdBirthdate').value || '';
+  const headBirthForSheet = toSheetDateFormat(bd_input); // store as DD/MM/YYYY
+  editHead = {
+    'Barangay': document.getElementById('edit_barangay').value || '',
+    'Sitio / Purok': document.getElementById('edit_sitio').value || '',
+    'Name of Household Head': document.getElementById('edit_householdHead').value.trim() || '',
+    'Sex': document.querySelector("input[name='edit_head_sex']:checked")?.value || '',
+    'Birthdate': headBirthForSheet,
+    'Age': document.getElementById('edit_householdAge').value || '',
+    'Stage': document.getElementById('edit_householdStage').value || '',
+    'No. of Household Member/s': String(document.getElementById('edit_memberCount').value || '0'),
+    'Persons with Disability (PWD)': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
+    'Status': document.getElementById('edit_head_status').value || '',
+    'Transportation': document.getElementById('edit_head_transport').value || '',
+    'Designated Pick-Up Point': document.getElementById('edit_pickup').value || '',
+    'Drop-Off Point': document.getElementById('edit_dropoff').value || '',
+    'Name of Camp': document.getElementById('edit_campName').value || '',
+    'Capacity': document.getElementById('edit_capacity').value || '',
+    'No. of Individuals Inside Camp': document.getElementById('edit_insideCamp').value || '',
+    'No. of Individuals Outside Camp': document.getElementById('edit_outsideCamp').value || ''
+  };
+}
+
+/* Save edited household -> updateHousehold action using FormData
+   if silentReload true, we'll reload records after success without extra prompt (used by sequenceMode)
+*/
+async function saveEditedHousehold(silentReload){
+  collectHeadFromEditForm();
+
+  // ensure memberCount matches editMembers length (pad/trim)
+  const expected = Number(document.getElementById('edit_memberCount').value || 0);
+  while(editMembers.length < expected) editMembers.push(createEmptyMember());
+  if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
+
+  const fd = new FormData();
+  fd.append('action','updateHousehold');
+  fd.append('dataID', editDataID);
+  fd.append('head', JSON.stringify(editHead));
+  fd.append('members', JSON.stringify(editMembers || []));
+  fd.append('submittedBy', localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown');
+
+  const btn = document.getElementById('saveEditBtn'); btn.disabled = true; btn.innerText = 'Saving...';
+
+  try {
+    const res = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
+    const text = await res.text();
+    let json; try { json = JSON.parse(text); } catch(e){ throw new Error('Invalid server response'); }
+    if(!json.success){ alert('Save failed: ' + (json.message || JSON.stringify(json))); console.error(json); }
+    else {
+      if(!silentReload) alert('Household updated (Data ID: ' + (editDataID||'') + ')');
+      closeEditPanel();
+      loadRecords();
+    }
+  } catch(err){
+    console.error('Save error', err);
+    alert('Network or server error. See console.');
+  } finally {
+    btn.disabled = false; btn.innerText = 'Save changes';
+  }
+}
+
+/* Save button handler (manual save) */
+document.getElementById('saveEditBtn').addEventListener('click', (ev)=>{
+  ev.preventDefault();
+  saveEditedHousehold(false);
+});
+
+/* ========================= Export helpers (CSV) ========================= */
+function groupsToCSV(groups){
+  const cols = header.slice();
+  const csv = [];
+  csv.push(cols.map(c => `"${c.replace(/"/g,'""')}"`).join(','));
+  groups.forEach(g => {
+    const h = g.head || {};
+    csv.push(cols.map(c => `"${String(h[c]||'').replace(/"/g,'""')}"`).join(','));
+    (g.members||[]).forEach(m => csv.push(cols.map(c => `"${String(m[c]||'').replace(/"/g,'""')}"`).join(',')));
+  });
+  return csv.join('\r\n');
+}
+function downloadCSV(name, content){
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name; a.click();
+  setTimeout(()=> URL.revokeObjectURL(url), 500);
+}
+function exportAll(){ if(!groupsArr.length) return alert('Nothing to export.'); downloadCSV('mdrrmo_records_all.csv', groupsToCSV(groupsArr)); }
+function exportSelected(){ const sel = groupsArr.filter(g => selectedIds.has(g.dataID)); if(!sel.length) return alert('No selected households.'); downloadCSV('mdrrmo_records_selected.csv', groupsToCSV(sel)); }
+
+/* ========================= UI bindings ========================= */
+document.getElementById('filterBarangay').onchange = loadRecords;
+document.getElementById('refreshBtn').onclick = loadRecords;
+document.getElementById('exportMenuBtn').onclick = ()=> document.getElementById('exportDropdown').classList.toggle('hidden');
+document.addEventListener('click', e => {
+  const menu = document.getElementById('exportMenuBtn'), box = document.getElementById('exportDropdown');
+  if(!menu.contains(e.target) && !box.contains(e.target)) box.classList.add('hidden');
+});
+document.getElementById('searchInput').addEventListener('input', ()=>{ clearTimeout(window.__typeTimer); window.__typeTimer = setTimeout(loadRecords, 300); });
+
+/* init */
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('userName').innerText = localStorage.getItem('staffName') || '';
+  // wire auto-age update for head
+  document.getElementById('edit_householdBirthdate').addEventListener('change', updateEditHeadAgeStage);
+  loadRecords();
+});
 </script>
 </body>
 </html>
