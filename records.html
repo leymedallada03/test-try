@@ -335,6 +335,58 @@ function toInputDate(val){
   return '';
 }
 
+/* Convert anything → DD/MM/YYYY (TEXT) */
+function toDisplayDate(val) {
+  if (!val) return "";
+
+  // If Apps Script inserted a Date object through JSONP
+  if (typeof val === "object" && val !== null && val.year) {
+    const y = val.year;
+    const m = String(val.month).padStart(2, '0');
+    const d = String(val.day).padStart(2, '0');
+    return `${d}/${m}/${y}`;
+  }
+
+  if (typeof val !== "string") val = String(val).trim();
+
+  // Remove time if exists
+  val = val.split(" ")[0];
+
+  // Already DD/MM/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) return val;
+
+  // MM/DD/YYYY → convert
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)) {
+    let [m, d, y] = val.split("/");
+    m = String(m).padStart(2,'0');
+    d = String(d).padStart(2,'0');
+    return `${d}/${m}/${y}`;
+  }
+
+  // yyyy-mm-dd → convert
+  if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    let [y,m,d] = val.split("-");
+    return `${d}/${m}/${y}`;
+  }
+
+  return val; // fallback
+}
+
+/* Convert DD/MM/YYYY → yyyy-mm-dd for <input type="date"> */
+function toInputDate(display) {
+  if (!display) return "";
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(display)) return "";
+  const [d,m,y] = display.split("/");
+  return `${y}-${m}-${d}`;
+}
+
+/* Convert yyyy-mm-dd → DD/MM/YYYY */
+function fromInputDate(input) {
+  if (!input) return "";
+  const [y,m,d] = input.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 /* ========================= JSONP loader for GAS (getRecords) ========================= */
 function jsonpGet(params, cb){
   const ts = Date.now();
@@ -427,7 +479,13 @@ function renderPage(){
       let txt = head[col] ?? '';
       if(col === 'No. of Household Member/s') txt = `${txt} (+${memCount})`;
       // if Birthdate present, show raw string (sheet may include time) but keep search/highlight functionality
-      td.innerHTML = highlight(txt, keyword);
+      // Format Birthdate to DD/MM/YYYY
+if (col === 'Birthdate') {
+    txt = toDisplayDate(txt);
+}
+
+td.innerHTML = highlight(txt, keyword);
+
       tr.appendChild(td);
     });
 
@@ -585,6 +643,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
 
 
 
