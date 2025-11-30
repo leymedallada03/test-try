@@ -992,9 +992,9 @@ document.getElementById('startSequenceBtn').addEventListener('click', (ev)=>{
 
 /* collect head fields helper */
 function collectHeadFromEditForm(){
-  // gather head but do not send yet
   const bd_input = document.getElementById('edit_householdBirthdate').value || '';
-  const headBirthForSheet = toSheetDateFormat(bd_input); // store as DD/MM/YYYY
+  const headBirthForSheet = toSheetDateFormat(bd_input);
+
   editHead = {
     'Barangay': document.getElementById('edit_barangay').value || '',
     'Sitio / Purok': document.getElementById('edit_sitio').value || '',
@@ -1013,17 +1013,20 @@ function collectHeadFromEditForm(){
     'Capacity': document.getElementById('edit_capacity').value || '',
     'No. of Individuals Inside Camp': document.getElementById('edit_insideCamp').value || '',
     'No. of Individuals Outside Camp': document.getElementById('edit_outsideCamp').value || '',
+
+    // Assistance
     'TUPAD': document.getElementById('edit_ass_tupad').checked ? 'Yes' : 'No',
-'Local 4Ps': document.getElementById('edit_ass_local4ps').checked ? 'Yes' : 'No',
-'National 4Ps': document.getElementById('edit_ass_intl4ps').checked ? 'Yes' : 'No',
-'Local Social Pension': document.getElementById('edit_ass_locsp').checked ? 'Yes' : 'No',
-'National Social Pension': document.getElementById('edit_ass_intlsp').checked ? 'Yes' : 'No',
-'Solo Parent Assistance': document.getElementById('edit_ass_solo').checked ? 'Yes' : 'No',
-'Cash Subsidy': document.getElementById('edit_ass_cash').checked ? 'Yes' : 'No',
-'Relief Goods': document.getElementById('edit_ass_relief').checked ? 'Yes' : 'No',
-'AICS': document.getElementById('edit_ass_aics').value || ''
+    'Local 4Ps': document.getElementById('edit_ass_local4ps').checked ? 'Yes' : 'No',
+    'National 4Ps': document.getElementById('edit_ass_intl4ps').checked ? 'Yes' : 'No',
+    'Local Social Pension': document.getElementById('edit_ass_locsp').checked ? 'Yes' : 'No',
+    'National Social Pension': document.getElementById('edit_ass_intlsp').checked ? 'Yes' : 'No',
+    'Solo Parent Assistance': document.getElementById('edit_ass_solo').checked ? 'Yes' : 'No',
+    'Cash Subsidy': document.getElementById('edit_ass_cash').checked ? 'Yes' : 'No',
+    'Relief Goods': document.getElementById('edit_ass_relief').checked ? 'Yes' : 'No',
+    'AICS': document.getElementById('edit_ass_aics').value || ''
   };
 }
+
 
 /* Save edited household -> updateHousehold action using FormData
    if silentReload true, we'll reload records after success without extra prompt (used by sequenceMode)
@@ -1110,4 +1113,5 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
 
