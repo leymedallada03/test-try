@@ -438,8 +438,15 @@ function renderPage(){
 
     // actions
     const tdAct = document.createElement('td'); tdAct.className = 'actions-col';
-    tdAct.innerHTML = `<button title="Edit" class="icon-btn" onclick="onEditClick('${group.dataID}')"><span class="action-icon">✏️</span></button>
-                       <button title="Delete" class="icon-btn" onclick="onDeleteClick('${group.dataID}')"><span class="action-icon">🗑️</span></button>`;
+    tdAct.innerHTML = `
+<button title="Edit" class="icon-btn" onclick="event.stopPropagation(); event.preventDefault(); onEditClick('${group.dataID}')">
+    <span class="action-icon">✏️</span>
+</button>
+<button title="Delete" class="icon-btn" onclick="event.stopPropagation(); event.preventDefault(); onDeleteClick('${group.dataID}')">
+    <span class="action-icon">🗑️</span>
+</button>
+`;
+
     tr.appendChild(tdAct);
 
     tbody.appendChild(tr);
@@ -569,3 +576,4 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
