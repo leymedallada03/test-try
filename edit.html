@@ -430,101 +430,122 @@ const rowsPerPage = 25;
 
 /* Edit state */
 let editDataID = null;
-let editHead = {};           // object for head when editing
-let editMembers = [];        // array of member objects when editing
-let memberEditIndex = 0;     // index currently editing in sequential member panel
-let sequenceMode = false;    // true when "startSequenceBtn" initiated (auto-save after last member)
+let editHead = {};
+let editMembers = [];
+let memberEditIndex = 0;
+let sequenceMode = false;
 
-/* ========================= UTILITIES ========================= */
-function showLoading(show){ document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
+/* ========================= UTIL HELPERS ========================= */
+const $ = id => document.getElementById(id);
+const q = sel => document.querySelector(sel);
+const qAll = sel => Array.from(document.querySelectorAll(sel));
+
+function showLoading(show = true){
+  const el = $('loading');
+  if(!el) return;
+  el.style.display = show ? 'flex' : 'none';
+}
 function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
 function computeKeywordRegex(q){ if(!q) return null; const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g,"\\$&"); return new RegExp(esc,"gi"); }
 function highlight(text,q){ if(!q) return escapeHtml(text); const re=computeKeywordRegex(q); return escapeHtml(text).replace(re,m=>`<span class="hl">${m}</span>`); }
 
-/* ---------- DATE PARSING / FORMATTING ---------- */
-/* Convert various sheet date string formats to yyyy-mm-dd suitable for <input type="date"> */
+/* ========================= DATE PARSING & FORMATTING =========================
+   - toInputDate: converts different sheet/display values -> "yyyy-mm-dd" for <input type="date">
+   - toSheetDate: converts "yyyy-mm-dd" -> "DD/MM/YYYY" for saving to sheet
+   - toDisplayDate: normalize various inputs to "DD/MM/YYYY" for UI display (if needed)
+*/
 function toInputDate(val){
   if(!val && val !== 0) return '';
-  // If it's a Date object (GAS occasionally serializes dates), handle it
-  if(typeof val === 'object' && val instanceof Date){
-    const d = val;
-    const mm = String(d.getMonth()+1).padStart(2,'0');
-    const dd = String(d.getDate()).padStart(2,'0');
-    return `${d.getFullYear()}-${mm}-${dd}`;
-  }
-  let s = String(val).trim();
-  // strip time if present
-  if(s.indexOf(' ') !== -1) s = s.split(' ')[0];
+  // If already yyyy-mm-dd
+  if(typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
 
-  // handle formats:
-  // 1) DD/MM/YYYY (common in your sheet) -> convert to yyyy-mm-dd
-  // 2) MM/DD/YYYY or MM/DD/YYYY HH:MM:SS -> detect ambiguous: if first number >12 => treat as DD/MM/YYYY
-  // 3) ISO YYYY-MM-DD
-  // 4) Other strings -> try Date parse
-
-  // ISO yyyy-mm-dd
-  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-
-  // slash separated
-  if(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(s)){
-    const parts = s.split('/');
-    let p1 = parseInt(parts[0],10), p2 = parseInt(parts[1],10), p3 = parseInt(parts[2],10);
-    if(p3 < 100) p3 += 2000;
-    let day, month, year = p3;
-    if(p1 > 12 && p2 <= 12){
-      // DD/MM/YYYY
-      day = p1; month = p2;
-    } else if(p2 > 12 && p1 <=12){
-      // MM/DD/YYYY but p2 > 12 is unlikely - fallback
-      month = p1; day = p2;
-    } else {
-      // both <=12 -> ambiguous. Heuristic: your headers & earlier note say sheet uses DD/MM/YYYY; prefer DD/MM/YYYY
-      // However if p1<=12 and p2>12 we already handled. So assume DD/MM/YYYY when ambiguous.
-      day = p1; month = p2;
-    }
-    month = String(month).padStart(2,'0'); day = String(day).padStart(2,'0');
-    return `${year}-${month}-${day}`;
+  // If the sheet provided DD/MM/YYYY
+  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(val)){
+    const parts = val.split('/');
+    // prefer DD/MM/YYYY (your sheet uses DD/MM/YYYY). handle 2- or 4-digit years
+    let d = parts[0].padStart(2,'0'), m = parts[1].padStart(2,'0'), y = parts[2];
+    if(y.length === 2) y = '20' + y;
+    // If it's ambiguous (both <=12) we prioritize DD/MM/YYYY per your requirement
+    return `${y}-${m}-${d}`;
   }
 
-  // Try Date parse fallback
-  const dt = new Date(s);
+  // If the string looks like MM/DD/YYYY we try to detect
+  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
+    // attempt both interpretations: prefer DD/MM/YYYY as above
+    const [a,b,c] = val.split('/');
+    // prefer DD/MM/YYYY
+    const d = a.padStart(2,'0'), m = b.padStart(2,'0'), y = c;
+    return `${y}-${m}-${d}`;
+  }
+
+  // If it's a Date object
+  if(val instanceof Date && !isNaN(val)){
+    const mm = String(val.getMonth()+1).padStart(2,'0');
+    const dd = String(val.getDate()).padStart(2,'0');
+    return `${val.getFullYear()}-${mm}-${dd}`;
+  }
+
+  // fallback: try parsing
+  const dt = new Date(String(val));
   if(!isNaN(dt)){
     const mm = String(dt.getMonth()+1).padStart(2,'0');
     const dd = String(dt.getDate()).padStart(2,'0');
     return `${dt.getFullYear()}-${mm}-${dd}`;
   }
+
   return '';
 }
 
-/* Convert yyyy-mm-dd (from input) to DD/MM/YYYY string for saving to sheet */
-function toSheetDateFormat(inputVal){
+function toSheetDate(inputVal){
+  // Expects "yyyy-mm-dd" OR Date-like -> returns "DD/MM/YYYY" (sheet format)
   if(!inputVal) return '';
-  // inputVal expected 'yyyy-mm-dd'
   if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
     const [y,m,d] = inputVal.split('-');
     return `${d}/${m}/${y}`;
   }
-  // fallback: try parse
+  // fallback: parse and format
   const dt = new Date(inputVal);
   if(!isNaN(dt)){
     const mm = String(dt.getMonth()+1).padStart(2,'0');
     const dd = String(dt.getDate()).padStart(2,'0');
     return `${dd}/${mm}/${dt.getFullYear()}`;
   }
-  return inputVal;
+  return '';
 }
 
-/* Age & Stage helpers */
-function computeAgeFromBirthdate(dateStr){
-  if(!dateStr) return null;
-  const b = new Date(dateStr);
-  if(isNaN(b)) return null;
+function toDisplayDate(val){
+  // Normalize to DD/MM/YYYY for showing to users (if you ever need it)
+  if(!val) return '';
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(val)) return val;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(val)){
+    const [y,m,d] = val.split('-'); return `${d}/${m}/${y}`;
+  }
+  // try to parse sloppy inputs
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
+    const [a,b,c] = val.split('/'); // treat as DD/MM/YYYY per your sheet
+    const d = a.padStart(2,'0'), m = b.padStart(2,'0'), y = c;
+    return `${d}/${m}/${y}`;
+  }
+  const dt = new Date(val);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dd}/${mm}/${dt.getFullYear()}`;
+  }
+  return String(val);
+}
+
+/* ========================= AGE / STAGE HELPERS ========================= */
+function computeAgeFromBirthdateISO(isoDate){
+  if(!isoDate) return null;
+  const d = new Date(isoDate);
+  if(isNaN(d)) return null;
   const now = new Date();
-  let years = now.getFullYear() - b.getFullYear();
-  const m = now.getMonth() - b.getMonth();
-  if(m < 0 || (m === 0 && now.getDate() < b.getDate())) years--;
+  let years = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if(m < 0 || (m === 0 && now.getDate() < d.getDate())) years--;
   if(years <= 0){
-    const months = (now.getFullYear() - b.getFullYear())*12 + (now.getMonth() - b.getMonth());
+    const months = (now.getFullYear() - d.getFullYear())*12 + (now.getMonth() - d.getMonth());
     return { years: 0, months: Math.max(0, months) };
   }
   return { years };
@@ -541,28 +562,28 @@ function deriveStageFromAge(ageObj){
   return 'Adult';
 }
 
-/* ========================= JSONP loader for GAS (getRecords) ========================= */
+/* ========================= JSONP (GAS) ========================= */
 function jsonpGet(params, cb){
   const ts = Date.now();
   const cbName = 'cb_' + ts + '_' + Math.floor(Math.random()*1000);
   window[cbName] = function(resp){ cb(null, resp); delete window[cbName]; };
-  const q = `action=getRecords&filterBarangay=${encodeURIComponent(params.filterBarangay||'')}&filterStage=${encodeURIComponent(params.filterStage||'')}&q=${encodeURIComponent(params.q||'')}&callback=${cbName}`;
+  const qstr = `action=getRecords&filterBarangay=${encodeURIComponent(params.filterBarangay||'')}&filterStage=${encodeURIComponent(params.filterStage||'')}&q=${encodeURIComponent(params.q||'')}&callback=${cbName}`;
   const s = document.createElement('script');
-  s.src = `${SCRIPT_URL}?${q}`;
+  s.src = `${SCRIPT_URL}?${qstr}`;
   s.onerror = ()=>cb(new Error('JSONP failed'));
   s.onload = ()=>s.remove();
   document.body.appendChild(s);
 }
 
-/* ========================= Load + group ========================= */
+/* ========================= LOAD & GROUP RECORDS ========================= */
 function loadRecords(){
   showLoading(true);
-  const filterBarangay = document.getElementById('filterBarangay').value || '';
-  const q = document.getElementById('searchInput').value || '';
+  const filterBarangay = $('filterBarangay') ? $('filterBarangay').value : '';
+  const qstr = $('searchInput') ? $('searchInput').value : '';
 
-  jsonpGet({ filterBarangay, q }, (err, resp) => {
+  jsonpGet({ filterBarangay, q: qstr }, (err, resp) => {
     showLoading(false);
-    if(err || !resp || !resp.success){ alert('Failed to load records'); console.error(err); return; }
+    if(err || !resp || !resp.success){ alert('Failed to load records'); console.error(err, resp); return; }
     header = resp.header || [];
     rawRows = resp.rows || [];
     grouped = {};
@@ -576,6 +597,7 @@ function loadRecords(){
       else grouped[id].members.push(r);
     });
 
+    // ensure if no explicit head, first member becomes head
     Object.keys(grouped).forEach(id=>{
       if(!grouped[id].head && grouped[id].members.length>0) grouped[id].head = grouped[id].members.shift();
     });
@@ -583,22 +605,20 @@ function loadRecords(){
     const keys = Object.keys(grouped).sort((a,b)=> Number(a) - Number(b));
     groupsArr = keys.map(k => grouped[k]);
 
-    currentPage = 1;
-    selectedIds.clear();
-    renderPage();
-    renderPagination();
-    updateCounts();
+    currentPage = 1; selectedIds.clear();
+    renderPage(); renderPagination(); updateCounts();
   });
 }
 
-/* ========================= Render table ========================= */
+/* ========================= RENDER TABLE ========================= */
 function renderPage(){
-  const tbody = document.getElementById('tableBody');
-  const thead = document.getElementById('tableHead');
+  const tbody = $('tableBody');
+  const thead = $('tableHead');
+  if(!tbody || !thead) return;
   tbody.innerHTML = '';
   thead.innerHTML = '';
 
-  // header row
+  // header
   let hdr = '<tr>';
   hdr += `<th class="select-col"><input id="selectAll" type="checkbox"></th>`;
   header.forEach(h => hdr += `<th>${escapeHtml(h)}</th>`);
@@ -609,17 +629,16 @@ function renderPage(){
 
   const start = (currentPage - 1) * rowsPerPage;
   const slice = groupsArr.slice(start, start + rowsPerPage);
-  const keyword = (document.getElementById('searchInput').value || '').trim();
+  const keyword = ($('searchInput')?.value || '').trim();
 
   slice.forEach(group => {
     const head = group.head || {};
     const members = group.members || [];
     const memCount = members.length;
-
     const cls = memCount <= 1 ? 'mem-small' : memCount <= 4 ? 'mem-normal' : memCount <= 7 ? 'mem-large' : 'mem-critical';
-    const tr = document.createElement('tr');
-    tr.className = cls;
 
+    // head row
+    const tr = document.createElement('tr'); tr.className = cls;
     // select col
     const tdSel = document.createElement('td'); tdSel.className = 'select-col';
     const cb = document.createElement('input'); cb.type='checkbox'; cb.className='row-select'; cb.dataset.dataId = group.dataID;
@@ -627,7 +646,7 @@ function renderPage(){
     cb.addEventListener('change', onRowSelect);
     tdSel.appendChild(cb); tr.appendChild(tdSel);
 
-    // data columns (head values)
+    // data columns
     header.forEach(col=>{
       const td = document.createElement('td');
       let txt = head[col] ?? '';
@@ -643,18 +662,20 @@ function renderPage(){
 
     // actions
     const tdAct = document.createElement('td'); tdAct.className = 'actions-col';
-    tdAct.innerHTML = `<button title="Edit" class="icon-btn" onclick="onEditClick('${group.dataID}')"><span class="action-icon">✏️</span></button>
-                       <button title="Delete" class="icon-btn" onclick="onDeleteClick('${group.dataID}')"><span class="action-icon">🗑️</span></button>`;
+    tdAct.innerHTML = `
+      <button title="Edit" class="icon-btn" onclick="onEditClick('${group.dataID}')"><span class="action-icon">✏️</span></button>
+      <button title="Delete" class="icon-btn" onclick="onDeleteClick('${group.dataID}')"><span class="action-icon">🗑️</span></button>
+    `;
     tr.appendChild(tdAct);
 
     tbody.appendChild(tr);
 
-    // member rows (hidden by default)
+    // member rows
     members.forEach(m => {
       const mr = document.createElement('tr');
       mr.className = 'member-row hidden';
       mr.dataset.parent = group.dataID;
-      mr.appendChild(document.createElement('td')); // blank select col
+      mr.appendChild(document.createElement('td'));
       header.forEach(col=>{
         const td = document.createElement('td');
         td.innerHTML = highlight(m[col] || '', keyword);
@@ -666,8 +687,8 @@ function renderPage(){
     });
   });
 
-  // selectAll behavior
-  const selectAll = document.getElementById('selectAll');
+  // selectAll
+  const selectAll = $('selectAll');
   if(selectAll){
     selectAll.checked = slice.every(g => selectedIds.has(g.dataID));
     selectAll.onchange = ()=>{ slice.forEach(g => { if(selectAll.checked) selectedIds.add(g.dataID); else selectedIds.delete(g.dataID); }); renderPage(); };
@@ -676,14 +697,14 @@ function renderPage(){
   updateCounts();
 }
 
-/* toggle members rows */
 function toggleMembers(id){
-  document.querySelectorAll(`tr.member-row[data-parent="${id}"]`).forEach(r => r.classList.toggle('hidden'));
+  qAll(`tr.member-row[data-parent="${id}"]`).forEach(r => r.classList.toggle('hidden'));
 }
 
-/* pagination */
+/* ========================= PAGINATION / COUNTS ========================= */
 function renderPagination(){
-  const div = document.getElementById('paginationArea');
+  const div = $('paginationArea');
+  if(!div) return;
   const total = Math.max(1, Math.ceil(groupsArr.length / rowsPerPage));
   if(total <= 1){ div.innerHTML = ''; return; }
   let html = `<button class="page-btn" onclick="changePage(${currentPage-1})">⬅ Prev</button>`;
@@ -692,12 +713,10 @@ function renderPagination(){
   div.innerHTML = html;
 }
 function changePage(p){ const total = Math.ceil(groupsArr.length / rowsPerPage); if(p<1||p>total) return; currentPage = p; renderPage(); renderPagination(); }
-
-/* counts */
-function updateCounts(){ document.getElementById('rowCount').innerText = groupsArr.length; document.getElementById('matchCount').innerText = groupsArr.length; document.getElementById('selectedCount').innerText = selectedIds.size; }
+function updateCounts(){ if($('rowCount')) $('rowCount').innerText = groupsArr.length; if($('matchCount')) $('matchCount').innerText = groupsArr.length; if($('selectedCount')) $('selectedCount').innerText = selectedIds.size; }
 function onRowSelect(e){ const id = e.target.dataset.dataId; if(e.target.checked) selectedIds.add(id); else selectedIds.delete(id); updateCounts(); }
 
-/* ========================= Delete (FormData POST) ========================= */
+/* ========================= DELETE ========================= */
 function onDeleteClick(dataID){
   if(!confirm('Delete household ' + dataID + '?')) return;
   const fd = new FormData();
@@ -708,19 +727,12 @@ function onDeleteClick(dataID){
     .then(txt => {
       let json;
       try { json = JSON.parse(txt); } catch(e){ throw new Error('Invalid server response'); }
-      if(json.success){
-        alert(json.message || 'Deleted');
-        loadRecords();
-      } else {
-        alert('Delete failed: ' + (json.message || JSON.stringify(json)));
-      }
-    }).catch(err => {
-      console.error('Delete error', err);
-      alert('Delete failed — see console');
-    });
+      if(json.success){ alert(json.message || 'Deleted'); loadRecords(); }
+      else alert('Delete failed: ' + (json.message || JSON.stringify(json)));
+    }).catch(err => { console.error('Delete error', err); alert('Delete failed — see console'); });
 }
 
-/* ========================= Edit flow ========================= */
+/* ========================= EDIT FLOW ========================= */
 function onEditClick(dataID){
   const group = grouped[dataID] || groupsArr.find(g => g.dataID === dataID);
   if(!group){ alert('Record not found'); return; }
@@ -729,61 +741,57 @@ function onEditClick(dataID){
   editHead = Object.assign({}, group.head || {});
   editMembers = (group.members || []).map(m => Object.assign({}, m));
 
-  // Prefill edit head
-  document.getElementById('edit_barangay').value = editHead['Barangay'] || '';
-  document.getElementById('edit_sitio').value = editHead['Sitio / Purok'] || '';
-  document.getElementById('edit_householdHead').value = editHead['Name of Household Head'] || '';
-  Array.from(document.getElementsByName('edit_head_sex')).forEach(r => r.checked = (r.value === (editHead['Sex'] || '')));
-  // birthdate -> date input
-  document.getElementById('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
+  // Prefill head inputs (convert sheet dates to input ISO)
+  $('edit_barangay').value = editHead['Barangay'] || '';
+  $('edit_sitio').value = editHead['Sitio / Purok'] || '';
+  $('edit_householdHead').value = editHead['Name of Household Head'] || '';
+  qAll("input[name='edit_head_sex']").forEach(r => r.checked = (r.value === (editHead['Sex'] || '')));
+  $('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
   updateEditHeadAgeStage();
-  document.getElementById('edit_memberCount').value = editHead['No. of Household Member/s'] || (editMembers.length || 0);
-  Array.from(document.getElementsByName('edit_head_pwd')).forEach(r => r.checked = (r.value === (editHead['Persons with Disability (PWD)'] || 'No')));
-  document.getElementById('edit_head_status').value = editHead['Status'] || '';
-  document.getElementById('edit_head_transport').value = editHead['Transportation'] || '';
-  document.getElementById('edit_pickup').value = editHead['Designated Pick-Up Point'] || '';
-  document.getElementById('edit_dropoff').value = editHead['Drop-Off Point'] || '';
-  document.getElementById('edit_campName').value = editHead['Name of Camp'] || '';
-  document.getElementById('edit_capacity').value = editHead['Capacity'] || '';
-  document.getElementById('edit_insideCamp').value = editHead['No. of Individuals Inside Camp'] || '';
-  document.getElementById('edit_outsideCamp').value = editHead['No. of Individuals Outside Camp'] || '';
-  document.getElementById('edit_ass_tupad').checked = (editHead['TUPAD'] === 'Yes');
-  document.getElementById('edit_ass_local4ps').checked = (editHead['Local 4Ps'] === 'Yes');
-  document.getElementById('edit_ass_intl4ps').checked = (editHead['National 4Ps'] === 'Yes');
-  document.getElementById('edit_ass_locsp').checked = (editHead['Local Social Pension'] === 'Yes');
-  document.getElementById('edit_ass_intlsp').checked = (editHead['National Social Pension'] === 'Yes');
-  document.getElementById('edit_ass_solo').checked = (editHead['Solo Parent Assistance'] === 'Yes');
-  document.getElementById('edit_ass_cash').checked = (editHead['Cash Subsidy'] === 'Yes');
-  document.getElementById('edit_ass_relief').checked = (editHead['Relief Goods'] === 'Yes');
-  document.getElementById('edit_ass_aics').value = editHead['AICS'] || '';
+  $('edit_memberCount').value = editHead['No. of Household Member/s'] || (editMembers.length || 0);
+  qAll("input[name='edit_head_pwd']").forEach(r => r.checked = (r.value === (editHead['Persons with Disability (PWD)'] || 'No')));
+  $('edit_head_status').value = editHead['Status'] || '';
+  $('edit_head_transport').value = editHead['Transportation'] || '';
+  $('edit_pickup').value = editHead['Designated Pick-Up Point'] || '';
+  $('edit_dropoff').value = editHead['Drop-Off Point'] || '';
+  $('edit_campName').value = editHead['Name of Camp'] || '';
+  $('edit_capacity').value = editHead['Capacity'] || '';
+  $('edit_insideCamp').value = editHead['No. of Individuals Inside Camp'] || '';
+  $('edit_outsideCamp').value = editHead['No. of Individuals Outside Camp'] || '';
+  $('edit_ass_tupad').checked = (editHead['TUPAD'] === 'Yes');
+  $('edit_ass_local4ps').checked = (editHead['Local 4Ps'] === 'Yes');
+  $('edit_ass_intl4ps').checked = (editHead['National 4Ps'] === 'Yes');
+  $('edit_ass_locsp').checked = (editHead['Local Social Pension'] === 'Yes');
+  $('edit_ass_intlsp').checked = (editHead['National Social Pension'] === 'Yes');
+  $('edit_ass_solo').checked = (editHead['Solo Parent Assistance'] === 'Yes');
+  $('edit_ass_cash').checked = (editHead['Cash Subsidy'] === 'Yes');
+  $('edit_ass_relief').checked = (editHead['Relief Goods'] === 'Yes');
+  $('edit_ass_aics').value = editHead['AICS'] || '';
 
-  // update member preview
   updateEditMembersPreview();
-
-  // open panel and focus first head input
   openEditPanel();
-  setTimeout(()=> document.getElementById('edit_householdHead').focus(), 120);
+  setTimeout(()=> $('edit_householdHead')?.focus(), 120);
 }
 
-/* open/close edit panel */
-function openEditPanel(){ document.getElementById('editPanel').classList.add('open'); document.getElementById('panelOverlay').classList.add('show'); }
-function closeEditPanel(){ document.getElementById('editPanel').classList.remove('open'); document.getElementById('panelOverlay').classList.remove('show'); }
+function openEditPanel(){ $('editPanel')?.classList.add('open'); $('panelOverlay')?.classList.add('show'); }
+function closeEditPanel(){ $('editPanel')?.classList.remove('open'); $('panelOverlay')?.classList.remove('show'); }
 
-/* update head age/stage */
+/* Head age/stage */
 function updateEditHeadAgeStage(){
-  const d = document.getElementById('edit_householdBirthdate').value;
-  const ageObj = computeAgeFromBirthdate(d);
-  if(!ageObj){ document.getElementById('edit_householdAge').value = ''; document.getElementById('edit_householdStage').value = ''; return; }
-  document.getElementById('edit_householdAge').value = (ageObj.years === 0 ? 0 : ageObj.years);
-  document.getElementById('edit_householdStage').value = deriveStageFromAge(ageObj);
+  const d = $('edit_householdBirthdate')?.value || '';
+  const ageObj = computeAgeFromBirthdateISO(d);
+  if(!ageObj){ if($('edit_householdAge')) $('edit_householdAge').value=''; if($('edit_householdStage')) $('edit_householdStage').value=''; return; }
+  $('edit_householdAge').value = (ageObj.years === 0 ? 0 : ageObj.years);
+  $('edit_householdStage').value = deriveStageFromAge(ageObj);
 }
 
-/* members preview */
+/* Members preview */
 function updateEditMembersPreview(){
-  const ul = document.getElementById('edit_membersPreview');
+  const ul = $('edit_membersPreview');
+  if(!ul) return;
   ul.innerHTML = '';
   const n = editMembers.length || 0;
-  document.getElementById('edit_previewCount').innerText = n;
+  if($('edit_previewCount')) $('edit_previewCount').innerText = n;
   for(let i=0;i<n;i++){
     const li = document.createElement('li');
     const m = editMembers[i] || {};
@@ -794,16 +802,14 @@ function updateEditMembersPreview(){
   }
 }
 
-/* Add/Edit Members button - ensure array size & open at index 0 */
-document.getElementById('edit_addMember').addEventListener('click', () => {
-  const expected = Number(document.getElementById('edit_memberCount').value || 0);
+/* Add/Edit Members button handler */
+function ensureMembersArraySize(){
+  const expected = Number($('edit_memberCount')?.value || 0);
   while(editMembers.length < expected) editMembers.push(createEmptyMember());
   if(editMembers.length === 0) editMembers.push(createEmptyMember());
-  memberEditIndex = 0;
-  openMemberPanelForEdit(memberEditIndex);
-});
+}
 
-/* create empty member */
+/* create empty member object */
 function createEmptyMember(){
   return {
     'Name of Household Member/s':'',
@@ -827,54 +833,52 @@ function createEmptyMember(){
   };
 }
 
-/* open memberPanel for edit */
+/* MEMBER PANEL: open -> fill -> collect -> navigate */
 function openMemberPanelForEdit(index){
+  ensureMembersArraySize();
+  memberEditIndex = index;
   const total = editMembers.length;
-  document.getElementById('memberPanelTitle').innerText = `Member ${index+1} of ${total}`;
+  $('memberPanelTitle').innerText = `Member ${index+1} of ${total}`;
   fillMemberPanelFromEdit(index);
-  document.getElementById('memberPanel').classList.add('open');
-  document.getElementById('panelOverlay').classList.add('show');
+  $('memberPanel')?.classList.add('open');
+  $('panelOverlay')?.classList.add('show');
 }
 
-/* fill member panel fields from editMembers[index] */
 function fillMemberPanelFromEdit(idx){
   const m = editMembers[idx] || createEmptyMember();
-  document.getElementById('memberName').value = m['Name of Household Member/s'] || '';
-  Array.from(document.getElementsByName('member_sex')).forEach(r => r.checked = (r.value === (m['Sex'] || '')));
-  document.getElementById('memberBirthdate').value = toInputDate(m['Birthdate'] || '');
+  $('memberName').value = m['Name of Household Member/s'] || '';
+  qAll("input[name='member_sex']").forEach(r => r.checked = (r.value === (m['Sex'] || '')));
+  $('memberBirthdate').value = toInputDate(m['Birthdate'] || '');
   updateMemberAgeStage();
-  Array.from(document.getElementsByName('member_pwd')).forEach(r => r.checked = (r.value === (m['Persons with Disability (PWD)'] || 'No')));
-  document.getElementById('memberStage').value = m['Stage'] || '';
-  document.getElementById('memberStatus').value = m['Status'] || '';
-  document.getElementById('memberTransport').value = m['Transportation'] || '';
-  document.getElementById('memberPickup').value = m['Designated Pick-Up Point'] || '';
-  document.getElementById('memberDropoff').value = m['Drop-Off Point'] || '';
-  document.getElementById('memberCamp').value = m['Name of Camp'] || '';
-  document.getElementById('memberCampCap').value = m['Capacity'] || '';
-  document.getElementById('memberInside').value = m['No. of Individuals Inside Camp'] || '';
-  document.getElementById('memberOutside').value = m['No. of Individuals Outside Camp'] || '';
-  document.getElementById('memberReason').value = m['Reasons for Displacement'] || '';
-  // support checkboxes for assistance if present in your sheet (safe check)
-document.getElementById('member_tupad').checked = (m['TUPAD'] === 'Yes');
-document.getElementById('member_local4ps').checked = (m['Local 4Ps'] === 'Yes');
-document.getElementById('member_intl4ps').checked = (m['National 4Ps'] === 'Yes');
-document.getElementById('member_locsp').checked = (m['Local Social Pension'] === 'Yes');
-document.getElementById('member_intlsp').checked = (m['National Social Pension'] === 'Yes');
-document.getElementById('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes');
-document.getElementById('member_cash').checked = (m['Cash Subsidy'] === 'Yes');
-document.getElementById('member_relief').checked = (m['Relief Goods'] === 'Yes');
-document.getElementById('memberAics').value = m['AICS'] || '';
-
+  qAll("input[name='member_pwd']").forEach(r => r.checked = (r.value === (m['Persons with Disability (PWD)'] || 'No')));
+  $('memberStage').value = m['Stage'] || '';
+  $('memberStatus').value = m['Status'] || '';
+  $('memberTransport').value = m['Transportation'] || '';
+  $('memberPickup').value = m['Designated Pick-Up Point'] || '';
+  $('memberDropoff').value = m['Drop-Off Point'] || '';
+  $('memberCamp').value = m['Name of Camp'] || '';
+  $('memberCampCap').value = m['Capacity'] || '';
+  $('memberInside').value = m['No. of Individuals Inside Camp'] || '';
+  $('memberOutside').value = m['No. of Individuals Outside Camp'] || '';
+  $('memberReason').value = m['Reasons for Displacement'] || '';
+  $('member_tupad').checked = (m['TUPAD'] === 'Yes');
+  $('member_local4ps').checked = (m['Local 4Ps'] === 'Yes');
+  $('member_intl4ps').checked = (m['National 4Ps'] === 'Yes');
+  $('member_locsp').checked = (m['Local Social Pension'] === 'Yes');
+  $('member_intlsp').checked = (m['National Social Pension'] === 'Yes');
+  $('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes');
+  $('member_cash').checked = (m['Cash Subsidy'] === 'Yes');
+  $('member_relief').checked = (m['Relief Goods'] === 'Yes');
+  $('memberAics').value = m['AICS'] || '';
 }
 
-/* collect member panel into editMembers[index] */
 function collectMemberPanelToEdit(){
-  const name = document.getElementById('memberName').value.trim();
+  const name = $('memberName').value.trim();
   const sex = document.querySelector("input[name='member_sex']:checked")?.value || '';
-  const birthdate_input = document.getElementById('memberBirthdate').value || '';
-  const birth_for_sheet = toSheetDateFormat(birthdate_input); // DD/MM/YYYY
-  const age = document.getElementById('memberAge').value || '';
-  const stage = document.getElementById('memberStage').value || '';
+  const birthdate_input = $('memberBirthdate').value || '';
+  const birth_for_sheet = toSheetDate(birthdate_input);
+  const age = $('memberAge').value || '';
+  const stage = $('memberStage').value || '';
   const pwd = document.querySelector("input[name='member_pwd']:checked")?.value || 'No';
   const obj = {
     'Name of Household Member/s': name,
@@ -883,159 +887,79 @@ function collectMemberPanelToEdit(){
     'Age': age,
     'Stage': stage,
     'Persons with Disability (PWD)': pwd,
-    'Status': document.getElementById('memberStatus').value || '',
-    'Transportation': document.getElementById('memberTransport').value || '',
-    'Designated Pick-Up Point': document.getElementById('memberPickup').value || '',
-    'Drop-Off Point': document.getElementById('memberDropoff').value || '',
-    'Name of Camp': document.getElementById('memberCamp').value || '',
-    'Capacity': document.getElementById('memberCampCap').value || '',
-    'No. of Individuals Inside Camp': document.getElementById('memberInside').value || '',
-    'No. of Individuals Outside Camp': document.getElementById('memberOutside').value || '',
-    'Reasons for Displacement': document.getElementById('memberReason').value || '',
-    'TUPAD': (document.getElementById('member_tupad') && document.getElementById('member_tupad').checked) ? 'Yes' : 'No',
-    'Local 4Ps': (document.getElementById('member_local4ps') && document.getElementById('member_local4ps').checked) ? 'Yes' : 'No',
-    'National 4Ps': (document.getElementById('member_intl4ps') && document.getElementById('member_intl4ps').checked) ? 'Yes' : 'No',
-    'Local Social Pension': (document.getElementById('member_locsp') && document.getElementById('member_locsp').checked) ? 'Yes' : 'No',
-    'National Social Pension': (document.getElementById('member_intlsp') && document.getElementById('member_intlsp').checked) ? 'Yes' : 'No',
-    'Solo Parent Assistance': (document.getElementById('member_solo') && document.getElementById('member_solo').checked) ? 'Yes' : 'No',
-    'Cash Subsidy': (document.getElementById('member_cash') && document.getElementById('member_cash').checked) ? 'Yes' : 'No',
-    'Relief Goods': (document.getElementById('member_relief') && document.getElementById('member_relief').checked) ? 'Yes' : 'No',
-    'AICS': (document.getElementById('memberAics') && document.getElementById('memberAics').value) ? document.getElementById('memberAics').value : ''
+    'Status': $('memberStatus').value || '',
+    'Transportation': $('memberTransport').value || '',
+    'Designated Pick-Up Point': $('memberPickup').value || '',
+    'Drop-Off Point': $('memberDropoff').value || '',
+    'Name of Camp': $('memberCamp').value || '',
+    'Capacity': $('memberCampCap').value || '',
+    'No. of Individuals Inside Camp': $('memberInside').value || '',
+    'No. of Individuals Outside Camp': $('memberOutside').value || '',
+    'Reasons for Displacement': $('memberReason').value || '',
+    'TUPAD': $('member_tupad').checked ? 'Yes' : 'No',
+    'Local 4Ps': $('member_local4ps').checked ? 'Yes' : 'No',
+    'National 4Ps': $('member_intl4ps').checked ? 'Yes' : 'No',
+    'Local Social Pension': $('member_locsp').checked ? 'Yes' : 'No',
+    'National Social Pension': $('member_intlsp').checked ? 'Yes' : 'No',
+    'Solo Parent Assistance': $('member_solo').checked ? 'Yes' : 'No',
+    'Cash Subsidy': $('member_cash').checked ? 'Yes' : 'No',
+    'Relief Goods': $('member_relief').checked ? 'Yes' : 'No',
+    'AICS': $('memberAics').value || ''
   };
   editMembers[memberEditIndex] = obj;
 }
 
-/* next/back in member panel */
-document.getElementById('memberNext').addEventListener('click', ()=> {
-  const name = document.getElementById('memberName').value.trim();
-  if(!name){ alert('Please enter member name'); return; }
-  collectMemberPanelToEdit();
-  memberEditIndex++;
-  if(memberEditIndex >= editMembers.length){
-    // finished all
-    document.getElementById('memberPanel').classList.remove('open');
-    updateEditMembersPreview();
-    if(sequenceMode){
-      // if sequence mode is active, automatically save
-      sequenceMode = false;
-      saveEditedHousehold(true); // silent reload after save
-    }
-    return;
-  }
-  // else show next
-  fillMemberPanelFromEdit(memberEditIndex);
-  document.getElementById('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`;
-});
+/* NAV: Next / Back inside member panel wired after DOM ready */
 
-document.getElementById('memberBack').addEventListener('click', ()=> {
-  collectMemberPanelToEdit();
-  if(memberEditIndex > 0){
-    memberEditIndex--;
-    fillMemberPanelFromEdit(memberEditIndex);
-    document.getElementById('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`;
-  } else {
-    // back to edit panel head
-    document.getElementById('memberPanel').classList.remove('open');
-    updateEditMembersPreview();
-  }
-});
-
-document.getElementById('memberPanelClose').addEventListener('click', ()=> {
-  if(confirm('Close member entry? Unsaved member edits will be kept in panel preview.')) {
-    document.getElementById('memberPanel').classList.remove('open');
-    updateEditMembersPreview();
-  }
-});
-
-/* member birthdate -> age & stage */
-document.getElementById('memberBirthdate').addEventListener('change', updateMemberAgeStage);
+/* member date change -> update age & stage */
 function updateMemberAgeStage(){
-  const date = document.getElementById('memberBirthdate').value;
-  const ageObj = computeAgeFromBirthdate(date);
-  if(!ageObj){ document.getElementById('memberAge').value=''; document.getElementById('memberStage').value=''; return; }
-  document.getElementById('memberAge').value = (ageObj.years === 0 ? 0 : ageObj.years);
-  document.getElementById('memberStage').value = deriveStageFromAge(ageObj);
+  const date = $('memberBirthdate').value;
+  const ageObj = computeAgeFromBirthdateISO(date);
+  if(!ageObj){ $('memberAge').value=''; $('memberStage').value=''; return; }
+  $('memberAge').value = (ageObj.years === 0 ? 0 : ageObj.years);
+  $('memberStage').value = deriveStageFromAge(ageObj);
 }
 
-/* edit head birthdate change */
-document.getElementById('edit_householdBirthdate').addEventListener('change', updateEditHeadAgeStage);
-
-/* cancel and close edit panel */
-document.getElementById('cancelEditBtn').addEventListener('click', ()=> {
-  if(confirm('Discard changes and close?')) closeEditPanel();
-});
-document.getElementById('panelClose').addEventListener('click', ()=> {
-  if(confirm('Discard changes and close?')) closeEditPanel();
-});
-document.getElementById('panelOverlay').addEventListener('click', ()=> {
-  if(document.getElementById('memberPanel').classList.contains('open')) return;
-  if(confirm('Close edit panel? Unsaved changes will be lost.')) closeEditPanel();
-});
-
-/* ---------- Start Sequence button: begin the head->members auto sequence ---------- */
-document.getElementById('startSequenceBtn').addEventListener('click', (ev)=>{
-  ev.preventDefault();
-  // update head object before member edits
-  collectHeadFromEditForm();
-  // ensure editMembers matches expected count
-  const expected = Number(document.getElementById('edit_memberCount').value || 0);
-  while(editMembers.length < expected) editMembers.push(createEmptyMember());
-  if(editMembers.length === 0){
-    // nothing to edit -> save immediately
-    saveEditedHousehold(true);
-    return;
-  }
-  sequenceMode = true;
-  memberEditIndex = 0;
-  openMemberPanelForEdit(memberEditIndex);
-});
-
-/* collect head fields helper */
+/* HEAD collect */
 function collectHeadFromEditForm(){
-  const bd_input = document.getElementById('edit_householdBirthdate').value || '';
-  const headBirthForSheet = toSheetDateFormat(bd_input);
+  const bd_input = $('edit_householdBirthdate').value || '';
+  const headBirthForSheet = toSheetDate(bd_input);
 
   editHead = {
-    'Barangay': document.getElementById('edit_barangay').value || '',
-    'Sitio / Purok': document.getElementById('edit_sitio').value || '',
-    'Name of Household Head': document.getElementById('edit_householdHead').value.trim() || '',
+    'Barangay': $('edit_barangay').value || '',
+    'Sitio / Purok': $('edit_sitio').value || '',
+    'Name of Household Head': ($('edit_householdHead').value || '').trim(),
     'Sex': document.querySelector("input[name='edit_head_sex']:checked")?.value || '',
     'Birthdate': headBirthForSheet,
-    'Age': document.getElementById('edit_householdAge').value || '',
-    'Stage': document.getElementById('edit_householdStage').value || '',
-    'No. of Household Member/s': String(document.getElementById('edit_memberCount').value || '0'),
+    'Age': $('edit_householdAge').value || '',
+    'Stage': $('edit_householdStage').value || '',
+    'No. of Household Member/s': String($('edit_memberCount').value || '0'),
     'Persons with Disability (PWD)': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
-    'Status': document.getElementById('edit_head_status').value || '',
-    'Transportation': document.getElementById('edit_head_transport').value || '',
-    'Designated Pick-Up Point': document.getElementById('edit_pickup').value || '',
-    'Drop-Off Point': document.getElementById('edit_dropoff').value || '',
-    'Name of Camp': document.getElementById('edit_campName').value || '',
-    'Capacity': document.getElementById('edit_capacity').value || '',
-    'No. of Individuals Inside Camp': document.getElementById('edit_insideCamp').value || '',
-    'No. of Individuals Outside Camp': document.getElementById('edit_outsideCamp').value || '',
-
-    // Assistance
-    'TUPAD': document.getElementById('edit_ass_tupad').checked ? 'Yes' : 'No',
-    'Local 4Ps': document.getElementById('edit_ass_local4ps').checked ? 'Yes' : 'No',
-    'National 4Ps': document.getElementById('edit_ass_intl4ps').checked ? 'Yes' : 'No',
-    'Local Social Pension': document.getElementById('edit_ass_locsp').checked ? 'Yes' : 'No',
-    'National Social Pension': document.getElementById('edit_ass_intlsp').checked ? 'Yes' : 'No',
-    'Solo Parent Assistance': document.getElementById('edit_ass_solo').checked ? 'Yes' : 'No',
-    'Cash Subsidy': document.getElementById('edit_ass_cash').checked ? 'Yes' : 'No',
-    'Relief Goods': document.getElementById('edit_ass_relief').checked ? 'Yes' : 'No',
-    'AICS': document.getElementById('edit_ass_aics').value || ''
+    'Status': $('edit_head_status').value || '',
+    'Transportation': $('edit_head_transport').value || '',
+    'Designated Pick-Up Point': $('edit_pickup').value || '',
+    'Drop-Off Point': $('edit_dropoff').value || '',
+    'Name of Camp': $('edit_campName').value || '',
+    'Capacity': $('edit_capacity').value || '',
+    'No. of Individuals Inside Camp': $('edit_insideCamp').value || '',
+    'No. of Individuals Outside Camp': $('edit_outsideCamp').value || '',
+    'TUPAD': $('edit_ass_tupad').checked ? 'Yes' : 'No',
+    'Local 4Ps': $('edit_ass_local4ps').checked ? 'Yes' : 'No',
+    'National 4Ps': $('edit_ass_intl4ps').checked ? 'Yes' : 'No',
+    'Local Social Pension': $('edit_ass_locsp').checked ? 'Yes' : 'No',
+    'National Social Pension': $('edit_ass_intlsp').checked ? 'Yes' : 'No',
+    'Solo Parent Assistance': $('edit_ass_solo').checked ? 'Yes' : 'No',
+    'Cash Subsidy': $('edit_ass_cash').checked ? 'Yes' : 'No',
+    'Relief Goods': $('edit_ass_relief').checked ? 'Yes' : 'No',
+    'AICS': $('edit_ass_aics').value || ''
   };
 }
 
-
-/* Save edited household -> updateHousehold action using FormData
-   if silentReload true, we'll reload records after success without extra prompt (used by sequenceMode)
-*/
-async function saveEditedHousehold(silentReload){
+/* ========================= SAVE EDITED HOUSEHOLD ========================= */
+async function saveEditedHousehold(silentReload = false){
   collectHeadFromEditForm();
 
-  // ensure memberCount matches editMembers length (pad/trim)
-  const expected = Number(document.getElementById('edit_memberCount').value || 0);
+  const expected = Number($('edit_memberCount')?.value || 0);
   while(editMembers.length < expected) editMembers.push(createEmptyMember());
   if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
 
@@ -1046,7 +970,8 @@ async function saveEditedHousehold(silentReload){
   fd.append('members', JSON.stringify(editMembers || []));
   fd.append('submittedBy', localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown');
 
-  const btn = document.getElementById('saveEditBtn'); btn.disabled = true; btn.innerText = 'Saving...';
+  const btn = $('saveEditBtn');
+  if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
 
   try {
     const res = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
@@ -1062,17 +987,11 @@ async function saveEditedHousehold(silentReload){
     console.error('Save error', err);
     alert('Network or server error. See console.');
   } finally {
-    btn.disabled = false; btn.innerText = 'Save changes';
+    if(btn){ btn.disabled = false; btn.innerText = 'Save changes'; }
   }
 }
 
-/* Save button handler (manual save) */
-document.getElementById('saveEditBtn').addEventListener('click', (ev)=>{
-  ev.preventDefault();
-  saveEditedHousehold(false);
-});
-
-/* ========================= Export helpers (CSV) ========================= */
+/* ========================= EXPORT CSV (kept small) ========================= */
 function groupsToCSV(groups){
   const cols = header.slice();
   const csv = [];
@@ -1093,25 +1012,79 @@ function downloadCSV(name, content){
 function exportAll(){ if(!groupsArr.length) return alert('Nothing to export.'); downloadCSV('mdrrmo_records_all.csv', groupsToCSV(groupsArr)); }
 function exportSelected(){ const sel = groupsArr.filter(g => selectedIds.has(g.dataID)); if(!sel.length) return alert('No selected households.'); downloadCSV('mdrrmo_records_selected.csv', groupsToCSV(sel)); }
 
-/* ========================= UI bindings ========================= */
-document.getElementById('filterBarangay').onchange = loadRecords;
-document.getElementById('refreshBtn').onclick = loadRecords;
-document.getElementById('exportMenuBtn').onclick = ()=> document.getElementById('exportDropdown').classList.toggle('hidden');
-document.addEventListener('click', e => {
-  const menu = document.getElementById('exportMenuBtn'), box = document.getElementById('exportDropdown');
-  if(!menu.contains(e.target) && !box.contains(e.target)) box.classList.add('hidden');
-});
-document.getElementById('searchInput').addEventListener('input', ()=>{ clearTimeout(window.__typeTimer); window.__typeTimer = setTimeout(loadRecords, 300); });
+/* ========================= UI BINDINGS (wired on DOMContentLoaded) ========================= */
+function wireUI(){
+  if($('filterBarangay')) $('filterBarangay').onchange = loadRecords;
+  if($('refreshBtn')) $('refreshBtn').onclick = loadRecords;
+  if($('exportMenuBtn')) $('exportMenuBtn').onclick = ()=> $('exportDropdown')?.classList.toggle('hidden');
+  document.addEventListener('click', e => {
+    const menu = $('exportMenuBtn'), box = $('exportDropdown');
+    if(menu && box && !menu.contains(e.target) && !box.contains(e.target)) box.classList.add('hidden');
+  });
+  if($('searchInput')) $('searchInput').addEventListener('input', ()=>{ clearTimeout(window.__typeTimer); window.__typeTimer = setTimeout(loadRecords, 300); });
 
-/* init */
+  // member / edit controls
+  if($('edit_addMember')) $('edit_addMember').addEventListener('click', ()=>{
+    ensureMembersArraySize(); memberEditIndex = 0; openMemberPanelForEdit(memberEditIndex);
+  });
+  if($('memberNext')) $('memberNext').addEventListener('click', ()=>{
+    const name = $('memberName').value.trim();
+    if(!name){ alert('Please enter member name'); return; }
+    collectMemberPanelToEdit();
+    memberEditIndex++;
+    if(memberEditIndex >= editMembers.length){
+      $('memberPanel')?.classList.remove('open');
+      updateEditMembersPreview();
+      if(sequenceMode){
+        sequenceMode = false;
+        saveEditedHousehold(true);
+      }
+      return;
+    }
+    fillMemberPanelFromEdit(memberEditIndex);
+    $('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`;
+  });
+  if($('memberBack')) $('memberBack').addEventListener('click', ()=>{
+    collectMemberPanelToEdit();
+    if(memberEditIndex > 0){ memberEditIndex--; fillMemberPanelFromEdit(memberEditIndex); $('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`; }
+    else { $('memberPanel')?.classList.remove('open'); updateEditMembersPreview(); }
+  });
+  if($('memberPanelClose')) $('memberPanelClose').addEventListener('click', ()=> {
+    if(confirm('Close member entry? Unsaved member edits will be kept in panel preview.')) { $('memberPanel')?.classList.remove('open'); updateEditMembersPreview(); }
+  });
+  if($('memberBirthdate')) $('memberBirthdate').addEventListener('change', updateMemberAgeStage);
+  if($('edit_householdBirthdate')) $('edit_householdBirthdate').addEventListener('change', updateEditHeadAgeStage);
+  if($('cancelEditBtn')) $('cancelEditBtn').addEventListener('click', ()=> { if(confirm('Discard changes and close?')) closeEditPanel(); });
+  if($('panelClose')) $('panelClose').addEventListener('click', ()=> { if(confirm('Discard changes and close?')) closeEditPanel(); });
+  if($('panelOverlay')) $('panelOverlay').addEventListener('click', ()=> {
+    if($('memberPanel')?.classList.contains('open')) return;
+    if(confirm('Close edit panel? Unsaved changes will be lost.')) closeEditPanel();
+  });
+  if($('startSequenceBtn')) $('startSequenceBtn').addEventListener('click', (ev)=> {
+    ev.preventDefault();
+    collectHeadFromEditForm();
+    const expected = Number($('edit_memberCount')?.value || 0);
+    while(editMembers.length < expected) editMembers.push(createEmptyMember());
+    if(editMembers.length === 0){ saveEditedHousehold(true); return; }
+    sequenceMode = true; memberEditIndex = 0; openMemberPanelForEdit(memberEditIndex);
+  });
+  if($('saveEditBtn')) $('saveEditBtn').addEventListener('click', (ev)=> { ev.preventDefault(); saveEditedHousehold(false); });
+
+  // export menu items (if dropdown entries exist)
+  // they call global functions exportAll / exportSelected defined above
+}
+
+/* ========================= INIT ========================= */
 window.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('userName').innerText = localStorage.getItem('staffName') || '';
-  // wire auto-age update for head
-  document.getElementById('edit_householdBirthdate').addEventListener('change', updateEditHeadAgeStage);
+  // set username
+  if($('userName')) $('userName').innerText = localStorage.getItem('staffName') || '';
+  wireUI();
   loadRecords();
 });
 </script>
+
 </body>
 </html>
+
 
 
