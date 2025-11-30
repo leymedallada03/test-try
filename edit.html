@@ -249,6 +249,29 @@
           <div><label>No. Outside Camp</label><input type="number" id="edit_outsideCamp" min="0"/></div>
         </div>
 
+        <h4>Assistance Received (optional)</h4>
+
+<div class="form-grid">
+  <label><input type="checkbox" id="edit_ass_tupad"> TUPAD</label>
+  <label><input type="checkbox" id="edit_ass_local4ps"> Local 4Ps</label>
+  <label><input type="checkbox" id="edit_ass_intl4ps"> National 4Ps</label>
+  <label><input type="checkbox" id="edit_ass_locsp"> Local Social Pension</label>
+  <label><input type="checkbox" id="edit_ass_intlsp"> National Social Pension</label>
+  <label><input type="checkbox" id="edit_ass_solo"> Solo Parent Assistance</label>
+  <label><input type="checkbox" id="edit_ass_relief"> Relief Goods</label>
+  <label><input type="checkbox" id="edit_ass_cash"> Cash Subsidy</label>
+</div>
+
+<div style="margin-top:8px">
+  <label>AICS (if any)</label>
+  <select id="edit_ass_aics">
+    <option value="">None</option>
+    <option>Shelter Assistance</option>
+    <option>Burial</option>
+    <option>Scholarship</option>
+  </select>
+</div>
+
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
           <button id="startSequenceBtn" class="btn">Next → Members (Start sequence)</button>
           <button id="saveEditBtn" class="btn">Save changes</button>
@@ -360,7 +383,29 @@
           <select id="memberReason" class="member-reason"><option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option></select>
         </div>
 
-      </div>
+        <div style="grid-column:1/-1; margin-top:8px">
+  <h4 style="margin:6px 0 8px 0">Government Support</h4>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
+    <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
+    <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
+    <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
+    <label><input type="checkbox" id="member_locsp" class="member_locsp"> Local Social Pension</label>
+    <label><input type="checkbox" id="member_intlsp" class="member_intlsp"> National Social Pension</label>
+    <label><input type="checkbox" id="member_solo" class="member_solo"> Solo Parent Assistance</label>
+    <label><input type="checkbox" id="member_cash" class="member_cash"> Cash Subsidy</label>
+    <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
+  </div>
+
+  <div style="margin-top:8px">
+    <label>AICS (if any)</label>
+    <select id="memberAics" class="member_aics">
+      <option value="">None</option>
+      <option>Shelter Assistance</option>
+      <option>Burial</option>
+      <option>Scholarship</option>
+    </select>
+  </div>
+</div>
 
       <div class="panel-actions" style="margin-top:10px;">
         <button id="memberBack" class="btn secondary" type="button">Back</button>
@@ -702,6 +747,15 @@ function onEditClick(dataID){
   document.getElementById('edit_capacity').value = editHead['Capacity'] || '';
   document.getElementById('edit_insideCamp').value = editHead['No. of Individuals Inside Camp'] || '';
   document.getElementById('edit_outsideCamp').value = editHead['No. of Individuals Outside Camp'] || '';
+  document.getElementById('edit_ass_tupad').checked = (editHead['TUPAD'] === 'Yes');
+  document.getElementById('edit_ass_local4ps').checked = (editHead['Local 4Ps'] === 'Yes');
+  document.getElementById('edit_ass_intl4ps').checked = (editHead['National 4Ps'] === 'Yes');
+  document.getElementById('edit_ass_locsp').checked = (editHead['Local Social Pension'] === 'Yes');
+  document.getElementById('edit_ass_intlsp').checked = (editHead['National Social Pension'] === 'Yes');
+  document.getElementById('edit_ass_solo').checked = (editHead['Solo Parent Assistance'] === 'Yes');
+  document.getElementById('edit_ass_cash').checked = (editHead['Cash Subsidy'] === 'Yes');
+  document.getElementById('edit_ass_relief').checked = (editHead['Relief Goods'] === 'Yes');
+  document.getElementById('edit_ass_aics').value = editHead['AICS'] || '';
 
   // update member preview
   updateEditMembersPreview();
@@ -801,15 +855,16 @@ function fillMemberPanelFromEdit(idx){
   document.getElementById('memberOutside').value = m['No. of Individuals Outside Camp'] || '';
   document.getElementById('memberReason').value = m['Reasons for Displacement'] || '';
   // support checkboxes for assistance if present in your sheet (safe check)
-  document.getElementById('member_tupad') && (document.getElementById('member_tupad').checked = (m['TUPAD'] === 'Yes'));
-  document.getElementById('member_local4ps') && (document.getElementById('member_local4ps').checked = (m['Local 4Ps'] === 'Yes'));
-  document.getElementById('member_intl4ps') && (document.getElementById('member_intl4ps').checked = (m['National 4Ps'] === 'Yes'));
-  document.getElementById('member_locsp') && (document.getElementById('member_locsp').checked = (m['Local Social Pension'] === 'Yes'));
-  document.getElementById('member_intlsp') && (document.getElementById('member_intlsp').checked = (m['National Social Pension'] === 'Yes'));
-  document.getElementById('member_solo') && (document.getElementById('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes'));
-  document.getElementById('member_cash') && (document.getElementById('member_cash').checked = (m['Cash Subsidy'] === 'Yes'));
-  document.getElementById('member_relief') && (document.getElementById('member_relief').checked = (m['Relief Goods'] === 'Yes'));
-  document.getElementById('memberAics') && (document.getElementById('memberAics').value = m['AICS'] || '');
+document.getElementById('member_tupad').checked = (m['TUPAD'] === 'Yes');
+document.getElementById('member_local4ps').checked = (m['Local 4Ps'] === 'Yes');
+document.getElementById('member_intl4ps').checked = (m['National 4Ps'] === 'Yes');
+document.getElementById('member_locsp').checked = (m['Local Social Pension'] === 'Yes');
+document.getElementById('member_intlsp').checked = (m['National Social Pension'] === 'Yes');
+document.getElementById('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes');
+document.getElementById('member_cash').checked = (m['Cash Subsidy'] === 'Yes');
+document.getElementById('member_relief').checked = (m['Relief Goods'] === 'Yes');
+document.getElementById('memberAics').value = m['AICS'] || '';
+
 }
 
 /* collect member panel into editMembers[index] */
@@ -957,7 +1012,16 @@ function collectHeadFromEditForm(){
     'Name of Camp': document.getElementById('edit_campName').value || '',
     'Capacity': document.getElementById('edit_capacity').value || '',
     'No. of Individuals Inside Camp': document.getElementById('edit_insideCamp').value || '',
-    'No. of Individuals Outside Camp': document.getElementById('edit_outsideCamp').value || ''
+    'No. of Individuals Outside Camp': document.getElementById('edit_outsideCamp').value || '',
+    'TUPAD': document.getElementById('edit_ass_tupad').checked ? 'Yes' : 'No',
+'Local 4Ps': document.getElementById('edit_ass_local4ps').checked ? 'Yes' : 'No',
+'National 4Ps': document.getElementById('edit_ass_intl4ps').checked ? 'Yes' : 'No',
+'Local Social Pension': document.getElementById('edit_ass_locsp').checked ? 'Yes' : 'No',
+'National Social Pension': document.getElementById('edit_ass_intlsp').checked ? 'Yes' : 'No',
+'Solo Parent Assistance': document.getElementById('edit_ass_solo').checked ? 'Yes' : 'No',
+'Cash Subsidy': document.getElementById('edit_ass_cash').checked ? 'Yes' : 'No',
+'Relief Goods': document.getElementById('edit_ass_relief').checked ? 'Yes' : 'No',
+'AICS': document.getElementById('edit_ass_aics').value || ''
   };
 }
 
@@ -1046,3 +1110,4 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
