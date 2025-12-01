@@ -6,33 +6,52 @@
 <title>Data Entry — MDRRMO Alitagtag</title>
 <link rel="stylesheet" href="styles.css"/>
 <style>
-/* (KEEP your existing styles) */
+/* (kept + cleaned styles) */
+:root {
+  --green-1: #0f7a4a;
+  --muted: #6b6b6b;
+}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0;background:#f6f8f7;color:#102015}
+.page-container{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#fff;box-shadow:0 2px 8px rgba(6,30,20,0.04);position:sticky;top:0;z-index:100}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:44px;height:44px;object-fit:contain}
+.sidebar{background:#fff;padding:18px;border-right:1px solid rgba(6,30,20,0.04)}
+.sidebar ul{list-style:none;padding:0;margin:0}
+.sidebar li{margin:8px 0}
+.sidebar a{color:#0b5136;text-decoration:none;font-weight:600}
+.content-area{padding:18px; background:linear-gradient(180deg,#f6f8f7,#f4f6f5)}
+.card{ padding:14px;border-radius:10px;background:#fff;margin-bottom:12px;box-shadow:0 6px 18px rgba(6,30,20,0.04) }
+.form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-items:start }
+.small-muted{ font-size:13px; color:var(--muted) }
+.member-preview{ margin-top:8px; font-size:14px }
+.member-preview li{ margin-bottom:6px }
 .member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width: 96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 280ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y: auto; }
 .member-panel.open { transform: translateX(0%); }
-.member-panel .panel-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.member-panel h3 { margin:0; font-size:18px; color:var(--green-1); }
 .panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 5900; }
 .panel-overlay.show { opacity: 1; pointer-events: auto; }
 .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; }
-.btn.secondary { background: transparent; color: #0f7a4a; border:1px solid rgba(6,30,20,0.06); }
-.card { padding:14px;border-radius:10px;background:#fff;margin-bottom:12px;box-shadow:0 6px 18px rgba(6,30,20,0.04); }
-.form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-.small-muted { font-size:13px; color:var(--muted); }
-.member-preview { margin-top:8px; font-size:14px; }
-.member-preview li { margin-bottom:6px; }
+.btn.secondary { background: transparent; color: var(--green-1); border:1px solid rgba(6,30,20,0.06); }
+.radio-line{display:flex;gap:8px}
+.icon-btn{border:0;background:transparent;cursor:pointer}
+.actions-row{display:flex;gap:8px;justify-content:flex-end}
+@media (max-width:900px){ .page-container{grid-template-columns:1fr} .sidebar{display:none} }
+.hidden{display:none}
 </style>
 </head>
 <body>
 <div class="page-container">
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
-    <div class="brand">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
-      <div><div class="title">PUROK KALIGTASAN</div><div class="subtitle">DRRMO - Alitagtag</div></div>
+    <div style="display:flex;gap:12px;align-items:center">
+      <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="brand">
+        <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
+        <div><div style="font-weight:700">PUROK KALIGTASAN</div><div style="font-size:13px;color:var(--muted)">DRRMO - Alitagtag</div></div>
+      </div>
     </div>
     <div class="user-info">
       <span id="userName"></span>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+      <button id="logoutBtn" class="logout-btn" style="margin-left:12px">Logout</button>
     </div>
   </header>
 
@@ -96,7 +115,8 @@
 
           <div>
             <label>Age</label>
-            <input type="number" id="householdAge" readonly />
+            <!-- changed to text so we can show "11 months" -->
+            <input type="text" id="householdAge" readonly />
           </div>
 
           <div>
@@ -119,7 +139,7 @@
             <label>Persons with Disability (PWD)</label>
             <div class="radio-line">
               <label class="radio-item"><input type="radio" name="head_pwd" value="Yes"> Yes</label>
-              <label class="radio-item"><input type="radio" name="head_pwd" value="No"> No</label>
+              <label class="radio-item"><input type="radio" name="head_pwd" value="No" checked> No</label>
             </div>
           </div>
 
@@ -223,11 +243,11 @@
   </main>
 </div>
 
-<!-- slide-in member panel -->
+<!-- overlay + member panel -->
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
 <div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
-  <div class="panel-header">
+  <div class="panel-header" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
     <button id="panelClose" class="btn secondary" title="Close panel">←</button>
     <h3 id="panelTitle">Member 1 of N</h3>
   </div>
@@ -255,7 +275,8 @@
 
         <div>
           <label>Age</label>
-          <input type="number" id="memberAge" class="member-age" readonly />
+          <!-- changed to text so we can show "11 months" -->
+          <input type="text" id="memberAge" class="member-age" readonly />
         </div>
 
         <div>
@@ -350,7 +371,7 @@
 
       </div>
 
-      <div class="panel-actions">
+      <div class="panel-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
         <button id="memberBack" class="btn secondary" type="button">Back</button>
         <button id="memberNext" class="btn" type="button">Save & Next</button>
       </div>
@@ -359,341 +380,428 @@
 </div>
 
 <script>
-/*
-  FINAL merged client-side script.
-  - Uses FormData POST (no Content-Type header) so Apps Script receives e.parameter.
-  - head and members JSON fields match spreadsheet headers used by createRecord.
+/* final merged client-side script (fixed for date format + infant age) */
+
+const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+
+/* ----------------- Date helpers ----------------- */
+/* Convert yyyy-mm-dd (from input[type=date].value) into DD/MM/YYYY (text) */
+function toSheetDateFormat(inputVal){
+  if(!inputVal) return "";
+  // inputVal expected 'yyyy-mm-dd'
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
+    const [y,m,d] = inputVal.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  // try parse fallback
+  const dt = new Date(inputVal);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dd}/${mm}/${dt.getFullYear()}`;
+  }
+  return String(inputVal);
+}
+
+/* Convert DD/MM/YYYY back to yyyy-mm-dd for input[type=date] if needed */
+function toInputDate(val){
+  if(!val) return "";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(val)){
+    const [d,m,y] = val.split('/');
+    return `${y}-${m}-${d}`;
+  }
+  // fallback parse
+  const dt = new Date(val);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dt.getFullYear()}-${mm}-${dd}`;
+  }
+  return "";
+}
+
+/* ---------------- Age compute (detailed) ----------------
+   returns { years, months, days, display, stage }
+   display is:
+     - "X days" if <1 month
+     - "X months" if <1 year
+     - "Y" (years) if >=1 year
+   stage rules:
+     - if years === 0:
+         if months <= 10 -> "Infant"
+         else -> "Children"
+     - years <=17 -> "School Children"
+     - years >=60 -> "Elderly"
+     - else -> "Adult"
 */
+function computeAgeDetailed(inputDateValue){
+  if(!inputDateValue) return null;
+  // accept yyyy-mm-dd or Date-like strings
+  let d;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputDateValue)){
+    const parts = inputDateValue.split('-');
+    d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  } else {
+    d = new Date(inputDateValue);
+  }
+  if(isNaN(d)) return null;
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; // <-- keep updated to your deployment
+  const now = new Date();
+  // normalize to midnight to avoid timezone offset surprises
+  const birth = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-/* -------- helpers -------- */
-function ensureLoginOrRedirect() {
-    if (!localStorage.getItem("loggedIn")) {
-        window.location.href = "main.html";
-        return false;
+  let years = today.getFullYear() - birth.getFullYear();
+  let months = today.getMonth() - birth.getMonth();
+  let days = today.getDate() - birth.getDate();
+
+  if(days < 0){
+    months -= 1;
+    // get days in previous month
+    const prev = new Date(today.getFullYear(), today.getMonth(), 0);
+    days += prev.getDate();
+  }
+  if(months < 0){
+    years -= 1;
+    months += 12;
+  }
+
+  // determine display
+  let display = "";
+  if(years >= 1){
+    display = String(years); // keep years as simple number string per your requirement
+  } else {
+    if(months >= 1){
+      display = `${months} months`;
+    } else {
+      display = `${days} days`;
     }
-    return true;
-}
-function computeAge(dateStr) {
-    if (!dateStr) return null;
-    const d = new Date(dateStr);
-    if (isNaN(d)) return null;
-    const now = new Date();
-    let age = now.getFullYear() - d.getFullYear();
-    if (now.getMonth() < d.getMonth() || (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
-    return age;
-}
-function getStageFromAge(age) {
-    if (age === null || age === undefined || age === "") return "";
-    if (age <= 1) return "Infant";
-    if (age <= 12) return "Children";
-    if (age <= 17) return "School Children";
-    if (age >= 60) return "Elderly";
-    return "Adult";
+  }
+
+  // derive stage
+  let stage = "";
+  if(years === 0){
+    if(months <= 10) stage = "Infant";
+    else stage = "Children";
+  } else if(years <= 17){
+    stage = "School Children";
+  } else if(years >= 60){
+    stage = "Elderly";
+  } else {
+    stage = "Adult";
+  }
+
+  return { years: years, months: months, days: days, display: display, stage: stage };
 }
 
-/* -------- member panel state -------- */
+/* ---------------- UI + state ---------------- */
+function ensureLoginOrRedirect(){
+  if(!localStorage.getItem("loggedIn")){ window.location.href = "main.html"; return false; }
+  return true;
+}
+
 let membersToCollect = 0;
 let currentMemberIndex = 0;
-let collectedMembers = []; // each entry is an object whose keys match Master sheet columns
+let collectedMembers = [];
 
-/* -------- UI helpers -------- */
+/* update preview */
+function updateMemberPreview(){
+  const n = parseInt(document.getElementById("memberCount").value || 0);
+  document.getElementById("previewCount").innerText = n;
+  const list = document.getElementById("membersPreview");
+  list.innerHTML = "";
+  for(let i=0;i<n;i++){
+    const mem = collectedMembers[i];
+    const li = document.createElement('li');
+    li.innerText = mem ? `#${i+1} — ${mem["Name of Household Member/s"] || "(empty)"}` : `#${i+1} — (empty)`;
+    list.appendChild(li);
+  }
+}
+
+/* fill member panel with existing or blank */
+function fillMemberPanel(idx){
+  const mem = collectedMembers[idx] || {};
+  document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
+  Array.from(document.getElementsByName("member_sex")).forEach(r => r.checked = (r.value === (mem["Sex"] || "")));
+  // if birthdate stored as DD/MM/YYYY convert to yyyy-mm-dd for input
+  document.getElementById("memberBirthdate").value = mem["Birthdate"] ? toInputDate(mem["Birthdate"]) : "";
+  document.getElementById("memberAge").value = mem["Age"] || "";
+  document.getElementById("memberStage").value = mem["Stage"] || "";
+  document.getElementById("memberStatus").value = mem["Status"] || "";
+  document.getElementById("memberTransport").value = mem["Transportation"] || "";
+  document.getElementById("memberPickup").value = mem["Designated Pick-Up Point"] || "";
+  document.getElementById("memberDropoff").value = mem["Drop-Off Point"] || "";
+  document.getElementById("memberCamp").value = mem["Name of Camp"] || "";
+  document.getElementById("memberCampCap").value = mem["Capacity"] || "";
+  document.getElementById("memberInside").value = mem["No. of Individuals Inside Camp"] || "";
+  document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || "";
+  document.getElementById("memberReason").value = mem["Reasons for Displacement"] || "";
+  document.getElementById("member_tupad").checked = (mem["TUPAD"] === "Yes");
+  document.getElementById("member_local4ps").checked = (mem["Local 4Ps"] === "Yes");
+  document.getElementById("member_intl4ps").checked = (mem["National 4Ps"] === "Yes");
+  document.getElementById("member_locsp").checked = (mem["Local Social Pension"] === "Yes");
+  document.getElementById("member_intlsp").checked = (mem["National Social Pension"] === "Yes");
+  document.getElementById("member_solo").checked = (mem["Solo Parent Assistance"] === "Yes");
+  document.getElementById("member_relief").checked = (mem["Relief Goods"] === "Yes");
+  document.getElementById("member_cash").checked = (mem["Cash Subsidy"] === "Yes");
+  document.getElementById("memberAics").value = mem["AICS"] || "";
+}
+
+/* collect member panel inputs into object that matches Master sheet keys */
+function collectMemberDataFromPanel(){
+  const name = document.getElementById("memberName").value.trim();
+  const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
+  const birth_input = document.getElementById("memberBirthdate").value || ""; // yyyy-mm-dd
+  const birth_for_sheet = toSheetDateFormat(birth_input); // DD/MM/YYYY
+  const ageObj = computeAgeDetailed(birth_input);
+  const ageVal = ageObj ? ageObj.display : "";
+  const stageVal = ageObj ? ageObj.stage : "";
+
+  return {
+    "Name of Household Member/s": name,
+    "Sex": sex,
+    "Birthdate": birth_for_sheet,
+    "Age": ageVal,
+    "Stage": stageVal,
+    "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
+    "Status": document.getElementById("memberStatus").value || "",
+    "Transportation": document.getElementById("memberTransport").value || "",
+    "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
+    "Drop-Off Point": document.getElementById("memberDropoff").value || "",
+    "Name of Camp": document.getElementById("memberCamp").value || "",
+    "Capacity": document.getElementById("memberCampCap").value || "",
+    "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
+    "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
+    "Reasons for Displacement": document.getElementById("memberReason").value || "",
+    "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
+    "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
+    "National 4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
+    "Local Social Pension": document.getElementById("member_locsp").checked ? "Yes" : "No",
+    "National Social Pension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
+    "Solo Parent Assistance": document.getElementById("member_solo").checked ? "Yes" : "No",
+    "Relief Goods": document.getElementById("member_relief").checked ? "Yes" : "No",
+    "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
+    "AICS": document.getElementById("memberAics").value || ""
+  };
+}
+
+/* update member age/stage live when date changes */
+document.addEventListener('input', (ev) => {
+  if(ev.target && ev.target.id === "memberBirthdate"){
+    const v = ev.target.value;
+    const info = computeAgeDetailed(v);
+    document.getElementById("memberAge").value = info ? info.display : "";
+    document.getElementById("memberStage").value = info ? info.stage : "";
+  }
+  if(ev.target && ev.target.id === "householdBirthdate"){
+    const v = ev.target.value;
+    const info = computeAgeDetailed(v);
+    document.getElementById("householdAge").value = info ? info.display : "";
+    document.getElementById("householdStage").value = info ? info.stage : "";
+  }
+});
+
+/* ---------------- DOM loaded bindings ---------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  if(!ensureLoginOrRedirect()) return;
+  document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
+
+  // reset
+  document.getElementById("resetBtn").addEventListener('click', () => {
+    document.getElementById("headForm").reset();
+    collectedMembers = [];
+    updateMemberPreview();
+    document.getElementById("householdAge").value = "";
+    document.getElementById("householdStage").value = "";
+  });
+
+  // next (head -> members)
+  document.getElementById("nextToMembers").addEventListener('click', () => {
+    const barangay = document.getElementById("barangay").value.trim();
+    const sitio = document.getElementById("sitio").value.trim();
+    const headName = document.getElementById("householdHead").value.trim();
+    if(!barangay || !sitio || !headName){ alert("Please fill Barangay, Sitio/Purok and Name of Household Head."); return; }
+
+    membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
+    collectedMembers = []; currentMemberIndex = 0;
+    updateMemberPreview();
+
+    if(membersToCollect === 0){
+      // no members -> submit head only
+      submitHeadAndMembers();
+      return;
+    }
+
+    // open member panel first
+    fillMemberPanel(0);
+    currentMemberIndex = 0;
+    document.getElementById('panelTitle').innerText = `Member 1 of ${membersToCollect}`;
+    openPanel();
+  });
+
+  // panel close/back
+  document.getElementById("panelClose").addEventListener('click', () => { closePanel(); });
+  document.getElementById("memberBack").addEventListener('click', () => {
+    if(currentMemberIndex > 0){
+      collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
+      currentMemberIndex--;
+      fillMemberPanel(currentMemberIndex);
+      document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
+      updateMemberPreview();
+    } else {
+      closePanel();
+    }
+  });
+
+  // memberNext (save & next)
+  document.getElementById("memberNext").addEventListener('click', () => {
+    const name = document.getElementById("memberName").value.trim();
+    if(!name){ alert("Please enter member's name."); return; }
+
+    collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
+    updateMemberPreview();
+
+    currentMemberIndex++;
+    if(currentMemberIndex >= membersToCollect){
+      // done
+      closePanel();
+      submitHeadAndMembers();
+      return;
+    }
+    fillMemberPanel(currentMemberIndex);
+    document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
+  });
+
+  // live update household birthdate change (also handled by input listener)
+  document.getElementById("householdBirthdate").addEventListener('change', () => {
+    const info = computeAgeDetailed(document.getElementById("householdBirthdate").value);
+    document.getElementById("householdAge").value = info ? info.display : "";
+    document.getElementById("householdStage").value = info ? info.stage : "";
+  });
+
+  // preview initial
+  updateMemberPreview();
+});
+
+/* ---------------- open / close panel helpers ---------------- */
 function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
 function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
 
-function updateMemberPreview(){
-    const n = parseInt(document.getElementById("memberCount").value || 0);
-    document.getElementById("previewCount").innerText = n;
-    const list = document.getElementById("membersPreview");
-    list.innerHTML = "";
-    for (let i = 0; i < n; i++) {
-        const mem = collectedMembers[i];
-        const li = document.createElement('li');
-        li.innerText = mem ? `#${i+1} — ${mem["Name of Household Member/s"] || mem["Name"] || "—"}` : `#${i+1} — (empty)`;
-        list.appendChild(li);
+/* ---------------- Submit head + members ---------------- */
+async function submitHeadAndMembers(){
+  // head birthdate -> DD/MM/YYYY
+  const headBirthInput = document.getElementById("householdBirthdate").value || "";
+  const headBirthForSheet = toSheetDateFormat(headBirthInput);
+  const headAgeInfo = computeAgeDetailed(headBirthInput);
+  const headAgeVal = headAgeInfo ? headAgeInfo.display : "";
+
+  const head = {
+    "Barangay": document.getElementById("barangay").value || "",
+    "Sitio / Purok": document.getElementById("sitio").value || "",
+    "Name of Household Head": document.getElementById("householdHead").value || "",
+    "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
+    "Birthdate": headBirthForSheet,
+    "Age": headAgeVal,
+    "Stage": headAgeInfo ? headAgeInfo.stage : "",
+    "No. of Household Member/s": document.getElementById("memberCount").value || "0",
+    "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
+    "Reasons for Displacement": document.getElementById("reasons").value || "",
+    "Transportation": document.getElementById("head_transport").value || "",
+    "Drop-Off Point": document.getElementById("dropoff").value || "",
+    "Designated Pick-Up Point": document.getElementById("pickup").value || "",
+    "Status": document.getElementById("head_status").value || "",
+    "Name of Camp": document.getElementById("campName").value || "",
+    "Capacity": document.getElementById("capacity").value || "",
+    "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
+    "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
+    "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
+    "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
+    "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
+    "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
+    "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
+    "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
+    "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
+    "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
+    "AICS": document.getElementById("ass_aics").value || ""
+  };
+
+  // ensure members array length matches count
+  const expected = parseInt(document.getElementById("memberCount").value || 0);
+  const members = collectedMembers.slice(0);
+  for(let i=0;i<expected;i++){
+    if(!members[i]){
+      members[i] = {
+        "Name of Household Member/s": "",
+        "Sex": "",
+        "Birthdate": "",
+        "Age": "",
+        "Stage": "",
+        "Persons with Disability (PWD)": "No",
+        "Status": "",
+        "Transportation": "",
+        "Designated Pick-Up Point": "",
+        "Drop-Off Point": "",
+        "Name of Camp": "",
+        "Capacity": "",
+        "No. of Individuals Inside Camp": "",
+        "No. of Individuals Outside Camp": "",
+        "Reasons for Displacement": "",
+        "TUPAD": "No",
+        "Local 4Ps": "No",
+        "National 4Ps": "No",
+        "Local Social Pension": "No",
+        "National Social Pension": "No",
+        "Solo Parent Assistance": "No",
+        "Relief Goods": "No",
+        "Cash Subsidy": "No",
+        "AICS": ""
+      };
     }
-}
-
-/* fill member panel form from existing member (for edit in panel) */
-function fillMemberPanel(idx){
-    const mem = collectedMembers[idx] || {};
-    document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
-    // sex radios
-    Array.from(document.getElementsByName("member_sex")).forEach(r => r.checked = (r.value === (mem["Sex"] || "")));
-    document.getElementById("memberBirthdate").value = mem["Birthdate"] || "";
-    document.getElementById("memberAge").value = mem["Age"] || "";
-    document.getElementById("memberStage").value = mem["Stage"] || "";
-    // status/transport/pickup/dropoff
-    document.getElementById("memberStatus").value = mem["Status"] || "";
-    document.getElementById("memberTransport").value = mem["Transportation"] || "";
-    document.getElementById("memberPickup").value = mem["Designated Pick-Up Point"] || "";
-    document.getElementById("memberDropoff").value = mem["Drop-Off Point"] || "";
-    document.getElementById("memberCamp").value = mem["Name of Camp"] || "";
-    document.getElementById("memberCampCap").value = mem["Capacity"] || "";
-    document.getElementById("memberInside").value = mem["No. of Individuals Inside Camp"] || "";
-    document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || "";
-    document.getElementById("memberReason").value = mem["Reasons for Displacement"] || "";
-    // checks
-    document.getElementById("member_tupad").checked = (mem["TUPAD"] === "Yes");
-    document.getElementById("member_local4ps").checked = (mem["Local 4Ps"] === "Yes");
-    document.getElementById("member_intl4ps").checked = (mem["National 4Ps"] === "Yes");
-    document.getElementById("member_locsp").checked = (mem["Local Social Pension"] === "Yes");
-    document.getElementById("member_intlsp").checked = (mem["National Social Pension"] === "Yes");
-    document.getElementById("member_solo").checked = (mem["Solo Parent Assistance"] === "Yes");
-    document.getElementById("member_relief").checked = (mem["Relief Goods"] === "Yes");
-    document.getElementById("member_cash").checked = (mem["Cash Subsidy"] === "Yes");
-    document.getElementById("memberAics").value = mem["AICS"] || "";
-}
-
-/* collect data from panel inputs into the exact Master sheet column keys */
-function collectMemberDataFromPanel(){
-    const name = document.getElementById("memberName").value.trim();
-    const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
-    const birthdate = document.getElementById("memberBirthdate").value || "";
-    const age = computeAge(birthdate);
-    const stage = getStageFromAge(age);
-    return {
-        "Name of Household Member/s": name,
-        "Sex": sex,
-        "Birthdate": birthdate,
-        "Age": age != null ? age : "",
-        "Stage": stage,
-        "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
-        "Status": document.getElementById("memberStatus").value || "",
-        "Transportation": document.getElementById("memberTransport").value || "",
-        "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
-        "Drop-Off Point": document.getElementById("memberDropoff").value || "",
-        "Name of Camp": document.getElementById("memberCamp").value || "",
-        "Capacity": document.getElementById("memberCampCap").value || "",
-        "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
-        "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
-        "Reasons for Displacement": document.getElementById("memberReason").value || "",
-        "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
-        "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
-        "National 4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
-        "Local Social Pension": document.getElementById("member_locsp").checked ? "Yes" : "No",
-        "National Social Pension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
-        "Solo Parent Assistance": document.getElementById("member_solo").checked ? "Yes" : "No",
-        "Relief Goods": document.getElementById("member_relief").checked ? "Yes" : "No",
-        "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
-        "AICS": document.getElementById("memberAics").value || ""
-    };
-}
-
-/* ---------------- AGE & STAGE AUTO UPDATE ---------------- */
-
-// HEAD AUTO UPDATE (correct IDs)
-document.getElementById("householdBirthdate").addEventListener("input", () => {
-    const dob = document.getElementById("householdBirthdate").value;
-    const age = computeAge(dob) || "";
-    document.getElementById("householdAge").value = age;
-    document.getElementById("householdStage").value = getStageFromAge(age) || "";
-});
-
-// MEMBER AUTO UPDATE
-document.getElementById("memberBirthdate").addEventListener("input", () => {
-    const dob = document.getElementById("memberBirthdate").value;
-    const age = computeAge(dob) || "";
-    document.getElementById("memberAge").value = age;
-    document.getElementById("memberStage").value = getStageFromAge(age) || "";
-});
-
-/* -------- panel navigation -------- */
-document.getElementById && document.addEventListener('DOMContentLoaded', () => {
-    // populate user name
-    if (!ensureLoginOrRedirect()) return;
-    document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
-
-    // reset behavior
-    document.getElementById("resetBtn").addEventListener('click', () => {
-        document.getElementById("headForm").reset();
-        document.getElementById("membersPreview").innerHTML = "";
-        collectedMembers = [];
-        updateMemberPreview();
-    });
-
-    // next button (head -> members)
-    document.getElementById("nextToMembers").addEventListener('click', () => {
-        const barangay = document.getElementById("barangay").value.trim();
-        const sitio = document.getElementById("sitio").value.trim();
-        const headName = document.getElementById("householdHead").value.trim();
-        if (!barangay || !sitio || !headName) {
-            alert("Please fill Barangay, Sitio/Purok and Name of Household Head.");
-            return;
-        }
-        membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
-        collectedMembers = []; currentMemberIndex = 0;
-        updateMemberPreview();
-        if (membersToCollect === 0) {
-            // directly submit head-only
-            submitHeadAndMembers();
-            return;
-        }
-        // open first member panel
-        fillMemberPanel(0); // populate with blank or existing
-        document.getElementById('panelTitle').innerText = `Member 1 of ${membersToCollect}`;
-        openPanel();
-    });
-
-    // panel close/back
-    document.getElementById("panelClose").addEventListener('click', () => { closePanel(); });
-    document.getElementById("memberBack").addEventListener('click', () => {
-        // if editing previous, save it to collectedMembers and step back, else just close
-        if (currentMemberIndex > 0) {
-            // save current into array
-            collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
-            currentMemberIndex--;
-            fillMemberPanel(currentMemberIndex);
-            document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
-            updateMemberPreview();
-        } else {
-            closePanel();
-        }
-    });
-
-    // save & next in panel
-    document.getElementById("memberNext").addEventListener('click', () => {
-        // validate name
-        const name = document.getElementById("memberName").value.trim();
-        if (!name) { alert("Please enter member's name."); return; }
-
-        // collect and store
-        collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
-        updateMemberPreview();
-
-        currentMemberIndex++;
-        if (currentMemberIndex >= membersToCollect) {
-            // done with members -> close panel & submit
-            closePanel();
-            submitHeadAndMembers();
-            return;
-        }
-        // load next
-        fillMemberPanel(currentMemberIndex);
-        document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
-    });
-
-    // live update head birthdate → age/stage
-    document.getElementById("householdBirthdate").addEventListener("change", () => {
-        const age = computeAge(document.getElementById("householdBirthdate").value);
-        document.getElementById("householdAge").value = age || '';
-        document.getElementById("householdStage").value = getStageFromAge(age) || '';
-    });
-});
-
-/* -------- submit head + members -------- */
-async function submitHeadAndMembers() {
-    // Build HEAD object that matches sheet header names exactly
-    const head = {
-        "Barangay": document.getElementById("barangay").value || "",
-        "Sitio / Purok": document.getElementById("sitio").value || "",
-        "Name of Household Head": document.getElementById("householdHead").value || "",
-        "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-        "Birthdate": document.getElementById("householdBirthdate").value || "",
-        "Age": document.getElementById("householdAge").value || "",
-        "Stage": document.getElementById("householdStage").value || "",
-        "No. of Household Member/s": document.getElementById("memberCount").value || "0",
-        "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "",
-        "Reasons for Displacement": document.getElementById("reasons").value || "",
-        "Transportation": document.getElementById("head_transport").value || "",
-        "Drop-Off Point": document.getElementById("dropoff").value || "",
-        "Designated Pick-Up Point": document.getElementById("pickup").value || "",
-        "Status": document.getElementById("head_status").value || "",
-        "Name of Camp": document.getElementById("campName").value || "",
-        "Capacity": document.getElementById("capacity").value || "",
-        "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
-        "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
-        "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
-        "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
-        "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
-        "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
-        "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
-        "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
-        "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
-        "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
-        "AICS": document.getElementById("ass_aics").value || ""
-    };
-
-    // Ensure collectedMembers length matches memberCount — if user skipped some, keep blanks
-    const expected = parseInt(document.getElementById("memberCount").value || 0);
-    const members = collectedMembers.slice(0); // shallow copy
-    for (let i = 0; i < expected; i++) {
-        if (!members[i]) {
-            // create an empty member with at least name blank
-            members[i] = {
-                "Name of Household Member/s": "",
-                "Sex": "",
-                "Birthdate": "",
-                "Age": "",
-                "Stage": "",
-                "Persons with Disability (PWD)": "No",
-                "Status": "",
-                "Transportation": "",
-                "Designated Pick-Up Point": "",
-                "Drop-Off Point": "",
-                "Name of Camp": "",
-                "Capacity": "",
-                "No. of Individuals Inside Camp": "",
-                "No. of Individuals Outside Camp": "",
-                "Reasons for Displacement": "",
-                "TUPAD": "No",
-                "Local 4Ps": "No",
-                "National 4Ps": "No",
-                "Local Social Pension": "No",
-                "National Social Pension": "No",
-                "Solo Parent Assistance": "No",
-                "Relief Goods": "No",
-                "Cash Subsidy": "No",
-                "AICS": ""
-            };
-        }
+    // ensure any birthdate in members are DD/MM/YYYY
+    if(members[i]["Birthdate"]){
+      // if user saved a raw yyyy-mm-dd in some path, convert
+      members[i]["Birthdate"] = (members[i]["Birthdate"].indexOf('/') === -1) ? toSheetDateFormat(members[i]["Birthdate"]) : members[i]["Birthdate"];
     }
+  }
 
-    // Build FormData (Apps Script expects FormData or e.parameter)
-    const form = new FormData();
-    form.append("action", "createRecord");
-    form.append("head", JSON.stringify(head));
-    form.append("members", JSON.stringify(members));
-    form.append("submittedBy", localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown");
+  // build FormData
+  const form = new FormData();
+  form.append("action","createRecord");
+  form.append("head", JSON.stringify(head));
+  form.append("members", JSON.stringify(members));
+  form.append("submittedBy", localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown");
 
-    // Disable UI while submitting
-    const submitBtn = document.getElementById("nextToMembers");
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Saving...";
+  // UI disable
+  const submitBtn = document.getElementById("nextToMembers");
+  submitBtn.disabled = true;
+  submitBtn.innerText = "Saving...";
 
-    try {
-        console.log("SUBMIT payload head:", head);
-        console.log("SUBMIT payload members:", members);
+  try{
+    console.log("Submitting HEAD:", head);
+    console.log("Submitting MEMBERS:", members);
+    const res = await fetch(API_URL, { method: "POST", body: form });
+    const text = await res.text();
+    console.log("RAW RESPONSE:", text);
+    let data;
+    try { data = JSON.parse(text); } catch(e){ throw new Error("Invalid response from server"); }
 
-        const res = await fetch(API_URL, { method: "POST", body: form });
-        const text = await res.text();
-        console.log("RAW RESPONSE:", text);
-
-        let data;
-        try { data = JSON.parse(text); }
-        catch (err) { throw new Error("Invalid response from server"); }
-
-        if (data.success) {
-            alert("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
-            // clear form or redirect
-            window.location.href = "records.html";
-        } else {
-            alert("Save failed: " + (data.message || "Unknown error"));
-            console.error("SAVE ERROR:", data);
-        }
-
-    } catch (err) {
-        console.error("SUBMIT ERROR:", err);
-        alert("Network / Server error. Check console.");
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Save → Next Members";
+    if(data.success){
+      alert("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
+      window.location.href = "records.html";
+    } else {
+      alert("Save failed: " + (data.message || "Unknown error"));
+      console.error("SAVE ERROR:", data);
     }
+  }catch(err){
+    console.error("SUBMIT ERROR:", err);
+    alert("Network / Server error. Check console.");
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Save → Next Members";
+  }
 }
+
 </script>
 </body>
 </html>
-
-
-
