@@ -19,7 +19,7 @@
       padding:12px;
       box-shadow:0 8px 24px rgba(6,30,20,0.06);
     }
-    .chart-card h4{ margin:4px 0 10px 0; font-size:15px; color:var(--green-1) }
+    .chart-card h4{ margin:4px 0 10px 0; font-size:15px; color:var(--green-1); display:flex; align-items:center; gap:8px }
     /* floating menu */
     .floating-menu{
       position: fixed;
@@ -42,6 +42,9 @@
       .charts-container{ grid-template-columns:1fr; }
       .floating-menu{ right:10px; top:auto; bottom:16px; width:92%; left:4%; }
     }
+
+    /* center small loader */
+    #loader { display:none; text-align:center; padding:8px; color:var(--muted); }
   </style>
 </head>
 <body>
@@ -73,43 +76,43 @@
 
     <main class="content-area">
       <h2>📈 Visualizations</h2>
-      <div class="small muted">Hover to interact. Use floating menu to export/print.</div>
+      <div id="loader">Loading chart data…</div>
 
       <div class="charts-container" id="chartsContainer">
         <div class="chart-card">
           <h4>1. Evacuees per Barangay</h4>
-          <canvas id="chartBarangay" height="200"></canvas>
+          <canvas id="chartBarangay" height="220"></canvas>
         </div>
 
         <div class="chart-card">
-          <h4>2. Stage Distribution</h4>
-          <canvas id="chartStage" height="200"></canvas>
+          <h4>2. Age Distribution</h4>
+          <canvas id="chartAge" height="220"></canvas>
         </div>
 
         <div class="chart-card">
-          <h4>3. Persons With Disability (PWD)</h4>
-          <canvas id="chartPWD" height="200"></canvas>
+          <h4>3. Stage Distribution</h4>
+          <canvas id="chartStage" height="220"></canvas>
         </div>
 
         <div class="chart-card">
-          <h4>4. Status Distribution</h4>
-          <canvas id="chartStatus" height="200"></canvas>
+          <h4>4. Persons With Disability (PWD)</h4>
+          <canvas id="chartPWD" height="220"></canvas>
         </div>
 
         <div class="chart-card">
-          <h4>5. Transportation Distribution</h4>
-          <canvas id="chartTransport" height="200"></canvas>
+          <h4>5. Status Distribution</h4>
+          <canvas id="chartStatus" height="220"></canvas>
         </div>
 
         <div class="chart-card">
-          <h4>6. Age Group Distribution</h4>
-          <canvas id="chartAgeGroup" height="200"></canvas>
+          <h4>6. Assistance Received (combined)</h4>
+          <canvas id="chartAssistance" height="220"></canvas>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Floating right-side export menu (Option B) -->
+  <!-- Floating right-side export menu -->
   <div class="floating-menu" aria-hidden="false">
     <h5>Export & Print</h5>
     <button id="btnPrint" class="btn">Print Charts</button>
@@ -117,9 +120,6 @@
     <button id="btnExportPNGs" class="btn">Export All → PNG (ZIP)</button>
     <div class="small-desc">Pro tip: use PDF for sharing; PNG ZIP for individual images.</div>
   </div>
-
-  <!-- include the uploaded file (developer note) -->
-  <script src="/mnt/data/users.js"></script>
 
   <!-- libs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -130,5 +130,3 @@
   <script src="js/charts.js"></script>
 </body>
 </html>
-
-
