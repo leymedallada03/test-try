@@ -3,13 +3,32 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Purok Kaligtasan — Graphical Data Representation</title>
+  <title>Purok Kaligtasan — Charts</title>
   <link rel="stylesheet" href="styles.css"/>
   <style>
+    :root{
+      --green-1:#0F7A4A;
+      --muted:#6b7280;
+      --card-grad: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,255,250,0.96));
+    }
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background: #fbfefb;color:#102015}
+    .page-container{display:flex;min-height:100vh}
+    .topbar{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(6,30,20,0.04);background:white;width:100%;position:fixed;top:0;left:0;z-index:50}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:42px;height:42px;object-fit:contain}
+    .title{font-weight:800;font-size:14px}
+    .subtitle{font-size:12px;color:var(--muted)}
+    .user-info{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .logout-btn{background:transparent;border:1px solid rgba(6,30,20,0.06);padding:8px;border-radius:8px;cursor:pointer}
+    aside.sidebar{width:220px;padding-top:86px;background:transparent;position:fixed;left:0;top:0;bottom:0}
+    aside.sidebar ul{list-style:none;padding:18px;margin:0}
+    aside.sidebar li{margin-bottom:10px}
+    aside.sidebar a{display:block;padding:8px 10px;border-radius:8px;color:rgba(6,30,20,0.85);text-decoration:none}
+    aside.sidebar a.active{background:linear-gradient(90deg,#eaf7ef,#f3fff6);border-left:3px solid var(--green-1);font-weight:700}
 
-    h2{ margin:0 0 6px 0; font-size:20px }
-    .small.muted{ color:var(--muted); margin-bottom:6px }
+    main.content-area{flex:1;padding:110px 32px 40px 260px;min-height:100vh}
 
+    h2{margin:0 0 6px 0}
     .charts-container{
       display:grid;
       grid-template-columns: repeat(2, 1fr);
@@ -21,28 +40,22 @@
       border-radius:14px;
       padding:16px;
       box-shadow: 0 10px 30px rgba(6,30,20,0.06);
+      backdrop-filter: blur(4px);
       border: 1px solid rgba(6,30,20,0.03);
+      min-height:170px;
+      position:relative;
     }
     .chart-card h4{
       margin:4px 0 12px 0;
-      font-size:16px;
+      font-size:15px;
       font-weight:700;
       color:var(--green-1);
     }
-    /* ensure charts export with white background */
-    canvas{
-      display:block;
-      width:100% !important;
-      height:auto !important;
-      background: white;
-      border-radius:6px;
-      box-shadow: 0 10px 20px rgba(6,30,20,0.04);
-    }
-
+    canvas{filter: drop-shadow(0 8px 16px rgba(6,30,20,0.06)); display:block; width:100% !important; height:auto !important; background:white}
     .floating-menu{
       position: fixed;
       right: 18px;
-      top: 120px;
+      top: 130px;
       width: 220px;
       background: white;
       border-radius: 14px;
@@ -53,37 +66,42 @@
       flex-direction:column;
       gap:10px;
     }
-    .floating-menu h5{ margin:0 0 6px 0; font-size:15px; font-weight:700; color:var(--green-1) }
-    .btn{ padding:8px; border-radius:8px; font-weight:700; cursor:pointer; background:linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; border:0 }
-    .small-desc{ font-size:12px; color:var(--muted) }
-
+    .floating-menu h5{margin:0 0 6px 0;font-size:15px;font-weight:700;color:var(--green-1)}
+    .btn{padding:8px;border-radius:8px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;border:0}
+    .small-desc{font-size:12px;color:var(--muted)}
+    /* PWD gauge overlay counts */
+    .pwd-info{position:absolute;right:18px;top:54px;text-align:right;font-size:13px;color:#22332b}
+    .pwd-info b{display:block;font-size:14px}
+    /* comparison chart full width row */
+    .full-row{grid-column:1/-1}
     @media(max-width:980px){
-      .charts-container{ grid-template-columns:1fr }
-      .sidebar{ display:none }
-      main.content-area{ padding-top:86px; margin-left:0 }
-      .floating-menu{ left:8px; right:8px; bottom:18px; top:auto; width:auto; flex-direction:row; justify-content:space-between }
+      .charts-container{grid-template-columns:1fr}
+      aside.sidebar{display:none}
+      main.content-area{padding:110px 18px 40px}
+      .floating-menu{left:8px;right:8px;bottom:18px;top:auto;width:auto;flex-direction:row;justify-content:space-between}
     }
 
-    /* print tweaks */
-    @media print{
-      body{ background:white }
-      header, .sidebar, .floating-menu{ display:none !important }
-      .chart-card{ page-break-inside:avoid; border:none; box-shadow:none; background:white }
-      canvas{ filter:none !important; box-shadow:none !important; background:white !important }
+    /* Print tweaks: remove shadows/gradients for crisp export */
+    @media print {
+      body * { visibility: hidden; }
+      .chart-card, .chart-card * { visibility: visible; }
+      .chart-card { page-break-inside: avoid; box-shadow:none; background:white !important; border: none; }
+      canvas { filter:none !important; box-shadow:none !important; background:white !important; }
     }
   </style>
 </head>
 <body>
 <div class="page-container">
 
-  <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
-
-    <div class="brand">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
-      <div>
-        <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+  <header class="topbar" role="banner">
+    <div style="display:flex;gap:12px;align-items:center">
+      <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="brand">
+        <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+        <div>
+          <div class="title">PUROK KALIGTASAN</div>
+          <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+        </div>
       </div>
     </div>
 
@@ -93,19 +111,19 @@
     </div>
   </header>
 
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
     <ul>
       <li><a href="dashboard.html">📊 Dashboard</a></li>
-      <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
+      <li><a href="dataForm.html">📝 Data Entry</a></li>
       <li><a href="records.html">📁 Records</a></li>
-      <li><a href="charts.html">📈 Charts</a></li>
+      <li><a href="charts.html" class="active">📈 Charts</a></li>
       <li class="admin-only"><a href="users.html">👥 User Management</a></li>
     </ul>
   </aside>
 
-  <main class="content-area">
+  <main class="content-area" role="main">
     <h2>📈 Household Statistics & Trends</h2>
-    <div class="small muted">Visual summary of all registered household. Hover legends to toggle series. Charts refresh when page loads.</div>
+    <div class="small muted">Visual summary of all registered evacuees. Auto-refresh every 30s. Use the floating menu to export charts or CSV.</div>
 
     <div class="charts-container" id="chartsContainer">
       <div class="chart-card">
@@ -114,28 +132,34 @@
       </div>
 
       <div class="chart-card">
-        <h4>2. Age Groups </h4>
+        <h4>2. Age Groups (0-11 months, ≤17, 18-59, 60+)</h4>
         <canvas id="chartAgeGroup" height="220"></canvas>
       </div>
 
       <div class="chart-card">
-        <h4>3. Stage </h4>
+        <h4>3. Stage Distribution (Double-ring)</h4>
         <canvas id="chartStage" height="220"></canvas>
       </div>
 
       <div class="chart-card">
         <h4>4. Persons With Disability (PWD)</h4>
-        <canvas id="chartPWD" height="220"></canvas>
+        <canvas id="chartPWD" height="160"></canvas>
+        <div class="pwd-info" id="pwdInfo"><span id="pwdYes">Yes: 0</span><span id="pwdNo">No: 0</span></div>
       </div>
 
       <div class="chart-card">
-        <h4>5. Status </h4>
+        <h4>5. Status Distribution</h4>
         <canvas id="chartStatus" height="220"></canvas>
       </div>
 
       <div class="chart-card">
-        <h4>6. Government Support </h4>
+        <h4>6. Government Support (ALL)</h4>
         <canvas id="chartSupport" height="260"></canvas>
+      </div>
+
+      <div class="chart-card full-row">
+        <h4>Comparison — Barangay vs Status</h4>
+        <canvas id="chartComparison" height="300"></canvas>
       </div>
     </div>
   </main>
@@ -146,90 +170,51 @@
   <button id="btnPrint" class="btn">Print</button>
   <button id="btnExportPDF" class="btn">Export PDF</button>
   <button id="btnExportPNGs" class="btn">Export PNG ZIP</button>
-  <div class="small-desc">Use PDF for reports, PNG for slides.</div>
+  <button id="btnExportCSV" class="btn" style="background:linear-gradient(90deg,#2476ff,#4aa0ff)">Export CSV</button>
+  <div class="small-desc">Green = Barangay | Blue = Age groups. Auto-refresh: 30s</div>
 </div>
 
-<!-- Chart.js v4 -->
+<!-- libs -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver/2.0.5/FileSaver.min.js"></script>
-<script>window.saveAs = window.saveAs || saveAs;</script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <script>
 (function(){
-  // === CONFIG ===
+  // === CONFIG - set your Apps Script web app URL here ===
   const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-  // container for Chart instances so we can destroy them on re-render
-  const CHARTS = {};
-  // Modern Government Dashboard Palette
-const COLORSET = {
-  greenTop:  "rgba(46, 204, 113, 0.95)",
-  greenBot:  "rgba(39, 174, 96, 0.85)",
-  greenLine: "#27ae60",
+  // chart instances
+  const CH = {};
 
-  blueTop:   "rgba(52, 152, 219, 0.95)",
-  blueBot:   "rgba(41, 128, 185, 0.85)",
-  blueLine:  "#2980b9",
+  // Auto-refresh interval (ms)
+  const AUTO_REFRESH_MS = 30000; // 30 seconds
 
-  // Teal + Cyan for doughnuts
-  doughnut: [
-    "#1abc9c","#16a085","#48c9b0","#76d7c4","#b2f7e9"
-  ],
-
-  // PWD colors (muted)
-  pwd: [
-    "#3498db", // Yes
-    "#95a5a6", // No
-    "#bdc3c7"  // Unknown
-  ],
-
-  // Status colors (gray + accents)
-  status: [
-    "#2ecc71","#3498db","#9b59b6","#e67e22","#95a5a6"
-  ],
-
-  // Assistance palette (professional)
-  assistance: [
-    "#1abc9c","#3498db","#9b59b6","#f1c40f",
-    "#e67e22","#2ecc71","#e74c3c","#34495e","#16a085"
-  ]
-};
-
-
-  /*******************
-   * Utilities
-   *******************/
-  function safeGet(r, keyCandidates){
-    for(const k of keyCandidates){
-      if(r.hasOwnProperty(k)) return r[k];
-      // case-insensitive match
-      for(const kk of Object.keys(r)){
-        if(String(kk).trim().toLowerCase() === String(k).trim().toLowerCase()) return r[kk];
-      }
+  // Utility: find value case-insensitively in object
+  function getField(r, key) {
+    if (!r) return "";
+    if (r.hasOwnProperty(key)) return r[key];
+    const kl = key.toLowerCase().trim();
+    for (const k of Object.keys(r)) {
+      if (String(k).toLowerCase().trim() === kl) return r[k];
     }
     return "";
   }
 
+  // Parse dates, support dd/mm/yyyy and ISO
   function parseAnyDate(v){
     if(!v && v !== 0) return null;
-    if(v instanceof Date) return v;
+    if (v instanceof Date) return v;
     v = String(v).trim();
-    if(!v) return null;
-    // dd/mm/yyyy
+    if (!v) return null;
     if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v)){
       const p = v.split('/');
       return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
     }
-    // yyyy-mm-dd (optionally with time)
     if(/^\d{4}-\d{2}-\d{2}/.test(v)){
-      // let Date parse it (handles timezone)
-      const d = new Date(v);
-      return isNaN(d) ? null : d;
+      return new Date(v);
     }
-    // try Date constructor
     const d = new Date(v);
     return isNaN(d) ? null : d;
   }
@@ -238,371 +223,445 @@ const COLORSET = {
     if(!d1 || !d2) return null;
     let years = d2.getFullYear() - d1.getFullYear();
     let months = d2.getMonth() - d1.getMonth();
-    let total = years*12 + months;
-    if(d2.getDate() < d1.getDate()) total--;
-    return total;
+    let m = years*12 + months;
+    if(d2.getDate() < d1.getDate()) m--;
+    return m;
   }
 
-  function yearsFromBirth(bd){
+  function ageInYearsFromBirth(bd){
     const d = parseAnyDate(bd);
     if(!d) return null;
     const now = new Date();
-    let y = now.getFullYear() - d.getFullYear();
+    let years = now.getFullYear() - d.getFullYear();
     const m = now.getMonth() - d.getMonth();
-    if(m < 0 || (m === 0 && now.getDate() < d.getDate())) y--;
-    return y;
+    if(m < 0 || (m === 0 && now.getDate() < d.getDate())) years--;
+    return years;
   }
 
-  // normalize row object from getRecords
+  // normalize row values we need
   function normalizeRow(r){
-    const barangay = String(safeGet(r, ["Barangay"])).trim() || "Unknown";
-    const stage = String(safeGet(r, ["Stage"])).trim() || "";
-    const pwd = String(safeGet(r, ["Persons with Disability (PWD)", "PWD"])).trim().toLowerCase();
-    const status = String(safeGet(r, ["Status"])).trim() || "";
-    const birthRaw = safeGet(r, ["Birthdate", "Birth Date", "Birthdate (Head)"]);
-    const birthdate = birthRaw ? String(birthRaw).trim() : "";
-
-    // Age field may already contain numeric years
-    const ageField = safeGet(r, ["Age"]);
+    const barangay = String(getField(r,"Barangay") || "").trim() || "Unknown";
+    const stage = String(getField(r,"Stage") || "").trim() || "Unspecified";
+    const pwdRaw = String(getField(r,"Persons with Disability (PWD)") || getField(r,"PWD") || "").trim().toLowerCase();
+    const pwd = (pwdRaw === "yes" || pwdRaw === "y" || pwdRaw === "true") ? "Yes" : (pwdRaw === "no" ? "No" : (pwdRaw === "" ? "No" : pwdRaw));
+    const status = String(getField(r,"Status") || "").trim() || "Unspecified";
+    const birthRaw = getField(r,"Birthdate") || getField(r,"Birth Date") || "";
+    const birth = birthRaw ? String(birthRaw).trim() : "";
+    let ageVal = getField(r,"Age");
     let ageYears = null;
-    if(ageField !== "" && ageField !== null && ageField !== undefined && !isNaN(Number(ageField))){
-      ageYears = Number(ageField);
+    if (ageVal !== "" && ageVal !== null && ageVal !== undefined && !isNaN(Number(ageVal))) {
+      ageYears = Number(ageVal);
     } else {
-      // compute from birthdate if possible
-      if(birthdate) {
-        const yrs = yearsFromBirth(birthdate);
-        if(yrs !== null) ageYears = yrs;
+      if (birth) {
+        const y = ageInYearsFromBirth(birth);
+        if (y !== null) ageYears = y;
       }
     }
-
-    // infant months calc if ageYears is 0 or missing but birthdate exists
     let infantMonths = null;
-    if(birthdate){
-      const bd = parseAnyDate(birthdate);
-      if(bd){
-        const m = monthsBetween(bd, new Date());
-        if(m !== null) infantMonths = m;
-      }
+    if ((ageYears === 0 || ageYears === 0) && birth) {
+      const bd = parseAnyDate(birth);
+      if (bd) infantMonths = monthsBetween(bd, new Date());
     }
 
-    // assistance fields (we count "yes" on checkboxes; AICS counts any non-empty)
-    const assistFields = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
+    // assistance fields — we treat 'yes' only except AICS counts non-empty
+    const assistKeys = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
     const assist = {};
-    assistFields.forEach(k => {
-      assist[k] = String(safeGet(r, [k])).trim();
+    assistKeys.forEach(k => {
+      assist[k] = String(getField(r,k) || "").trim();
     });
 
-    return { barangay, stage, pwd, status, birthdate, ageYears, infantMonths, assist };
+    return { barangay, stage, pwd, status, birth, ageYears, infantMonths, assist };
   }
 
-  // Age bucket according to your rule
+  // Age bucketing per your rule:
   // 0-11 months => Infant
   // <=17 => School Children
   // 18-59 => Adult
   // 60+ => Elderly
-  function ageBucket(obj){
-    if(obj.infantMonths !== null && obj.infantMonths !== undefined && obj.infantMonths >= 0 && obj.infantMonths <= 11){
-      return "Infant (0-11 mos)";
-    }
-    const y = obj.ageYears;
-    if(y === null || y === undefined) return "Unknown";
-    if(y <= 17) return "School Children (≤17)";
-    if(y >= 60) return "Elderly (60+)";
+  function bucketAge(norm){
+    if (typeof norm.infantMonths === "number" && norm.infantMonths >= 0 && norm.infantMonths <= 11) return "Infant (0-11 mos)";
+    const y = norm.ageYears;
+    if (y === null || y === undefined || y === "") return "Unknown";
+    if (y <= 17) return "School Children (≤17)";
+    if (y >= 60) return "Elderly (60+)";
     return "Adult (18-59)";
   }
 
-  /***********************
-   * Fetch data from API
-   ***********************/
+  // FETCH rows from Apps Script
   async function fetchRecords(){
     const url = API_URL + "?action=getRecords";
-    const res = await fetch(url, { cache: "no-store" });
-    if(!res.ok) throw new Error("Network error: " + res.status);
+    const res = await fetch(url, {cache: "no-store"});
+    if(!res.ok) throw new Error("Network error " + res.status);
     const j = await res.json();
     if(!j || !j.success) throw new Error("Bad response from API");
     return j.rows || [];
   }
 
-  /***********************
-   * Chart drawing helpers
-   ***********************/
-  function destroyIfExists(id){
-    if(CHARTS[id]) {
-      try { CHARTS[id].destroy(); } catch(e){}
-      CHARTS[id] = null;
-    }
+  // color utilities
+  function pastelGreen(i){ return `rgba(52,183,143,${0.85 - (i*0.02)})`; }
+  function pastelBlue(i){ return `rgba(70,140,240,${0.85 - (i*0.02)})`; }
+  function palette(i){ const colors = ['#0f7a4a','#3fbf8b','#f6b042','#f26c4f','#7b61ff','#0096c7','#ff7ab6','#6c757d','#2d9cdb']; return colors[i % colors.length]; }
+
+  // ensure canvas white background before exporting
+  function ensureCanvasWhite(c){
+    if (!c) return;
+    // draw white rect underneath if empty background
+    const ctx = c.getContext('2d');
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.restore();
   }
 
-  function makeVerticalGradient(ctx, height, colorTop, colorBottom){
-    const g = ctx.createLinearGradient(0,0,0,height || 200);
-    g.addColorStop(0, colorTop);
-    g.addColorStop(1, colorBottom);
-    return g;
+  // DRAWS
+  function drawBarChart(id, labels, values, colorFunc){
+    const ctx = document.getElementById(id).getContext('2d');
+    if (CH[id]) CH[id].destroy();
+
+    const bg = labels.map((_,i) => colorFunc ? colorFunc(i) : pastelGreen(i));
+
+    CH[id] = new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Count', data: values, backgroundColor: bg, borderColor: bg.map(c => c), borderWidth: 0, borderRadius:6 }] },
+      options: {
+        responsive:true,
+        plugins: { legend:{ display:false }, tooltip:{ mode:'index' } },
+        scales: { x:{ ticks:{ autoSkip:true } }, y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
+      }
+    });
   }
 
-  function drawBar(id, labels, data, opts = {}){
-    const ctxEl = document.getElementById(id);
-    if(!ctxEl) return;
-    const ctx = ctxEl.getContext("2d");
-    destroyIfExists(id);
-    const gradient = makeVerticalGradient(ctx, ctxEl.height, opts.topColor || "rgba(52,183,143,0.95)", opts.botColor || "rgba(15,122,74,0.85)");
+  function drawHorizontalBars(id, labels, values){
+    const ctx = document.getElementById(id).getContext('2d');
+    if (CH[id]) CH[id].destroy();
+    CH[id] = new Chart(ctx, {
+      type:'bar',
+      data:{ labels, datasets:[{ label:'Recipients', data:values, backgroundColor: labels.map((_,i)=> palette(i)) }]},
+      options:{ indexAxis:'y', responsive:true, plugins:{ legend:{ display:false }}, scales:{ x:{ beginAtZero:true, ticks:{ stepSize:1 } } } }
+    });
+  }
 
-    CHARTS[id] = new Chart(ctx, {
-      type: "bar",
+  function drawDoughnutDouble(id, innerLabels, innerValues, outerLabels, outerValues){
+    // Create composite by drawing outer ring first then smaller inner ring
+    const ctx = document.getElementById(id).getContext('2d');
+    if (CH[id]) CH[id].destroy();
+
+    CH[id] = new Chart(ctx, {
+      type: 'doughnut',
       data: {
-        labels,
-        datasets: [{
-          label: opts.label || "Count",
-          data,
-          backgroundColor: labels.map((_,i) => gradient),
-          borderColor: labels.map(()=> opts.borderColor || "#0f7a4a"),
-          borderWidth: 1,
-          borderRadius: 6
-        }]
+        labels: outerLabels.concat(innerLabels),
+        datasets: [
+          {
+            label: 'Outer',
+            data: outerValues,
+            backgroundColor: outerLabels.map((_,i)=> `hsl(${(i*40)%360} 65% 65%)`),
+            cutout: '50%',
+            circumference: 360,
+            weight: 1
+          },
+          {
+            label: 'Inner',
+            data: innerValues,
+            backgroundColor: innerLabels.map((_,i)=> `hsl(${(i*40+20)%360} 70% 50%)`),
+            cutout: '70%',
+            circumference: 360,
+            weight: 0.5
+          }
+        ]
       },
       options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { precision:0 } },
-          x: { ticks: { autoSkip: true, maxRotation:0 } }
+        responsive:true,
+        plugins:{ legend:{ position:'bottom' } }
+      }
+    });
+  }
+
+  function drawDoughnutSingle(id, labels, values){
+    const ctx = document.getElementById(id).getContext('2d');
+    if (CH[id]) CH[id].destroy();
+    CH[id] = new Chart(ctx, {
+      type:'doughnut',
+      data:{ labels, datasets:[{ data:values, backgroundColor: labels.map((_,i)=> `hsl(${(i*55)%360} 65% 55%)`) }]},
+      options:{ responsive:true, plugins:{ legend:{ position:'bottom' } } }
+    });
+  }
+
+  // PWD gauge: show YES % in ring and update counts in DOM
+  function drawPWDGauge(id, yesCount, noCount){
+    const total = yesCount + noCount;
+    const percent = total === 0 ? 0 : Math.round((yesCount/total) * 100);
+    const ctx = document.getElementById(id).getContext('2d');
+    if (CH[id]) CH[id].destroy();
+
+    CH[id] = new Chart(ctx, {
+      type:'doughnut',
+      data:{
+        labels:['Yes','No'],
+        datasets:[{
+          data:[percent, 100-percent],
+          backgroundColor: [`rgba(52,183,143,0.95)`, `rgba(220,220,220,0.6)`],
+          hoverOffset:6
+        }]
+      },
+      options:{
+        rotation: -120 * Math.PI/180,
+        circumference: 240 * Math.PI/180,
+        cutout: '70%',
+        responsive:true,
+        plugins:{
+          legend:{ display:false },
+          tooltip:{ enabled:true, callbacks:{ label: (ctx)=> `${ctx.label}: ${ctx.parsed}` } }
         }
       }
     });
+
+    // overlay text in center (we'll draw using Chart plugin? simpler: create two DOM labels)
+    document.getElementById('pwdYes').innerText = `Yes: ${yesCount}`;
+    document.getElementById('pwdNo').innerText = `No: ${noCount}`;
+
+    // draw percent label in center using plugin? We'll render as HTML overlay by writing into center of canvas
+    // Simpler approach: draw over canvas with text using ctx after short delay
+    setTimeout(()=> {
+      try {
+        const c = document.getElementById(id);
+        const ctx2 = c.getContext('2d');
+        // re-render current chart then draw label
+        // determine center and draw
+        const cx = c.width / 2;
+        const cy = c.height / 2;
+        ctx2.save();
+        ctx2.fillStyle = '#0b3b2a';
+        ctx2.font = '600 20px system-ui,Segoe UI';
+        ctx2.textAlign = 'center';
+        ctx2.textBaseline = 'middle';
+        ctx2.fillText(percent + '%', cx, cy - 6);
+        ctx2.font = '400 12px system-ui,Segoe UI';
+        ctx2.fillText('YES', cx, cy + 14);
+        ctx2.restore();
+      } catch(e){}
+    }, 120);
   }
 
-  function drawHorizontalBar(id, labels, data){
-    const ctxEl = document.getElementById(id);
-    if(!ctxEl) return;
-    const ctx = ctxEl.getContext("2d");
-    destroyIfExists(id);
+  // Comparison: grouped bar (barangay categories as x, statuses as datasets)
+  function drawComparison(barangayLabels, statusKeys, matrix){
+    const ctx = document.getElementById('chartComparison').getContext('2d');
+    if (CH['chartComparison']) CH['chartComparison'].destroy();
 
-    const palette = [
-      "#0f7a4a","#3fbf8b","#f6b042","#f26c4f","#7b61ff","#0096c7","#ff7ab6","#6c757d","#2d9cdb"
-    ];
+    const datasets = statusKeys.map((s,i)=> ({
+      label: s,
+      data: barangayLabels.map(b => matrix[b] ? (matrix[b][s]||0) : 0),
+      backgroundColor: palette(i),
+      borderColor: palette(i),
+      borderWidth: 1
+    }));
 
-    CHARTS[id] = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          label: "Recipients",
-          data,
-          backgroundColor: labels.map((_,i)=> palette[i % palette.length]),
-          borderColor: labels.map(()=> 'rgba(0,0,0,0.06)'),
-          borderWidth: 1
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { x: { beginAtZero: true, ticks: { precision:0 } } }
+    CH['chartComparison'] = new Chart(ctx, {
+      type:'bar',
+      data:{ labels: barangayLabels, datasets },
+      options:{
+        responsive:true,
+        plugins:{ legend:{ position:'bottom' }, tooltip:{ mode:'index' } },
+        scales:{ x:{ stacked:false }, y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
       }
     });
   }
 
-  function drawDoughnut(id, labels, data){
-    const ctxEl = document.getElementById(id);
-    if(!ctxEl) return;
-    const ctx = ctxEl.getContext("2d");
-    destroyIfExists(id);
-
-    CHARTS[id] = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels,
-        datasets: [{
-          data,
-          backgroundColor: labels.map((_,i)=> `hsl(${(i*55)%360} 70% 52%)`),
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
-  }
-
-  /***********************
-   * Build charts main
-   ***********************/
+  // Build charts from raw rows
   async function buildCharts(){
     try {
-      const raw = await fetchRecords();
-      const normalized = raw.map(normalizeRow);
+      const rawRows = await fetchRecords(); // array of objects (sheet rows)
+      const norm = rawRows.map(normalizeRow);
 
       // 1) Entry per Barangay
-      const barangayMap = {};
-      normalized.forEach(n => {
-        const b = n.barangay || "Unknown";
-        barangayMap[b] = (barangayMap[b] || 0) + 1;
-      });
+      const barangayCounts = {};
+      norm.forEach(n => barangayCounts[n.barangay] = (barangayCounts[n.barangay]||0) + 1);
       // sort descending
-      const brEntries = Object.entries(barangayMap).sort((a,b)=> b[1]-a[1]);
-      const brLabels = brEntries.map(e => e[0]);
-      const brCounts = brEntries.map(e => e[1]);
-      drawBar("chartBarangay", brLabels, brCounts, {
-  topColor: COLORSET.greenTop,
-  botColor: COLORSET.greenBot,
-  borderColor: COLORSET.greenLine
-});
+      const brgEntries = Object.entries(barangayCounts).sort((a,b)=> b[1] - a[1]);
+      const brgLabels = brgEntries.map(e=>e[0]);
+      const brgValues = brgEntries.map(e=>e[1]);
+      drawBarChart('chartBarangay', brgLabels, brgValues, (i)=> pastelGreen(i));
 
+      // 2) Age groups (pastel blue)
+      const ageBuckets = {"Infant (0-11 mos)":0,"School Children (≤17)":0,"Adult (18-59)":0,"Elderly (60+)":0,"Unknown":0};
+      norm.forEach(n => { ageBuckets[bucketAge(n)] = (ageBuckets[bucketAge(n)] || 0) + 1; });
+      drawBarChart('chartAgeGroup', Object.keys(ageBuckets), Object.values(ageBuckets), (i)=> pastelBlue(i));
 
+      // 3) Stage distribution — make double-ring:
+      // Outer: top 6 stages; Inner: rest or same distribution split
+      const stageCounts = {};
+      norm.forEach(n => stageCounts[n.stage] = (stageCounts[n.stage]||0) + 1);
+      const stageEntries = Object.entries(stageCounts).sort((a,b)=> b[1]-a[1]);
+      const outer = stageEntries.slice(0, Math.min(stageEntries.length,6));
+      const inner = stageEntries.slice(6);
+      const outerLabels = outer.map(e=>e[0]), outerVals = outer.map(e=>e[1]);
+      const innerLabels = inner.length ? inner.map(e=>e[0]) : outerLabels.slice(0, Math.min(3, outerLabels.length));
+      const innerVals = inner.length ? inner.map(e=>e[1]) : outerVals.slice(0, Math.min(3, outerVals.length));
+      drawDoughnutDouble('chartStage', innerLabels, innerVals, outerLabels, outerVals);
 
-      // 2) Age groups
-      const ageBuckets = {
-        "Infant (0-11 mos)": 0,
-        "School Children (≤17)": 0,
-        "Adult (18-59)": 0,
-        "Elderly (60+)": 0,
-        "Unknown": 0
-      };
-      normalized.forEach(n => {
-        ageBuckets[ ageBucket(n) ] = (ageBuckets[ ageBucket(n) ] || 0) + 1;
-      });
-      drawBar("chartAgeGroup", Object.keys(ageBuckets), Object.values(ageBuckets), {
-  topColor: COLORSET.blueTop,
-  botColor: COLORSET.blueBot,
-  borderColor: COLORSET.blueLine
-});
+      // 4) PWD gauge (Yes/No only)
+      let yes = 0, no = 0;
+      norm.forEach(n => { if (String(n.pwd).toLowerCase() === 'yes') yes++; else no++; });
+      drawPWDGauge('chartPWD', yes, no);
 
-      // 3) Stage distribution (doughnut)
-      const stageMap = {};
-      normalized.forEach(n => {
-        const s = n.stage || "Unspecified";
-        stageMap[s] = (stageMap[s]||0) + 1;
-      });
-      drawDoughnut("chartStage", Object.keys(stageMap), Object.values(stageMap), COLORSET.doughnut);
+      // 5) Status donut
+      const statusCounts = {};
+      norm.forEach(n => statusCounts[n.status] = (statusCounts[n.status]||0) + 1);
+      drawDoughnutSingle('chartStatus', Object.keys(statusCounts), Object.values(statusCounts));
 
-
-      // 4) PWD
-      const pwdCounts = { Yes:0, No:0, Unknown:0 };
-      normalized.forEach(n => {
-        const v = (n.pwd || "").toString().trim().toLowerCase();
-        if(v === "yes" || v === "y" || v === "true") pwdCounts.Yes++;
-        else if(v === "no" || v === "n" || v === "") pwdCounts.No++;
-        else pwdCounts.Unknown++;
-      });
-      drawDoughnut("chartPWD", Object.keys(pwdMap), Object.values(pwdMap), COLORSET.pwd);
-
-
-      // 5) Status distribution
-      const statusMap = {};
-      normalized.forEach(n => {
-        const s = n.status || "Unspecified";
-        statusMap[s] = (statusMap[s]||0) + 1;
-      });
-      drawDoughnut("chartPWD", Object.keys(pwdMap), Object.values(pwdMap), COLORSET.pwd);
-
-
-      // 6) Government support
-      const assistKeys = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
-      const assistCounts = {};
-      assistKeys.forEach(k => assistCounts[k] = 0);
-      normalized.forEach(n => {
-        assistKeys.forEach(k => {
+      // 6) Government support horizontal bars (count yes, AICS non-empty)
+      const supportKeys = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
+      const supportCounts = {};
+      supportKeys.forEach(k=> supportCounts[k]=0);
+      norm.forEach(n=>{
+        supportKeys.forEach(k=>{
           const v = (n.assist && n.assist[k]) ? String(n.assist[k]).trim().toLowerCase() : "";
-          if(k === "AICS"){
-            if(v !== "") assistCounts[k]++; // count non-empty AICS
+          if (k === 'AICS') {
+            if (v) supportCounts[k]++; // any non-empty AICS
           } else {
-            if(v === "yes" || v === "y" || v === "true") assistCounts[k]++;
+            if (v === 'yes' || v === 'y' || v === 'true') supportCounts[k]++;
           }
         });
       });
-      drawHBar("chartSupport", Object.keys(assistMap), Object.values(assistMap), COLORSET.assistance);
+      drawHorizontalBars('chartSupport', Object.keys(supportCounts), Object.values(supportCounts));
+
+      // Comparison — Barangay vs Status
+      // build matrix: { barangay: { status: count, ... }, ... }
+      const comparisonMatrix = {};
+      const statusSet = new Set();
+      norm.forEach(n=>{
+        const b = n.barangay || 'Unknown';
+        const s = n.status || 'Unspecified';
+        statusSet.add(s);
+        if(!comparisonMatrix[b]) comparisonMatrix[b] = {};
+        comparisonMatrix[b][s] = (comparisonMatrix[b][s]||0) + 1;
+      });
+      const statusKeys = Array.from(statusSet).sort();
+      const barangayLabels = Object.keys(comparisonMatrix).sort((a,b)=> (comparisonMatrix[b] && Object.values(comparisonMatrix[b]).reduce((x,y)=>x+y,0)) - (comparisonMatrix[a] && Object.values(comparisonMatrix[a]).reduce((x,y)=>x+y,0)));
+      drawComparison(barangayLabels, statusKeys, comparisonMatrix);
 
     } catch(err){
-      console.error("buildCharts error", err);
+      console.error("buildCharts error:", err);
       alert("Unable to load charts: " + err.message);
     }
   }
 
-  /***********************
-   * Export helpers
-   ***********************/
-  // create a white background copy of a canvas and return its dataURL
-  function canvasToDataURLWithWhiteBg(canvas, type = "image/png", quality = 0.95){
-    // create an offscreen canvas
-    const w = canvas.width;
-    const h = canvas.height;
-    const off = document.createElement('canvas');
-    off.width = w;
-    off.height = h;
-    const ctx = off.getContext('2d');
-    // white background
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0,0,w,h);
-    // draw original canvas over it
-    ctx.drawImage(canvas, 0, 0, w, h);
-    return off.toDataURL(type, quality);
-  }
-
-  async function exportAllToPDF(){
+  // EXPORT: PDF (ensures white backgrounds)
+  async function exportToPDF(){
     try {
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation: "landscape" });
-      const ids = ["chartBarangay","chartAgeGroup","chartStage","chartPWD","chartStatus","chartSupport"];
+      const pdf = new jsPDF({ orientation:'landscape' });
+      const ids = ['chartBarangay','chartAgeGroup','chartStage','chartPWD','chartStatus','chartSupport','chartComparison'];
       let page = 0;
-      for(const id of ids){
+      for (const id of ids){
         const c = document.getElementById(id);
         if(!c) continue;
-        const imgData = canvasToDataURLWithWhiteBg(c, "image/jpeg", 0.95);
-        if(page > 0) pdf.addPage();
-        // fit into pdf page with margins
-        const pw = pdf.internal.pageSize.getWidth();
-        const ph = pdf.internal.pageSize.getHeight();
-        const margin = 12;
-        const w = pw - margin * 2;
-        const h = ph - margin * 2;
-        pdf.addImage(imgData, "JPEG", margin, margin, w, h);
+        // ensure white background
+        ensureCanvasWhite(c);
+        const img = c.toDataURL('image/jpeg', 0.96);
+        if (page > 0) pdf.addPage();
+        // adapt size to page - keep margins
+        const w = pdf.internal.pageSize.getWidth() - 20;
+        const h = pdf.internal.pageSize.getHeight() - 20;
+        pdf.addImage(img, 'JPEG', 10, 10, w, h);
         page++;
       }
-      pdf.save(`Charts_Report_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`);
+      pdf.save(`Charts_Report_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`);
     } catch(err){
-      console.error("PDF export failed", err);
+      console.error("PDF export failed:", err);
       alert("PDF export failed: " + err.message);
     }
   }
 
+  // EXPORT PNG ZIP
   async function exportPNGsZip(){
     try {
       const zip = new JSZip();
-      const ids = ["chartBarangay","chartAgeGroup","chartStage","chartPWD","chartStatus","chartSupport"];
+      const ids = ['chartBarangay','chartAgeGroup','chartStage','chartPWD','chartStatus','chartSupport','chartComparison'];
       for(const id of ids){
         const c = document.getElementById(id);
         if(!c) continue;
-        const dataUrl = canvasToDataURLWithWhiteBg(c, "image/png", 1.0);
-        // convert dataURL to blob
-        const res = await fetch(dataUrl);
-        const blob = await res.blob();
-        zip.file(`${id}.png`, blob);
+        ensureCanvasWhite(c);
+        const blob = await new Promise(res => c.toBlob(res, 'image/png', 1.0));
+        if(blob) zip.file(`${id}.png`, blob);
       }
-      const content = await zip.generateAsync({ type: "blob" });
-      saveAs(content, `Charts_PNGs_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.zip`);
+      const content = await zip.generateAsync({type:'blob'});
+      saveAs(content, `Charts_PNGs_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.zip`);
     } catch(err){
-      console.error("PNG export failed", err);
-      alert("PNG export failed: " + err.message);
+      console.error("PNG ZIP failed:", err);
+      alert("PNG ZIP failed: " + err.message);
     }
   }
 
-  // Hook export buttons
-  document.getElementById('btnPrint').addEventListener('click', () => window.print());
-  document.getElementById('btnExportPDF').addEventListener('click', exportAllToPDF);
-  document.getElementById('btnExportPNGs').addEventListener('click', exportPNGsZip);
+  // CSV Export: create CSV from normalized rows or by chart data. Offer "all rows" CSV.
+  async function exportCSV_AllRows(){
+    try {
+      const raw = await fetchRecords();
+      if(!Array.isArray(raw) || raw.length === 0){
+        alert("No data to export");
+        return;
+      }
+      // build header union
+      const keys = new Set();
+      raw.forEach(r => Object.keys(r).forEach(k => keys.add(k)));
+      const header = Array.from(keys);
+      const rows = raw.map(r => header.map(h => {
+        const v = r[h];
+        if (v === null || v === undefined) return '';
+        return typeof v === 'string' ? v.replace(/"/g,'""') : String(v);
+      }));
+      let csv = '"' + header.join('","') + '"\n';
+      rows.forEach(r => csv += '"' + r.join('","') + '"\n');
 
-  // Init
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      saveAs(blob, `All_Rows_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`);
+    } catch(err){
+      console.error("CSV export failed", err);
+      alert("CSV export failed: " + err.message);
+    }
+  }
+
+  // small helper: export single chart dataset as CSV (labels + values)
+  function exportChartCSV(labels, values, filename){
+    const header = ['Label','Value'];
+    let csv = header.join(',') + '\n';
+    for(let i=0;i<labels.length;i++){
+      csv += `"${String(labels[i]).replace(/"/g,'""')}",${String(values[i]||0)}\n`;
+    }
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    saveAs(blob, filename);
+  }
+
+  // wire buttons
+  document.getElementById('btnExportPDF').addEventListener('click', exportToPDF);
+  document.getElementById('btnExportPNGs').addEventListener('click', exportPNGsZip);
+  document.getElementById('btnExportCSV').addEventListener('click', exportCSV_AllRows);
+  document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+
+  // Auto-refresh loop
+  let intervalHandle = null;
+  function startAutoRefresh(){
+    if(intervalHandle) clearInterval(intervalHandle);
+    intervalHandle = setInterval(() => {
+      buildCharts();
+    }, AUTO_REFRESH_MS);
+  }
+
+  // init
   (function init(){
-    document.getElementById('userName').innerText = localStorage.getItem('staffName') || '';
+    document.getElementById('userName').innerText = localStorage.getItem('staffName') || localStorage.getItem('username') || '';
     document.getElementById('logoutBtn').addEventListener('click', ()=> { localStorage.clear(); location.href='login.html'; });
+
+    // initial build
     buildCharts();
+    startAutoRefresh();
+    // also rebuild when tab becomes visible again (freshness)
+    document.addEventListener('visibilitychange', ()=> {
+      if(document.visibilityState === 'visible') buildCharts();
+    });
   })();
 
 })();
 </script>
 </body>
 </html>
-
-
-
