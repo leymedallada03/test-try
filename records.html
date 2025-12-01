@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>MDRRMO Records — Uniform Design</title>
+<title>Purok Kaligtasan — Household Records</title>
 <link rel="stylesheet" href="styles.css"/>
 <style>
 /* ====== Reuse the same look & feel as your dataForm basis ====== */
@@ -29,7 +29,6 @@
 .member-panel h3 { margin:0; font-size:18px; color:var(--green-1,#0f7a4a); }
 .member-panel .panel-body { margin-top:8px; }
 .member-panel .panel-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-
 .panel-overlay {
   position: fixed;
   inset: 0;
@@ -40,18 +39,13 @@
   z-index: 5900;
 }
 .panel-overlay.show { opacity: 1; pointer-events: auto; }
-
 .radio-line { display:flex; gap:18px; align-items:center; padding:6px 0; }
 .radio-item { display:flex; align-items:center; gap:6px; font-weight:700; font-size:14px; }
-
 .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; }
 .btn.secondary { background: transparent; color: #0f7a4a; border:1px solid rgba(6,30,20,0.06); }
 .card { padding:14px;border-radius:10px;background:#fff;margin-bottom:12px;box-shadow:0 6px 18px rgba(6,30,20,0.04); }
 .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
 .small-muted { font-size:13px; color:#666; }
-
-.brand .logo { width:44px; height:44px; object-fit:contain; }
-
 /* Records page specific */
 .green { color:#0f7a4a; font-weight:700; }
 
@@ -65,20 +59,17 @@
 }
 .toolbar-center { flex:1; display:flex; justify-content:center; }
 .toolbar-right { display:flex; align-items:center; gap:12px; }
-
 .search-box {
   padding:8px 12px;
   border-radius:8px;
   border:1px solid #bbb;
   min-width:260px;
 }
-
 .brgy-dropdown {
   padding:8px 10px;
   border-radius:8px;
   border:1px solid #ccc;
 }
-
 /* Icon Buttons */
 .icon-btn-lg {
   border:none;
@@ -94,10 +85,8 @@
 }
 .icon-btn-lg:hover { background:#e8ffee; }
 .icon-btn { border:0; background:none; cursor:pointer; padding:6px; border-radius:6px; }
-
 /* Refresh icon color */
 .icon-refresh svg path { fill:#0A8A15; }
-
 /* Export dropdown */
 .export-wrapper { position:relative; }
 .export-dropdown {
@@ -114,7 +103,6 @@
 .export-dropdown div { padding:10px 14px; cursor:pointer; }
 .export-dropdown div:hover { background:#effff5; }
 .hidden { display:none; }
-
 /* Table */
 .records-wrapper {
   overflow:auto;
@@ -122,14 +110,12 @@
   background:#fff;
   box-shadow:0 2px 5px rgba(0,0,0,0.05);
 }
-
 .records-table {
   width:100%;
   border-collapse:collapse;
   min-width:1100px;
   font-size:13px;
 }
-
 .records-table th,
 .records-table td {
   padding:8px 10px;
@@ -138,7 +124,6 @@
   height:36px; /* consistent row height */
   vertical-align:middle;
 }
-
 .records-table thead th {
   background:#f4f7f4;
   position:sticky;
@@ -146,22 +131,18 @@
   z-index:20;
   font-weight:700;
 }
-
 /* sticky columns */
 .select-col { position:sticky; left:0; background:#fff; z-index:25; padding-left:12px; }
 .actions-col { position:sticky; right:0; background:#fff; z-index:25; }
-
 /* Color coding */
 .mem-small { background:#d4f6ff; }
 .mem-normal { background:#d9ffd9; }
 .mem-large { background:#fff7c2; }
 .mem-critical { background:#ffd6d6; }
-
 /* Member rows should match head rows in height & font-size */
 .member-row { background:white; }
 .member-row.hidden { display:none; }
 .member-row td { padding-left:20px; font-size:13px; color:#444; height:36px; }
-
 /* members toggle */
 .members-toggle-btn {
   padding:4px 6px;
@@ -172,34 +153,33 @@
   color:#0a6a9a;
 }
 .members-toggle-btn:hover { text-decoration:underline; }
-
 /* action icons */
 .action-icon { font-size:16px; line-height:1; }
-
 /* small counts text */
 .top-stats strong { font-size:13px; }
-
 /* pagination */
 #paginationArea { text-align:center; margin-top:16px; }
 .page-btn { padding:6px 12px; margin:0 3px; border-radius:6px; border:1px solid #ccc; background:white; cursor:pointer; }
 .page-btn.active { background:#0f7a4a; color:white; font-weight:bold; }
-
 /* responsive tweaks */
 @media(max-width:900px){ .form-grid { grid-template-columns:1fr; } .member-panel{ width:100%; } }
 </style>
 </head>
 <body>
 <div class="page-container">
+
   <header class="topbar">
     <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
-    <div class="brand" style="display:flex;align-items:center;gap:12px;">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
+
+    <div class="brand">
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
       <div>
         <div class="title">PUROK KALIGTASAN</div>
         <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
       </div>
     </div>
-    <div class="user-info" style="margin-left:auto;">
+
+    <div class="user-info">
       <span id="userName"></span>
       <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
@@ -643,6 +623,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
 
 
 
