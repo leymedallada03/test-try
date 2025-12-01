@@ -13,9 +13,28 @@
 }
 body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0;background:#f6f8f7;color:#102015}
 .page-container{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
-.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#fff;box-shadow:0 2px 8px rgba(6,30,20,0.04);position:sticky;top:0;z-index:100}
+.topbar{
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 14px;
+  border-radius:var(--radius);
+  background: linear-gradient(90deg, rgba(15,122,74,0.96), rgba(52,183,143,0.95));
+  color:#fff;
+  box-shadow:0 6px 20px rgba(5,40,25,0.12);
+  position:relative;
+  z-index:40; /* ensure topbar sits above sidebar on smaller screens */
+}
 .brand{display:flex;gap:12px;align-items:center}
-.logo{width:44px;height:44px;object-fit:contain}
+.brand .logo{
+  width:56px;height:56px;border-radius:10px;background:rgba(255,255,255,0.12);
+  display:inline-flex;align-items:center;justify-content:center;backdrop-filter: blur(4px);
+  border:1px solid rgba(255,255,255,0.08);
+  object-fit:contain;
+}
+.title{font-weight:700;font-size:18px;line-height:1}
+.subtitle{font-size:13px;opacity:0.95}
 .sidebar{background:#fff;padding:18px;border-right:1px solid rgba(6,30,20,0.04)}
 .sidebar ul{list-style:none;padding:0;margin:0}
 .sidebar li{margin:8px 0}
@@ -35,8 +54,6 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
 .radio-line{display:flex;gap:8px}
 .icon-btn{border:0;background:transparent;cursor:pointer}
 .actions-row{display:flex;gap:8px;justify-content:flex-end}
-@media (max-width:900px){ .page-container{grid-template-columns:1fr} .sidebar{display:none} }
-.hidden{display:none}
 .assistance-grid {
   display:grid;
   grid-template-columns: repeat(2, 1fr);
@@ -52,6 +69,9 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
   font-weight:600;
   color:#0b4630;
 }
+@media (max-width:900px){ .page-container{grid-template-columns:1fr} .sidebar{display:none} }
+.hidden{display:none}
+
 </style>
 </head>
 <body>
@@ -820,3 +840,4 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
