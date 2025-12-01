@@ -6,35 +6,6 @@
   <title>Purok Kaligtasan — Charts</title>
   <link rel="stylesheet" href="styles.css"/>
   <style>
-    :root{
-      --green-1: #0F7A4A;
-      --muted: #6b7176;
-      --card-grad: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,255,250,0.96));
-    }
-    body{ font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; background:#f6fbf8; color:#0b2b1f }
-    .page-container{ min-height:100vh; display:flex; }
-    header.topbar{
-      position:fixed; left:0; right:0; top:0; height:64px;
-      display:flex; align-items:center; gap:14px; padding:10px 18px;
-      background: white; box-shadow: 0 6px 20px rgba(6,30,20,0.04); z-index:60;
-    }
-    .brand{ display:flex; gap:12px; align-items:center }
-    .logo{ width:44px; height:44px; object-fit:contain }
-    .title{ font-weight:800; font-size:15px; color:var(--green-1) }
-    .subtitle{ font-size:12px; color:var(--muted) }
-
-    .sidebar{
-      width:220px; margin-top:64px; padding:18px; background:transparent;
-      position:fixed; left:0; top:64px; bottom:0;
-    }
-    .sidebar ul{ list-style:none; padding:0; margin:0; }
-    .sidebar li{ margin-bottom:10px }
-    .sidebar a{ text-decoration:none; color:#123; display:block; padding:8px 10px; border-radius:8px }
-    .sidebar a.active{ background: linear-gradient(90deg,#f0fff5,#ecfff1); font-weight:700; color:var(--green-1) }
-
-    main.content-area{
-      flex:1; margin-left:240px; padding:92px 28px 48px 28px;
-    }
 
     h2{ margin:0 0 6px 0; font-size:20px }
     .small.muted{ color:var(--muted); margin-bottom:6px }
@@ -106,7 +77,7 @@
 <div class="page-container">
 
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
+    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
 
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
@@ -116,10 +87,8 @@
       </div>
     </div>
 
-    <div style="margin-left:auto; display:flex; gap:12px; align-items:center">
-      <div class="user-info">
-        <span id="userName"></span>
-      </div>
+    <div class="user-info">
+      <span id="userName"></span>
       <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
   </header>
@@ -127,9 +96,9 @@
   <aside class="sidebar" id="sidebar">
     <ul>
       <li><a href="dashboard.html">📊 Dashboard</a></li>
-      <li><a href="dataForm.html">📝 Data Entry</a></li>
+      <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
       <li><a href="records.html">📁 Records</a></li>
-      <li><a href="charts.html" class="active">📈 Charts</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
       <li class="admin-only"><a href="users.html">👥 User Management</a></li>
     </ul>
   </aside>
@@ -598,4 +567,5 @@
 </script>
 </body>
 </html>
+
 
