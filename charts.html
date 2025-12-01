@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Purok Kaligtasan — Charts</title>
+  <title>Purok Kaligtasan — Graphical Data Representation</title>
   <link rel="stylesheet" href="styles.css"/>
   <style>
 
@@ -164,6 +164,40 @@
 
   // container for Chart instances so we can destroy them on re-render
   const CHARTS = {};
+  // Modern Government Dashboard Palette
+const COLORSET = {
+  greenTop:  "rgba(46, 204, 113, 0.95)",
+  greenBot:  "rgba(39, 174, 96, 0.85)",
+  greenLine: "#27ae60",
+
+  blueTop:   "rgba(52, 152, 219, 0.95)",
+  blueBot:   "rgba(41, 128, 185, 0.85)",
+  blueLine:  "#2980b9",
+
+  // Teal + Cyan for doughnuts
+  doughnut: [
+    "#1abc9c","#16a085","#48c9b0","#76d7c4","#b2f7e9"
+  ],
+
+  // PWD colors (muted)
+  pwd: [
+    "#3498db", // Yes
+    "#95a5a6", // No
+    "#bdc3c7"  // Unknown
+  ],
+
+  // Status colors (gray + accents)
+  status: [
+    "#2ecc71","#3498db","#9b59b6","#e67e22","#95a5a6"
+  ],
+
+  // Assistance palette (professional)
+  assistance: [
+    "#1abc9c","#3498db","#9b59b6","#f1c40f",
+    "#e67e22","#2ecc71","#e74c3c","#34495e","#16a085"
+  ]
+};
+
 
   /*******************
    * Utilities
@@ -410,11 +444,11 @@
       const brLabels = brEntries.map(e => e[0]);
       const brCounts = brEntries.map(e => e[1]);
       drawBar("chartBarangay", brLabels, brCounts, {
-  label: "Evacuees",
-  topColor: "rgba(52,183,143,0.95)",   // green
-  botColor: "rgba(15,122,74,0.85)",     // green darker
-  borderColor: "#0f7a4a"
+  topColor: COLORSET.greenTop,
+  botColor: COLORSET.greenBot,
+  borderColor: COLORSET.greenLine
 });
+
 
 
       // 2) Age groups
@@ -429,11 +463,10 @@
         ageBuckets[ ageBucket(n) ] = (ageBuckets[ ageBucket(n) ] || 0) + 1;
       });
       drawBar("chartAgeGroup", Object.keys(ageBuckets), Object.values(ageBuckets), {
-  topColor: "rgba(79,129,255,0.95)",   // blue
-  botColor: "rgba(52,83,255,0.85)",    // blue darker
-  borderColor: "#2557d6"
+  topColor: COLORSET.blueTop,
+  botColor: COLORSET.blueBot,
+  borderColor: COLORSET.blueLine
 });
-
 
       // 3) Stage distribution (doughnut)
       const stageMap = {};
@@ -441,7 +474,8 @@
         const s = n.stage || "Unspecified";
         stageMap[s] = (stageMap[s]||0) + 1;
       });
-      drawDoughnut("chartStage", Object.keys(stageMap), Object.values(stageMap));
+      drawDoughnut("chartStage", Object.keys(stageMap), Object.values(stageMap), COLORSET.doughnut);
+
 
       // 4) PWD
       const pwdCounts = { Yes:0, No:0, Unknown:0 };
@@ -451,7 +485,8 @@
         else if(v === "no" || v === "n" || v === "") pwdCounts.No++;
         else pwdCounts.Unknown++;
       });
-      drawDoughnut("chartPWD", Object.keys(pwdCounts), Object.values(pwdCounts));
+      drawDoughnut("chartPWD", Object.keys(pwdMap), Object.values(pwdMap), COLORSET.pwd);
+
 
       // 5) Status distribution
       const statusMap = {};
@@ -459,7 +494,8 @@
         const s = n.status || "Unspecified";
         statusMap[s] = (statusMap[s]||0) + 1;
       });
-      drawDoughnut("chartStatus", Object.keys(statusMap), Object.values(statusMap));
+      drawDoughnut("chartPWD", Object.keys(pwdMap), Object.values(pwdMap), COLORSET.pwd);
+
 
       // 6) Government support
       const assistKeys = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
@@ -475,7 +511,7 @@
           }
         });
       });
-      drawHorizontalBar("chartSupport", assistKeys, assistKeys.map(k => assistCounts[k]));
+      drawHBar("chartSupport", Object.keys(assistMap), Object.values(assistMap), COLORSET.assistance);
 
     } catch(err){
       console.error("buildCharts error", err);
@@ -567,5 +603,6 @@
 </script>
 </body>
 </html>
+
 
 
