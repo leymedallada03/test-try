@@ -9,7 +9,6 @@
 <body>
 <div class="page-container">
 
-  <!-- HEADER -->
   <header class="topbar">
     <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
 
@@ -27,7 +26,6 @@
     </div>
   </header>
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <ul>
       <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
@@ -38,21 +36,18 @@
     </ul>
   </aside>
 
-  <!-- CONTENT -->
-  <main class="content-area">
+  <main class="content-area" tabindex="-1">
     <h2>📊 Dashboard Overview</h2>
 
-    <!-- TOP CARDS -->
     <div class="dashboard-cards">
-
       <div class="card">
         <h3>Total Household Heads</h3>
-        <div id="totalHHHeads" class="card-value">0</div>
+        <div id="totalHeads" class="card-value">0</div>
       </div>
 
       <div class="card">
         <h3>Total Household Members</h3>
-        <div id="totalHHMembers" class="card-value">0</div>
+        <div id="totalMembers" class="card-value">0</div>
       </div>
 
       <div class="card">
@@ -64,109 +59,114 @@
         <h3>Last Updated</h3>
         <div id="lastUpdated" class="card-value">---</div>
       </div>
-
     </div>
 
-    <!-- CHART: Household per Barangay -->
     <div class="card">
-      <h3>Households Per Barangay (Household Heads)</h3>
-      <canvas id="chartHHHeadBrgy" height="140"></canvas>
-    </div>
-
-    <!-- CHART: Members per Barangay -->
-    <div class="card">
-      <h3>Household Members Per Barangay</h3>
-      <canvas id="chartHHMemberBrgy" height="140"></canvas>
+      <h3>Household Distribution per Barangay</h3>
+      <canvas id="barangayChart" height="140"></canvas>
     </div>
 
   </main>
 
 </div>
 
-<!-- CHART.JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
 
 <script>
-/* DASHBOARD JS */
+/* DASHBOARD LOGIC */
 document.addEventListener("DOMContentLoaded", async () => {
+  // Auth check
   if (!localStorage.getItem("loggedIn")) return location.href = "login.html";
 
-  document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
-  document.getElementById("assignedBarangay").innerText = localStorage.getItem("assignedBarangay") || '---';
+  document.getElementById("assignedBarangay").innerText =
+    localStorage.getItem("assignedBarangay") || '---';
+  document.getElementById("userName").innerText =
+    localStorage.getItem("staffName") || "";
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.clear();
+    location.href = "login.html";
+  });
 
   try {
-    const data = await apiGet({ action: "list" });
-    document.getElementById("lastUpdated").innerText = new Date().toLocaleString();
+    // === FIXED: call getRecords instead of list ===
+    const response = await apiGet({ action: "getRecords" });
 
-    // --------------------------
-    // TOTAL HOUSEHOLD HEADS + MEMBERS
-    // --------------------------
-    const totalHeads = data.length;
-    let totalMembers = 0;
+    if (!response || !response.rows) {
+      console.error("Invalid API response:", response);
+      return;
+    }
 
-    data.forEach(r => {
-      const num = Number(r["No. of Household Member/s"]) || 0;
-      totalMembers += num;
+    const rows = response.rows;
+
+    // Count heads and members
+    let headCount = 0;
+    let memberCount = 0;
+
+    rows.forEach(r => {
+      if (String(r["RelationToHead"] || "").toLowerCase() === "head") {
+        headCount++;
+      } else {
+        memberCount++;
+      }
     });
 
-    document.getElementById("totalHHHeads").innerText = totalHeads;
-    document.getElementById("totalHHMembers").innerText = totalMembers;
+    document.getElementById("totalHeads").innerText = headCount;
+    document.getElementById("totalMembers").innerText = memberCount;
 
-    // --------------------------
-    // PER BARANGAY CALCULATIONS
-    // --------------------------
-    const headPerBrgy = {};
-    const memberPerBrgy = {};
+    // Last updated time
+    document.getElementById("lastUpdated").innerText =
+      new Date().toLocaleString();
 
-    data.forEach(r => {
-      const brgy = r.Barangay || "Unknown";
-      const members = Number(r["No. of Household Member/s"]) || 0;
+    // Barangay distribution (heads + members)
+    const barangayMap = {};
 
-      // household head count
-      headPerBrgy[brgy] = (headPerBrgy[brgy] || 0) + 1;
+    rows.forEach(r => {
+      const b = r["Barangay"] || "Unknown";
+      if (!barangayMap[b]) barangayMap[b] = { heads: 0, members: 0 };
 
-      // household member count
-      memberPerBrgy[brgy] = (memberPerBrgy[brgy] || 0) + members;
+      if (String(r["RelationToHead"] || "").toLowerCase() === "head") {
+        barangayMap[b].heads++;
+      } else {
+        barangayMap[b].members++;
+      }
     });
 
-    const brgyLabels = Object.keys(headPerBrgy);
+    const brgyLabels = Object.keys(barangayMap);
+    const brgyHeads = brgyLabels.map(b => barangayMap[b].heads);
+    const brgyMembers = brgyLabels.map(b => barangayMap[b].members);
 
-    // --------------------------
-    // CHART 1 — Household heads per barangay
-    // --------------------------
-    new Chart(document.getElementById("chartHHHeadBrgy"), {
+    // Draw chart
+    const ctx = document.getElementById("barangayChart").getContext("2d");
+
+    new Chart(ctx, {
       type: "bar",
       data: {
         labels: brgyLabels,
-        datasets: [{
-          label: "Household Heads",
-          data: brgyLabels.map(b => headPerBrgy[b]),
-          backgroundColor: "#0f7a4a"
-        }]
+        datasets: [
+          {
+            label: "Household Heads",
+            data: brgyHeads,
+            backgroundColor: "#2b9348"
+          },
+          {
+            label: "Household Members",
+            data: brgyMembers,
+            backgroundColor: "#55a630"
+          }
+        ]
       },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
-    });
-
-    // --------------------------
-    // CHART 2 — Household members per barangay
-    // --------------------------
-    new Chart(document.getElementById("chartHHMemberBrgy"), {
-      type: "bar",
-      data: {
-        labels: brgyLabels,
-        datasets: [{
-          label: "Household Members",
-          data: brgyLabels.map(b => memberPerBrgy[b]),
-          backgroundColor: "#3498db"
-        }]
-      },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
     });
 
   } catch (err) {
-    console.error(err);
-    alert("Error loading dashboard data");
+    console.error("Dashboard Error:", err);
   }
 });
 </script>
