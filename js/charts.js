@@ -1,17 +1,23 @@
-// js/charts.js — polished charts for Purok Kaligtasan
-// Replace this URL if your deployment URL differs
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+/* charts.js — updated to produce:
+   - Barangay (people per barangay)
+   - Age distribution (numeric buckets)
+   - Stage distribution (separate)
+   - PWD (Yes / No)
+   - Status distribution
+   - Assistance (combined horizontal bar)
+*/
+
+const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec"; // your deployment
 
 let charts = {};
 
 window.addEventListener('load', async () => {
-  // basic auth guard (your site stores loggedIn)
   if (!localStorage.getItem("loggedIn")) {
-    // redirect to main/login if not logged
+    // if your app uses main.html or login page, adjust accordingly
     // location.href = "login.html";
-  } else {
-    document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
   }
+
+  document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
 
   document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.clear();
@@ -22,384 +28,297 @@ window.addEventListener('load', async () => {
   document.getElementById("btnExportPDF").addEventListener("click", exportAllToPDF);
   document.getElementById("btnExportPNGs").addEventListener("click", exportAllPNGsZip);
 
+  document.getElementById("loader").style.display = 'block';
   await loadAndRender();
+  document.getElementById("loader").style.display = 'none';
 });
 
-/* ---------- helpers: parse date strings robustly ---------- */
-function parseDateFlexible(v) {
-  if (!v && v !== 0) return null;
-  // If already a Date object
-  if (Object.prototype.toString.call(v) === '[object Date]') {
-    if (isNaN(v)) return null;
-    return v;
-  }
-  const s = String(v).trim();
-  if (!s) return null;
-
-  // ISO-like: 2025-11-04T16:00:00.000Z
-  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
-    const d = new Date(s);
-    return isNaN(d) ? null : d;
-  }
-
-  // yyyy-mm-dd
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-    const parts = s.split('-');
-    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-  }
-
-  // dd/mm/yyyy
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
-    const p = s.split('/');
-    // ambiguous: treat as dd/mm/yyyy (your sheet uses DD/MM/YYYY)
-    return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
-  }
-
-  // mm/dd/yyyy fallback
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
-    const p = s.split('/');
-    return new Date(Number(p[2]), Number(p[0]) - 1, Number(p[1]));
-  }
-
-  // last-ditch parse
-  const d = new Date(s);
-  return isNaN(d) ? null : d;
-}
-
-function computeAgeYearsMonthsFromDate(d) {
-  if (!d) return null;
-  const now = new Date();
-  let years = now.getFullYear() - d.getFullYear();
-  const m = now.getMonth() - d.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) years--;
-  if (years < 0) years = 0;
-  // months when <1 year
-  const months = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
-  return { years: years, months: months < 0 ? 0 : months };
-}
-
-/* ---------- load data ---------- */
-async function loadAndRender() {
+async function loadAndRender(){
   try {
-    const url = SCRIPT_URL + "?action=getRecords";
-    const res = await fetch(url);
-    const json = await res.json();
-    if (!json || !json.success) {
-      console.error("No data or API error", json);
+    // fetch records using your existing API
+    const res = await fetch(API_URL + "?action=getRecords");
+    const j = await res.json();
+    if (!j || !j.success) {
+      console.error("Failed to fetch records:", j);
       return;
     }
-    const rows = json.rows || [];
+    const rows = j.rows || [];
 
-    // rows are raw sheet rows — can be heads + members; we'll treat each row as a person row
-    const persons = rows.map(r => {
-      // prefer keys as they come from sheet (header names)
-      // normalize field names
-      const obj = {};
-      for (const k in r) {
-        obj[k] = r[k];
+    // Build stats
+    const barangayCounts = {};
+    const pwd = { Yes: 0, No: 0 };
+    const statusCounts = {};
+    const assistanceList = [
+      "TUPAD",
+      "Local 4Ps",
+      "National 4Ps",
+      "Local Social Pension",
+      "National Social Pension",
+      "Solo Parent Assistance",
+      "Cash Subsidy",
+      "Relief Goods",
+      "AICS"
+    ];
+    const assistCounts = assistanceList.reduce((acc,k)=> (acc[k]=0,acc), {});
+    // Age buckets: "<1" (infant months), "1-4", "5-12", "13-17", "18-59", "60+"
+    const ageBuckets = {"<1":0, "1-4":0, "5-12":0, "13-17":0, "18-59":0, "60+":0};
+    const stageCounts = {}; // use Stage field if present; fallback derive from birthdate/age
+
+    // helper: parse age or birthdate
+    function computeAgeFromValue(ageVal, birthVal){
+      // prefer numeric ageVal if present and not empty
+      const a = parseInt(ageVal,10);
+      if (!isNaN(a)) return a;
+      // try parse birthVal (could be DD/MM/YYYY or yyyy-mm-dd or Date object)
+      if (!birthVal) return null;
+      const s = String(birthVal).trim();
+      // If sheet stored DD/MM/YYYY convert to yyyy-mm-dd
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)){
+        const parts = s.split('/');
+        const dd = parts[0], mm = parts[1], yy = parts[2];
+        const dt = new Date(`${yy}-${mm}-${dd}T00:00:00`);
+        if (!isNaN(dt)) return calcYears(dt);
       }
-      // parse birthdate with fallback to Age field
-      const bd = parseDateFlexible(r["Birthdate"] || r["birthdate"] || r["Birth Date"] || "");
-      obj.__birthdateParsed = bd;
-      // Age numeric if present and not parsed
-      const ageNum = Number(r["Age"] || r["age"] || "");
-      obj.__ageFromField = (!isNaN(ageNum) ? ageNum : null);
-      return obj;
-    });
+      // if stored ISO-like string
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)){
+        const dt = new Date(s);
+        if (!isNaN(dt)) return calcYears(dt);
+      }
+      // try Date parse fallback
+      const dt2 = new Date(s);
+      if (!isNaN(dt2)) return calcYears(dt2);
+      return null;
+    }
+    function calcYears(d){
+      const now = new Date();
+      let years = now.getFullYear() - d.getFullYear();
+      const m = now.getMonth() - d.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < d.getDate())) years--;
+      return years;
+    }
 
-    buildAndDrawCharts(persons);
+    function deriveStageFromAgeOrField(ageNum, stageField){
+      if (stageField && String(stageField).trim()) return String(stageField);
+      if (ageNum === null || ageNum === undefined) return "";
+      if (ageNum === 0) return "Infant";
+      if (ageNum <= 12) return "Children";
+      if (ageNum <= 17) return "School Children";
+      if (ageNum >= 60) return "Elderly";
+      return "Adult";
+    }
+
+    // iterate rows — each row corresponds to a person (head rows have blank "Name of Household Member/s" but still a person)
+    for (const r of rows) {
+      const barangay = String(r["Barangay"] || r["barangay"] || "Unknown").trim();
+      barangayCounts[barangay] = (barangayCounts[barangay] || 0) + 1;
+
+      // PWD
+      const vpwd = String(r["Persons with Disability (PWD)"] || r["PWD"] || "").toLowerCase();
+      if (vpwd === "yes" || vpwd === "y" || vpwd === "true") pwd.Yes++; else pwd.No++;
+
+      // Status
+      const st = String(r["Status"] || "").trim() || "Unspecified";
+      statusCounts[st] = (statusCounts[st] || 0) + 1;
+
+      // Assistance counts (check exact header names)
+      assistanceList.forEach(k=>{
+        const val = String(r[k] || r[k.replace(/ /g,'')] || "").toString().trim();
+        if (!val) return;
+        // For AICS, many entries might be text (Shelter Assistance etc.) — count non-empty as 1 per person per AICS
+        if (k === "AICS") {
+          if (val !== "") assistCounts[k] += 1;
+        } else {
+          // treat yes or "Yes" as count
+          if (val.toLowerCase() === "yes" || val.toLowerCase() === "y" || val.toLowerCase() === "true") assistCounts[k] += 1;
+        }
+      });
+
+      // Age
+      const ageNum = computeAgeFromValue(r["Age"], r["Birthdate"] || r["Birth Date"] || r["birthdate"]);
+      // bucket
+      if (ageNum === null || isNaN(ageNum)) {
+        // if we cannot compute age, try to inspect birthdate for months (<1)
+        const b = r["Birthdate"] || r["birthdate"] || r["Birth Date"];
+        if (b && /^\d{2}\/\d{2}\/\d{4}$/.test(String(b).trim())) {
+          // compute months
+          const parts = String(b).trim().split('/');
+          const dt = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+          if (!isNaN(dt)) {
+            const months = monthDiff(dt, new Date());
+            if (months < 12) { ageBuckets["<1"]++; }
+            else {
+              const yrs = Math.floor(months/12);
+              bucketByYears(yrs);
+            }
+          }
+        }
+      } else {
+        bucketByYears(ageNum);
+      }
+
+      // Stage
+      const stageField = r["Stage"] || r["stage"] || "";
+      const stage = deriveStageFromAgeOrField(ageNum, stageField);
+      if (stage) stageCounts[stage] = (stageCounts[stage] || 0) + 1;
+    }
+
+    // helpers
+    function monthDiff(d1, d2) {
+      let months = (d2.getFullYear() - d1.getFullYear()) * 12;
+      months += d2.getMonth() - d1.getMonth();
+      if (d2.getDate() < d1.getDate()) months--;
+      return months;
+    }
+    function bucketByYears(yrs){
+      if (yrs < 1) ageBuckets["<1"]++;
+      else if (yrs <= 4) ageBuckets["1-4"]++;
+      else if (yrs <= 12) ageBuckets["5-12"]++;
+      else if (yrs <= 17) ageBuckets["13-17"]++;
+      else if (yrs <= 59) ageBuckets["18-59"]++;
+      else ageBuckets["60+"]++;
+    }
+
+    // Draw charts
+    drawBarangayChart(barangayCounts);
+    drawBarChart('chartAge', ageBuckets, 'Age');
+    drawPieChart('chartStage', stageCounts, 'Stage');
+    drawPieChart('chartPWD', { Yes: pwd.Yes, No: pwd.No }, 'PWD');
+    drawPieChart('chartStatus', statusCounts, 'Status');
+    drawHorizontalBar('chartAssistance', assistCounts, 'Assistance Received (counts)');
+
   } catch (err) {
     console.error("loadAndRender error", err);
   }
 }
 
-/* ---------- build stats and draw ---------- */
-function buildAndDrawCharts(rows) {
-  // 1) Entry per Barangay
-  const barangayCounts = {};
-  rows.forEach(r => {
-    const b = String(r["Barangay"] || r["barangay"] || "").trim() || "Unknown";
-    barangayCounts[b] = (barangayCounts[b] || 0) + 1;
-  });
+/* ---------------- CHART DRAWING HELPERS ---------------- */
 
-  // 2) Age groups: Infant (0-11 months), School Children (1-17), Adult (18-59), Elderly (60+)
-  const ageGroupCounts = { Infant: 0, "School Children": 0, Adult: 0, Elderly: 0 };
+function drawBarangayChart(counts) {
+  const labels = Object.keys(counts).sort();
+  const data = labels.map(k => counts[k] || 0);
 
-  // 3) Stage distribution (use Stage column if present)
-  const stageCounts = {};
+  const ctx = document.getElementById('chartBarangay').getContext('2d');
+  if (charts.chartBarangay) charts.chartBarangay.destroy();
 
-  // 4) PWD
-  const pwdCounts = { Yes: 0, No: 0 };
-
-  // 5) Status
-  const statusCounts = {};
-
-  // 6) Government support combined
-  const supportKeys = [
-    "TUPAD",
-    "Local 4Ps",
-    "National 4Ps",
-    "Local Social Pension",
-    "National Social Pension",
-    "Solo Parent Assistance",
-    "Cash Subsidy",
-    "Relief Goods",
-    "AICS"
-  ];
-  const supportCounts = {};
-  supportKeys.forEach(k => supportCounts[k] = 0);
-
-  rows.forEach(r => {
-    // age: prefer parsed birthdate, fallback to Age column
-    let ageYears = null;
-    let ageMonths = null;
-    if (r.__birthdateParsed) {
-      const am = computeAgeYearsMonthsFromDate(r.__birthdateParsed);
-      ageYears = am.years;
-      ageMonths = am.months;
-    } else if (r.__ageFromField !== null) {
-      ageYears = r.__ageFromField;
-      ageMonths = (r.__ageFromField === 0 ? 0 : null);
-    }
-
-    // classify age group
-    if (ageYears === 0 || (ageYears === 0 && ageMonths !== null)) {
-      // infant if explicitly <1 year — we also check months
-      ageGroupCounts.Infant++;
-    } else if (ageYears !== null && ageYears <= 17) {
-      ageGroupCounts["School Children"]++;
-    } else if (ageYears !== null && ageYears <= 59) {
-      ageGroupCounts.Adult++;
-    } else if (ageYears !== null && ageYears >= 60) {
-      ageGroupCounts.Elderly++;
-    } else {
-      // unknown - try Stage field for classification (fallback)
-      const st = String(r["Stage"] || "").trim();
-      if (st.toLowerCase().includes("infant")) ageGroupCounts.Infant++;
-      else if (st) ageGroupCounts.Adult++; // fallback to adult
-    }
-
-    // Stage
-    const stage = String(r["Stage"] || r["stage"] || "").trim() || "Unknown";
-    stageCounts[stage] = (stageCounts[stage] || 0) + 1;
-
-    // PWD
-    const pwd = String(r["Persons with Disability (PWD)"] || r["PWD"] || "").trim().toLowerCase();
-    if (pwd === "yes" || pwd === "y" || pwd === "true") pwdCounts.Yes++;
-    else pwdCounts.No++;
-
-    // Status
-    const stt = String(r["Status"] || "").trim() || "Unknown";
-    statusCounts[stt] = (statusCounts[stt] || 0) + 1;
-
-    // Support flags (count Yes or non-empty AICS)
-    supportKeys.forEach(k => {
-      const val = String(r[k] || r[k.toLowerCase()] || "").toString().trim();
-      if (k === "AICS") {
-        if (val) supportCounts[k]++;
-      } else {
-        if (val.toLowerCase() === "yes" || val.toLowerCase() === "y" || val === "TRUE") supportCounts[k]++;
-      }
-    });
-  });
-
-  // Draw charts
-  drawBarChart('chartBarangay', barangayCounts, 'Evacuees per Barangay');
-  drawBarChart('chartAgeGroup', ageGroupCounts, 'Age Groups', {rounded: true});
-  drawDoughnut('chartStage', stageCounts, 'Stage Distribution');
-  drawDoughnut('chartPWD', pwdCounts, 'PWD (Yes / No)');
-  drawDoughnut('chartStatus', statusCounts, 'Status Distribution');
-  drawHorizontalBar('chartSupport', supportCounts, 'Government Support counts');
-}
-
-/* ---------- chart helpers ---------- */
-function createGradient(ctx, topColor, bottomColor) {
-  const g = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
-  g.addColorStop(0, topColor);
-  g.addColorStop(1, bottomColor);
-  return g;
-}
-
-function drawBarChart(canvasId, countsObj, label, opts = {}) {
-  const labels = Object.keys(countsObj).sort();
-  const data = labels.map(l => countsObj[l] || 0);
-
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
-  if (charts[canvasId]) charts[canvasId].destroy();
-
-  // gradient
-  const grad = createGradient(ctx, 'rgba(52,183,143,0.95)', 'rgba(15,122,74,0.95)');
-
-  charts[canvasId] = new Chart(ctx, {
+  charts.chartBarangay = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [{
-        label,
+        label: 'Persons',
         data,
-        backgroundColor: labels.map(() => grad),
-        borderColor: labels.map(() => '#0f7a4a'),
-        borderWidth: 1,
-        borderRadius: opts.rounded ? 12 : 4,
-        barPercentage: 0.7
+        backgroundColor: labels.map(()=>'rgba(52,183,143,0.8)'),
+        borderColor: labels.map(()=> '#0f7a4a'),
+        borderWidth: 1
       }]
     },
     options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => `${ctx.dataset.label || ''}: ${ctx.parsed.y ?? ctx.parsed || ''}`
-          }
-        }
-      },
+      responsive:true,
+      plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+        x: { ticks: { autoSkip: false } }
       }
     }
   });
 }
 
-function drawDoughnut(canvasId, countsObj, title) {
-  const labels = Object.keys(countsObj).filter(k => k !== null);
-  const data = labels.map(l => countsObj[l] || 0);
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
+function drawPieChart(canvasId, countsObj, title){
+  const labels = Object.keys(countsObj).filter(k => countsObj[k] > 0);
+  const data = labels.map(k => countsObj[k] || 0);
+  const ctx = document.getElementById(canvasId).getContext('2d');
   if (charts[canvasId]) charts[canvasId].destroy();
-
-  const colors = labels.map((_, i) => `hsl(${(i*45) % 360} 70% 55%)`);
 
   charts[canvasId] = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: colors,
-        borderColor: '#fff',
-        borderWidth: 2
-      }]
+      labels, datasets: [{ data, backgroundColor: labels.map((_,i)=>`hsl(${(i*50)%360} 70% 50%)`), borderWidth:0 }]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'bottom' },
-        tooltip: { mode: 'index' }
-      },
-      cutout: '45%'
-    }
+    options: { responsive:true, plugins:{ legend:{ position:'bottom' } } }
   });
 }
 
-function drawHorizontalBar(canvasId, countsObj, title) {
+function drawBarChart(canvasId, countsObj, title) {
   const labels = Object.keys(countsObj);
-  const data = labels.map(l => countsObj[l] || 0);
+  const data = labels.map(k => countsObj[k] || 0);
 
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
+  const ctx = document.getElementById(canvasId).getContext('2d');
   if (charts[canvasId]) charts[canvasId].destroy();
 
-  // create gradient per bar
-  const bg = labels.map((_, i) => {
-    // make pleasing palette
-    const hue = (i * 30) % 360;
-    return `hsl(${hue} 70% 50%)`;
+  charts[canvasId] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: title, data, backgroundColor: labels.map(()=> 'rgba(79,176,131,0.85)'), borderColor: labels.map(()=> '#0f7a4a'), borderWidth:1 }] },
+    options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } } }
   });
+}
+
+function drawHorizontalBar(canvasId, countsObj, title){
+  const labels = Object.keys(countsObj);
+  const data = labels.map(k => countsObj[k] || 0);
+
+  // Sort descending so largest assistance shows on top
+  const combined = labels.map((l,i)=>({label:l, value:data[i]})).sort((a,b)=>b.value-a.value);
+  const sortedLabels = combined.map(c=>c.label);
+  const sortedData = combined.map(c=>c.value);
+
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  if (charts[canvasId]) charts[canvasId].destroy();
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels,
-      datasets: [{
-        label: title,
-        data,
-        backgroundColor: bg,
-        borderWidth: 0,
-        borderRadius: 8
-      }]
+      labels: sortedLabels,
+      datasets: [{ label: title, data: sortedData, backgroundColor: sortedLabels.map(()=> 'rgba(52,183,143,0.85)'), borderColor: sortedLabels.map(()=> '#0f7a4a'), borderWidth:1 }]
     },
     options: {
       indexAxis: 'y',
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => `${ctx.label}: ${ctx.parsed.x ?? ctx.parsed}`
-          }
-        }
-      },
-      scales: {
-        x: { beginAtZero: true, ticks: { stepSize: 1 } }
-      }
+      responsive:true,
+      plugins: { legend: { display:false } },
+      scales: { x: { beginAtZero: true, ticks: { stepSize:1 } } }
     }
   });
 }
 
-/* ---------- export helpers (PDF / PNG ZIP) ---------- */
+/* ---------------- EXPORT / PRINT ---------------- */
+
 async function exportAllToPDF() {
   try {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape' });
-
-    const ids = [
-      'chartBarangay',
-      'chartAgeGroup',
-      'chartStage',
-      'chartPWD',
-      'chartStatus',
-      'chartSupport'
-    ];
-
+    const ids = ['chartBarangay','chartAge','chartStage','chartPWD','chartStatus','chartAssistance'];
     let page = 0;
-    for (const id of ids) {
+    for (const id of ids){
       const canvas = document.getElementById(id);
       if (!canvas) continue;
       const img = canvas.toDataURL("image/jpeg", 0.95);
       if (page > 0) doc.addPage();
       const w = doc.internal.pageSize.getWidth();
       const h = doc.internal.pageSize.getHeight();
-      const margin = 18;
+      const margin = 12;
       doc.addImage(img, 'JPEG', margin, margin, w - margin*2, h - margin*2);
       page++;
     }
-
-    doc.save(`Charts_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`);
+    doc.save(`Charts_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`);
   } catch (err) {
-    console.error("PDF export error", err);
-    alert("PDF export failed: " + err.message);
+    console.error("PDF export failed", err);
+    alert("PDF export failed: " + (err.message||err));
   }
 }
 
 async function exportAllPNGsZip() {
   try {
     const zip = new JSZip();
-    const ids = [
-      'chartBarangay',
-      'chartAgeGroup',
-      'chartStage',
-      'chartPWD',
-      'chartStatus',
-      'chartSupport'
-    ];
-    for (const id of ids) {
+    const ids = ['chartBarangay','chartAge','chartStage','chartPWD','chartStatus','chartAssistance'];
+    for (const id of ids){
       const canvas = document.getElementById(id);
       if (!canvas) continue;
       const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", 1.0));
       if (blob) zip.file(`${id}.png`, blob);
     }
     const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, `Charts_PNGs_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.zip`);
+    saveAs(content, `Charts_PNGs_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.zip`);
   } catch (err) {
-    console.error("PNG ZIP export error", err);
-    alert("ZIP export failed: " + err.message);
+    console.error("PNG ZIP export failed", err);
+    alert("PNG ZIP export failed: " + (err.message||err));
   }
 }
