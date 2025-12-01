@@ -136,7 +136,7 @@
 
   <main class="content-area">
     <h2>📈 Household Statistics & Trends</h2>
-    <div class="small muted">Visual summary of all registered evacuees. Hover legends to toggle series. Charts refresh when page loads.</div>
+    <div class="small muted">Visual summary of all registered household. Hover legends to toggle series. Charts refresh when page loads.</div>
 
     <div class="charts-container" id="chartsContainer">
       <div class="chart-card">
@@ -145,12 +145,12 @@
       </div>
 
       <div class="chart-card">
-        <h4>2. Age Groups (0-11 months, ≤17, 18-59, 60+)</h4>
+        <h4>2. Age Groups </h4>
         <canvas id="chartAgeGroup" height="220"></canvas>
       </div>
 
       <div class="chart-card">
-        <h4>3. Stage Distribution</h4>
+        <h4>3. Stage </h4>
         <canvas id="chartStage" height="220"></canvas>
       </div>
 
@@ -160,12 +160,12 @@
       </div>
 
       <div class="chart-card">
-        <h4>5. Status Distribution</h4>
+        <h4>5. Status </h4>
         <canvas id="chartStatus" height="220"></canvas>
       </div>
 
       <div class="chart-card">
-        <h4>6. Government Support (ALL)</h4>
+        <h4>6. Government Support </h4>
         <canvas id="chartSupport" height="260"></canvas>
       </div>
     </div>
@@ -185,6 +185,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver/2.0.5/FileSaver.min.js"></script>
+<script>window.saveAs = window.saveAs || saveAs;</script>
+
 
 <script>
 (function(){
@@ -438,7 +440,13 @@
       const brEntries = Object.entries(barangayMap).sort((a,b)=> b[1]-a[1]);
       const brLabels = brEntries.map(e => e[0]);
       const brCounts = brEntries.map(e => e[1]);
-      drawBar("chartBarangay", brLabels, brCounts, { label: "Evacuees", topColor: "rgba(79,129,255,0.95)", botColor: "rgba(52,83,255,0.7)", borderColor: "#2557d6" });
+      drawBar("chartBarangay", brLabels, brCounts, {
+  label: "Evacuees",
+  topColor: "rgba(52,183,143,0.95)",   // green
+  botColor: "rgba(15,122,74,0.85)",     // green darker
+  borderColor: "#0f7a4a"
+});
+
 
       // 2) Age groups
       const ageBuckets = {
@@ -451,7 +459,12 @@
       normalized.forEach(n => {
         ageBuckets[ ageBucket(n) ] = (ageBuckets[ ageBucket(n) ] || 0) + 1;
       });
-      drawBar("chartAgeGroup", Object.keys(ageBuckets), Object.values(ageBuckets), { topColor: "rgba(255,183,77,0.95)", botColor: "rgba(255,140,45,0.85)", borderColor: "#c86b19" });
+      drawBar("chartAgeGroup", Object.keys(ageBuckets), Object.values(ageBuckets), {
+  topColor: "rgba(79,129,255,0.95)",   // blue
+  botColor: "rgba(52,83,255,0.85)",    // blue darker
+  borderColor: "#2557d6"
+});
+
 
       // 3) Stage distribution (doughnut)
       const stageMap = {};
@@ -585,3 +598,4 @@
 </script>
 </body>
 </html>
+
