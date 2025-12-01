@@ -43,17 +43,21 @@
 </head>
 <body>
 <div class="page-container">
+
   <header class="topbar">
-    <div style="display:flex;gap:12px;align-items:center">
-      <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
-      <div class="brand">
-        <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
-        <div><div style="font-weight:700">PUROK KALIGTASAN</div><div style="font-size:13px;color:var(--muted)">DRRMO - Alitagtag</div></div>
+    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
+
+    <div class="brand">
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+      <div>
+        <div class="title">PUROK KALIGTASAN</div>
+        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
       </div>
     </div>
+
     <div class="user-info">
       <span id="userName"></span>
-      <button id="logoutBtn" class="logout-btn" style="margin-left:12px">Logout</button>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
   </header>
 
@@ -807,5 +811,6 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
