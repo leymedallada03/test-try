@@ -5,120 +5,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Data Entry — MDRRMO Alitagtag</title>
 <link rel="stylesheet" href="styles.css"/>
-
 <style>
-/* ---------------- GLOBAL LAYOUT FIX ---------------- */
-.page-container {
-  display: flex;
-  min-height: 100vh;
-  background: #f6f9f6;
+/* (kept + cleaned styles) */
+:root {
+  --green-1: #0f7a4a;
+  --muted: #6b6b6b;
 }
-
-/* ---------------- TOPBAR ---------------- */
-.topbar {
-  position: fixed;
-  top:0; left:0; right:0;
-  height: 62px;
-  background: linear-gradient(90deg,#0f7a4a,#34b78f);
-  color:white;
-  display:flex;
-  align-items:center;
-  padding:0 16px;
-  z-index:5000;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
-}
-
-.topbar .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.topbar .logo {
-  width: 44px; height: 44px;
-}
-
-.topbar .title { font-size:18px; font-weight:700; margin-bottom:2px; }
-.topbar .subtitle { font-size:13px; opacity:0.9; }
-
-.menu-btn {
-  font-size:22px;
-  border:0;background:none;
-  cursor:pointer;color:white;
-  margin-right:14px;
-}
-
-/* ---------------- SIDEBAR ---------------- */
-.sidebar {
-  width:220px;
-  background:white;
-  padding-top:70px;
-  border-right:1px solid rgba(0,0,0,0.08);
-  position:fixed;
-  left:0; top:0; bottom:0;
-}
-
-.sidebar ul { list-style:none; padding:0; margin:0; }
-.sidebar li a {
-  display:block;
-  padding:12px 18px;
-  color:#0b4630;
-  text-decoration:none;
-  font-weight:600;
-}
-.sidebar li a:hover,
-.sidebar li a.active {
-  background:#e7faf1;
-  color:#0f7a4a;
-}
-
-/* ---------------- MAIN CONTENT ---------------- */
-.content-area {
-  flex:1;
-  margin-left:220px;
-  padding:86px 22px 40px;
-}
-
-.card {
-  background:white;
-  padding:16px;
-  margin-bottom:14px;
-  border-radius:10px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.06);
-}
-
-h3 { margin-top:0; }
-
-/* ---------------- GRID ---------------- */
-.form-grid {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-
-.radio-line {
-  display:flex;
-  gap:14px;
-}
-
-/* ---------------- BUTTONS ---------------- */
-.btn {
-  border:0;
-  padding:10px 16px;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:700;
-  background: linear-gradient(90deg,#0f7a4a,#34b78f);
-  color:#fff;
-}
-
-.btn.secondary {
-  background:#fff;
-  color:#0f7a4a;
-  border:1px solid #0f7a4a33;
-}
-
-/* ---------------- ASSISTANCE STYLE — OPTION A ---------------- */
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0;background:#f6f8f7;color:#102015}
+.page-container{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#fff;box-shadow:0 2px 8px rgba(6,30,20,0.04);position:sticky;top:0;z-index:100}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:44px;height:44px;object-fit:contain}
+.sidebar{background:#fff;padding:18px;border-right:1px solid rgba(6,30,20,0.04)}
+.sidebar ul{list-style:none;padding:0;margin:0}
+.sidebar li{margin:8px 0}
+.sidebar a{color:#0b5136;text-decoration:none;font-weight:600}
+.content-area{padding:18px; background:linear-gradient(180deg,#f6f8f7,#f4f6f5)}
+.card{ padding:14px;border-radius:10px;background:#fff;margin-bottom:12px;box-shadow:0 6px 18px rgba(6,30,20,0.04) }
+.form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-items:start }
+.small-muted{ font-size:13px; color:var(--muted) }
+.member-preview{ margin-top:8px; font-size:14px }
+.member-preview li{ margin-bottom:6px }
+.member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width: 96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 280ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y: auto; }
+.member-panel.open { transform: translateX(0%); }
+.panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 5900; }
+.panel-overlay.show { opacity: 1; pointer-events: auto; }
+.btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; }
+.btn.secondary { background: transparent; color: var(--green-1); border:1px solid rgba(6,30,20,0.06); }
+.radio-line{display:flex;gap:8px}
+.icon-btn{border:0;background:transparent;cursor:pointer}
+.actions-row{display:flex;gap:8px;justify-content:flex-end}
+@media (max-width:900px){ .page-container{grid-template-columns:1fr} .sidebar{display:none} }
+.hidden{display:none}
 .assistance-grid {
   display:grid;
   grid-template-columns: repeat(2, 1fr);
@@ -134,297 +52,271 @@ h3 { margin-top:0; }
   font-weight:600;
   color:#0b4630;
 }
-
-/* Fix the AICS select spacing */
-.ass-aics-container {
-  margin-top: 12px;
-}
-
-.small-muted {
-  font-size:13px;
-  color:#666;
-}
 </style>
 </head>
-
 <body>
 <div class="page-container">
-
-<!-- -------------------- TOPBAR -------------------- -->
-<header class="topbar">
-  <button id="menuToggle" class="menu-btn">☰</button>
-  <div class="brand">
-    <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
-    <div>
-      <div class="title">PUROK KALIGTASAN</div>
-      <div class="subtitle">DRRMO - Alitagtag</div>
-    </div>
-  </div>
-
-  <div class="user-info" style="margin-left:auto; display:flex;align-items:center;gap:10px;">
-    <span id="userName"></span>
-    <button id="logoutBtn" class="btn secondary">Logout</button>
-  </div>
-</header>
-
-<!-- -------------------- SIDEBAR -------------------- -->
-<aside class="sidebar" id="sidebar">
-  <ul>
-    <li><a href="dashboard.html">📊 Dashboard</a></li>
-    <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
-    <li><a href="records.html">📁 Records</a></li>
-    <li><a href="charts.html">📈 Charts</a></li>
-    <li class="admin-only"><a href="users.html">👥 User Management</a></li>
-  </ul>
-</aside>
-
-<!-- -------------------- MAIN CONTENT -------------------- -->
-<main class="content-area">
-  <h2>📝 Household Evacuation Information (Head First)</h2>
-
-<form id="headForm" onsubmit="return false;">
-
-<div class="card">
-  <h3>Basic Information (Household Head)</h3>
-
-  <div class="form-grid">
-    <div>
-      <label>Barangay <span class="small-muted">*</span></label>
-      <select id="barangay" required>
-        <option value="">Select Barangay...</option>
-        <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-        <option>Dalipit East</option><option>Dalipit West</option>
-        <option>Dominador East</option><option>Dominador West</option>
-        <option>Munlawin Sur</option><option>Munlawin Norte</option>
-        <option>Muzon Primero</option><option>Muzon Segundo</option>
-        <option>Pinagkurusan</option><option>Ping-As</option>
-        <option>Poblacion East</option><option>Poblacion West</option>
-        <option>San Jose</option><option>San Juan</option>
-        <option>Santa Cruz</option><option>Tadlac</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Sitio / Purok <span class="small-muted">*</span></label>
-      <select id="sitio" required>
-        <option value="">Select...</option>
-        <option>Purok I</option><option>Purok II</option><option>Purok III</option>
-        <option>Purok IV</option><option>Purok V</option><option>Purok VI</option>
-        <option>Purok VII</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Name of Household Head <span class="small-muted">*</span></label>
-      <input type="text" id="householdHead" required>
-    </div>
-
-    <div>
-      <label>Sex <span class="small-muted">*</span></label>
-      <div class="radio-line">
-        <label><input type="radio" name="head_sex" value="Male"> Male</label>
-        <label><input type="radio" name="head_sex" value="Female"> Female</label>
+  <header class="topbar">
+    <div style="display:flex;gap:12px;align-items:center">
+      <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="brand">
+        <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
+        <div><div style="font-weight:700">PUROK KALIGTASAN</div><div style="font-size:13px;color:var(--muted)">DRRMO - Alitagtag</div></div>
       </div>
     </div>
-
-    <div>
-      <label>Birthdate</label>
-      <input type="date" id="householdBirthdate">
+    <div class="user-info">
+      <span id="userName"></span>
+      <button id="logoutBtn" class="logout-btn" style="margin-left:12px">Logout</button>
     </div>
+  </header>
 
-    <div>
-      <label>Age</label>
-      <input type="text" id="householdAge" readonly>
-    </div>
+  <aside class="sidebar" id="sidebar">
+    <ul>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
+      <li><a href="records.html">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+    </ul>
+  </aside>
 
-    <div>
-      <label>Stage</label>
-      <input type="text" id="householdStage" readonly>
-    </div>
+  <main class="content-area" tabindex="-1">
+    <h2>📝 Household Evacuation Information (Head first)</h2>
 
-    <div>
-      <label>No. of Household Members</label>
-      <input type="number" id="memberCount" min="0" value="0">
-    </div>
-  </div>
+    <form id="headForm" novalidate onsubmit="return false;">
+      <div class="form-section card">
+        <h3>Basic Information (Household Head)</h3>
+        <div class="form-grid">
+          <div>
+            <label>Barangay <span class="small">*</span></label>
+            <select id="barangay" required>
+              <option value="">Select Barangay...</option>
+              <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+              <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+              <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+              <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+              <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+              <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+            </select>
+          </div>
 
-  <hr>
+          <div>
+            <label>Sitio / Purok <span class="small">*</span></label>
+            <select id="sitio" required>
+              <option value="">Select...</option>
+              <option>Purok I</option><option>Purok II</option><option>Purok III</option>
+              <option>Purok IV</option><option>Purok V</option><option>Purok VI</option>
+              <option>Purok VII</option>
+            </select>
+          </div>
 
-  <h3>Health and Status</h3>
-  <div class="form-grid">
-    <div>
-      <label>PWD</label>
-      <div class="radio-line">
-        <label><input type="radio" name="head_pwd" value="Yes"> Yes</label>
-        <label><input type="radio" name="head_pwd" value="No"> No</label>
+          <div>
+            <label>Name of Household Head <span class="small">*</span></label>
+            <input type="text" id="householdHead" required />
+          </div>
+
+          <div>
+            <label>Sex <span class="small">*</span></label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="head_sex" value="Male" required> Male</label>
+              <label class="radio-item"><input type="radio" name="head_sex" value="Female"> Female</label>
+            </div>
+          </div>
+
+          <div>
+            <label>Birthdate</label>
+            <input type="date" id="householdBirthdate" />
+          </div>
+
+          <div>
+            <label>Age</label>
+            <!-- changed to text so we can show "11 months" -->
+            <input type="text" id="householdAge" readonly />
+          </div>
+
+          <div>
+            <label>Stage</label>
+            <input type="text" id="householdStage" readonly />
+          </div>
+
+          <div>
+            <label>No. of Household Member/s <span class="small">*</span></label>
+            <input type="number" id="memberCount" min="0" value="0" />
+            <div class="small-muted">Set to 0 if no other members.</div>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0">
+
+        <h4>Health and Status</h4>
+        <div class="form-grid">
+          <div>
+            <label>Persons with Disability (PWD)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="head_pwd" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="head_pwd" value="No" checked> No</label>
+            </div>
+          </div>
+
+          <div>
+            <label>Status</label>
+            <select id="head_status">
+              <option value="">Select...</option>
+              <option>With Sickness</option><option>Pregnant</option><option>Others</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Transportation</label>
+            <select id="head_transport">
+              <option value="">Select...</option>
+              <option>Individual with Transportation</option>
+              <option>Individual needing Transportation</option>
+            </select>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0">
+
+        <h4>Pickup  / Transport / Camp Details</h4>
+        <div class="form-grid">
+          <div>
+            <label>Designated Pick-Up Point</label>
+            <input type="text" id="pickup" />
+          </div>
+          <div>
+            <label>Drop-Off Point</label>
+            <input type="text" id="dropoff" />
+          </div>
+          <div>
+            <label>Name of Camp</label>
+            <input type="text" id="campName" />
+          </div>
+          <div>
+            <label>Capacity</label>
+            <input type="number" id="capacity" min="0" />
+          </div>
+          <div>
+            <label>No. of Individuals Inside Camp</label>
+            <input type="number" id="insideCamp" min="0" value="0" />
+          </div>
+          <div>
+            <label>No. of Individuals Outside Camp</label>
+            <input type="number" id="outsideCamp" min="0" value="0" />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div style="grid-column:1/-1">
+            <label>Reasons for Displacement</label>
+            <select id="reasons">
+              <option value="">Select...</option>
+              <option>With-in 14-15 KM Danger Zone</option>
+              <option>Others</option>
+            </select>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0">
+        <h4>Assistance Received (optional)</h4>
+        <div class="form-grid">
+          <label><input type="checkbox" id="ass_tupad"> TUPAD</label>
+          <label><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
+          <label><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
+          <label><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
+          <label><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
+          <label><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
+          <label><input type="checkbox" id="ass_relief"> Relief Goods</label>
+          <label><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
+        </div>
+
+        <div style="margin-top:8px">
+          <label>AICS (if any)</label>
+          <select id="ass_aics">
+            <option value="">None</option>
+            <option>Shelter Assistance</option>
+            <option>Burial</option>
+            <option>Scholarship</option>
+          </select>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button id="resetBtn" class="btn secondary" type="button">Reset</button>
+          <button id="nextToMembers" class="btn" type="button">Save → Next Members</button>
+        </div>
       </div>
-    </div>
 
-    <div>
-      <label>Status</label>
-      <select id="head_status">
-        <option value="">Select...</option>
-        <option>With Sickness</option>
-        <option>Pregnant</option>
-        <option>Others</option>
-      </select>
-    </div>
+      <!-- preview of members to be added -->
+      <div class="card">
+        <h4>Members to be collected</h4>
+        <div class="small-muted">Number of members chosen: <strong id="previewCount">0</strong></div>
+        <ul id="membersPreview" class="member-preview"></ul>
+      </div>
+    </form>
+  </main>
+</div>
 
-    <div>
-      <label>Transportation</label>
-      <select id="head_transport">
-        <option value="">Select...</option>
-        <option>Individual with Transportation</option>
-        <option>Individual needing Transportation</option>
-      </select>
-    </div>
-  </div>
-
-  <hr>
-
-  <h3>Pickup / Transport / Camp</h3>
-  <div class="form-grid">
-    <div>
-      <label>Pick-Up Point</label>
-      <input type="text" id="pickup">
-    </div>
-
-    <div>
-      <label>Drop-Off Point</label>
-      <input type="text" id="dropoff">
-    </div>
-
-    <div>
-      <label>Name of Camp</label>
-      <input type="text" id="campName">
-    </div>
-
-    <div>
-      <label>Capacity</label>
-      <input type="number" id="capacity" min="0">
-    </div>
-
-    <div>
-      <label>Individuals Inside Camp</label>
-      <input type="number" id="insideCamp" min="0">
-    </div>
-
-    <div>
-      <label>Individuals Outside Camp</label>
-      <input type="number" id="outsideCamp" min="0">
-    </div>
-  </div>
-
-  <hr>
-
-  <h3>Reasons for Displacement</h3>
-  <select id="reasons">
-    <option value="">Select...</option>
-    <option>With-in 14-15 KM Danger Zone</option>
-    <option>Others</option>
-  </select>
-
-  <hr>
-
-  <!-- ---------------- ASSISTANCE — OPTION A (Aligned) ---------------- -->
-  <h3>Assistance Received (optional)</h3>
-
-  <div class="assistance-grid">
-    <label><input type="checkbox" id="ass_tupad"> TUPAD</label>
-    <label><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
-    <label><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
-    <label><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
-    <label><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
-    <label><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
-    <label><input type="checkbox" id="ass_relief"> Relief Goods</label>
-    <label><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
-  </div>
-
-  <div class="ass-aics-container">
-    <label>AICS</label>
-    <select id="ass_aics">
-      <option value="">None</option>
-      <option>Shelter Assistance</option>
-      <option>Burial</option>
-      <option>Scholarship</option>
-    </select>
-  </div>
-
-<!-- Members preview card -->
-  <div class="card" style="margin-top:12px">
-    <h3>Members to be collected</h3>
-    <div class="small-muted">Number of members chosen: <strong id="previewCount">0</strong></div>
-    <ul id="membersPreview" class="member-preview"></ul>
-
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button id="resetBtn" class="btn secondary" type="button">Reset</button>
-      <button id="nextToMembers" class="btn" type="button">Save → Next Members</button>
-    </div>
-  </div>
-
-</form>
-</main>
-
-</div> <!-- end page-container -->
-
-<!-- panel overlay + member panel -->
+<!-- overlay + member panel -->
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
-<div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel" style="max-width:420px;">
-  <div class="panel-header" style="padding:12px 18px;">
+<div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
+  <div class="panel-header" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
     <button id="panelClose" class="btn secondary" title="Close panel">←</button>
-    <h3 id="panelTitle" style="margin:0 0 0 8px">Member 1 of N</h3>
+    <h3 id="panelTitle">Member 1 of N</h3>
   </div>
 
-  <div class="panel-body" style="padding:12px 18px 22px;">
+  <div class="panel-body">
     <form id="memberForm" onsubmit="return false;">
       <div class="form-grid">
         <div>
-          <label>Member Name <span class="small-muted">*</span></label>
-          <input type="text" id="memberName" required>
+          <label>Member Name <span class="small">*</span></label>
+          <input type="text" id="memberName" class="member-name" required />
         </div>
 
         <div>
           <label>Sex</label>
           <div class="radio-line">
-            <label><input type="radio" name="member_sex" value="Male"> Male</label>
-            <label><input type="radio" name="member_sex" value="Female"> Female</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex"> Male</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Female" class="member-sex"> Female</label>
           </div>
         </div>
 
         <div>
           <label>Birthdate</label>
-          <input type="date" id="memberBirthdate">
+          <input type="date" id="memberBirthdate" class="member-birthdate" />
         </div>
 
         <div>
           <label>Age</label>
-          <input type="text" id="memberAge" readonly>
+          <!-- changed to text so we can show "11 months" -->
+          <input type="text" id="memberAge" class="member-age" readonly />
         </div>
 
         <div>
           <label>PWD</label>
           <div class="radio-line">
-            <label><input type="radio" name="member_pwd" value="Yes"> Yes</label>
-            <label><input type="radio" name="member_pwd" value="No" checked> No</label>
+            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" class="member-pwd"> Yes</label>
+            <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked class="member-pwd"> No</label>
           </div>
         </div>
 
         <div>
           <label>Stage</label>
-          <input type="text" id="memberStage" readonly>
+          <input type="text" id="memberStage" class="member-stage" readonly />
         </div>
 
         <div>
           <label>Status</label>
-          <select id="memberStatus">
+          <select id="memberStatus" class="member-status">
             <option value="">Select...</option><option>With Sickness</option><option>Pregnant</option>
           </select>
         </div>
 
         <div>
           <label>Transportation</label>
-          <select id="memberTransport">
+          <select id="memberTransport" class="member-transport">
             <option value="">Select...</option>
             <option>Individual with Transportation</option>
             <option>Individual needing Transportation</option>
@@ -432,60 +324,58 @@ h3 { margin-top:0; }
         </div>
 
         <div>
-          <label>Pick-Up Point</label>
-          <input type="text" id="memberPickup">
+          <label>Designated Pick-Up Point</label>
+          <input type="text" id="memberPickup" class="member-pickup"/>
         </div>
 
         <div>
           <label>Drop-Off Point</label>
-          <input type="text" id="memberDropoff">
+          <input type="text" id="memberDropoff" class="member-dropoff"/>
         </div>
 
         <div>
           <label>Name of Camp</label>
-          <input type="text" id="memberCamp">
+          <input type="text" id="memberCamp" class="member-camp"/>
         </div>
 
         <div>
           <label>Capacity</label>
-          <input type="number" id="memberCampCap" min="0">
+          <input type="number" id="memberCampCap" class="member-cap" min="0"/>
         </div>
 
         <div>
-          <label>Inside Camp</label>
-          <input type="number" id="memberInside" min="0">
+          <label>No. of Individuals Inside Camp</label>
+          <input type="number" id="memberInside" class="member-inside" min="0"/>
         </div>
 
         <div>
-          <label>Outside Camp</label>
-          <input type="number" id="memberOutside" min="0">
+          <label>No. of Individuals Outside Camp</label>
+          <input type="number" id="memberOutside" class="member-outside" min="0"/>
         </div>
 
-        <div style="grid-column:1/-1;margin-top:6px;">
+        <div>
           <label>Reason</label>
-          <select id="memberReason">
-            <option value="">Select...</option>
-            <option>With-in 14-15 KM Danger Zone</option><option>Others</option>
+          <select id="memberReason" class="member-reason">
+            <option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option>
           </select>
         </div>
 
-        <!-- Assistance grid for member (Option B aligned) -->
-        <div style="grid-column:1/-1; margin-top:8px;">
+        <div style="grid-column:1/-1; margin-top:8px">
           <h4 style="margin:6px 0 8px 0">Government Support</h4>
-          <div class="assistance-grid" style="grid-template-columns: repeat(2,1fr);">
-            <label><input type="checkbox" id="member_tupad"> TUPAD</label>
-            <label><input type="checkbox" id="member_local4ps"> Local 4Ps</label>
-            <label><input type="checkbox" id="member_intl4ps"> National 4Ps</label>
-            <label><input type="checkbox" id="member_locsp"> Local Social Pension</label>
-            <label><input type="checkbox" id="member_intlsp"> National Social Pension</label>
-            <label><input type="checkbox" id="member_solo"> Solo Parent Assistance</label>
-            <label><input type="checkbox" id="member_relief"> Relief Goods</label>
-            <label><input type="checkbox" id="member_cash"> Cash Subsidy</label>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
+            <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
+            <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
+            <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
+            <label><input type="checkbox" id="member_locsp" class="member_locsp"> Local Social Pension</label>
+            <label><input type="checkbox" id="member_intlsp" class="member_intlsp"> National Social Pension</label>
+            <label><input type="checkbox" id="member_solo" class="member_solo"> Solo Parent Assistance</label>
+            <label><input type="checkbox" id="member_cash" class="member_cash"> Cash Subsidy</label>
+            <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
           </div>
 
-          <div style="margin-top:8px;">
+          <div style="margin-top:8px">
             <label>AICS (if any)</label>
-            <select id="memberAics">
+            <select id="memberAics" class="member_aics">
               <option value="">None</option>
               <option>Shelter Assistance</option>
               <option>Burial</option>
@@ -496,7 +386,7 @@ h3 { margin-top:0; }
 
       </div>
 
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <div class="panel-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
         <button id="memberBack" class="btn secondary" type="button">Back</button>
         <button id="memberNext" class="btn" type="button">Save & Next</button>
       </div>
@@ -504,77 +394,133 @@ h3 { margin-top:0; }
   </div>
 </div>
 
-<!-- ========================= SCRIPT (improved) ========================= -->
 <script>
-/* ----------------- CONFIG ----------------- */
+/* final merged client-side script (fixed for date format + infant age) */
+
 const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-/* ----------------- UTIL: convert yyyy-mm-dd -> DD/MM/YYYY ----------------- */
-function toSheetDateFormat(dateYMD){
-  if(!dateYMD) return "";
-  // input usually yyyy-mm-dd from <input type=date>
-  if(/^\d{4}-\d{2}-\d{2}$/.test(dateYMD)){
-    const parts = dateYMD.split("-");
-    return parts[2] + "/" + parts[1] + "/" + parts[0];
+/* ----------------- Date helpers ----------------- */
+/* Convert yyyy-mm-dd (from input[type=date].value) into DD/MM/YYYY (text) */
+function toSheetDateFormat(inputVal){
+  if(!inputVal) return "";
+  // inputVal expected 'yyyy-mm-dd'
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
+    const [y,m,d] = inputVal.split('-');
+    return `${d}/${m}/${y}`;
   }
-  // try Date parse fallback
-  const dt = new Date(dateYMD);
+  // try parse fallback
+  const dt = new Date(inputVal);
   if(!isNaN(dt)){
-    const d = ("0"+dt.getDate()).slice(-2);
-    const m = ("0"+(dt.getMonth()+1)).slice(-2);
-    const y = dt.getFullYear();
-    return d + "/" + m + "/" + y;
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dd}/${mm}/${dt.getFullYear()}`;
+  }
+  return String(inputVal);
+}
+
+/* Convert DD/MM/YYYY back to yyyy-mm-dd for input[type=date] if needed */
+function toInputDate(val){
+  if(!val) return "";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(val)){
+    const [d,m,y] = val.split('/');
+    return `${y}-${m}-${d}`;
+  }
+  // fallback parse
+  const dt = new Date(val);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dt.getFullYear()}-${mm}-${dd}`;
   }
   return "";
 }
 
-/* ----------------- UTIL: age object (years + months) ----------------- */
-function computeAgeObject(dateYMD){
-  if(!dateYMD) return null;
-  const d = new Date(dateYMD);
+/* ---------------- Age compute (detailed) ----------------
+   returns { years, months, days, display, stage }
+   display is:
+     - "X days" if <1 month
+     - "X months" if <1 year
+     - "Y" (years) if >=1 year
+   stage rules:
+     - if years === 0:
+         if months <= 10 -> "Infant"
+         else -> "Children"
+     - years <=17 -> "School Children"
+     - years >=60 -> "Elderly"
+     - else -> "Adult"
+*/
+function computeAgeDetailed(inputDateValue){
+  if(!inputDateValue) return null;
+  // accept yyyy-mm-dd or Date-like strings
+  let d;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputDateValue)){
+    const parts = inputDateValue.split('-');
+    d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  } else {
+    d = new Date(inputDateValue);
+  }
   if(isNaN(d)) return null;
+
   const now = new Date();
-  let years = now.getFullYear() - d.getFullYear();
-  let months = now.getMonth() - d.getMonth();
-  let days = now.getDate() - d.getDate();
-  if(days < 0){ months--; }
-  if(months < 0){ years--; months += 12; }
-  if(years < 0) { years = 0; }
-  return { years: years, months: months };
-}
+  // normalize to midnight to avoid timezone offset surprises
+  const birth = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-/* ----------------- UTIL: human age text ----------------- */
-function ageTextFromObj(ageObj){
-  if(!ageObj) return "";
-  if(ageObj.years === 0){
-    // months representation, show "11 months" etc. If months is 0 show "0 months"
-    return (ageObj.months || 0) + " months";
+  let years = today.getFullYear() - birth.getFullYear();
+  let months = today.getMonth() - birth.getMonth();
+  let days = today.getDate() - birth.getDate();
+
+  if(days < 0){
+    months -= 1;
+    // get days in previous month
+    const prev = new Date(today.getFullYear(), today.getMonth(), 0);
+    days += prev.getDate();
   }
-  return String(ageObj.years);
-}
-
-/* ----------------- STAGE derivation ----------------- */
-function deriveStageFromAgeObj(ageObj){
-  if(!ageObj) return "";
-  if(ageObj.years === 0){
-    // infants: months <=10 -> Infant else Children
-    if((ageObj.months || 0) <= 10) return "Infant";
-    return "Children";
+  if(months < 0){
+    years -= 1;
+    months += 12;
   }
-  if(ageObj.years <= 17) return "School Children";
-  if(ageObj.years >= 60) return "Elderly";
-  return "Adult";
+
+  // determine display
+  let display = "";
+  if(years >= 1){
+    display = String(years); // keep years as simple number string per your requirement
+  } else {
+    if(months >= 1){
+      display = `${months} months`;
+    } else {
+      display = `${days} days`;
+    }
+  }
+
+  // derive stage
+  let stage = "";
+  if(years === 0){
+    if(months <= 10) stage = "Infant";
+    else stage = "Children";
+  } else if(years <= 17){
+    stage = "School Children";
+  } else if(years >= 60){
+    stage = "Elderly";
+  } else {
+    stage = "Adult";
+  }
+
+  return { years: years, months: months, days: days, display: display, stage: stage };
 }
 
-/* ----------------- UI state ----------------- */
+/* ---------------- UI + state ---------------- */
+function ensureLoginOrRedirect(){
+  if(!localStorage.getItem("loggedIn")){ window.location.href = "main.html"; return false; }
+  return true;
+}
+
 let membersToCollect = 0;
 let currentMemberIndex = 0;
 let collectedMembers = [];
 
-/* ----------------- UI helpers ----------------- */
-function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
-function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
-
+/* update preview */
 function updateMemberPreview(){
   const n = parseInt(document.getElementById("memberCount").value || 0);
   document.getElementById("previewCount").innerText = n;
@@ -582,24 +528,19 @@ function updateMemberPreview(){
   list.innerHTML = "";
   for(let i=0;i<n;i++){
     const mem = collectedMembers[i];
-    const li = document.createElement("li");
+    const li = document.createElement('li');
     li.innerText = mem ? `#${i+1} — ${mem["Name of Household Member/s"] || "(empty)"}` : `#${i+1} — (empty)`;
     list.appendChild(li);
   }
 }
 
-/* ----------------- fill panel ----------------- */
+/* fill member panel with existing or blank */
 function fillMemberPanel(idx){
   const mem = collectedMembers[idx] || {};
   document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
-  Array.from(document.getElementsByName("member_sex")).forEach(r=> r.checked = (r.value === (mem["Sex"]||"")));
-  // memberBirthdate input expects yyyy-mm-dd; try to convert if mem has DD/MM/YYYY
-  if(mem["Birthdate"] && /^\d{2}\/\d{2}\/\d{4}$/.test(mem["Birthdate"])){
-    const parts = mem["Birthdate"].split("/");
-    document.getElementById("memberBirthdate").value = parts[2]+"-"+parts[1]+"-"+parts[0];
-  } else {
-    document.getElementById("memberBirthdate").value = mem["Birthdate"] || "";
-  }
+  Array.from(document.getElementsByName("member_sex")).forEach(r => r.checked = (r.value === (mem["Sex"] || "")));
+  // if birthdate stored as DD/MM/YYYY convert to yyyy-mm-dd for input
+  document.getElementById("memberBirthdate").value = mem["Birthdate"] ? toInputDate(mem["Birthdate"]) : "";
   document.getElementById("memberAge").value = mem["Age"] || "";
   document.getElementById("memberStage").value = mem["Stage"] || "";
   document.getElementById("memberStatus").value = mem["Status"] || "";
@@ -622,21 +563,22 @@ function fillMemberPanel(idx){
   document.getElementById("memberAics").value = mem["AICS"] || "";
 }
 
-/* ----------------- collect member data from panel ----------------- */
+/* collect member panel inputs into object that matches Master sheet keys */
 function collectMemberDataFromPanel(){
   const name = document.getElementById("memberName").value.trim();
   const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
-  const birthYMD = document.getElementById("memberBirthdate").value || "";
-  const ageObj = computeAgeObject(birthYMD);
-  const ageText = ageTextFromObj(ageObj);
-  const stage = deriveStageFromAgeObj(ageObj);
+  const birth_input = document.getElementById("memberBirthdate").value || ""; // yyyy-mm-dd
+  const birth_for_sheet = toSheetDateFormat(birth_input); // DD/MM/YYYY
+  const ageObj = computeAgeDetailed(birth_input);
+  const ageVal = ageObj ? ageObj.display : "";
+  const stageVal = ageObj ? ageObj.stage : "";
 
   return {
     "Name of Household Member/s": name,
     "Sex": sex,
-    "Birthdate": toSheetDateFormat(birthYMD), // convert to DD/MM/YYYY text
-    "Age": ageText,
-    "Stage": stage,
+    "Birthdate": birth_for_sheet,
+    "Age": ageVal,
+    "Stage": stageVal,
     "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
     "Status": document.getElementById("memberStatus").value || "",
     "Transportation": document.getElementById("memberTransport").value || "",
@@ -659,104 +601,124 @@ function collectMemberDataFromPanel(){
   };
 }
 
-/* ----------------- head birthdate live updates ----------------- */
-document.getElementById("householdBirthdate").addEventListener("input", ()=>{
-  const ymd = document.getElementById("householdBirthdate").value;
-  const ageObj = computeAgeObject(ymd);
-  document.getElementById("householdAge").value = ageObj ? ageTextFromObj(ageObj) : "";
-  document.getElementById("householdStage").value = ageObj ? deriveStageFromAgeObj(ageObj) : "";
+/* update member age/stage live when date changes */
+document.addEventListener('input', (ev) => {
+  if(ev.target && ev.target.id === "memberBirthdate"){
+    const v = ev.target.value;
+    const info = computeAgeDetailed(v);
+    document.getElementById("memberAge").value = info ? info.display : "";
+    document.getElementById("memberStage").value = info ? info.stage : "";
+  }
+  if(ev.target && ev.target.id === "householdBirthdate"){
+    const v = ev.target.value;
+    const info = computeAgeDetailed(v);
+    document.getElementById("householdAge").value = info ? info.display : "";
+    document.getElementById("householdStage").value = info ? info.stage : "";
+  }
 });
 
-/* ----------------- member birthdate live updates ----------------- */
-document.getElementById("memberBirthdate").addEventListener("input", ()=>{
-  const ymd = document.getElementById("memberBirthdate").value;
-  const ageObj = computeAgeObject(ymd);
-  document.getElementById("memberAge").value = ageObj ? ageTextFromObj(ageObj) : "";
-  document.getElementById("memberStage").value = ageObj ? deriveStageFromAgeObj(ageObj) : "";
-});
-
-/* ----------------- DOMContentLoaded bindings ----------------- */
-document.addEventListener("DOMContentLoaded", ()=> {
-  // username (simple guard)
+/* ---------------- DOM loaded bindings ---------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  if(!ensureLoginOrRedirect()) return;
   document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
 
-  document.getElementById("resetBtn").addEventListener("click", ()=>{
+  // reset
+  document.getElementById("resetBtn").addEventListener('click', () => {
     document.getElementById("headForm").reset();
     collectedMembers = [];
     updateMemberPreview();
+    document.getElementById("householdAge").value = "";
+    document.getElementById("householdStage").value = "";
   });
 
-  document.getElementById("nextToMembers").addEventListener("click", ()=>{
+  // next (head -> members)
+  document.getElementById("nextToMembers").addEventListener('click', () => {
     const barangay = document.getElementById("barangay").value.trim();
     const sitio = document.getElementById("sitio").value.trim();
     const headName = document.getElementById("householdHead").value.trim();
-    if(!barangay || !sitio || !headName){
-      alert("Please fill Barangay, Sitio/Purok and Name of Household Head.");
-      return;
-    }
+    if(!barangay || !sitio || !headName){ alert("Please fill Barangay, Sitio/Purok and Name of Household Head."); return; }
+
     membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
-    collectedMembers = [];
-    currentMemberIndex = 0;
+    collectedMembers = []; currentMemberIndex = 0;
     updateMemberPreview();
+
     if(membersToCollect === 0){
+      // no members -> submit head only
       submitHeadAndMembers();
       return;
     }
-    // open first member panel
+
+    // open member panel first
     fillMemberPanel(0);
-    document.getElementById("panelTitle").innerText = `Member 1 of ${membersToCollect}`;
+    currentMemberIndex = 0;
+    document.getElementById('panelTitle').innerText = `Member 1 of ${membersToCollect}`;
     openPanel();
   });
 
-  document.getElementById("panelClose").addEventListener("click", ()=> { if(confirm("Close member panel? Unsaved member edits will be kept in preview.")) closePanel(); });
-
-  document.getElementById("memberBack").addEventListener("click", ()=>{
+  // panel close/back
+  document.getElementById("panelClose").addEventListener('click', () => { closePanel(); });
+  document.getElementById("memberBack").addEventListener('click', () => {
     if(currentMemberIndex > 0){
-      // save current
       collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
       currentMemberIndex--;
       fillMemberPanel(currentMemberIndex);
-      document.getElementById("panelTitle").innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
+      document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
       updateMemberPreview();
     } else {
-      // close
       closePanel();
     }
   });
 
-  document.getElementById("memberNext").addEventListener("click", ()=>{
+  // memberNext (save & next)
+  document.getElementById("memberNext").addEventListener('click', () => {
     const name = document.getElementById("memberName").value.trim();
     if(!name){ alert("Please enter member's name."); return; }
-    // collect & save
+
     collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
     updateMemberPreview();
+
     currentMemberIndex++;
     if(currentMemberIndex >= membersToCollect){
-      // finish
+      // done
       closePanel();
       submitHeadAndMembers();
       return;
     }
     fillMemberPanel(currentMemberIndex);
-    document.getElementById("panelTitle").innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
+    document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
   });
+
+  // live update household birthdate change (also handled by input listener)
+  document.getElementById("householdBirthdate").addEventListener('change', () => {
+    const info = computeAgeDetailed(document.getElementById("householdBirthdate").value);
+    document.getElementById("householdAge").value = info ? info.display : "";
+    document.getElementById("householdStage").value = info ? info.stage : "";
+  });
+
+  // preview initial
+  updateMemberPreview();
 });
 
-/* ----------------- SUBMIT head + members ----------------- */
+/* ---------------- open / close panel helpers ---------------- */
+function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
+function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
+
+/* ---------------- Submit head + members ---------------- */
 async function submitHeadAndMembers(){
-  // prepare head
-  const headBirthYMD = document.getElementById("householdBirthdate").value || "";
-  const ageObj = computeAgeObject(headBirthYMD);
-  const ageText = ageTextFromObj(ageObj);
+  // head birthdate -> DD/MM/YYYY
+  const headBirthInput = document.getElementById("householdBirthdate").value || "";
+  const headBirthForSheet = toSheetDateFormat(headBirthInput);
+  const headAgeInfo = computeAgeDetailed(headBirthInput);
+  const headAgeVal = headAgeInfo ? headAgeInfo.display : "";
 
   const head = {
     "Barangay": document.getElementById("barangay").value || "",
     "Sitio / Purok": document.getElementById("sitio").value || "",
     "Name of Household Head": document.getElementById("householdHead").value || "",
     "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-    "Birthdate": toSheetDateFormat(headBirthYMD),
-    "Age": ageText || "",
-    "Stage": ageObj ? deriveStageFromAgeObj(ageObj) : "",
+    "Birthdate": headBirthForSheet,
+    "Age": headAgeVal,
+    "Stage": headAgeInfo ? headAgeInfo.stage : "",
     "No. of Household Member/s": document.getElementById("memberCount").value || "0",
     "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
     "Reasons for Displacement": document.getElementById("reasons").value || "",
@@ -779,9 +741,9 @@ async function submitHeadAndMembers(){
     "AICS": document.getElementById("ass_aics").value || ""
   };
 
-  // Ensure members array length == memberCount
+  // ensure members array length matches count
   const expected = parseInt(document.getElementById("memberCount").value || 0);
-  const members = collectedMembers.slice();
+  const members = collectedMembers.slice(0);
   for(let i=0;i<expected;i++){
     if(!members[i]){
       members[i] = {
@@ -811,38 +773,50 @@ async function submitHeadAndMembers(){
         "AICS": ""
       };
     }
+    // ensure any birthdate in members are DD/MM/YYYY
+    if(members[i]["Birthdate"]){
+      // if user saved a raw yyyy-mm-dd in some path, convert
+      members[i]["Birthdate"] = (members[i]["Birthdate"].indexOf('/') === -1) ? toSheetDateFormat(members[i]["Birthdate"]) : members[i]["Birthdate"];
+    }
   }
 
-  // disable UI
-  const btn = document.getElementById("nextToMembers");
-  btn.disabled = true; btn.innerText = "Saving...";
+  // build FormData
+  const form = new FormData();
+  form.append("action","createRecord");
+  form.append("head", JSON.stringify(head));
+  form.append("members", JSON.stringify(members));
+  form.append("submittedBy", localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown");
 
-  try {
-    const fd = new FormData();
-    fd.append("action","createRecord");
-    fd.append("head", JSON.stringify(head));
-    fd.append("members", JSON.stringify(members));
-    fd.append("submittedBy", localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown");
+  // UI disable
+  const submitBtn = document.getElementById("nextToMembers");
+  submitBtn.disabled = true;
+  submitBtn.innerText = "Saving...";
 
-    const res = await fetch(API_URL, { method: "POST", body: fd });
-    const txt = await res.text();
-    let json;
-    try { json = JSON.parse(txt); } catch(e){ throw new Error("Invalid server response"); }
+  try{
+    console.log("Submitting HEAD:", head);
+    console.log("Submitting MEMBERS:", members);
+    const res = await fetch(API_URL, { method: "POST", body: form });
+    const text = await res.text();
+    console.log("RAW RESPONSE:", text);
+    let data;
+    try { data = JSON.parse(text); } catch(e){ throw new Error("Invalid response from server"); }
 
-    if(json.success){
-      alert("Saved (Data ID: " + (json.dataID || "n/a") + ")");
+    if(data.success){
+      alert("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
       window.location.href = "records.html";
     } else {
-      alert("Save failed: " + (json.message || "Unknown"));
-      console.error("SAVE ERROR", json);
+      alert("Save failed: " + (data.message || "Unknown error"));
+      console.error("SAVE ERROR:", data);
     }
-  } catch(err){
-    console.error("SUBMIT ERROR", err);
-    alert("Network/server error — check console");
-  } finally {
-    btn.disabled = false; btn.innerText = "Save → Next Members";
+  }catch(err){
+    console.error("SUBMIT ERROR:", err);
+    alert("Network / Server error. Check console.");
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Save → Next Members";
   }
 }
+
 </script>
 </body>
 </html>
