@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Purok Kaligtasan — Dashboard</title>
 <link rel="stylesheet" href="styles.css"/>
+<style>
+  /* Small dashboard tweaks so it looks OK standalone */
+  .dashboard-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:12px 0 18px 0 }
+  .card{ padding:12px; border-radius:10px; background:#fff; box-shadow:0 6px 18px rgba(6,30,20,0.04) }
+  .card h3{ margin:0 0 8px 0; font-size:14px; color:#0f7a4a }
+  .card-value{ font-size:22px; font-weight:800; color:#153b26 }
+</style>
 </head>
 <body>
 <div class="page-container">
@@ -63,113 +70,170 @@
 
     <div class="card">
       <h3>Household Distribution per Barangay</h3>
-      <canvas id="barangayChart" height="140"></canvas>
+      <canvas id="barangayChart" height="160"></canvas>
     </div>
 
   </main>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="app.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-/* DASHBOARD LOGIC */
-document.addEventListener("DOMContentLoaded", async () => {
-  // Auth check
-  if (!localStorage.getItem("loggedIn")) return location.href = "login.html";
+/*
+  Fixed dashboard:
+  - detects household HEAD rows by checking "Name of Household Member/s" (empty => head)
+  - robust case-insensitive header lookup
+  - tries `apiGet()` (if present in app.js) and falls back to direct fetch to API_URL
+  - auto-refresh every 30 seconds
+*/
 
-  document.getElementById("assignedBarangay").innerText =
-    localStorage.getItem("assignedBarangay") || '---';
-  document.getElementById("userName").innerText =
-    localStorage.getItem("staffName") || "";
+const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+let refreshTimer = null;
+let currentChart = null;
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    localStorage.clear();
-    location.href = "login.html";
-  });
+function getField(obj, fieldName) {
+  // case-insensitive lookup of a field in an object
+  if (!obj || !fieldName) return "";
+  if (Object.prototype.hasOwnProperty.call(obj, fieldName)) return obj[fieldName];
+  const want = String(fieldName).trim().toLowerCase();
+  for (const k of Object.keys(obj)) {
+    if (String(k).trim().toLowerCase() === want) return obj[k];
+  }
+  return "";
+}
 
+async function fetchRecordsUsingApiGet(payload) {
+  // try to use apiGet if available (your app.js might define it)
+  if (typeof window.apiGet === "function") {
+    try {
+      return await window.apiGet(payload);
+    } catch (err) {
+      console.warn("apiGet() failed, falling back to fetch:", err);
+    }
+  }
+  // fallback to direct GET call
+  const url = new URL(API_URL);
+  Object.keys(payload || {}).forEach(k => url.searchParams.append(k, payload[k]));
+  const res = await fetch(url.toString(), { cache: "no-store" });
+  if (!res.ok) throw new Error("Network error: " + res.status);
+  return await res.json();
+}
+
+function destroyChartIfAny() {
+  if (currentChart) {
+    try { currentChart.destroy(); } catch (e) { /* ignore */ }
+    currentChart = null;
+  }
+}
+
+async function loadAndRender() {
   try {
-    // === FIXED: call getRecords instead of list ===
-    const response = await apiGet({ action: "getRecords" });
+    const response = await fetchRecordsUsingApiGet({ action: "getRecords" });
 
+    // response expected shape: { success: true, header: [...], rows: [ {..}, ... ] }
     if (!response || !response.rows) {
-      console.error("Invalid API response:", response);
+      console.error("Unexpected response from API:", response);
+      alert("Unable to load data for dashboard. See console for details.");
       return;
     }
 
     const rows = response.rows;
 
-    // Count heads and members
+    // Count heads vs members:
+    // HEAD rows are the rows where "Name of Household Member/s" is empty (that's how your createRecord writes them)
     let headCount = 0;
     let memberCount = 0;
 
+    const barangayMap = {}; // { barangay: { heads: n, members: m } }
+
     rows.forEach(r => {
-      if (String(r["RelationToHead"] || "").toLowerCase() === "head") {
-        headCount++;
-      } else {
-        memberCount++;
-      }
+      const nameOfMember = String(getField(r, "Name of Household Member/s") || "").trim();
+      const barangay = String(getField(r, "Barangay") || "Unknown").trim();
+
+      const isHead = (!nameOfMember); // empty => head; non-empty => member
+
+      if (isHead) headCount++;
+      else memberCount++;
+
+      if (!barangayMap[barangay]) barangayMap[barangay] = { heads: 0, members: 0 };
+      if (isHead) barangayMap[barangay].heads++;
+      else barangayMap[barangay].members++;
     });
 
     document.getElementById("totalHeads").innerText = headCount;
     document.getElementById("totalMembers").innerText = memberCount;
+    document.getElementById("assignedBarangay").innerText = localStorage.getItem("assignedBarangay") || '---';
+    document.getElementById("userName").innerText = localStorage.getItem("staffName") || '';
+    document.getElementById("lastUpdated").innerText = new Date().toLocaleString();
 
-    // Last updated time
-    document.getElementById("lastUpdated").innerText =
-      new Date().toLocaleString();
+    // Build chart data
+    const labels = Object.keys(barangayMap).sort();
+    const headData = labels.map(l => barangayMap[l].heads || 0);
+    const memberData = labels.map(l => barangayMap[l].members || 0);
 
-    // Barangay distribution (heads + members)
-    const barangayMap = {};
-
-    rows.forEach(r => {
-      const b = r["Barangay"] || "Unknown";
-      if (!barangayMap[b]) barangayMap[b] = { heads: 0, members: 0 };
-
-      if (String(r["RelationToHead"] || "").toLowerCase() === "head") {
-        barangayMap[b].heads++;
-      } else {
-        barangayMap[b].members++;
-      }
-    });
-
-    const brgyLabels = Object.keys(barangayMap);
-    const brgyHeads = brgyLabels.map(b => barangayMap[b].heads);
-    const brgyMembers = brgyLabels.map(b => barangayMap[b].members);
-
-    // Draw chart
+    // Draw stacked bar chart (heads + members)
+    destroyChartIfAny();
     const ctx = document.getElementById("barangayChart").getContext("2d");
-
-    new Chart(ctx, {
-      type: "bar",
+    currentChart = new Chart(ctx, {
+      type: 'bar',
       data: {
-        labels: brgyLabels,
+        labels,
         datasets: [
           {
-            label: "Household Heads",
-            data: brgyHeads,
-            backgroundColor: "#2b9348"
+            label: 'Household Heads',
+            data: headData,
+            backgroundColor: '#2b9348'
           },
           {
-            label: "Household Members",
-            data: brgyMembers,
-            backgroundColor: "#55a630"
+            label: 'Household Members',
+            data: memberData,
+            backgroundColor: '#55a630'
           }
         ]
       },
       options: {
         responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'bottom' }
+        },
         scales: {
+          x: { stacked: false },
           y: { beginAtZero: true }
         }
       }
     });
 
   } catch (err) {
-    console.error("Dashboard Error:", err);
+    console.error("Dashboard load error:", err);
   }
+}
+
+function startAutoRefresh(seconds = 30) {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => {
+    loadAndRender();
+  }, seconds * 1000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!localStorage.getItem("loggedIn")) {
+    // if not logged in, redirect to login page
+    location.href = "login.html";
+    return;
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.clear();
+    location.href = "login.html";
+  });
+
+  // initial load
+  loadAndRender();
+
+  // auto-refresh every 30 seconds
+  startAutoRefresh(30);
 });
 </script>
-
 </body>
 </html>
