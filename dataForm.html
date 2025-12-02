@@ -109,17 +109,18 @@
       <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
       <li><a href="records.html">📁 Records</a></li>
       <li><a href="charts.html">📈 Charts</a></li>
-      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+      <li id="navUsers" style="display:none;">
+    <a href="users.html">👥 User Management</a>
     </ul>
   </aside>
 
   <main class="content-area" tabindex="-1">
-    <h2>📝 Household Evacuation Information (Head first)</h2>
+    <h2>📝 Household Information (Head)</h2>
 
     <form id="headForm" novalidate onsubmit="return false;">
       <!-- BASIC -->
       <div class="card form-section">
-        <div class="section-title"><div class="chip">1</div><h3>Basic Information (Household Head)</h3></div>
+        <div class="section-title"><div class="chip">1</div><h3>Basic Information </h3></div>
         <div class="form-grid">
           <div>
             <label>Coordinate (optional)</label>
@@ -309,7 +310,11 @@
             <label>Reasons for Displacement</label>
             <select id="reasons" class="animated">
               <option value="">Select...</option>
-              <option>With-in 14-15 KM Danger Zone During Taal Eruption</option>
+              <option>Taal Volcano (With-in 14-15 KM Danger Zone)</option>
+               <option>Typhoon</option>
+               <option>Flood</option>
+               <option>Landslide</option>
+               <option>Earthquake</option>
               <option>Others</option>
             </select>
           </div>
@@ -319,6 +324,7 @@
       <!-- GOVERNMENT SUPPORT -->
       <div class="card">
         <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
+         <div class="small-muted">Kindly check if available.</div>
         <div class="form-grid">
           <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
           <label class="checkbox-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
@@ -344,7 +350,7 @@
       <!-- MEMBERS PREVIEW + ACTION -->
       <div class="card">
         <div class="section-title"><div class="chip">6</div><h3>Members to be collected</h3></div>
-        <div class="small-muted">Number of members chosen: <strong id="previewCount">0</strong></div>
+        <div class="small-muted">Member/s: <strong id="previewCount">0</strong></div>
         <ul id="membersPreview" class="member-preview"></ul>
 
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
@@ -412,7 +418,7 @@
         <div>
           <label>Status</label>
           <select id="memberStatus" class="member-status animated">
-            <option value="">Select...</option><option>With Sickness</option><option>Pregnant</option>
+            <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
           </select>
         </div>
 
@@ -458,12 +464,18 @@
         <div>
           <label>Reason</label>
           <select id="memberReason" class="member-reason animated">
-            <option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option>
+              <option>Taal Volcano (With-in 14-15 KM Danger Zone)</option>
+               <option>Typhoon</option>
+               <option>Flood</option>
+               <option>Landslide</option>
+               <option>Earthquake</option>
+              <option>Others</option>
           </select>
         </div>
 
         <div style="grid-column:1/-1; margin-top:8px">
           <h4 style="margin:6px 0 8px 0">Government Support</h4>
+          <div class="small-muted">Kindly check if available.</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
             <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
             <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
@@ -498,7 +510,7 @@
 
 <script>
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
-const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 /* ---------------- helpers ---------------- */
 function toSheetDateFormat(inputVal){
@@ -912,5 +924,6 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
