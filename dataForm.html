@@ -32,12 +32,9 @@
   gap: 8px;
   padding: 6px 0;
 }
-   .sub-label {
-  display: block;
-   font-size:13px; 
+   .sub-label1 {
    color:var(--muted); 
-  margin-left: 20px;
-  margin-bottom: 8px;
+{display:flex;align-items:center;gap:10px; margin-bottom:10px}
 }
 
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
@@ -99,11 +96,12 @@
   /* subtle animations for selects */
   select.animated{appearance:none;padding-right:36px;background-image:linear-gradient(45deg,transparent 50%,#0b4630 50%),linear-gradient(135deg,#0b4630 50%,transparent 50%);background-position:calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);background-size:6px 6px,6px 6px;background-repeat:no-repeat}
   .section-title{display:flex;align-items:center;gap:10px; margin-bottom:10px}
+   .section-title1{display:flex;align-items:center;gap:10px;}
   .chip{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;font-size:13px;font-weight:800}
   .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(6,30,20,0.04),transparent);margin:12px 0;border-radius:6px}
 
   /* small helpers */
-  .muted{color:var(--muted);font-size:13px}
+  .muted{color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
@@ -249,8 +247,8 @@
 
       <!-- DOMESTIC ANIMALS -->
       <div class="card">
-        <div class="section-title"><div class="chip">3</div><h3>Household Livestock</h3></div>
-         <div class="sub-label">Please check (✓) all items that apply.</div>
+        <div class="section-title1"><div class="chip">3</div><h3>Household Livestock</h3></div>
+         <div class="sub-label1">Please check (✓) all items that apply.</div>
 
         <div class="domestic-grid">
           <div class="animal-row">
@@ -348,8 +346,8 @@
 
       <!-- GOVERNMENT SUPPORT -->
 <div class="card">
-  <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
-<label class="sub-label">Please check (✓) all items that apply.</label>
+  <div class="section-title1"><div class="chip">5</div><h3>Government Support</h3></div>
+<label class="sub-label1">Please check (✓) all items that apply.</label>
 
   <div class="gov-support-grid">
     <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
@@ -952,6 +950,7 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
 
