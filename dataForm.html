@@ -32,9 +32,12 @@
   gap: 8px;
   padding: 6px 0;
 }
-   .sub-label1 {
-   color:var(--muted); 
-{display:flex;align-items:center;gap:10px; margin-bottom:10px}
+.sub-label1 {
+  color: var(--muted);
+  display: block;       /* makes it sit below the title */
+  margin-left: 18px;    /* indent */
+  margin-bottom: 10px;  /* space below */
+  font-size: 12px;
 }
 
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
@@ -57,7 +60,7 @@
   }
   input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%) sepia(50%) saturate(600%) hue-rotate(120deg) brightness(90%)}
   input:focus, select:focus, textarea:focus{outline:none;box-shadow:0 8px 22px rgba(6,30,20,0.06);transform:translateY(-1px)}
-  .small-muted{ font-size:13px; color:var(--muted) }
+  .small-muted{ font-size:12px; color:var(--muted) }
   .member-preview{ margin-top:8px; font-size:14px }
   .member-preview li{ margin-bottom:6px }
 
@@ -950,6 +953,7 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
 
