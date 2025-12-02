@@ -4,133 +4,96 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Purok Kaligtasan — Data Entry of household</title>
-
-<!-- Minimal reset + variables -->
+<link rel="stylesheet" href="styles.css"/>
 <style>
-  :root{
-    --bg:#f6f8f7;
-    --card:#ffffff;
-    --muted:#6b776f;
-    --accent1:#0f7a4a;
-    --accent2:#34b78f;
-    --shadow: 0 8px 28px rgba(6,30,20,0.06);
-    --radius:12px;
-    --gap:12px;
-    --input-h:40px;
-    --fs-sm:13px;
-  }
-  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#0b2b1f}
-  a{color:inherit}
-  /* page container — preserved */
-  .page-container{display:grid;grid-template-columns:260px 1fr;gap:18px;min-height:100vh;padding:18px}
-  .sidebar{background:#fff;border-radius:10px;padding:12px;box-shadow:var(--shadow)}
-  .topbar{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 18px;background:#fff;border-radius:10px;box-shadow:var(--shadow);margin-bottom:8px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:44px;height:44px;object-fit:contain}
-  .title{font-weight:800;color:var(--accent1)}
-  .subtitle{font-size:13px;color:var(--muted)}
-  .user-info{display:flex;gap:8px;align-items:center}
-  .logout-btn{border:0;background:transparent;color:var(--accent1);cursor:pointer}
+  .sidebar a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff}
 
-  /* content area */
-  .content-area{padding:18px;background:transparent}
-  h2{margin:8px 0 12px 0}
-  .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
-  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap);align-items:start}
-  label{display:block;font-weight:600;margin-bottom:6px;color:#0b4630;font-size:14px}
-  input[type="text"], input[type="number"], select, textarea, input[type="date"]{
-    height:var(--input-h);padding:8px 10px;border-radius:10px;border:1px solid rgba(11,36,20,0.08);outline:none;font-size:14px;background:#fff;
-    transition:box-shadow 160ms, transform 160ms;
+  .content-area{padding:18px}
+  h2{margin:8px 0 18px 0}
+  .card{ padding:16px;border-radius:var(--radius);background:var(--card-bg);margin-bottom:12px;box-shadow:var(--shadow) }
+  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-items:start }
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  label{display:block;font-weight:700;margin-bottom:6px;color:#0b4630}
+  input[type="text"], input[type="date"], input[type="number"], select, textarea{
+    width:100%;padding:10px;border-radius:10px;border:1px solid rgba(6,30,20,0.06);box-shadow:none;font-size:14px;
+    transition: box-shadow .18s ease, transform .12s ease;
+    background:#fff;
   }
-  input[type="date"]{padding-left:10px}
-  input[type="text"]:focus, select:focus, textarea:focus, input[type="number"]:focus, input[type="date"]:focus{
-    box-shadow:0 6px 18px rgba(6,30,20,0.06);transform:translateY(-1px)
-  }
-  .small-muted{font-size:var(--fs-sm);color:var(--muted)}
+  input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%) sepia(50%) saturate(600%) hue-rotate(120deg) brightness(90%)}
+  input:focus, select:focus, textarea:focus{outline:none;box-shadow:0 8px 22px rgba(6,30,20,0.06);transform:translateY(-1px)}
+  .small-muted{ font-size:13px; color:var(--muted) }
+  .member-preview{ margin-top:8px; font-size:14px }
+  .member-preview li{ margin-bottom:6px }
+
+  /* radio / checkbox alignment */
+  .radio-line, .checkbox-grid { display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+  .radio-item, .checkbox-item{ display:flex; align-items:center; gap:8px; font-weight:600; color:#0b4630 }
+  .radio-item input, .checkbox-item input{transform:scale(1.05)}
+
+  /* member panel (slide-in) */
+  .member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width: 96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 320ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y: auto; border-radius: 8px 0 0 8px;}
+  .member-panel.open { transform: translateX(0%); }
+  .panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 5900; }
+  .panel-overlay.show { opacity: 1; pointer-events: auto; }
+
+  .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff; }
+  .btn.secondary { background: transparent; color: var(--accent1); border:1px solid rgba(6,30,20,0.06); }
+
   .actions-row{display:flex;gap:8px;justify-content:flex-end}
-  .btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff}
-  .btn.secondary{background:transparent;color:var(--accent1);border:1px solid rgba(6,30,20,0.06)}
-  .radio-line{display:flex;gap:12px;align-items:center}
-  .radio-item{display:flex;gap:8px;align-items:center}
-  .checkbox-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 12px;align-items:center}
-  .checkbox-grid label{display:flex;gap:8px;align-items:center;font-weight:600;color:#0b4630}
-  /* members preview */
-  .member-preview{margin-top:8px;font-size:14px}
-  .member-preview li{margin-bottom:6px}
-  /* overlay + panel */
-  .panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.32);opacity:0;pointer-events:none;transition:opacity 200ms;z-index:5900}
-  .panel-overlay.show{opacity:1;pointer-events:auto}
-  .member-panel{position:fixed;right:0;top:0;height:100vh;width:460px;max-width:96%;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(250,255,250,0.98));box-shadow:-18px 0 40px rgba(6,30,20,0.12);transform:translateX(110%);transition:transform 280ms cubic-bezier(.2,.9,.3,1);z-index:6000;padding:18px;overflow:auto;border-radius:0 12px 12px 0}
-  .member-panel.open{transform:translateX(0)}
-  .panel-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-  .panel-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 
-  /* Domestic animals grid (2-col) */
-  .domestic-grid{display:grid;grid-template-columns:1fr 120px;gap:8px 12px;align-items:center}
-  .domestic-grid .animal-label{font-weight:700;color:#0b4630}
-  .animal-row{display:contents} /* each label + qty will follow grid cells */
+  /* domestic animals grid */
+  .domestic-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:10px 18px; align-items:center }
+  .animal-row{ display:flex; gap:8px; align-items:center; justify-content:space-between; background:#fbfffb;padding:8px;border-radius:10px;border:1px solid rgba(6,30,20,0.03) }
+  .animal-left{display:flex;gap:8px;align-items:center}
+  .animal-left label{margin:0;font-weight:700}
+  .qty{width:86px}
+  .others-box{width:100%;min-height:72px;padding:10px;border-radius:10px;border:1px solid rgba(6,30,20,0.06)}
 
-  /* large textarea for Others */
-  textarea.large{min-height:84px;resize:vertical;padding:10px;border-radius:10px}
-
-  /* modern select dropdown animation */
-  select{
-    -webkit-appearance:none;-moz-appearance:none;appearance:none;
-    background-image:linear-gradient(45deg,transparent 50%, #0b4630 50%), linear-gradient(135deg,#0b4630 50%, transparent 50%);
-    background-position:calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
-    background-size:6px 6px,6px 6px;
-    background-repeat:no-repeat;
-    padding-right:36px;
-  }
-
-  /* small responsive */
-  @media (max-width:900px){
-    .page-container{grid-template-columns:1fr;padding:12px}
+  /* responsive */
+  @media (max-width:980px){
+    .page-container{grid-template-columns:1fr}
+    .sidebar{display:none}
     .form-grid{grid-template-columns:1fr}
-    .domestic-grid{grid-template-columns:1fr 100px}
-    .member-panel{width:100%;left:0;right:auto;border-radius:0}
+    .domestic-grid{grid-template-columns:1fr}
   }
 
-  /* align checkboxes and radios better */
-  input[type="checkbox"], input[type="radio"]{width:18px;height:18px;margin:0}
-  .field-inline{display:flex;align-items:center;gap:8px}
-  .section-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .section-title h3{margin:0}
-  .muted-small{font-size:12px;color:var(--muted)}
-  .card-sep{height:10px}
-  /* subtle anim on input focus for date to look modern */
-  input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(40%) sepia(60%) saturate(400%) hue-rotate(100deg)}
+  /* subtle animations for selects */
+  select.animated{appearance:none;padding-right:36px;background-image:linear-gradient(45deg,transparent 50%,#0b4630 50%),linear-gradient(135deg,#0b4630 50%,transparent 50%);background-position:calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+  .section-title{display:flex;align-items:center;gap:10px; margin-bottom:10px}
+  .chip{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;font-size:13px;font-weight:800}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(6,30,20,0.04),transparent);margin:12px 0;border-radius:6px}
+
+  /* small helpers */
+  .muted{color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
 <div class="page-container">
 
   <header class="topbar">
-    <div style="display:flex;gap:12px;align-items:center">
-      <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
-      <div class="brand">
-        <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
-        <div>
-          <div class="title">PUROK KALIGTASAN</div>
-          <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
-        </div>
+    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
+
+    <div class="brand">
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+      <div>
+        <div class="title">PUROK KALIGTASAN</div>
+        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
       </div>
     </div>
 
-    <div class="user-info">
-      <span id="userName"></span>
+    <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
+      <div class="muted">Signed in as <strong id="userName"></strong></div>
       <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
   </header>
 
   <aside class="sidebar" id="sidebar">
-    <ul style="list-style:none;padding:6px;margin:0">
-      <li style="margin:8px 0"><a href="dashboard.html">📊 Dashboard</a></li>
-      <li style="margin:8px 0"><a href="dataForm.html" class="active">📝 Data Entry</a></li>
-      <li style="margin:8px 0"><a href="records.html">📁 Records</a></li>
-      <li style="margin:8px 0"><a href="charts.html">📈 Charts</a></li>
-      <li style="margin:8px 0" class="admin-only"><a href="users.html">👥 User Management</a></li>
+    <ul>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
+      <li><a href="records.html">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
     </ul>
   </aside>
 
@@ -138,19 +101,19 @@
     <h2>📝 Household Evacuation Information (Head first)</h2>
 
     <form id="headForm" novalidate onsubmit="return false;">
-      <!-- BASIC INFORMATION -->
-      <div class="card">
-        <div class="section-title"><h3>Basic Information (Household Head)</h3><div class="muted-small">Required: Contact no. & Birthdate</div></div>
-        <div class="form-grid" style="margin-top:10px">
+      <!-- BASIC -->
+      <div class="card form-section">
+        <div class="section-title"><div class="chip">1</div><h3>Basic Information (Household Head)</h3></div>
+        <div class="form-grid">
           <div>
             <label>Coordinate (optional)</label>
-            <input type="text" id="coordinate" placeholder="lat, lon (optional)" />
-            <div class="small-muted">Optional — fill when available</div>
+            <input type="text" id="coordinate" placeholder="Latitude, Longitude (optional)"/>
+            <div class="small-muted">Optional — paste `lat, lng` if available.</div>
           </div>
 
           <div>
-            <label>Barangay <span style="color:#b33">*</span></label>
-            <select id="barangay" required>
+            <label>Barangay <span class="small">*</span></label>
+            <select id="barangay" required class="animated">
               <option value="">Select Barangay...</option>
               <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
               <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
@@ -162,8 +125,8 @@
           </div>
 
           <div>
-            <label>Sitio / Purok <span style="color:#b33">*</span></label>
-            <select id="sitio" required>
+            <label>Sitio / Purok <span class="small">*</span></label>
+            <select id="sitio" required class="animated">
               <option value="">Select...</option>
               <option>Purok I</option><option>Purok II</option><option>Purok III</option>
               <option>Purok IV</option><option>Purok V</option><option>Purok VI</option>
@@ -172,18 +135,17 @@
           </div>
 
           <div>
-            <label>Name of Household Head <span style="color:#b33">*</span></label>
+            <label>Name of Household Head <span class="small">*</span></label>
             <input type="text" id="householdHead" required />
           </div>
 
           <div>
-            <label>Contact no. <span style="color:#b33">*</span></label>
-            <input type="text" id="contactNo" placeholder="09XXXXXXXXX" pattern="^09[0-9]{9}$" required />
-            <div class="small-muted">Format: 09XXXXXXXXX</div>
+            <label>Contact no. <span class="small">*</span></label>
+            <input type="text" id="contactNo" placeholder="09XXXXXXXXX" required />
           </div>
 
           <div>
-            <label>Sex <span style="color:#b33">*</span></label>
+            <label>Sex <span class="small">*</span></label>
             <div class="radio-line">
               <label class="radio-item"><input type="radio" name="head_sex" value="Male" required> Male</label>
               <label class="radio-item"><input type="radio" name="head_sex" value="Female"> Female</label>
@@ -191,7 +153,7 @@
           </div>
 
           <div>
-            <label>Birthdate <span style="color:#b33">*</span></label>
+            <label>Birthdate <span class="small">*</span></label>
             <input type="date" id="householdBirthdate" required />
           </div>
 
@@ -206,7 +168,7 @@
           </div>
 
           <div>
-            <label>No. of Household Member/s <span style="color:#b33">*</span></label>
+            <label>No. of Household Member/s <span class="small">*</span></label>
             <input type="number" id="memberCount" min="0" value="0" />
             <div class="small-muted">Set to 0 if no other members.</div>
           </div>
@@ -215,8 +177,8 @@
 
       <!-- HEALTH & STATUS -->
       <div class="card">
-        <h3>Health and Status</h3>
-        <div class="form-grid" style="margin-top:10px">
+        <div class="section-title"><div class="chip">2</div><h3>Health and Status</h3></div>
+        <div class="form-grid">
           <div>
             <label>Persons with Disability (PWD)</label>
             <div class="radio-line">
@@ -227,7 +189,7 @@
 
           <div>
             <label>Status</label>
-            <select id="head_status">
+            <select id="head_status" class="animated">
               <option value="">Select...</option>
               <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
             </select>
@@ -235,48 +197,73 @@
 
           <div>
             <label>Transportation</label>
-            <select id="head_transport">
+            <select id="head_transport" class="animated">
               <option value="">Select...</option>
               <option>Individual with Transportation</option>
               <option>Individual needing Transportation</option>
             </select>
           </div>
+        </div>
+      </div>
+
+      <!-- DOMESTIC ANIMALS -->
+      <div class="card">
+        <div class="section-title"><div class="chip">3</div><h3>Domestic (Animals)</h3></div>
+
+        <div class="domestic-grid">
+          <div class="animal-row">
+            <div class="animal-left">
+              <label class="checkbox-item"><input type="checkbox" id="dog_chk"> Dog</label>
+            </div>
+            <div><input type="number" id="dog_qty" class="qty" min="0" placeholder="Qty" /></div>
+          </div>
+
+          <div class="animal-row">
+            <div class="animal-left">
+              <label class="checkbox-item"><input type="checkbox" id="cat_chk"> Cat</label>
+            </div>
+            <div><input type="number" id="cat_qty" class="qty" min="0" placeholder="Qty" /></div>
+          </div>
+
+          <div class="animal-row">
+            <div class="animal-left">
+              <label class="checkbox-item"><input type="checkbox" id="pig_chk"> Pig</label>
+            </div>
+            <div><input type="number" id="pig_qty" class="qty" min="0" placeholder="Qty" /></div>
+          </div>
+
+          <div class="animal-row">
+            <div class="animal-left">
+              <label class="checkbox-item"><input type="checkbox" id="cow_chk"> Cow</label>
+            </div>
+            <div><input type="number" id="cow_qty" class="qty" min="0" placeholder="Qty" /></div>
+          </div>
+
+          <div class="animal-row">
+            <div class="animal-left">
+              <label class="checkbox-item"><input type="checkbox" id="carabao_chk"> Carabao</label>
+            </div>
+            <div><input type="number" id="carabao_qty" class="qty" min="0" placeholder="Qty" /></div>
+          </div>
+
+          <div class="animal-row">
+            <div class="animal-left">
+              <label class="checkbox-item"><input type="checkbox" id="chicken_chk"> Chicken</label>
+            </div>
+            <div><input type="number" id="chicken_qty" class="qty" min="0" placeholder="Qty" /></div>
+          </div>
 
           <div style="grid-column:1/-1">
-            <label>Reasons for Displacement</label>
-            <select id="reasons">
-              <option value="">Select...</option>
-              <option>With-in 14-15 KM Danger Zone During Taal Eruption</option>
-              <option>Others</option>
-            </select>
+            <label>Others (describe — max ~2 sentences)</label>
+            <textarea id="animals_others" class="others-box" placeholder="Describe other domestic animals or notes..."></textarea>
           </div>
         </div>
       </div>
 
-      <!-- DOMESTIC (ANIMALS) — HEAD ONLY -->
+      <!-- PICKUP / TRANSPORT / CAMP -->
       <div class="card">
-        <h3>Domestic (Animals) — Household Head</h3>
-        <div class="small-muted" style="margin-bottom:8px">List animals and the quantities. "Others" is a free-text box (2 sentences).</div>
-
-        <div class="domestic-grid card" style="padding:12px">
-          <!-- Each animal label then qty -->
-          <div class="animal-label">Dog</div><div><input type="number" id="dogQty" min="0" placeholder="Qty" /></div>
-          <div class="animal-label">Cat</div><div><input type="number" id="catQty" min="0" /></div>
-          <div class="animal-label">Pig</div><div><input type="number" id="pigQty" min="0" /></div>
-          <div class="animal-label">Cow</div><div><input type="number" id="cowQty" min="0" /></div>
-          <div class="animal-label">Carabao</div><div><input type="number" id="carabaoQty" min="0" /></div>
-          <div class="animal-label">Chicken</div><div><input type="number" id="chickenQty" min="0" /></div>
-          <div style="grid-column:1/-1;margin-top:8px">
-            <label>Others</label>
-            <textarea id="animalsOthers" class="large" maxlength="250" placeholder="Type other domestic animals or notes (max ~2 sentences)"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- PICKUP / TRANSPORT / CAMP DETAILS -->
-      <div class="card">
-        <h3>Pickup / Transport / Camp Details</h3>
-        <div class="form-grid" style="margin-top:10px">
+        <div class="section-title"><div class="chip">4</div><h3>Pickup / Transport / Camp Details</h3></div>
+        <div class="form-grid">
           <div>
             <label>Designated Pick-Up Point</label>
             <input type="text" id="pickup" />
@@ -301,42 +288,50 @@
             <label>No. of Individuals Outside Camp</label>
             <input type="number" id="outsideCamp" min="0" value="0" />
           </div>
+
+          <div style="grid-column:1/-1">
+            <label>Reasons for Displacement</label>
+            <select id="reasons" class="animated">
+              <option value="">Select...</option>
+              <option>With-in 14-15 KM Danger Zone During Taal Eruption</option>
+              <option>Others</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- GOVERNMENT SUPPORT (HEAD) - 2 col aligned -->
+      <!-- GOVERNMENT SUPPORT -->
       <div class="card">
-        <h3>Government Support (Household Head)</h3>
-        <div class="checkbox-grid" style="margin-top:8px">
-          <label><input type="checkbox" id="ass_tupad"> TUPAD</label>
-          <label><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
-          <label><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
-          <label><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
-          <label><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
-          <label><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
-          <label><input type="checkbox" id="ass_relief"> Relief Goods</label>
-          <label><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
-        </div>
+        <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
+        <div class="form-grid">
+          <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_relief"> Relief Goods</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
 
-        <div style="margin-top:10px">
-          <label>AICS (if any)</label>
-          <select id="ass_aics">
-            <option value="">None</option>
-            <option>Shelter Assistance</option>
-            <option>Burial</option>
-            <option>Scholarship</option>
-          </select>
+          <div style="grid-column:1/-1;margin-top:8px">
+            <label>AICS (if any)</label>
+            <select id="ass_aics" class="animated">
+              <option value="">None</option>
+              <option>Shelter Assistance</option>
+              <option>Burial</option>
+              <option>Scholarship</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- members preview + submit -->
+      <!-- MEMBERS PREVIEW + ACTION -->
       <div class="card">
-        <h4>Members to be collected</h4>
+        <div class="section-title"><div class="chip">6</div><h3>Members to be collected</h3></div>
         <div class="small-muted">Number of members chosen: <strong id="previewCount">0</strong></div>
         <ul id="membersPreview" class="member-preview"></ul>
 
-        <div style="height:10px"></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
           <button id="resetBtn" class="btn secondary" type="button">Reset</button>
           <button id="nextToMembers" class="btn" type="button">Save → Next Members</button>
         </div>
@@ -349,124 +344,135 @@
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
 <div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
-  <div class="panel-header">
+  <div class="panel-header" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
     <button id="panelClose" class="btn secondary" title="Close panel">←</button>
     <h3 id="panelTitle">Member 1 of N</h3>
   </div>
 
   <div class="panel-body">
     <form id="memberForm" onsubmit="return false;">
-      <div class="card" style="margin-bottom:8px">
-        <h4>Member — Basic Info</h4>
-        <div class="form-grid" style="margin-top:8px">
-          <div>
-            <label>Member Name <span style="color:#b33">*</span></label>
-            <input type="text" id="memberName" class="member-name" required />
-          </div>
-
-          <div>
-            <label>Contact no.</label>
-            <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX" />
-          </div>
-
-          <div>
-            <label>Sex</label>
-            <div class="radio-line">
-              <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex"> Male</label>
-              <label class="radio-item"><input type="radio" name="member_sex" value="Female" class="member-sex"> Female</label>
-            </div>
-          </div>
-
-          <div>
-            <label>Birthdate</label>
-            <input type="date" id="memberBirthdate" class="member-birthdate" />
-          </div>
-
-          <div>
-            <label>Age</label>
-            <input type="text" id="memberAge" class="member-age" readonly />
-          </div>
-
-          <div>
-            <label>Stage</label>
-            <input type="text" id="memberStage" class="member-stage" readonly />
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:8px">
-        <h4>Health & Status</h4>
-        <div class="form-grid" style="margin-top:8px">
-          <div>
-            <label>PWD</label>
-            <div class="radio-line">
-              <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" class="member-pwd"> Yes</label>
-              <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked class="member-pwd"> No</label>
-            </div>
-          </div>
-
-          <div>
-            <label>Status</label>
-            <select id="memberStatus" class="member-status">
-              <option value="">Select...</option><option>With Sickness</option><option>Pregnant</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Transportation</label>
-            <select id="memberTransport" class="member-transport">
-              <option value="">Select...</option>
-              <option>Individual with Transportation</option>
-              <option>Individual needing Transportation</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Reason</label>
-            <select id="memberReason" class="member-reason">
-              <option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:8px">
-        <h4>Pickup / Transport / Camp</h4>
-        <div class="form-grid" style="margin-top:8px">
-          <div><label>Designated Pick-Up Point</label><input type="text" id="memberPickup" class="member-pickup"/></div>
-          <div><label>Drop-Off Point</label><input type="text" id="memberDropoff" class="member-dropoff"/></div>
-          <div><label>Name of Camp</label><input type="text" id="memberCamp" class="member-camp"/></div>
-          <div><label>Capacity</label><input type="number" id="memberCampCap" class="member-cap" min="0"/></div>
-          <div><label>No. inside camp</label><input type="number" id="memberInside" class="member-inside" min="0"/></div>
-          <div><label>No. outside camp</label><input type="number" id="memberOutside" class="member-outside" min="0"/></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:8px">
-        <h4>Government Support (Member)</h4>
-        <div class="checkbox-grid" style="margin-top:8px">
-          <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
-          <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
-          <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
-          <label><input type="checkbox" id="member_locsp" class="member_locsp"> Local Social Pension</label>
-          <label><input type="checkbox" id="member_intlsp" class="member_intlsp"> National Social Pension</label>
-          <label><input type="checkbox" id="member_solo" class="member_solo"> Solo Parent Assistance</label>
-          <label><input type="checkbox" id="member_cash" class="member_cash"> Cash Subsidy</label>
-          <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
+      <div class="form-grid">
+        <div>
+          <label>Member Name <span class="small">*</span></label>
+          <input type="text" id="memberName" class="member-name" required />
         </div>
 
-        <div style="margin-top:8px">
-          <label>AICS (if any)</label>
-          <select id="memberAics" class="member_aics">
-            <option value="">None</option>
-            <option>Shelter Assistance</option>
-            <option>Burial</option>
-            <option>Scholarship</option>
+        <div>
+          <label>Contact no. <span class="small">*</span></label>
+          <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX" required />
+        </div>
+
+        <div>
+          <label>Sex</label>
+          <div class="radio-line">
+            <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex"> Male</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Female" class="member-sex"> Female</label>
+          </div>
+        </div>
+
+        <div>
+          <label>Birthdate</label>
+          <input type="date" id="memberBirthdate" class="member-birthdate" />
+        </div>
+
+        <div>
+          <label>Age</label>
+          <input type="text" id="memberAge" class="member-age" readonly />
+        </div>
+
+        <div>
+          <label>PWD</label>
+          <div class="radio-line">
+            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" class="member-pwd"> Yes</label>
+            <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked class="member-pwd"> No</label>
+          </div>
+        </div>
+
+        <div>
+          <label>Stage</label>
+          <input type="text" id="memberStage" class="member-stage" readonly />
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select id="memberStatus" class="member-status animated">
+            <option value="">Select...</option><option>With Sickness</option><option>Pregnant</option>
           </select>
         </div>
+
+        <div>
+          <label>Transportation</label>
+          <select id="memberTransport" class="member-transport animated">
+            <option value="">Select...</option>
+            <option>Individual with Transportation</option>
+            <option>Individual needing Transportation</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Designated Pick-Up Point</label>
+          <input type="text" id="memberPickup" class="member-pickup"/>
+        </div>
+
+        <div>
+          <label>Drop-Off Point</label>
+          <input type="text" id="memberDropoff" class="member-dropoff"/>
+        </div>
+
+        <div>
+          <label>Name of Camp</label>
+          <input type="text" id="memberCamp" class="member-camp"/>
+        </div>
+
+        <div>
+          <label>Capacity</label>
+          <input type="number" id="memberCampCap" class="member-cap" min="0"/>
+        </div>
+
+        <div>
+          <label>No. of Individuals Inside Camp</label>
+          <input type="number" id="memberInside" class="member-inside" min="0"/>
+        </div>
+
+        <div>
+          <label>No. of Individuals Outside Camp</label>
+          <input type="number" id="memberOutside" class="member-outside" min="0"/>
+        </div>
+
+        <div>
+          <label>Reason</label>
+          <select id="memberReason" class="member-reason animated">
+            <option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option>
+          </select>
+        </div>
+
+        <div style="grid-column:1/-1; margin-top:8px">
+          <h4 style="margin:6px 0 8px 0">Government Support</h4>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
+            <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
+            <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
+            <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
+            <label><input type="checkbox" id="member_locsp" class="member_locsp"> Local Social Pension</label>
+            <label><input type="checkbox" id="member_intlsp" class="member_intlsp"> National Social Pension</label>
+            <label><input type="checkbox" id="member_solo" class="member_solo"> Solo Parent Assistance</label>
+            <label><input type="checkbox" id="member_cash" class="member_cash"> Cash Subsidy</label>
+            <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>AICS (if any)</label>
+            <select id="memberAics" class="member_aics animated">
+              <option value="">None</option>
+              <option>Shelter Assistance</option>
+              <option>Burial</option>
+              <option>Scholarship</option>
+            </select>
+          </div>
+        </div>
+
       </div>
 
-      <div class="panel-actions">
+      <div class="panel-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
         <button id="memberBack" class="btn secondary" type="button">Back</button>
         <button id="memberNext" class="btn" type="button">Save & Next</button>
       </div>
@@ -475,10 +481,10 @@
 </div>
 
 <script>
-/* ---------------- Configuration ---------------- */
+/* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
 const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-/* ---------------- date helpers (same as your previous) ---------------- */
+/* ---------------- helpers ---------------- */
 function toSheetDateFormat(inputVal){
   if(!inputVal) return "";
   if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
@@ -509,7 +515,7 @@ function toInputDate(val){
   return "";
 }
 
-/* ---------------- Age compute (unchanged) ---------------- */
+/* compute age display + stage */
 function computeAgeDetailed(inputDateValue){
   if(!inputDateValue) return null;
   let d;
@@ -543,31 +549,24 @@ function computeAgeDetailed(inputDateValue){
   if(years >= 1){
     display = String(years);
   } else {
-    if(months >= 1){
-      display = `${months} months`;
-    } else {
-      display = `${days} days`;
-    }
+    if(months >= 1) display = `${months} months`;
+    else display = `${days} days`;
   }
 
   let stage = "";
   if(years === 0){
     if(months <= 10) stage = "Infant";
     else stage = "Children";
-  } else if(years <= 17){
-    stage = "School Children";
-  } else if(years >= 60){
-    stage = "Elderly";
-  } else {
-    stage = "Adult";
-  }
+  } else if(years <= 17) stage = "School Children";
+  else if(years >= 60) stage = "Elderly";
+  else stage = "Adult";
 
   return { years, months, days, display, stage };
 }
 
 /* ---------------- UI + state ---------------- */
 function ensureLoginOrRedirect(){
-  if(!localStorage.getItem("loggedIn")){ /* keep behavior but don't redirect in test */ return true; }
+  if(!localStorage.getItem("loggedIn")){ /* keep as-is or redirect to login */ return true; }
   return true;
 }
 
@@ -575,7 +574,6 @@ let membersToCollect = 0;
 let currentMemberIndex = 0;
 let collectedMembers = [];
 
-/* update preview */
 function updateMemberPreview(){
   const n = parseInt(document.getElementById("memberCount").value || 0);
   document.getElementById("previewCount").innerText = n;
@@ -584,12 +582,12 @@ function updateMemberPreview(){
   for(let i=0;i<n;i++){
     const mem = collectedMembers[i];
     const li = document.createElement('li');
-    li.innerText = mem ? `#${i+1} — ${mem["Name of Household Member/s"] || "(empty)"}` : `#${i+1} — (empty)`;
+    li.innerText = mem ? `#${i+1} — ${mem["Name of Household Member/s"] || "(empty)"} (${mem["Contact no."]||""})` : `#${i+1} — (empty)`;
     list.appendChild(li);
   }
 }
 
-/* fill member panel with existing or blank */
+/* fill member panel */
 function fillMemberPanel(idx){
   const mem = collectedMembers[idx] || {};
   document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
@@ -618,7 +616,7 @@ function fillMemberPanel(idx){
   document.getElementById("memberAics").value = mem["AICS"] || "";
 }
 
-/* collect member panel inputs into object that matches Master sheet keys */
+/* collect member data */
 function collectMemberDataFromPanel(){
   const name = document.getElementById("memberName").value.trim();
   const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
@@ -635,7 +633,7 @@ function collectMemberDataFromPanel(){
     "Birthdate": birth_for_sheet,
     "Age": ageVal,
     "Stage": stageVal,
-    "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
+    "PWD": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
     "Status": document.getElementById("memberStatus").value || "",
     "Transportation": document.getElementById("memberTransport").value || "",
     "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
@@ -657,7 +655,7 @@ function collectMemberDataFromPanel(){
   };
 }
 
-/* update member age/stage live when date changes */
+/* live age update */
 document.addEventListener('input', (ev) => {
   if(ev.target && ev.target.id === "memberBirthdate"){
     const v = ev.target.value;
@@ -692,11 +690,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const barangay = document.getElementById("barangay").value.trim();
     const sitio = document.getElementById("sitio").value.trim();
     const headName = document.getElementById("householdHead").value.trim();
-    const contact = document.getElementById("contactNo").value.trim();
-    const bdate = document.getElementById("householdBirthdate").value || "";
-    if(!barangay || !sitio || !headName){ alert("Please fill Barangay, Sitio/Purok and Name of Household Head."); return; }
-    if(!contact){ alert("Please fill Contact no. for household head."); return; }
-    if(!bdate){ alert("Please fill Birthdate for household head."); return; }
+    const headContact = document.getElementById("contactNo").value.trim();
+    if(!barangay || !sitio || !headName || !headContact){ alert("Please fill Barangay, Sitio/Purok, Name of Household Head and Contact no."); return; }
 
     membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
     collectedMembers = []; currentMemberIndex = 0;
@@ -732,7 +727,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // memberNext (save & next)
   document.getElementById("memberNext").addEventListener('click', () => {
     const name = document.getElementById("memberName").value.trim();
-    if(!name){ alert("Please enter member's name."); return; }
+    const contact = document.getElementById("memberContact").value.trim();
+    if(!name || !contact){ alert("Please enter member's name and contact no."); return; }
 
     collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
     updateMemberPreview();
@@ -748,7 +744,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
   });
 
-  // live update household birthdate change (also handled by input listener)
   document.getElementById("householdBirthdate").addEventListener('change', () => {
     const info = computeAgeDetailed(document.getElementById("householdBirthdate").value);
     document.getElementById("householdAge").value = info ? info.display : "";
@@ -758,13 +753,13 @@ document.addEventListener('DOMContentLoaded', () => {
   updateMemberPreview();
 });
 
-/* ---------------- open / close panel helpers ---------------- */
+/* panel helpers */
 function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
 function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
 
 /* ---------------- Submit head + members ---------------- */
 async function submitHeadAndMembers(){
-  // head birthdate -> DD/MM/YYYY
+  // gather head
   const headBirthInput = document.getElementById("householdBirthdate").value || "";
   const headBirthForSheet = toSheetDateFormat(headBirthInput);
   const headAgeInfo = computeAgeDetailed(headBirthInput);
@@ -779,11 +774,10 @@ async function submitHeadAndMembers(){
     "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
     "Birthdate": headBirthForSheet,
     "Age": headAgeVal,
-    "Stage": headAgeInfo ? headAgeInfo.stage : "",
     "No. of Household Member/s": document.getElementById("memberCount").value || "0",
-    "Name of Household Member/s": "",
-
-    "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
+    "Name of Household Member/s": "", // head row has this empty
+    "PWD": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
+    "Stage": headAgeInfo ? headAgeInfo.stage : "",
     "Status": document.getElementById("head_status").value || "",
     "Transportation": document.getElementById("head_transport").value || "",
     "Designated Pick-Up Point": document.getElementById("pickup").value || "",
@@ -793,7 +787,6 @@ async function submitHeadAndMembers(){
     "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
     "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
     "Reasons for Displacement": document.getElementById("reasons").value || "",
-
     "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
     "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
     "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
@@ -803,27 +796,25 @@ async function submitHeadAndMembers(){
     "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
     "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
     "AICS": document.getElementById("ass_aics").value || "",
-
-    /* Domestic animals — HEAD only (keys used below must match your sheet or Code.gs) */
-    "Dog": (document.getElementById("dogQty").value ? "Yes" : ""),
-    "Dog Qty": document.getElementById("dogQty").value || "",
-    "Cat": (document.getElementById("catQty").value ? "Yes" : ""),
-    "Cat Qty": document.getElementById("catQty").value || "",
-    "Pig": (document.getElementById("pigQty").value ? "Yes" : ""),
-    "Pig Qty": document.getElementById("pigQty").value || "",
-    "Cow": (document.getElementById("cowQty").value ? "Yes" : ""),
-    "Cow Qty": document.getElementById("cowQty").value || "",
-    "Carabao": (document.getElementById("carabaoQty").value ? "Yes" : ""),
-    "Carabao Qty": document.getElementById("carabaoQty").value || "",
-    "Chicken": (document.getElementById("chickenQty").value ? "Yes" : ""),
-    "Chicken Qty": document.getElementById("chickenQty").value || "",
-    "Others": document.getElementById("animalsOthers").value || "",
-
+    /* Domestic animals — store as separate fields matching your header */
+    "Dog": document.getElementById("dog_chk").checked ? "Yes" : "No",
+    "Dog Qty.": document.getElementById("dog_qty").value || "",
+    "Cat": document.getElementById("cat_chk").checked ? "Yes" : "No",
+    "Cat Qty.": document.getElementById("cat_qty").value || "",
+    "Pig": document.getElementById("pig_chk").checked ? "Yes" : "No",
+    "Pig Qty.": document.getElementById("pig_qty").value || "",
+    "Cow": document.getElementById("cow_chk").checked ? "Yes" : "No",
+    "Cow Qty.": document.getElementById("cow_qty").value || "",
+    "Carabao": document.getElementById("carabao_chk").checked ? "Yes" : "No",
+    "Carabao Qty.": document.getElementById("carabao_qty").value || "",
+    "Chicken": document.getElementById("chicken_chk").checked ? "Yes" : "No",
+    "Chicken Qty.": document.getElementById("chicken_qty").value || "",
+    "Others": document.getElementById("animals_others").value || "",
     "Submitted By": localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown",
-    "Submitted On": new Date().toLocaleString()
+    "Submitted On": new Date().toLocaleString() // the server will replace with formatted timestamp, but we include for debugging
   };
 
-  // ensure members array length matches count
+  // ensure members length matches selected
   const expected = parseInt(document.getElementById("memberCount").value || 0);
   const members = collectedMembers.slice(0);
   for(let i=0;i<expected;i++){
@@ -835,7 +826,7 @@ async function submitHeadAndMembers(){
         "Birthdate": "",
         "Age": "",
         "Stage": "",
-        "Persons with Disability (PWD)": "No",
+        "PWD": "No",
         "Status": "",
         "Transportation": "",
         "Designated Pick-Up Point": "",
@@ -856,13 +847,13 @@ async function submitHeadAndMembers(){
         "AICS": ""
       };
     }
-    // ensure any birthdate in members are DD/MM/YYYY
+    // ensure birthdate format DD/MM/YYYY
     if(members[i]["Birthdate"]){
       members[i]["Birthdate"] = (members[i]["Birthdate"].indexOf('/') === -1) ? toSheetDateFormat(members[i]["Birthdate"]) : members[i]["Birthdate"];
     }
   }
 
-  // build FormData
+  // Build request
   const form = new FormData();
   form.append("action","createRecord");
   form.append("head", JSON.stringify(head));
@@ -880,8 +871,12 @@ async function submitHeadAndMembers(){
     const res = await fetch(API_URL, { method: "POST", body: form });
     const text = await res.text();
     console.log("RAW RESPONSE:", text);
+
     let data;
-    try { data = JSON.parse(text); } catch(e){ throw new Error("Invalid response from server: " + e.message); }
+    try { data = JSON.parse(text); } catch (e) {
+      // server returned non-JSON (error). Show raw.
+      throw new Error("Invalid response from server: " + text);
+    }
 
     if(data.success){
       alert("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
@@ -892,7 +887,7 @@ async function submitHeadAndMembers(){
     }
   }catch(err){
     console.error("SUBMIT ERROR:", err);
-    alert("Network / Server error. Check console.");
+    alert("Network / Server error: " + (err.message || err));
   }finally{
     submitBtn.disabled = false;
     submitBtn.innerText = "Save → Next Members";
