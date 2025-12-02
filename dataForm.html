@@ -29,7 +29,19 @@
   .content-area{padding:18px}
   h2{margin:8px 0 18px 0}
   .card{ padding:16px;border-radius:var(--radius);background:var(--card-bg);margin-bottom:12px;box-shadow:var(--shadow) }
-  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-items:start }
+  .form-grid label {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 10px 40px; /* row-gap, column-gap */
+  margin-bottom: 20px;
+}
+.form-grid {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between checkbox and text */
+  font-size: 16px;
+  color: #064e3b; /* optional styling */
+}
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   label{display:block;font-weight:700;margin-bottom:6px;color:#0b4630}
   input[type="text"], input[type="date"], input[type="number"], select, textarea{
@@ -928,6 +940,7 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
 
