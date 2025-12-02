@@ -19,6 +19,19 @@
   #disc {
   margin-bottom: 5px;
 }
+   .gov-support-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 10px 20px; /* row-gap, column-gap */
+  margin-top: 12px;
+}
+
+.gov-support-grid .checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
   .page-container{display:grid;grid-template-columns:260px 1fr;min-height:100vh;gap:18px}
   .sidebar{background:transparent;padding:18px}
@@ -29,19 +42,7 @@
   .content-area{padding:18px}
   h2{margin:8px 0 18px 0}
   .card{ padding:16px;border-radius:var(--radius);background:var(--card-bg);margin-bottom:12px;box-shadow:var(--shadow) }
-  .form-grid label {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
-  gap: 10px 40px; /* row-gap, column-gap */
-  margin-bottom: 20px;
-}
-.form-grid {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* space between checkbox and text */
-  font-size: 16px;
-  color: #064e3b; /* optional styling */
-}
+  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-items:start }
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   label{display:block;font-weight:700;margin-bottom:6px;color:#0b4630}
   input[type="text"], input[type="date"], input[type="number"], select, textarea{
@@ -338,18 +339,21 @@
       </div>
 
       <!-- GOVERNMENT SUPPORT -->
-      <div class="card">
-        <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
-         <div class="small-muted">Please check (✓) all items that apply.</div>
-        <div class="form-grid">
-          <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_relief"> Relief Goods</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
+<div class="card">
+  <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
+  <div class="small-muted">Please check (✓) all items that apply.</div>
+
+  <div class="gov-support-grid">
+    <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
+    <label class="checkbox-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
+    <label class="checkbox-item"><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
+    <label class="checkbox-item"><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
+    <label class="checkbox-item"><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
+    <label class="checkbox-item"><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
+    <label class="checkbox-item"><input type="checkbox" id="ass_relief"> Relief Goods</label>
+    <label class="checkbox-item"><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
+  </div>
+</div>
 
           <div style="grid-column:1/-1;margin-top:8px">
             <label>AICS (if any)</label>
@@ -940,6 +944,7 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
 
