@@ -6,6 +6,13 @@
 <title>Purok Kaligtasan — Data Entry of household</title>
 <link rel="stylesheet" href="styles.css"/>
 <style>
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
+  .page-container{display:grid;grid-template-columns:260px 1fr;min-height:100vh;gap:18px}
+  .sidebar{background:transparent;padding:18px}
+  .sidebar ul{list-style:none;padding:0;margin:0}
+  .sidebar li{margin-bottom:10px}
+  .sidebar a{display:block;padding:10px;border-radius:10px;text-decoration:none;color:#0b4630;font-weight:700}
+  .sidebar a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff}
   .sidebar a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff}
 
   .content-area{padding:18px}
@@ -896,3 +903,4 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
