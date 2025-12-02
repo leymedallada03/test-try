@@ -199,394 +199,363 @@
   <div class="toast-wrap" id="toasts"></div>
 
 <script>
-/* =============================
-   USERS PAGE (Cookie-based auth)
-   ============================= */
+/* ============================================================
+   USERS.JS — Admin User Management Logic
+   Clean, optimized, with Toast UI + API auth + auto-refresh
+   ============================================================ */
 
-/*
-  Expectations:
-  - Cookies: "username" and "pwHash" MUST be present (set by your login flow).
-  - All API calls include these credentials (GET query or JSON auth field).
-  - Wire exactly to your Code.gs actions:
-      ?action=users             (GET)  -> returns { success:true, users: [...] }
-      POST body { action: "createUser", auth:{username,pwHash}, user: {...} }
-      POST body { action: "updateUser", auth:{...}, targetUsername, updates: {...} }
-      POST body { action: "deleteUser", auth:{...}, targetUsername }
-      ?action=logs&username=...&pwHash=...  -> returns { success:true, logs: [...] }
-*/
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
-
-// ---------- small helpers ----------
-function showToast(message, type='success', timeout=3500){
-  const wrap = document.getElementById('toasts');
-  const el = document.createElement('div');
-  el.className = 'toast ' + (type==='error' ? 'error' : 'success');
-  el.innerText = message;
-  wrap.appendChild(el);
-  setTimeout(()=> {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(12px)';
-    setTimeout(()=> wrap.removeChild(el), 300);
-  }, timeout);
-}
-
-function readCookie(name){
-  const m = document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='));
-  if(!m) return null;
-  return decodeURIComponent(m.split('=')[1] || '');
-}
-
-function requireAuthOrRedirect(){
-  const username = readCookie('username');
-  const pwHash = readCookie('pwHash');
-  if(!username || !pwHash){
-    // if no cookie, redirect to login
-    window.location.href = 'index.html';
-    return null;
-  }
-  return { username, pwHash };
-}
-
-// fetch helpers
-async function apiGet(action, params={}){
-  const auth = requireAuthOrRedirect();
-  if(!auth) throw new Error('Not authenticated');
-  const qp = new URLSearchParams({ action, username: auth.username, pwHash: auth.pwHash, ...params });
-  const res = await fetch(API_URL + '?' + qp.toString(), { cache: 'no-store' });
-  if(!res.ok) throw new Error('Network error: ' + res.status);
-  return res.json();
-}
-async function apiPost(body){
-  const auth = requireAuthOrRedirect();
-  if(!auth) throw new Error('Not authenticated');
-  body.auth = body.auth || {};
-  body.auth.username = auth.username;
-  body.auth.pwHash = auth.pwHash;
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if(!res.ok) throw new Error('Network error: ' + res.status);
-  return res.json();
-}
-
-// sha256 utility for password hashing (returns hex)
-async function sha256Hex(message){
-  const msgUint8 = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-// ---------- UI state ----------
 let ALL_USERS = [];
 let EDIT_TARGET = null;
 
-// ---------- DOM references ----------
-const usersBody = document.getElementById('usersBody');
-const filterInput = document.getElementById('filterUser');
-const statTotal = document.getElementById('statTotal');
-const statAdmins = document.getElementById('statAdmins');
-const statStaff = document.getElementById('statStaff');
+/* ============================================================
+   TOAST / SNACKBAR UI
+   ============================================================ */
+function showToast(msg, type = "info") {
+  let box = document.createElement("div");
+  box.className = `toast toast-${type}`;
+  box.innerText = msg;
 
-// ---------- event wiring ----------
-document.addEventListener('DOMContentLoaded', async () => {
-  const auth = requireAuthOrRedirect();
-  if(!auth) return;
+  document.body.appendChild(box);
 
-  document.getElementById('currentUser').innerText = auth.username;
+  setTimeout(() => {
+    box.style.opacity = 0;
+    setTimeout(() => box.remove(), 400);
+  }, 2400);
+}
 
-  document.getElementById('logoutBtn').addEventListener('click', ()=> {
-    // clear cookies (best-effort) and redirect to login
-    document.cookie = "username=; path=/; max-age=0";
-    document.cookie = "pwHash=; path=/; max-age=0";
-    window.location.href = 'index.html';
-  });
+/* Inject CSS for toast */
+const style = document.createElement("style");
+style.textContent = `
+.toast {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  background: #0F7A4A;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  opacity: 1;
+  transition: opacity .4s;
+  z-index: 99999;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+}
+.toast-error { background: #cc0000; }
+.toast-info { background: #0F7A4A; }
+.toast-warning { background: #ff8800; }
+`;
+document.head.appendChild(style);
 
-  document.getElementById('openAddUser').addEventListener('click', ()=> openUserDrawer('add'));
-  document.getElementById('cancelUserDrawer').addEventListener('click', closeUserDrawer);
-  document.getElementById('drawerBack').addEventListener('click', closeUserDrawer);
+/* ============================================================
+   PAGE INITIALIZATION (NO localStorage login)
+   ============================================================ */
+document.addEventListener("DOMContentLoaded", async () => {
+  // Check role using API
+  await verifyAccessRole();
 
-  document.getElementById('saveUserBtn').addEventListener('click', async () => {
-    if(EDIT_TARGET) await submitUpdateUser();
-    else await submitCreateUser();
-  });
+  document.getElementById("logoutBtn").onclick = logout;
 
-  document.getElementById('viewLogsBtn').addEventListener('click', loadLogs);
-  document.getElementById('closeLogs').addEventListener('click', ()=> document.getElementById('logsModal').style.display = 'none');
+  document.getElementById("filterUser").oninput = (e) =>
+    renderUsers(e.target.value.trim().toLowerCase());
 
-  filterInput.addEventListener('input', (e)=> renderUsers(e.target.value.trim().toLowerCase()));
+  document.getElementById("openAddUser").onclick = () => openDrawer("add");
+  document.getElementById("cancelUserDrawer").onclick = closeDrawer;
+  document.getElementById("drawerBack").onclick = closeDrawer;
+  document.getElementById("userPanelOverlay").onclick = closeDrawer;
 
-  // load user list
-  await loadUsersAndRender();
+  document.getElementById("saveUserBtn").onclick = saveUser;
+  document.getElementById("viewLogsBtn").onclick = loadLogs;
+  document.getElementById("closeLogs").onclick = () =>
+    (document.getElementById("logsModal").style.display = "none");
+
+  loadUsers();
+
+  // Auto-refresh users every 20s
+  setInterval(loadUsers, 20000);
 });
 
-// ---------- Load users ----------
-async function loadUsersAndRender(){
+/* ============================================================
+   ROLE VERIFICATION (No LocalStorage)
+   ============================================================ */
+async function verifyAccessRole() {
   try {
-    showToast('Loading users...', 'success', 1200);
-    const j = await apiGet('users');
-    if(!j || !j.success) {
-      showToast('Permission denied or failed to load users', 'error');
-      return;
-    }
-    ALL_USERS = j.users || [];
+    const res = await fetch(`${API_URL}?action=sessionCheck`);
+    const data = await res.json();
 
-    // check current user role (must be Admin)
-    const auth = requireAuthOrRedirect();
-    const me = ALL_USERS.find(u => String(u.Username) === String(auth.username));
-    if(!me || String(me.Role).toLowerCase() !== 'admin'){
-      // not admin -> redirect
-      showToast('Access denied — admin only', 'error', 2500);
-      setTimeout(()=> window.location.href = 'dashboard.html', 900);
+    if (!data.success || data.role !== "Admin") {
+      window.location.href = "index.html";
       return;
     }
 
-    renderStats();
-    renderUsers();
-    showToast('Users loaded', 'success');
-  } catch(err){
-    console.error(err);
-    showToast('Failed to load users: ' + (err.message || err), 'error', 5000);
-    usersBody.innerHTML = '<tr><td colspan="5" class="muted-note">Failed to load users.</td></tr>';
+    document.getElementById("userName").innerText = data.fullName || "";
+
+  } catch (err) {
+    showToast("Failed to verify login.", "error");
+    window.location.href = "index.html";
   }
 }
 
-// ---------- Render stats ----------
-function renderStats(){
-  const total = ALL_USERS.length;
-  const admins = ALL_USERS.filter(u => String(u.Role).toLowerCase() === 'admin').length;
-  const staff = ALL_USERS.filter(u => String(u.Role).toLowerCase() === 'staff').length;
-  statTotal.innerText = total;
-  statAdmins.innerText = admins;
-  statStaff.innerText = staff;
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+async function logout() {
+  await fetch(`${API_URL}?action=logout`);
+  window.location.href = "index.html";
 }
 
-// ---------- Render users table ----------
-function renderUsers(filter=''){
-  usersBody.innerHTML = '';
-  const q = (filter || '').toString().trim().toLowerCase();
+/* ============================================================
+   LOAD USERS
+   ============================================================ */
+async function loadUsers() {
+  try {
+    const res = await fetch(`${API_URL}?action=users`);
+    const data = await res.json();
 
-  const list = ALL_USERS.filter(u => {
-    if(!q) return true;
-    const hay = `${u.Username} ${u.FullName} ${u.Role} ${u.AssignedBarangay}`.toLowerCase();
-    return hay.includes(q);
-  });
+    if (!data.success) {
+      showToast("Permission denied.", "error");
+      return;
+    }
 
-  if(list.length === 0){
-    usersBody.innerHTML = `<tr><td colspan="5" class="muted-note">No users found.</td></tr>`;
+    ALL_USERS = data.users || [];
+    renderUsers();
+
+  } catch (err) {
+    showToast("Unable to load users.", "error");
+  }
+}
+
+/* ============================================================
+   RENDER USERS (filters included)
+   ============================================================ */
+function renderUsers(filter = "") {
+  const body = document.getElementById("usersBody");
+  body.innerHTML = "";
+
+  const list = ALL_USERS.filter((u) =>
+    `${u.Username} ${u.FullName} ${u.Role} ${u.AssignedBarangay}`
+      .toLowerCase()
+      .includes(filter)
+  );
+
+  if (list.length === 0) {
+    body.innerHTML = `<tr><td colspan="5">No users found</td></tr>`;
     return;
   }
 
-  list.forEach(user => {
-    const tr = document.createElement('tr');
+  list.forEach((user) => {
+    const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${escapeHtml(user.Username)}</td>
-      <td>${escapeHtml(user.FullName || '')}</td>
-      <td>${escapeHtml(user.Role || '')}</td>
-      <td>${escapeHtml(user.AssignedBarangay || '')}</td>
+      <td>${escape(user.Username)}</td>
+      <td>${escape(user.FullName)}</td>
+      <td>${escape(user.Role)}</td>
+      <td>${escape(user.AssignedBarangay)}</td>
       <td class="actions-cell">
-        <button class="icon-btn" title="Edit" data-username="${escapeHtml(user.Username)}" data-action="edit">✏️</button>
-        <button class="icon-btn" title="Reset Password" data-username="${escapeHtml(user.Username)}" data-action="resetpw">🔑</button>
-        <button class="icon-btn" title="Delete" data-username="${escapeHtml(user.Username)}" data-action="delete">🗑️</button>
+        <button class="icon-btn" data-act="edit" data-u="${user.Username}">✏️</button>
+        <button class="icon-btn" data-act="reset" data-u="${user.Username}">🔑</button>
+        <button class="icon-btn" data-act="delete" data-u="${user.Username}">🗑️</button>
       </td>
     `;
-    usersBody.appendChild(tr);
+    body.appendChild(tr);
   });
 
-  // bind actions
-  usersBody.querySelectorAll('button[data-action]').forEach(btn => {
-    btn.onclick = async (ev) => {
-      const action = btn.dataset.action;
-      const username = btn.dataset.username;
-      const target = ALL_USERS.find(u => u.Username === username);
-      if(action === 'edit') openUserDrawer('edit', target);
-      if(action === 'resetpw') openUserDrawer('edit', target, { focusPassword:true });
-      if(action === 'delete') deleteUser(username);
-    };
-  });
+  body.querySelectorAll("button[data-act]").forEach((btn) =>
+    btn.addEventListener("click", handleUserAction)
+  );
 }
 
-// ---------- Escaping ----------
-function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+/* ============================================================
+   USER ACTION HANDLER
+   ============================================================ */
+function handleUserAction(e) {
+  const action = e.target.dataset.act;
+  const username = e.target.dataset.u;
 
-// ---------- Drawer controls ----------
-function openUserDrawer(mode='add', userObj=null, opts={}) {
+  const user = ALL_USERS.find((x) => x.Username === username);
+
+  if (action === "edit") openDrawer("edit", user);
+  if (action === "reset") resetPassword(username);
+  if (action === "delete") deleteUser(username);
+}
+
+/* ============================================================
+   DRAWER (Open / Close)
+   ============================================================ */
+function openDrawer(mode, user = null) {
+  EDIT_TARGET = mode === "edit" ? user.Username : null;
+
+  document.getElementById("userForm").reset();
+  document.getElementById("drawerTitle").innerText =
+    mode === "edit" ? "Edit User" : "Add User";
+
+  document.getElementById("user_username").disabled = mode === "edit";
+  document.getElementById("saveUserBtn").innerText =
+    mode === "edit" ? "Save Changes" : "Create User";
+
+  if (mode === "edit" && user) {
+    document.getElementById("user_username").value = user.Username;
+    document.getElementById("user_fullname").value = user.FullName;
+    document.getElementById("user_role").value = user.Role;
+    document.getElementById("user_barangay").value = user.AssignedBarangay;
+  }
+
+  document.getElementById("userPanelOverlay").classList.add("show");
+  document.getElementById("userDrawer").classList.add("show");
+}
+
+function closeDrawer() {
   EDIT_TARGET = null;
-  document.getElementById('userForm').reset();
-  document.getElementById('userFormStatus').innerText = '';
-  document.getElementById('drawerTitle').innerText = mode === 'edit' ? `Edit ${userObj?.Username || ''}` : 'Add New User';
-  document.getElementById('saveUserBtn').innerText = mode === 'edit' ? 'Save Changes' : 'Create';
-  document.getElementById('user_username').disabled = (mode === 'edit');
-
-  if(mode === 'edit' && userObj){
-    EDIT_TARGET = userObj.Username;
-    document.getElementById('user_username').value = userObj.Username;
-    document.getElementById('user_fullname').value = userObj.FullName || '';
-    document.getElementById('user_role').value = userObj.Role || 'Staff';
-    document.getElementById('user_barangay').value = userObj.AssignedBarangay || '';
-    document.getElementById('user_password').value = '';
-    document.getElementById('user_password').placeholder = 'Leave blank to keep current';
-    if(opts.focusPassword) setTimeout(()=> document.getElementById('user_password').focus(), 220);
-  } else {
-    document.getElementById('user_username').value = '';
-    document.getElementById('user_fullname').value = '';
-    document.getElementById('user_role').value = 'Staff';
-    document.getElementById('user_barangay').value = '';
-    document.getElementById('user_password').value = '';
-    document.getElementById('user_username').disabled = false;
-  }
-
-  document.getElementById('userPanelOverlay').classList.add('show');
-  document.getElementById('userDrawer').classList.add('show');
+  document.getElementById("userPanelOverlay").classList.remove("show");
+  document.getElementById("userDrawer").classList.remove("show");
 }
 
-function closeUserDrawer(){
-  EDIT_TARGET = null;
-  document.getElementById('userPanelOverlay').classList.remove('show');
-  document.getElementById('userDrawer').classList.remove('show');
-  document.getElementById('userFormStatus').innerText = '';
-  document.getElementById('userForm').reset();
-}
+/* ============================================================
+   CREATE or UPDATE USER
+   ============================================================ */
+async function saveUser() {
+  const username = document.getElementById("user_username").value.trim();
+  const fullname = document.getElementById("user_fullname").value.trim();
+  const role = document.getElementById("user_role").value;
+  const barangay = document.getElementById("user_barangay").value;
+  const password = document.getElementById("user_password").value.trim();
 
-// ---------- Create user ----------
-async function submitCreateUser(){
-  const u = document.getElementById('user_username').value.trim();
-  const fullname = document.getElementById('user_fullname').value.trim();
-  const role = document.getElementById('user_role').value;
-  const barangay = document.getElementById('user_barangay').value;
-  const password = document.getElementById('user_password').value;
+  if (!username) return showToast("Username required!", "warning");
 
-  if(!u || !password){
-    document.getElementById('userFormStatus').innerText = 'Username and password required.';
-    return;
-  }
+  const payload = {
+    Username: username,
+    FullName: fullname,
+    Role: role,
+    AssignedBarangay: barangay,
+  };
+
+  if (password) payload.Password = password;
+
+  const body = {
+    action: EDIT_TARGET ? "updateUser" : "createUser",
+    user: payload,
+    target: EDIT_TARGET || "",
+  };
 
   try {
-    document.getElementById('saveUserBtn').disabled = true;
-    const pwHash = await sha256Hex(password);
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
 
-    const body = {
-      action: 'createUser',
-      user: {
-        Username: u,
-        PasswordHash: pwHash,
-        Role: role,
-        FullName: fullname,
-        AssignedBarangay: barangay
-      }
-    };
+    const data = await res.json();
 
-    const res = await apiPost(body);
-    document.getElementById('saveUserBtn').disabled = false;
-    if(res.success){
-      showToast('User created: ' + u, 'success');
-      closeUserDrawer();
-      await loadUsersAndRender();
-    } else {
-      showToast('Create failed: ' + (res.message||'unknown'), 'error', 5000);
-      document.getElementById('userFormStatus').innerText = res.message || 'Create failed';
+    if (!data.success) {
+      showToast(data.message || "Failed", "error");
+      return;
     }
-  } catch(err){
-    console.error(err);
-    document.getElementById('saveUserBtn').disabled = false;
-    showToast('Create failed: ' + err.message, 'error', 5000);
+
+    showToast(data.message || "Saved!", "info");
+    closeDrawer();
+    loadUsers();
+
+  } catch (err) {
+    showToast("Request failed", "error");
   }
 }
 
-// ---------- Update user ----------
-async function submitUpdateUser(){
-  if(!EDIT_TARGET) return;
-  const username = EDIT_TARGET;
-  const fullname = document.getElementById('user_fullname').value.trim();
-  const role = document.getElementById('user_role').value;
-  const barangay = document.getElementById('user_barangay').value;
-  const password = document.getElementById('user_password').value;
-
-  const updates = { Username: username, FullName: fullname, Role: role, AssignedBarangay: barangay };
+/* ============================================================
+   RESET PASSWORD
+   ============================================================ */
+async function resetPassword(username) {
+  if (!confirm(`Reset password for ${username}?`)) return;
 
   try {
-    document.getElementById('saveUserBtn').disabled = true;
-    if(password){
-      updates.PasswordHash = await sha256Hex(password);
-    }
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "resetPassword",
+        target: username
+      })
+    });
 
-    const body = { action: 'updateUser', targetUsername: username, updates };
-    const res = await apiPost(body);
-    document.getElementById('saveUserBtn').disabled = false;
-    if(res.success){
-      showToast('User updated: ' + username, 'success');
-      closeUserDrawer();
-      await loadUsersAndRender();
-    } else {
-      showToast('Update failed: ' + (res.message||'unknown'), 'error', 5000);
-      document.getElementById('userFormStatus').innerText = res.message || 'Update failed';
-    }
-  } catch(err){
-    console.error(err);
-    document.getElementById('saveUserBtn').disabled = false;
-    showToast('Update failed: ' + err.message, 'error', 5000);
+    const data = await res.json();
+    if (data.success) showToast("Password reset!", "info");
+    else showToast("Reset failed", "error");
+
+  } catch (err) {
+    showToast("Failed", "error");
   }
 }
 
-// ---------- Delete user ----------
-async function deleteUser(username){
-  if(!confirm(`Delete user ${username}? This cannot be undone.`)) return;
+/* ============================================================
+   DELETE USER
+   ============================================================ */
+async function deleteUser(username) {
+  if (!confirm(`Delete user ${username}?`)) return;
+
   try {
-    const body = { action: 'deleteUser', targetUsername: username };
-    const res = await apiPost(body);
-    if(res.success){
-      showToast('User deleted: ' + username, 'success');
-      await loadUsersAndRender();
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "deleteUser",
+        target: username
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      showToast("User deleted", "info");
+      loadUsers();
     } else {
-      showToast('Delete failed: ' + (res.message||'unknown'), 'error', 5000);
+      showToast("Delete failed", "error");
     }
-  } catch(err){
-    console.error(err);
-    showToast('Delete failed: ' + err.message, 'error', 5000);
+  } catch (err) {
+    showToast("Server error", "error");
   }
 }
 
-// ---------- Load logs ----------
-async function loadLogs(){
+/* ============================================================
+   LOAD LOGS
+   ============================================================ */
+async function loadLogs() {
   try {
-    const auth = requireAuthOrRedirect();
-    if(!auth) return;
-    const qp = new URLSearchParams({ action: 'logs', username: auth.username, pwHash: auth.pwHash });
-    const res = await fetch(API_URL + '?' + qp.toString());
-    if(!res.ok) throw new Error('Network error');
-    const j = await res.json();
-    if(!j || !j.success) { showToast('Failed to load logs', 'error'); return; }
+    const res = await fetch(`${API_URL}?action=logs`);
+    const data = await res.json();
 
-    const rows = j.logs || [];
-    const body = document.getElementById('logsBody');
-    body.innerHTML = '';
-    if(rows.length === 0){
-      body.innerHTML = `<tr><td colspan="7" class="muted-note">No logs found.</td></tr>`;
-    } else {
-      rows.reverse().forEach(r => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escapeHtml(r.Timestamp || '')}</td>
-          <td>${escapeHtml(r.Action || '')}</td>
-          <td>${escapeHtml(r.Actor || '')}</td>
-          <td>${escapeHtml(r.TargetSheet || '')}</td>
-          <td>${escapeHtml(r.TargetID || '')}</td>
-          <td>${escapeHtml(r.Details || '')}</td>
-          <td>${escapeHtml(r.Duration || '')}</td>
-        `;
-        body.appendChild(tr);
-      });
-    }
-    document.getElementById('logsModal').style.display = 'flex';
-  } catch(err){
-    console.error(err);
-    showToast('Load logs failed: ' + (err.message||''), 'error', 5000);
+    const body = document.getElementById("logsBody");
+    body.innerHTML = "";
+
+    (data.logs || []).forEach((log) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escape(log.Timestamp)}</td>
+        <td>${escape(log.Action)}</td>
+        <td>${escape(log.Actor)}</td>
+        <td>${escape(log.TargetSheet)}</td>
+        <td>${escape(log.TargetID)}</td>
+        <td>${escape(log.Details)}</td>
+      `;
+      body.appendChild(tr);
+    });
+
+    document.getElementById("logsModal").style.display = "flex";
+
+  } catch (err) {
+    showToast("Failed to load logs", "error");
   }
 }
+
+/* ============================================================
+   UTIL
+   ============================================================ */
+function escape(str) {
+  return String(str || "")
+    .replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
 </script>
 </body>
 </html>
+
 
