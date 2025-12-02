@@ -32,6 +32,12 @@
   gap: 8px;
   padding: 6px 0;
 }
+   .sub-label {
+  display: block;
+  margin-left: 15px;
+  margin-bottom: 8px;
+}
+
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
   .page-container{display:grid;grid-template-columns:260px 1fr;min-height:100vh;gap:18px}
   .sidebar{background:transparent;padding:18px}
@@ -341,7 +347,7 @@
       <!-- GOVERNMENT SUPPORT -->
 <div class="card">
   <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
-  <div class="small-muted">Please check (✓) all items that apply.</div>
+<label class="sub-label">Please check (✓) all items that apply.</label>
 
   <div class="gov-support-grid">
     <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
@@ -944,6 +950,7 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
 
