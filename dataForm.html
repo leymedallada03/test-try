@@ -6,15 +6,24 @@
 <title>Purok Kaligtasan — Data Entry of household</title>
 <link rel="stylesheet" href="styles.css"/>
 <style>
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
+   :root{
+    --bg:#f6f8f7;
+    --card-bg:#fff;
+    --muted:#6b6f6b;
+    --accent1:#0f7a4a;
+    --accent2:#34b78f;
+    --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --radius:12px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
   .page-container{display:grid;grid-template-columns:260px 1fr;min-height:100vh;gap:18px}
   .sidebar{background:transparent;padding:18px}
   .sidebar ul{list-style:none;padding:0;margin:0}
   .sidebar li{margin-bottom:10px}
   .sidebar a{display:block;padding:10px;border-radius:10px;text-decoration:none;color:#0b4630;font-weight:700}
   .sidebar a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff}
-  .sidebar a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff}
-
   .content-area{padding:18px}
   h2{margin:8px 0 18px 0}
   .card{ padding:16px;border-radius:var(--radius);background:var(--card-bg);margin-bottom:12px;box-shadow:var(--shadow) }
@@ -903,4 +912,5 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
