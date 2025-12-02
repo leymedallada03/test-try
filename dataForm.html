@@ -103,7 +103,12 @@
 
           <div>
             <label>Name of Household Head <span class="small">*</span></label>
-            <input type="text" id="householdHead" required />
+              <input type="text" id="householdHead" required />
+          </div>
+
+          <div>
+            <label>Contact no.</label>
+              <input type="text" id="contactNo" placeholder="09XXXXXXXXX" />
           </div>
 
           <div>
@@ -202,14 +207,17 @@
             <label>Reasons for Displacement</label>
             <select id="reasons">
               <option value="">Select...</option>
-              <option>With-in 14-15 KM Danger Zone</option>
+              <option> Taal Volcano Eruption - With-in 14-15 KM Danger Zone</option>
+              <option>Typhoon</option>
+              <option>Flood/Landslide</option>
+              <option>Earthquake</option>
               <option>Others</option>
             </select>
           </div>
         </div>
 
         <hr style="margin:12px 0">
-        <h4>Assistance Received (optional)</h4>
+        <h4>Government Support</h4>
         <div class="form-grid">
           <label><input type="checkbox" id="ass_tupad"> TUPAD</label>
           <label><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
@@ -264,8 +272,11 @@
         <div>
           <label>Member Name <span class="small">*</span></label>
           <input type="text" id="memberName" class="member-name" required />
-        </div>
-
+        </div>        
+<div>
+  <label>Contact no.</label>
+  <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX"/>
+</div>
         <div>
           <label>Sex</label>
           <div class="radio-line">
@@ -301,7 +312,7 @@
         <div>
           <label>Status</label>
           <select id="memberStatus" class="member-status">
-            <option value="">Select...</option><option>With Sickness</option><option>Pregnant</option>
+             <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
           </select>
         </div>
 
@@ -347,7 +358,11 @@
         <div>
           <label>Reason</label>
           <select id="memberReason" class="member-reason">
-            <option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option>
+              <option> Taal Volcano Eruption - With-in 14-15 KM Danger Zone</option>
+              <option>Typhoon</option>
+              <option>Flood/Landslide</option>
+              <option>Earthquake</option>
+              <option>Others</option>
           </select>
         </div>
 
@@ -529,8 +544,8 @@ function updateMemberPreview(){
 function fillMemberPanel(idx){
   const mem = collectedMembers[idx] || {};
   document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
+  document.getElementById("memberContact").value = mem["Contact no."] || "";
   Array.from(document.getElementsByName("member_sex")).forEach(r => r.checked = (r.value === (mem["Sex"] || "")));
-  // if birthdate stored as DD/MM/YYYY convert to yyyy-mm-dd for input
   document.getElementById("memberBirthdate").value = mem["Birthdate"] ? toInputDate(mem["Birthdate"]) : "";
   document.getElementById("memberAge").value = mem["Age"] || "";
   document.getElementById("memberStage").value = mem["Stage"] || "";
@@ -558,38 +573,39 @@ function fillMemberPanel(idx){
 function collectMemberDataFromPanel(){
   const name = document.getElementById("memberName").value.trim();
   const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
-  const birth_input = document.getElementById("memberBirthdate").value || ""; // yyyy-mm-dd
-  const birth_for_sheet = toSheetDateFormat(birth_input); // DD/MM/YYYY
+  const birth_input = document.getElementById("memberBirthdate").value || "";
+  const birth_for_sheet = toSheetDateFormat(birth_input);
   const ageObj = computeAgeDetailed(birth_input);
   const ageVal = ageObj ? ageObj.display : "";
   const stageVal = ageObj ? ageObj.stage : "";
 
-  return {
-    "Name of Household Member/s": name,
-    "Sex": sex,
-    "Birthdate": birth_for_sheet,
-    "Age": ageVal,
-    "Stage": stageVal,
-    "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
-    "Status": document.getElementById("memberStatus").value || "",
-    "Transportation": document.getElementById("memberTransport").value || "",
-    "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
-    "Drop-Off Point": document.getElementById("memberDropoff").value || "",
-    "Name of Camp": document.getElementById("memberCamp").value || "",
-    "Capacity": document.getElementById("memberCampCap").value || "",
-    "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
-    "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
-    "Reasons for Displacement": document.getElementById("memberReason").value || "",
-    "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
-    "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
-    "National 4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
-    "Local Social Pension": document.getElementById("member_locsp").checked ? "Yes" : "No",
-    "National Social Pension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
-    "Solo Parent Assistance": document.getElementById("member_solo").checked ? "Yes" : "No",
-    "Relief Goods": document.getElementById("member_relief").checked ? "Yes" : "No",
-    "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
-    "AICS": document.getElementById("memberAics").value || ""
-  };
+ return {
+  "Name of Household Member/s": name,
+  "Sex": sex,
+  "Birthdate": birth_for_sheet,
+  "Age": ageVal,
+  "Stage": stageVal,
+  "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
+  "Status": document.getElementById("memberStatus").value || "",
+  "Transportation": document.getElementById("memberTransport").value || "",
+  "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
+  "Drop-Off Point": document.getElementById("memberDropoff").value || "",
+  "Name of Camp": document.getElementById("memberCamp").value || "",
+  "Capacity": document.getElementById("memberCampCap").value || "",
+  "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
+  "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
+  "Reasons for Displacement": document.getElementById("memberReason").value || "",
+  "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
+  "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
+  "National 4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
+  "Local Social Pension": document.getElementById("member_locsp").checked ? "Yes" : "No",
+  "National Social Pension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
+  "Solo Parent Assistance": document.getElementById("member_solo").checked ? "Yes" : "No",
+  "Relief Goods": document.getElementById("member_relief").checked ? "Yes" : "No",
+  "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
+  "AICS": document.getElementById("memberAics").value || "",
+  "Contact no.": document.getElementById("memberContact").value || ""
+};
 }
 
 /* update member age/stage live when date changes */
@@ -702,35 +718,39 @@ async function submitHeadAndMembers(){
   const headAgeInfo = computeAgeDetailed(headBirthInput);
   const headAgeVal = headAgeInfo ? headAgeInfo.display : "";
 
-  const head = {
-    "Barangay": document.getElementById("barangay").value || "",
-    "Sitio / Purok": document.getElementById("sitio").value || "",
-    "Name of Household Head": document.getElementById("householdHead").value || "",
-    "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-    "Birthdate": headBirthForSheet,
-    "Age": headAgeVal,
-    "Stage": headAgeInfo ? headAgeInfo.stage : "",
-    "No. of Household Member/s": document.getElementById("memberCount").value || "0",
-    "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
-    "Reasons for Displacement": document.getElementById("reasons").value || "",
-    "Transportation": document.getElementById("head_transport").value || "",
-    "Drop-Off Point": document.getElementById("dropoff").value || "",
-    "Designated Pick-Up Point": document.getElementById("pickup").value || "",
-    "Status": document.getElementById("head_status").value || "",
-    "Name of Camp": document.getElementById("campName").value || "",
-    "Capacity": document.getElementById("capacity").value || "",
-    "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
-    "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
-    "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
-    "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
-    "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
-    "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
-    "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
-    "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
-    "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
-    "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
-    "AICS": document.getElementById("ass_aics").value || ""
-  };
+const head = {
+  "Barangay": document.getElementById("barangay").value || "",
+  "Sitio / Purok": document.getElementById("sitio").value || "",
+  "Name of Household Head": document.getElementById("householdHead").value || "",
+  "Contact no.": document.getElementById("contactNo").value || "",
+  "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
+  "Birthdate": headBirthForSheet,
+  "Age": headAgeVal,
+  "Stage": headAgeInfo ? headAgeInfo.stage : "",
+  "No. of Household Member/s": document.getElementById("memberCount").value || "0",
+  "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
+  "Reasons for Displacement": document.getElementById("reasons").value || "",
+  "Transportation": document.getElementById("head_transport").value || "",
+  "Designated Pick-Up Point": document.getElementById("pickup").value || "",
+  "Drop-Off Point": document.getElementById("dropoff").value || "",
+  "Status": document.getElementById("head_status").value || "",
+  "Name of Camp": document.getElementById("campName").value || "",
+  "Capacity": document.getElementById("capacity").value || "",
+  "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
+  "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
+  "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
+  "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
+  "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
+  "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
+  "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
+  "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
+  "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
+  "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
+  "AICS": document.getElementById("ass_aics").value || "",
+  "Submitted By": localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown",
+  "Submitted On": new Date().toLocaleString()
+};
+
 
   // ensure members array length matches count
   const expected = parseInt(document.getElementById("memberCount").value || 0);
@@ -811,6 +831,7 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
 
