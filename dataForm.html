@@ -130,10 +130,10 @@
 
   <aside class="sidebar" id="sidebar">
     <ul>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-      <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
-      <li><a href="records.html">📁 Records</a></li>
-      <li><a href="charts.html">📈 Charts</a></li>
+      <li><a href="dashboard.html" id="navUsers" class="active" >📊 Dashboard</a></li>
+      <li><a href="dataForm.html" id="navUsers" >📝 Data Entry</a></li>
+      <li><a href="records.html" id="navUsers" >📁 Records</a></li>
+      <li><a href="charts.html" id="navUsers" >📈 Charts</a></li>
       <li id="navUsers" style="display:none;">
     <a href="users.html">👥 User Management</a>
     </ul>
@@ -226,7 +226,7 @@
             <label>Persons with Disability (PWD)</label>
             <div class="radio-line">
               <label class="radio-item"><input type="radio" name="head_pwd" value="Yes"> Yes</label>
-              <label class="radio-item"><input type="radio" name="head_pwd" value="No" checked> No</label>
+              <label class="radio-item"><input type="radio" name="head_pwd" value="No"> No</label>
             </div>
           </div>
 
@@ -237,14 +237,6 @@
               <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
             </select>
           </div>
-
-          <div>
-            <label>Transportation</label>
-            <select id="head_transport" class="animated">
-              <option value="">Select...</option>
-              <option>Individual with Transportation</option>
-              <option>Individual needing Transportation</option>
-            </select>
           </div>
         </div>
       </div>
@@ -308,6 +300,14 @@
       <div class="card">
         <div class="section-title"><div class="chip">4</div><h3>Pickup / Transport / Camp Details</h3></div>
         <div class="form-grid">
+            <div>
+            <label>Transportation</label>
+            <select id="head_transport" class="animated">
+              <option value="">Select...</option>
+              <option>Individual with Transportation</option>
+              <option>Individual needing Transportation</option>
+            </select>
+               </div>
           <div>
             <label>Designated Pick-Up Point</label>
             <input type="text" id="pickup" />
@@ -326,11 +326,11 @@
           </div>
           <div>
             <label>No. of Individuals Inside Camp</label>
-            <input type="number" id="insideCamp" min="0" value="0" />
+            <input type="number" id="insideCamp" min="0" />
           </div>
           <div>
             <label>No. of Individuals Outside Camp</label>
-            <input type="number" id="outsideCamp" min="0" value="0" />
+            <input type="number" id="outsideCamp" min="0"/>
           </div>
 
           <div style="grid-column:1/-1">
@@ -954,6 +954,7 @@ async function submitHeadAndMembers(){
 </script>
 </body>
 </html>
+
 
 
 
