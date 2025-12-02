@@ -6,193 +6,150 @@
   <title>Users — MDRRMO</title>
   <link rel="stylesheet" href="styles.css"/>
   <style>
-    /* small tweaks for user management layout */
-    .users-grid { display: grid; grid-template-columns: 1fr; gap:16px; align-items:start; }
-    /* For larger screens we will show sidebar-like left controls + right content */
-    @media(min-width:980px){
-      .users-grid { grid-template-columns: 360px 1fr; }
+    :root{
+      --green-1:#0F7A4A;
+      --muted:#6b7a70;
+      --card-grad: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,255,250,0.98));
     }
-    .form-grid.users { display:grid; grid-template-columns:1fr; gap:8px; }
-    .users-table-wrap { overflow-x:auto; }
-    .small-input { padding:10px;border-radius:8px;border:1px solid rgba(6,30,20,0.06); width:100%; }
-    .muted { color: #6b7a70; font-size:13px }
-    .modal-box .form-grid { grid-template-columns: 1fr; }
-    .btn.small { padding:6px 8px; font-size:13px; border-radius:8px; }
-    .danger.small { background: #d9534f; }
-    .actions-cell button { margin-right:6px; }
-
-    /* Panel drawer styles reuse the same class names as member panel */
-    .panel-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      opacity: 0;
-      transition: opacity 220ms ease;
-      z-index: 999;
-      display: none;
-    }
-    .panel-overlay.show { display: block; opacity: 1; }
-
-    .drawer-panel {
-      position: fixed;
-      right: 0;
-      top: 0;
-      height: 100vh;
-      width: 420px;
-      max-width: 94%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
-      box-shadow: -18px 0 40px rgba(6,30,20,0.18);
-      transform: translateX(100%);
-      transition: transform 260ms cubic-bezier(.2,.9,.3,1);
-      z-index: 1000;
-      padding: 14px;
-      overflow:auto;
-    }
-    .drawer-panel.show { transform: translateX(0%); }
-
-    .panel-header {
-      display:flex;align-items:center;gap:10px;margin-bottom:12px;
-    }
-    .panel-header h3 { margin:0; font-size:16px; flex:1; text-align:center; }
-    .panel-body { padding-bottom:16px; }
-    .panel-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-    .drawer-close-btn { background:transparent; border:0; cursor:pointer; font-weight:700; padding:8px; border-radius:8px; }
-    .drawer-back-btn { background:transparent; border:0; cursor:pointer; font-weight:700; padding:8px; border-radius:8px; }
-
-    /* small helper for action column */
-    .actions-cell { white-space:nowrap; display:flex; gap:6px; align-items:center; }
-    /* LOG MODAL FIX */
-#logsModal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-#logsModal .modal-box {
-  background: #fff;
-  padding: 18px;
-  border-radius: 12px;
-  max-height: 80vh;
-  max-width: 90vw;
-  width: auto;             /* fit content */
-  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-  overflow: hidden;        /* remove bottom scrollbar */
-}
-
-#logsModal table {
-  border-collapse: collapse;
-  width: auto;
-  max-width: 100%;
-}
-
-#logsModal th,
-#logsModal td {
-  white-space: nowrap;     /* shrink width to content */
-  padding: 6px 10px;
-}
-
-#logsModal .table-wrapper {
-  max-height: 60vh;
-  overflow-y: auto;         /* only vertical scroll */
-  overflow-x: hidden;       /* remove horizontal scroll */
-}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:#f6f7f5}
+    .page-container{display:flex;min-height:100vh}
+    .topbar{height:68px;display:flex;align-items:center;gap:12px;padding:12px 18px;background:white;box-shadow:0 6px 18px rgba(6,30,20,0.04);width:100%;position:fixed;top:0;left:0;z-index:50}
+    .logo{height:44px;margin-right:10px}
+    .brand .title{font-weight:700}
+    aside.sidebar{width:220px;padding-top:86px;background:transparent}
+    .content-area{flex:1;padding:96px 28px 48px 28px}
+    .users-grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:980px){ .users-grid{grid-template-columns:360px 1fr} .sidebar{display:block} }
+    .card{background:var(--card-grad);padding:16px;border-radius:12px;box-shadow:0 10px 30px rgba(6,30,20,0.06);border:1px solid rgba(6,30,20,0.03)}
+    .small-input{padding:10px;border-radius:8px;border:1px solid rgba(6,30,20,0.06);width:100%}
+    .muted{color:var(--muted);font-size:13px}
+    .btn{padding:8px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--green-1),#34b78f);color:white;font-weight:700;cursor:pointer}
+    .btn.secondary{background:transparent;color:var(--green-1);border:1px solid rgba(6,30,20,0.06)}
+    .users-table-wrap{overflow:auto;margin-top:12px}
+    table.records-table{border-collapse:collapse;width:100%}
+    table.records-table th, table.records-table td{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.04);text-align:left;font-size:14px}
+    .actions-cell{display:flex;gap:6px;align-items:center}
+    .icon-btn{background:transparent;border:0;cursor:pointer;padding:6px;border-radius:8px}
+    .cards-row{display:flex;gap:12px;flex-wrap:wrap}
+    .stat-card{flex:1;min-width:160px}
+    .stat-value{font-size:20px;font-weight:800;color:var(--green-1);margin-top:6px}
+    /* drawer / modal */
+    .panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);opacity:0;visibility:hidden;transition:opacity .2s}
+    .panel-overlay.show{opacity:1;visibility:visible}
+    .drawer-panel{position:fixed;right:0;top:0;height:100vh;width:420px;max-width:96%;background:white;box-shadow:-18px 0 40px rgba(6,30,20,0.12);transform:translateX(110%);transition:transform .28s;padding:14px;z-index:1000;overflow:auto}
+    .drawer-panel.show{transform:translateX(0)}
+    .panel-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .panel-header h3{margin:0;flex:1;text-align:center}
+    /* logs modal */
+    #logsModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;padding:16px;z-index:2000}
+    #logsModal .modal-box{background:#fff;padding:16px;border-radius:12px;max-width:95%;max-height:86vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+    /* toast/snackbar */
+    .toast-wrap{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:3000}
+    .toast{padding:10px 14px;border-radius:10px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,0.12);font-weight:700;transform:translateY(12px);opacity:0;animation:slideIn .28s forwards}
+    .toast.success{background:linear-gradient(90deg,#18ab6b,#34b78f)}
+    .toast.error{background:linear-gradient(90deg,#e74c3c,#ff7b6f)}
+    @keyframes slideIn{to{transform:none;opacity:1}}
+    /* small helpers */
+    .muted-note{font-size:13px;color:var(--muted)}
   </style>
 </head>
 <body>
-<div class="page-container">
-  <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
-    <div class="brand">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
       <div>
         <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+        <div class="subtitle muted-note">User Management — Admin</div>
       </div>
     </div>
-    <div class="user-info">
-      <span id="userName"></span>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <div id="currentUser" class="muted-note">---</div>
+      <button id="logoutBtn" class="btn secondary">Logout</button>
     </div>
-    </header>
-
-    <aside class="sidebar" id="sidebar">
-      <ul>
-        <li><a href="dashboard.html">📊 Dashboard</a></li>
-        <li><a href="dataForm.html">📝 Data Entry</a></li>
-        <li><a href="records.html">📁 Records</a></li>
-        <li><a href="charts.html">📈 Charts</a></li>
-        <li class="active"><a href="users.html">👥 User Management</a></li>
-      </ul>
-    </aside>
-
-    <main class="content-area">
-      <h2>👥 Users (Admin)</h2>
-
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="display:flex;gap:12px;align-items:center;">
-          <div class="small muted">Create / Manage system users</div>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;">
-          <input id="filterUser" class="small-input" placeholder="Filter username / full name..." style="width:280px"/>
-          <button id="viewLogsBtn" class="btn">View Logs</button>
-          <button id="openAddUser" class="btn">Add User</button>
-        </div>
-      </div>
-
-      <div class="users-grid">
-        <!-- left drawer area (Create user form is a drawer; keep an empty placeholder for layout parity) -->
-        <div>
-          <div class="card" style="height:100%;">
-            <h3>Quick Info</h3>
-            <div class="small muted">Use the button <strong>Add User</strong> to open the slide-in drawer. Click a row's <strong>Edit</strong> to modify a user.</div>
-          </div>
-        </div>
-
-        <!-- users table -->
-        <div>
-          <div class="card">
-            <h3>Existing Users</h3>
-            <div class="users-table-wrap" style="margin-top:10px">
-              <table id="usersTable" class="records-table" style="min-width:700px">
-                <thead>
-                  <tr><th>Username</th><th>Full name</th><th>Role</th><th>Barangay</th><th>Actions</th></tr>
-                </thead>
-                <tbody id="usersBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
   </div>
 
-  <!-- Add / Edit User Drawer overlay + panel (same pattern as Member panel) -->
-  <div id="userPanelOverlay" class="panel-overlay" aria-hidden="true"></div>
+  <aside class="sidebar" style="padding-top:86px">
+    <ul style="list-style:none;padding:18px 12px;margin:0">
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="dataForm.html">📝 Data Entry</a></li>
+      <li><a href="records.html">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li style="margin-top:12px"><a href="users.html" class="active">👥 User Management</a></li>
+    </ul>
+  </aside>
 
-  <aside id="userDrawer" class="drawer-panel" role="dialog" aria-modal="true" aria-hidden="true">
+  <main class="content-area">
+    <h2>👥 Users (Admin)</h2>
+
+    <div style="display:flex;justify-content:space-between;gap:12px;margin:12px 0 18px 0;align-items:center">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="muted-note">Create / Manage system users</div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="filterUser" class="small-input" placeholder="Search username / full name..." style="width:320px"/>
+        <button id="viewLogsBtn" class="btn secondary">View Logs</button>
+        <button id="openAddUser" class="btn">Add User</button>
+      </div>
+    </div>
+
+    <div class="users-grid">
+      <div>
+        <div class="card">
+          <h3>Quick Info</h3>
+          <div style="margin-top:10px" class="cards-row">
+            <div class="card stat-card" style="padding:12px">
+              <div class="muted">Total Users</div>
+              <div id="statTotal" class="stat-value">0</div>
+            </div>
+            <div class="card stat-card" style="padding:12px">
+              <div class="muted">Total Admins</div>
+              <div id="statAdmins" class="stat-value">0</div>
+            </div>
+            <div class="card stat-card" style="padding:12px">
+              <div class="muted">Total Staff</div>
+              <div id="statStaff" class="stat-value">0</div>
+            </div>
+          </div>
+          <div style="margin-top:12px" class="muted-note">Use <strong>Add User</strong> to create accounts. Click ✏️ to edit, 🔑 to reset password, 🗑️ to delete.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3>Existing Users</h3>
+          <div class="users-table-wrap">
+            <table class="records-table" id="usersTable">
+              <thead>
+                <tr><th>Username</th><th>Full name</th><th>Role</th><th>Barangay</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="usersBody"><tr><td colspan="5" class="muted-note">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Drawer -->
+  <div id="userPanelOverlay" class="panel-overlay"></div>
+  <aside id="userDrawer" class="drawer-panel" aria-hidden="true">
     <div class="panel-header">
-      <button id="drawerBack" class="drawer-back-btn btn secondary" title="Close">←</button>
+      <button id="drawerBack" class="icon-btn">←</button>
       <h3 id="drawerTitle">Add New User</h3>
     </div>
 
     <div class="panel-body">
       <form id="userForm" onsubmit="return false;">
-        <div class="form-grid users" style="margin-top:6px;">
+        <div style="display:grid;grid-template-columns:1fr;gap:10px">
           <div>
-            <label>Username <span class="small">*</span></label>
+            <label>Username *</label>
             <input id="user_username" class="small-input" required />
           </div>
-
           <div>
             <label>Full name</label>
             <input id="user_fullname" class="small-input" />
           </div>
-
           <div>
             <label>Role</label>
             <select id="user_role" class="small-input">
@@ -200,7 +157,6 @@
               <option>Admin</option>
             </select>
           </div>
-
           <div>
             <label>Assigned Barangay</label>
             <select id="user_barangay" class="small-input">
@@ -208,18 +164,15 @@
               <option>Balagbag</option><option>Concepcion</option><option>Concordia</option><option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option><option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option><option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option><option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option><option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
             </select>
           </div>
-
           <div>
-            <label id="passwordLabel">Password</label>
-            <input id="user_password" class="small-input" type="password" placeholder="Password (plaintext)"/>
+            <label>Password</label>
+            <input id="user_password" type="password" class="small-input" placeholder="Enter password (plaintext)"/>
+            <div class="muted-note" style="margin-top:6px">Leave blank when editing to keep current password.</div>
           </div>
-
-          <div style="grid-column:1/-1; display:flex; gap:8px; justify-content:flex-end;">
-            <div id="userFormStatus" class="muted" style="align-self:center"></div>
-            <div style="flex:0 0 auto;">
-              <button id="cancelUserDrawer" class="btn secondary" type="button">Cancel</button>
-              <button id="saveUserBtn" class="btn" type="button">Create</button>
-            </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+            <div id="userFormStatus" class="muted-note"></div>
+            <button id="cancelUserDrawer" class="btn secondary" type="button">Cancel</button>
+            <button id="saveUserBtn" class="btn" type="button">Create</button>
           </div>
         </div>
       </form>
@@ -227,22 +180,412 @@
   </aside>
 
   <!-- Logs Modal -->
-  <div id="logsModal" class="modal-overlay" style="display:none">
+  <div id="logsModal">
     <div class="modal-box">
       <h3>Audit Logs</h3>
-      <div style="max-height:60vh;overflow:auto;margin-top:10px">
+      <div style="margin-top:8px;max-height:60vh;overflow:auto">
         <table class="records-table" id="logsTable">
-          <thead><tr><th>Timestamp</th><th>Action</th><th>Actor</th><th>Target</th><th>TargetID</th><th>Details</th></tr></thead>
-          <tbody id="logsBody"></tbody>
+          <thead><tr><th>Timestamp</th><th>Action</th><th>Actor</th><th>Target</th><th>TargetID</th><th>Details</th><th>Duration</th></tr></thead>
+          <tbody id="logsBody"><tr><td colspan="7" class="muted-note">No logs yet.</td></tr></tbody>
         </table>
       </div>
-      <div style="text-align:right;margin-top:10px">
-        <button id="closeLogs" class="btn">Close</button>
+      <div style="text-align:right;margin-top:12px">
+        <button id="closeLogs" class="btn secondary">Close</button>
       </div>
     </div>
   </div>
 
-<script src="users.js"></script>
+  <!-- Toast container -->
+  <div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* =============================
+   USERS PAGE (Cookie-based auth)
+   ============================= */
+
+/*
+  Expectations:
+  - Cookies: "username" and "pwHash" MUST be present (set by your login flow).
+  - All API calls include these credentials (GET query or JSON auth field).
+  - Wire exactly to your Code.gs actions:
+      ?action=users             (GET)  -> returns { success:true, users: [...] }
+      POST body { action: "createUser", auth:{username,pwHash}, user: {...} }
+      POST body { action: "updateUser", auth:{...}, targetUsername, updates: {...} }
+      POST body { action: "deleteUser", auth:{...}, targetUsername }
+      ?action=logs&username=...&pwHash=...  -> returns { success:true, logs: [...] }
+*/
+
+const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+
+// ---------- small helpers ----------
+function showToast(message, type='success', timeout=3500){
+  const wrap = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type==='error' ? 'error' : 'success');
+  el.innerText = message;
+  wrap.appendChild(el);
+  setTimeout(()=> {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(12px)';
+    setTimeout(()=> wrap.removeChild(el), 300);
+  }, timeout);
+}
+
+function readCookie(name){
+  const m = document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='));
+  if(!m) return null;
+  return decodeURIComponent(m.split('=')[1] || '');
+}
+
+function requireAuthOrRedirect(){
+  const username = readCookie('username');
+  const pwHash = readCookie('pwHash');
+  if(!username || !pwHash){
+    // if no cookie, redirect to login
+    window.location.href = 'login.html';
+    return null;
+  }
+  return { username, pwHash };
+}
+
+// fetch helpers
+async function apiGet(action, params={}){
+  const auth = requireAuthOrRedirect();
+  if(!auth) throw new Error('Not authenticated');
+  const qp = new URLSearchParams({ action, username: auth.username, pwHash: auth.pwHash, ...params });
+  const res = await fetch(API_URL + '?' + qp.toString(), { cache: 'no-store' });
+  if(!res.ok) throw new Error('Network error: ' + res.status);
+  return res.json();
+}
+async function apiPost(body){
+  const auth = requireAuthOrRedirect();
+  if(!auth) throw new Error('Not authenticated');
+  body.auth = body.auth || {};
+  body.auth.username = auth.username;
+  body.auth.pwHash = auth.pwHash;
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok) throw new Error('Network error: ' + res.status);
+  return res.json();
+}
+
+// sha256 utility for password hashing (returns hex)
+async function sha256Hex(message){
+  const msgUint8 = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ---------- UI state ----------
+let ALL_USERS = [];
+let EDIT_TARGET = null;
+
+// ---------- DOM references ----------
+const usersBody = document.getElementById('usersBody');
+const filterInput = document.getElementById('filterUser');
+const statTotal = document.getElementById('statTotal');
+const statAdmins = document.getElementById('statAdmins');
+const statStaff = document.getElementById('statStaff');
+
+// ---------- event wiring ----------
+document.addEventListener('DOMContentLoaded', async () => {
+  const auth = requireAuthOrRedirect();
+  if(!auth) return;
+
+  document.getElementById('currentUser').innerText = auth.username;
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=> {
+    // clear cookies (best-effort) and redirect to login
+    document.cookie = "username=; path=/; max-age=0";
+    document.cookie = "pwHash=; path=/; max-age=0";
+    window.location.href = 'login.html';
+  });
+
+  document.getElementById('openAddUser').addEventListener('click', ()=> openUserDrawer('add'));
+  document.getElementById('cancelUserDrawer').addEventListener('click', closeUserDrawer);
+  document.getElementById('drawerBack').addEventListener('click', closeUserDrawer);
+
+  document.getElementById('saveUserBtn').addEventListener('click', async () => {
+    if(EDIT_TARGET) await submitUpdateUser();
+    else await submitCreateUser();
+  });
+
+  document.getElementById('viewLogsBtn').addEventListener('click', loadLogs);
+  document.getElementById('closeLogs').addEventListener('click', ()=> document.getElementById('logsModal').style.display = 'none');
+
+  filterInput.addEventListener('input', (e)=> renderUsers(e.target.value.trim().toLowerCase()));
+
+  // load user list
+  await loadUsersAndRender();
+});
+
+// ---------- Load users ----------
+async function loadUsersAndRender(){
+  try {
+    showToast('Loading users...', 'success', 1200);
+    const j = await apiGet('users');
+    if(!j || !j.success) {
+      showToast('Permission denied or failed to load users', 'error');
+      return;
+    }
+    ALL_USERS = j.users || [];
+
+    // check current user role (must be Admin)
+    const auth = requireAuthOrRedirect();
+    const me = ALL_USERS.find(u => String(u.Username) === String(auth.username));
+    if(!me || String(me.Role).toLowerCase() !== 'admin'){
+      // not admin -> redirect
+      showToast('Access denied — admin only', 'error', 2500);
+      setTimeout(()=> window.location.href = 'dashboard.html', 900);
+      return;
+    }
+
+    renderStats();
+    renderUsers();
+    showToast('Users loaded', 'success');
+  } catch(err){
+    console.error(err);
+    showToast('Failed to load users: ' + (err.message || err), 'error', 5000);
+    usersBody.innerHTML = '<tr><td colspan="5" class="muted-note">Failed to load users.</td></tr>';
+  }
+}
+
+// ---------- Render stats ----------
+function renderStats(){
+  const total = ALL_USERS.length;
+  const admins = ALL_USERS.filter(u => String(u.Role).toLowerCase() === 'admin').length;
+  const staff = ALL_USERS.filter(u => String(u.Role).toLowerCase() === 'staff').length;
+  statTotal.innerText = total;
+  statAdmins.innerText = admins;
+  statStaff.innerText = staff;
+}
+
+// ---------- Render users table ----------
+function renderUsers(filter=''){
+  usersBody.innerHTML = '';
+  const q = (filter || '').toString().trim().toLowerCase();
+
+  const list = ALL_USERS.filter(u => {
+    if(!q) return true;
+    const hay = `${u.Username} ${u.FullName} ${u.Role} ${u.AssignedBarangay}`.toLowerCase();
+    return hay.includes(q);
+  });
+
+  if(list.length === 0){
+    usersBody.innerHTML = `<tr><td colspan="5" class="muted-note">No users found.</td></tr>`;
+    return;
+  }
+
+  list.forEach(user => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(user.Username)}</td>
+      <td>${escapeHtml(user.FullName || '')}</td>
+      <td>${escapeHtml(user.Role || '')}</td>
+      <td>${escapeHtml(user.AssignedBarangay || '')}</td>
+      <td class="actions-cell">
+        <button class="icon-btn" title="Edit" data-username="${escapeHtml(user.Username)}" data-action="edit">✏️</button>
+        <button class="icon-btn" title="Reset Password" data-username="${escapeHtml(user.Username)}" data-action="resetpw">🔑</button>
+        <button class="icon-btn" title="Delete" data-username="${escapeHtml(user.Username)}" data-action="delete">🗑️</button>
+      </td>
+    `;
+    usersBody.appendChild(tr);
+  });
+
+  // bind actions
+  usersBody.querySelectorAll('button[data-action]').forEach(btn => {
+    btn.onclick = async (ev) => {
+      const action = btn.dataset.action;
+      const username = btn.dataset.username;
+      const target = ALL_USERS.find(u => u.Username === username);
+      if(action === 'edit') openUserDrawer('edit', target);
+      if(action === 'resetpw') openUserDrawer('edit', target, { focusPassword:true });
+      if(action === 'delete') deleteUser(username);
+    };
+  });
+}
+
+// ---------- Escaping ----------
+function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+
+// ---------- Drawer controls ----------
+function openUserDrawer(mode='add', userObj=null, opts={}) {
+  EDIT_TARGET = null;
+  document.getElementById('userForm').reset();
+  document.getElementById('userFormStatus').innerText = '';
+  document.getElementById('drawerTitle').innerText = mode === 'edit' ? `Edit ${userObj?.Username || ''}` : 'Add New User';
+  document.getElementById('saveUserBtn').innerText = mode === 'edit' ? 'Save Changes' : 'Create';
+  document.getElementById('user_username').disabled = (mode === 'edit');
+
+  if(mode === 'edit' && userObj){
+    EDIT_TARGET = userObj.Username;
+    document.getElementById('user_username').value = userObj.Username;
+    document.getElementById('user_fullname').value = userObj.FullName || '';
+    document.getElementById('user_role').value = userObj.Role || 'Staff';
+    document.getElementById('user_barangay').value = userObj.AssignedBarangay || '';
+    document.getElementById('user_password').value = '';
+    document.getElementById('user_password').placeholder = 'Leave blank to keep current';
+    if(opts.focusPassword) setTimeout(()=> document.getElementById('user_password').focus(), 220);
+  } else {
+    document.getElementById('user_username').value = '';
+    document.getElementById('user_fullname').value = '';
+    document.getElementById('user_role').value = 'Staff';
+    document.getElementById('user_barangay').value = '';
+    document.getElementById('user_password').value = '';
+    document.getElementById('user_username').disabled = false;
+  }
+
+  document.getElementById('userPanelOverlay').classList.add('show');
+  document.getElementById('userDrawer').classList.add('show');
+}
+
+function closeUserDrawer(){
+  EDIT_TARGET = null;
+  document.getElementById('userPanelOverlay').classList.remove('show');
+  document.getElementById('userDrawer').classList.remove('show');
+  document.getElementById('userFormStatus').innerText = '';
+  document.getElementById('userForm').reset();
+}
+
+// ---------- Create user ----------
+async function submitCreateUser(){
+  const u = document.getElementById('user_username').value.trim();
+  const fullname = document.getElementById('user_fullname').value.trim();
+  const role = document.getElementById('user_role').value;
+  const barangay = document.getElementById('user_barangay').value;
+  const password = document.getElementById('user_password').value;
+
+  if(!u || !password){
+    document.getElementById('userFormStatus').innerText = 'Username and password required.';
+    return;
+  }
+
+  try {
+    document.getElementById('saveUserBtn').disabled = true;
+    const pwHash = await sha256Hex(password);
+
+    const body = {
+      action: 'createUser',
+      user: {
+        Username: u,
+        PasswordHash: pwHash,
+        Role: role,
+        FullName: fullname,
+        AssignedBarangay: barangay
+      }
+    };
+
+    const res = await apiPost(body);
+    document.getElementById('saveUserBtn').disabled = false;
+    if(res.success){
+      showToast('User created: ' + u, 'success');
+      closeUserDrawer();
+      await loadUsersAndRender();
+    } else {
+      showToast('Create failed: ' + (res.message||'unknown'), 'error', 5000);
+      document.getElementById('userFormStatus').innerText = res.message || 'Create failed';
+    }
+  } catch(err){
+    console.error(err);
+    document.getElementById('saveUserBtn').disabled = false;
+    showToast('Create failed: ' + err.message, 'error', 5000);
+  }
+}
+
+// ---------- Update user ----------
+async function submitUpdateUser(){
+  if(!EDIT_TARGET) return;
+  const username = EDIT_TARGET;
+  const fullname = document.getElementById('user_fullname').value.trim();
+  const role = document.getElementById('user_role').value;
+  const barangay = document.getElementById('user_barangay').value;
+  const password = document.getElementById('user_password').value;
+
+  const updates = { Username: username, FullName: fullname, Role: role, AssignedBarangay: barangay };
+
+  try {
+    document.getElementById('saveUserBtn').disabled = true;
+    if(password){
+      updates.PasswordHash = await sha256Hex(password);
+    }
+
+    const body = { action: 'updateUser', targetUsername: username, updates };
+    const res = await apiPost(body);
+    document.getElementById('saveUserBtn').disabled = false;
+    if(res.success){
+      showToast('User updated: ' + username, 'success');
+      closeUserDrawer();
+      await loadUsersAndRender();
+    } else {
+      showToast('Update failed: ' + (res.message||'unknown'), 'error', 5000);
+      document.getElementById('userFormStatus').innerText = res.message || 'Update failed';
+    }
+  } catch(err){
+    console.error(err);
+    document.getElementById('saveUserBtn').disabled = false;
+    showToast('Update failed: ' + err.message, 'error', 5000);
+  }
+}
+
+// ---------- Delete user ----------
+async function deleteUser(username){
+  if(!confirm(`Delete user ${username}? This cannot be undone.`)) return;
+  try {
+    const body = { action: 'deleteUser', targetUsername: username };
+    const res = await apiPost(body);
+    if(res.success){
+      showToast('User deleted: ' + username, 'success');
+      await loadUsersAndRender();
+    } else {
+      showToast('Delete failed: ' + (res.message||'unknown'), 'error', 5000);
+    }
+  } catch(err){
+    console.error(err);
+    showToast('Delete failed: ' + err.message, 'error', 5000);
+  }
+}
+
+// ---------- Load logs ----------
+async function loadLogs(){
+  try {
+    const auth = requireAuthOrRedirect();
+    if(!auth) return;
+    const qp = new URLSearchParams({ action: 'logs', username: auth.username, pwHash: auth.pwHash });
+    const res = await fetch(API_URL + '?' + qp.toString());
+    if(!res.ok) throw new Error('Network error');
+    const j = await res.json();
+    if(!j || !j.success) { showToast('Failed to load logs', 'error'); return; }
+
+    const rows = j.logs || [];
+    const body = document.getElementById('logsBody');
+    body.innerHTML = '';
+    if(rows.length === 0){
+      body.innerHTML = `<tr><td colspan="7" class="muted-note">No logs found.</td></tr>`;
+    } else {
+      rows.reverse().forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(r.Timestamp || '')}</td>
+          <td>${escapeHtml(r.Action || '')}</td>
+          <td>${escapeHtml(r.Actor || '')}</td>
+          <td>${escapeHtml(r.TargetSheet || '')}</td>
+          <td>${escapeHtml(r.TargetID || '')}</td>
+          <td>${escapeHtml(r.Details || '')}</td>
+          <td>${escapeHtml(r.Duration || '')}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+    document.getElementById('logsModal').style.display = 'flex';
+  } catch(err){
+    console.error(err);
+    showToast('Load logs failed: ' + (err.message||''), 'error', 5000);
+  }
+}
+</script>
 </body>
 </html>
-
