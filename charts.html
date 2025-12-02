@@ -642,11 +642,44 @@
       if(document.visibilityState === 'visible') buildCharts();
     });
   })();
-
 })();
+  async function checkRole() {
+    try {
+        const res = await fetch(API_URL + "?action=sessionCheck");
+        const data = await res.json();
+
+        if (!data.success) {
+            return window.location.href = "index.html";
+        }
+
+        // SHOW menu ONLY for admin
+        if (data.role === "Admin") {
+            const nav = document.getElementById("navUsers");
+            if (nav) nav.style.display = "block";
+        }
+
+        // Staff → hide Users and block direct access
+        if (data.role === "Staff") {
+            const nav = document.getElementById("navUsers");
+            if (nav) nav.style.display = "none";
+
+            // If staff tries to open users.html directly → redirect
+            if (location.pathname.includes("users.html")) {
+                return window.location.href = "index.html";
+            }
+        }
+
+    } catch (err) {
+        console.error(err);
+        window.location.href = "index.html";
+    }
+}
+
+checkRole();
 </script>
 </body>
 </html>
+
 
 
 
