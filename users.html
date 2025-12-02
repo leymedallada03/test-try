@@ -242,7 +242,7 @@ function requireAuthOrRedirect(){
   const pwHash = readCookie('pwHash');
   if(!username || !pwHash){
     // if no cookie, redirect to login
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
     return null;
   }
   return { username, pwHash };
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // clear cookies (best-effort) and redirect to login
     document.cookie = "username=; path=/; max-age=0";
     document.cookie = "pwHash=; path=/; max-age=0";
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   });
 
   document.getElementById('openAddUser').addEventListener('click', ()=> openUserDrawer('add'));
@@ -589,3 +589,4 @@ async function loadLogs(){
 </script>
 </body>
 </html>
+
