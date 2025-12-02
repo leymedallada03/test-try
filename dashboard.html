@@ -5,14 +5,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Purok Kaligtasan — Dashboard</title>
 <link rel="stylesheet" href="styles.css"/>
+
 <style>
-  /* Small dashboard tweaks so it looks OK standalone */
-  .dashboard-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:12px 0 18px 0 }
-  .card{ padding:12px; border-radius:10px; background:#fff; box-shadow:0 6px 18px rgba(6,30,20,0.04) }
-  .card h3{ margin:0 0 8px 0; font-size:14px; color:#0f7a4a }
-  .card-value{ font-size:22px; font-weight:800; color:#153b26 }
+  .dashboard-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:12px;
+    margin:12px 0 18px 0
+  }
+  .card{
+    padding:12px;
+    border-radius:10px;
+    background:#fff;
+    box-shadow:0 6px 18px rgba(6,30,20,0.04)
+  }
+  .card h3{
+    margin:0 0 8px 0;
+    font-size:14px;
+    color:#0f7a4a
+  }
+  .card-value{
+    font-size:22px;
+    font-weight:800;
+    color:#153b26
+  }
 </style>
 </head>
+
 <body>
 <div class="page-container">
 
@@ -39,7 +58,11 @@
       <li><a href="dataForm.html">📝 Data Entry</a></li>
       <li><a href="records.html">📁 Records</a></li>
       <li><a href="charts.html">📈 Charts</a></li>
-      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+
+      <!-- FIXED: Hidden by default -->
+      <li id="navUsers" style="display:none;">
+        <a href="users.html">👥 User Management</a>
+      </li>
     </ul>
   </aside>
 
@@ -78,79 +101,92 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script>
-/*
-  Fixed dashboard:
-  - detects household HEAD rows by checking "Name of Household Member/s" (empty => head)
-  - robust case-insensitive header lookup
-  - tries `apiGet()` (if present in app.js) and falls back to direct fetch to API_URL
-  - auto-refresh every 30 seconds
-*/
+/* ============================
+   ROLE CHECK — WORKS ON ALL PAGES
+   ============================ */
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxWs1kxkyleYw6qcQlIx1xsecQS8x2O-nyXxbcdcm5DVst6IcmDKR-NmzSgBxyH7ErvpA/exec";
+
+async function checkRole() {
+    try {
+        const res = await fetch(API_URL + "?action=sessionCheck");
+        const data = await res.json();
+
+        if (!data.success) {
+            return window.location.href = "index.html";
+        }
+
+        document.getElementById("userName").innerText = data.fullName || "";
+
+        // Admin → show User Management
+        if (data.role === "Admin") {
+            document.getElementById("navUsers").style.display = "block";
+        }
+
+        // Staff → hide User Management and block access
+        if (data.role === "Staff") {
+            document.getElementById("navUsers").style.display = "none";
+
+            if (location.pathname.includes("users.html")) {
+                return window.location.href = "index.html";
+            }
+        }
+
+    } catch (err) {
+        console.error(err);
+        window.location.href = "index.html";
+    }
+}
+
+checkRole();
+
+/* ============================
+   DASHBOARD LOGIC
+   ============================ */
+
 let refreshTimer = null;
 let currentChart = null;
 
+// case-insensitive field lookup
 function getField(obj, fieldName) {
-  // case-insensitive lookup of a field in an object
-  if (!obj || !fieldName) return "";
-  if (Object.prototype.hasOwnProperty.call(obj, fieldName)) return obj[fieldName];
-  const want = String(fieldName).trim().toLowerCase();
+  if (!obj) return "";
+  const want = fieldName.toLowerCase().trim();
   for (const k of Object.keys(obj)) {
-    if (String(k).trim().toLowerCase() === want) return obj[k];
+    if (k.toLowerCase().trim() === want) return obj[k];
   }
   return "";
 }
 
-async function fetchRecordsUsingApiGet(payload) {
-  // try to use apiGet if available (your app.js might define it)
-  if (typeof window.apiGet === "function") {
-    try {
-      return await window.apiGet(payload);
-    } catch (err) {
-      console.warn("apiGet() failed, falling back to fetch:", err);
-    }
-  }
-  // fallback to direct GET call
-  const url = new URL(API_URL);
-  Object.keys(payload || {}).forEach(k => url.searchParams.append(k, payload[k]));
-  const res = await fetch(url.toString(), { cache: "no-store" });
-  if (!res.ok) throw new Error("Network error: " + res.status);
+async function fetchRecords() {
+  const url = API_URL + "?action=getRecords";
+  const res = await fetch(url, { cache: "no-store" });
   return await res.json();
 }
 
-function destroyChartIfAny() {
+function destroyChart() {
   if (currentChart) {
-    try { currentChart.destroy(); } catch (e) { /* ignore */ }
+    try { currentChart.destroy(); } catch(e) {}
     currentChart = null;
   }
 }
 
-async function loadAndRender() {
+async function loadDashboard() {
   try {
-    const response = await fetchRecordsUsingApiGet({ action: "getRecords" });
+    const data = await fetchRecords();
+    const rows = data.rows || [];
 
-    // response expected shape: { success: true, header: [...], rows: [ {..}, ... ] }
-    if (!response || !response.rows) {
-      console.error("Unexpected response from API:", response);
-      alert("Unable to load data for dashboard. See console for details.");
-      return;
-    }
-
-    const rows = response.rows;
-
-    // Count heads vs members:
-    // HEAD rows are the rows where "Name of Household Member/s" is empty (that's how your createRecord writes them)
     let headCount = 0;
     let memberCount = 0;
 
-    const barangayMap = {}; // { barangay: { heads: n, members: m } }
+    const barangayMap = {};
 
     rows.forEach(r => {
-      const nameOfMember = String(getField(r, "Name of Household Member/s") || "").trim();
+      const memberName = String(getField(r, "Name of Household Member/s")).trim();
       const barangay = String(getField(r, "Barangay") || "Unknown").trim();
 
-      const isHead = (!nameOfMember); // empty => head; non-empty => member
+      const isHead = (memberName === "");
 
       if (isHead) headCount++;
       else memberCount++;
@@ -160,81 +196,54 @@ async function loadAndRender() {
       else barangayMap[barangay].members++;
     });
 
+    // Update dashboard values
     document.getElementById("totalHeads").innerText = headCount;
     document.getElementById("totalMembers").innerText = memberCount;
-    document.getElementById("assignedBarangay").innerText = localStorage.getItem("assignedBarangay") || '---';
-    document.getElementById("userName").innerText = localStorage.getItem("staffName") || '';
+    document.getElementById("assignedBarangay").innerText = localStorage.getItem("assignedBarangay") || "---";
     document.getElementById("lastUpdated").innerText = new Date().toLocaleString();
 
-    // Build chart data
+    // Chart
+    destroyChart();
     const labels = Object.keys(barangayMap).sort();
-    const headData = labels.map(l => barangayMap[l].heads || 0);
-    const memberData = labels.map(l => barangayMap[l].members || 0);
+    const headData = labels.map(b => barangayMap[b].heads);
+    const memberData = labels.map(b => barangayMap[b].members);
 
-    // Draw stacked bar chart (heads + members)
-    destroyChartIfAny();
     const ctx = document.getElementById("barangayChart").getContext("2d");
     currentChart = new Chart(ctx, {
-      type: 'bar',
+      type: "bar",
       data: {
         labels,
         datasets: [
-          {
-            label: 'Household Heads',
-            data: headData,
-            backgroundColor: '#2b9348'
-          },
-          {
-            label: 'Household Members',
-            data: memberData,
-            backgroundColor: '#55a630'
-          }
+          { label:"Household Heads", data: headData, backgroundColor:"#2b9348" },
+          { label:"Household Members", data: memberData, backgroundColor:"#55a630" }
         ]
       },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { position: 'bottom' }
-        },
-        scales: {
-          x: { stacked: false },
-          y: { beginAtZero: true }
-        }
+      options:{
+        responsive:true,
+        plugins:{ legend:{ position:"bottom" } },
+        scales:{ y:{ beginAtZero:true } }
       }
     });
 
   } catch (err) {
-    console.error("Dashboard load error:", err);
+    console.error("Dashboard error:", err);
   }
 }
 
-function startAutoRefresh(seconds = 30) {
+function autoRefresh() {
   if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(() => {
-    loadAndRender();
-  }, seconds * 1000);
+  refreshTimer = setInterval(loadDashboard, 30000); // 30 seconds
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (!localStorage.getItem("loggedIn")) {
-    // if not logged in, redirect to login page
-    location.href = "index.html";
-    return;
-  }
-
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    localStorage.clear();
-    location.href = "index.html";
-  });
-
-  // initial load
-  loadAndRender();
-
-  // auto-refresh every 30 seconds
-  startAutoRefresh(30);
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  fetch(API_URL + "?action=logout");
+  window.location.href = "index.html";
 });
+
+/* Init */
+loadDashboard();
+autoRefresh();
+
 </script>
 </body>
 </html>
-
