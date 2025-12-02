@@ -3,7 +3,7 @@
 */
 
 // ===== Dynamic API URL =====
-const API_URL = "https://script.google.com/macros/s/AKfycbyB66g9Ashw5n5ZwaX2XZH8KE2OvAm-8uPAAOVsrF9W59u5Uyr-D0N-fZSC7wIyD4rXDw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 // ===========================
 
@@ -102,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 
 
 
