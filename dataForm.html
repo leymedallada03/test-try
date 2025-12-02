@@ -3,42 +3,28 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Purok Kaligtasan — Data Entry of household</title>
+<title>Purok Kaligtasan — Data Entry of household (Part 1)</title>
 <link rel="stylesheet" href="styles.css"/>
 <style>
+/* Minimal embedded styles to preserve layout while you keep your styles.css */
 .content-area{padding:18px; background:linear-gradient(180deg,#f6f8f7,#f4f6f5)}
 .card{ padding:14px;border-radius:10px;background:#fff;margin-bottom:12px;box-shadow:0 6px 18px rgba(6,30,20,0.04) }
 .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-items:start }
 .small-muted{ font-size:13px; color:var(--muted) }
 .member-preview{ margin-top:8px; font-size:14px }
 .member-preview li{ margin-bottom:6px }
-.member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width: 96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 280ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y: auto; }
+.member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 480px; max-width: 96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 280ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y: auto; }
 .member-panel.open { transform: translateX(0%); }
 .panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 5900; }
 .panel-overlay.show { opacity: 1; pointer-events: auto; }
 .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,#0f7a4a,#34b78f); color:#fff; }
 .btn.secondary { background: transparent; color: var(--green-1); border:1px solid rgba(6,30,20,0.06); }
 .radio-line{display:flex;gap:8px}
-.icon-btn{border:0;background:transparent;cursor:pointer}
-.actions-row{display:flex;gap:8px;justify-content:flex-end}
-.assistance-grid {
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:10px 18px;
-  margin-top:10px;
-}
-
-.assistance-grid label {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:15px;
-  font-weight:600;
-  color:#0b4630;
-}
-@media (max-width:900px){ .page-container{grid-template-columns:1fr} .sidebar{display:none} }
 .hidden{display:none}
-
+@media (max-width:900px){ .page-container{grid-template-columns:1fr} .sidebar{display:none} }
+.animal-row { display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+.animal-row input[type="number"]{ width:90px; padding:6px; border-radius:6px; border:1px solid #ddd; }
+.animal-row label{ display:flex; gap:8px; align-items:center; }
 </style>
 </head>
 <body>
@@ -47,22 +33,22 @@
   <header class="topbar">
     <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
 
-    <div class="brand">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+    <div class="brand" style="display:flex;align-items:center;gap:12px">
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo" style="height:44px"/>
       <div>
         <div class="title">PUROK KALIGTASAN</div>
         <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
       </div>
     </div>
 
-    <div class="user-info">
-      <span id="userName"></span>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <div class="user-info"><span id="userName"></span></div>
       <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
   </header>
 
-  <aside class="sidebar" id="sidebar">
-    <ul>
+  <aside class="sidebar" id="sidebar" style="width:220px;padding:12px">
+    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px">
       <li><a href="dashboard.html">📊 Dashboard</a></li>
       <li><a href="dataForm.html" class="active">📝 Data Entry</a></li>
       <li><a href="records.html">📁 Records</a></li>
@@ -71,17 +57,19 @@
     </ul>
   </aside>
 
-  <main class="content-area" tabindex="-1">
+  <main class="content-area" tabindex="-1" style="margin-left:236px">
     <h2>📝 Household Evacuation Information (Head first)</h2>
 
     <form id="headForm" novalidate onsubmit="return false;">
       <div class="form-section card">
         <h3>Basic Information (Household Head)</h3>
+
         <div class="form-grid">
           <div>
             <label>Barangay <span class="small">*</span></label>
             <select id="barangay" required>
               <option value="">Select Barangay...</option>
+              <!-- keep your existing options or populate dynamically -->
               <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
               <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
               <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
@@ -89,6 +77,12 @@
               <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
               <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
             </select>
+          </div>
+
+          <div>
+            <label>Coordinate (optional)</label>
+            <input type="text" id="coordinate" placeholder="lat, lng (optional) — e.g. 14.12345, 120.98765" />
+            <div class="small-muted">Optional — keep blank if not available.</div>
           </div>
 
           <div>
@@ -103,12 +97,13 @@
 
           <div>
             <label>Name of Household Head <span class="small">*</span></label>
-              <input type="text" id="householdHead" required />
+            <input type="text" id="householdHead" required />
           </div>
 
           <div>
             <label>Contact no.</label>
-              <input type="text" id="contactNo" placeholder="09XXXXXXXXX" />
+            <input type="text" id="contactNo" placeholder="09XXXXXXXXX" />
+            <div class="small-muted">Format optional; store as text.</div>
           </div>
 
           <div>
@@ -126,7 +121,6 @@
 
           <div>
             <label>Age</label>
-            <!-- changed to text so we can show "11 months" -->
             <input type="text" id="householdAge" readonly />
           </div>
 
@@ -149,8 +143,8 @@
           <div>
             <label>Persons with Disability (PWD)</label>
             <div class="radio-line">
-              <label class="radio-item"><input type="radio" name="head_pwd" value="Yes"> Yes</label>
-              <label class="radio-item"><input type="radio" name="head_pwd" value="No" checked> No</label>
+              <label><input type="radio" name="head_pwd" value="Yes"> Yes</label>
+              <label><input type="radio" name="head_pwd" value="No" checked> No</label>
             </div>
           </div>
 
@@ -174,7 +168,7 @@
 
         <hr style="margin:12px 0">
 
-        <h4>Pickup  / Transport / Camp Details</h4>
+        <h4>Pickup / Transport / Camp Details</h4>
         <div class="form-grid">
           <div>
             <label>Designated Pick-Up Point</label>
@@ -207,12 +201,51 @@
             <label>Reasons for Displacement</label>
             <select id="reasons">
               <option value="">Select...</option>
-              <option> Taal Volcano Eruption - With-in 14-15 KM Danger Zone</option>
-              <option>Typhoon</option>
-              <option>Flood/Landslide</option>
-              <option>Earthquake</option>
+              <option>With-in 14-15 KM Danger Zone</option>
               <option>Others</option>
             </select>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0">
+
+        <h4>Domestic (Animals) — Head</h4>
+        <div id="headAnimals" class="card" style="padding:10px; margin-bottom:10px">
+          <!-- For each animal we provide a checkbox (owner) and qty input -->
+          <div class="animal-row">
+            <label><input type="checkbox" id="head_animal_dog"> Dog</label>
+            <input type="number" id="head_qty_dog" min="0" placeholder="Qty" />
+          </div>
+
+          <div class="animal-row">
+            <label><input type="checkbox" id="head_animal_cat"> Cat</label>
+            <input type="number" id="head_qty_cat" min="0" placeholder="Qty" />
+          </div>
+
+          <div class="animal-row">
+            <label><input type="checkbox" id="head_animal_pig"> Pig</label>
+            <input type="number" id="head_qty_pig" min="0" placeholder="Qty" />
+          </div>
+
+          <div class="animal-row">
+            <label><input type="checkbox" id="head_animal_cow"> Cow</label>
+            <input type="number" id="head_qty_cow" min="0" placeholder="Qty" />
+          </div>
+
+          <div class="animal-row">
+            <label><input type="checkbox" id="head_animal_carabao"> Carabao</label>
+            <input type="number" id="head_qty_carabao" min="0" placeholder="Qty" />
+          </div>
+
+          <div class="animal-row">
+            <label><input type="checkbox" id="head_animal_chicken"> Chicken</label>
+            <input type="number" id="head_qty_chicken" min="0" placeholder="Qty" />
+          </div>
+
+          <div class="animal-row">
+            <label><input type="checkbox" id="head_animal_others"> Others</label>
+            <input type="text" id="head_others_text" placeholder="Describe other animals" style="flex:1" />
+            <input type="number" id="head_qty_others" min="0" placeholder="Qty" style="width:90px" />
           </div>
         </div>
 
@@ -247,8 +280,8 @@
         </div>
       </div>
 
-      <!-- preview of members to be added -->
-      <div class="card">
+      <!-- preview + member list -->
+      <div class="card" style="margin-left:0">
         <h4>Members to be collected</h4>
         <div class="small-muted">Number of members chosen: <strong id="previewCount">0</strong></div>
         <ul id="membersPreview" class="member-preview"></ul>
@@ -257,7 +290,7 @@
   </main>
 </div>
 
-<!-- overlay + member panel -->
+<!-- overlay + member panel (member panel includes Contact no. + animal block identical to head) -->
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
 <div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
@@ -272,11 +305,13 @@
         <div>
           <label>Member Name <span class="small">*</span></label>
           <input type="text" id="memberName" class="member-name" required />
-        </div>        
-<div>
-  <label>Contact no.</label>
-  <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX"/>
-</div>
+        </div>
+
+        <div>
+          <label>Contact no.</label>
+          <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX" />
+        </div>
+
         <div>
           <label>Sex</label>
           <div class="radio-line">
@@ -292,7 +327,6 @@
 
         <div>
           <label>Age</label>
-          <!-- changed to text so we can show "11 months" -->
           <input type="text" id="memberAge" class="member-age" readonly />
         </div>
 
@@ -312,7 +346,7 @@
         <div>
           <label>Status</label>
           <select id="memberStatus" class="member-status">
-             <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
+            <option value="">Select...</option><option>With Sickness</option><option>Pregnant</option>
           </select>
         </div>
 
@@ -358,35 +392,50 @@
         <div>
           <label>Reason</label>
           <select id="memberReason" class="member-reason">
-              <option> Taal Volcano Eruption - With-in 14-15 KM Danger Zone</option>
-              <option>Typhoon</option>
-              <option>Flood/Landslide</option>
-              <option>Earthquake</option>
-              <option>Others</option>
+            <option value="">Select...</option><option>With-in 14-15 KM Danger Zone</option><option>Others</option>
           </select>
         </div>
 
+        <!-- Member Domestic (animals) block — same animals + qty fields as head -->
         <div style="grid-column:1/-1; margin-top:8px">
-          <h4 style="margin:6px 0 8px 0">Government Support</h4>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
-            <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
-            <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
-            <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
-            <label><input type="checkbox" id="member_locsp" class="member_locsp"> Local Social Pension</label>
-            <label><input type="checkbox" id="member_intlsp" class="member_intlsp"> National Social Pension</label>
-            <label><input type="checkbox" id="member_solo" class="member_solo"> Solo Parent Assistance</label>
-            <label><input type="checkbox" id="member_cash" class="member_cash"> Cash Subsidy</label>
-            <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
-          </div>
+          <h4 style="margin:6px 0 8px 0">Domestic (Animals) — Member</h4>
 
-          <div style="margin-top:8px">
-            <label>AICS (if any)</label>
-            <select id="memberAics" class="member_aics">
-              <option value="">None</option>
-              <option>Shelter Assistance</option>
-              <option>Burial</option>
-              <option>Scholarship</option>
-            </select>
+          <div id="memberAnimals">
+            <div class="animal-row">
+              <label><input type="checkbox" id="member_animal_dog"> Dog</label>
+              <input type="number" id="member_qty_dog" min="0" placeholder="Qty" />
+            </div>
+
+            <div class="animal-row">
+              <label><input type="checkbox" id="member_animal_cat"> Cat</label>
+              <input type="number" id="member_qty_cat" min="0" placeholder="Qty" />
+            </div>
+
+            <div class="animal-row">
+              <label><input type="checkbox" id="member_animal_pig"> Pig</label>
+              <input type="number" id="member_qty_pig" min="0" placeholder="Qty" />
+            </div>
+
+            <div class="animal-row">
+              <label><input type="checkbox" id="member_animal_cow"> Cow</label>
+              <input type="number" id="member_qty_cow" min="0" placeholder="Qty" />
+            </div>
+
+            <div class="animal-row">
+              <label><input type="checkbox" id="member_animal_carabao"> Carabao</label>
+              <input type="number" id="member_qty_carabao" min="0" placeholder="Qty" />
+            </div>
+
+            <div class="animal-row">
+              <label><input type="checkbox" id="member_animal_chicken"> Chicken</label>
+              <input type="number" id="member_qty_chicken" min="0" placeholder="Qty" />
+            </div>
+
+            <div class="animal-row">
+              <label><input type="checkbox" id="member_animal_others"> Others</label>
+              <input type="text" id="member_others_text" placeholder="Describe other animals" style="flex:1" />
+              <input type="number" id="member_qty_others" min="0" placeholder="Qty" style="width:90px" />
+            </div>
           </div>
         </div>
 
@@ -401,64 +450,11 @@
 </div>
 
 <script>
-/* final merged client-side script (fixed for date format + infant age) */
-
-const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
-
-/* ----------------- Date helpers ----------------- */
-/* Convert yyyy-mm-dd (from input[type=date].value) into DD/MM/YYYY (text) */
-function toSheetDateFormat(inputVal){
-  if(!inputVal) return "";
-  // inputVal expected 'yyyy-mm-dd'
-  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
-    const [y,m,d] = inputVal.split('-');
-    return `${d}/${m}/${y}`;
-  }
-  // try parse fallback
-  const dt = new Date(inputVal);
-  if(!isNaN(dt)){
-    const mm = String(dt.getMonth()+1).padStart(2,'0');
-    const dd = String(dt.getDate()).padStart(2,'0');
-    return `${dd}/${mm}/${dt.getFullYear()}`;
-  }
-  return String(inputVal);
-}
-
-/* Convert DD/MM/YYYY back to yyyy-mm-dd for input[type=date] if needed */
-function toInputDate(val){
-  if(!val) return "";
-  if(/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
-  if(/^\d{2}\/\d{2}\/\d{4}$/.test(val)){
-    const [d,m,y] = val.split('/');
-    return `${y}-${m}-${d}`;
-  }
-  // fallback parse
-  const dt = new Date(val);
-  if(!isNaN(dt)){
-    const mm = String(dt.getMonth()+1).padStart(2,'0');
-    const dd = String(dt.getDate()).padStart(2,'0');
-    return `${dt.getFullYear()}-${mm}-${dd}`;
-  }
-  return "";
-}
-
 /* ---------------- Age compute (detailed) ----------------
    returns { years, months, days, display, stage }
-   display is:
-     - "X days" if <1 month
-     - "X months" if <1 year
-     - "Y" (years) if >=1 year
-   stage rules:
-     - if years === 0:
-         if months <= 10 -> "Infant"
-         else -> "Children"
-     - years <=17 -> "School Children"
-     - years >=60 -> "Elderly"
-     - else -> "Adult"
 */
 function computeAgeDetailed(inputDateValue){
   if(!inputDateValue) return null;
-  // accept yyyy-mm-dd or Date-like strings
   let d;
   if(/^\d{4}-\d{2}-\d{2}$/.test(inputDateValue)){
     const parts = inputDateValue.split('-');
@@ -469,9 +465,10 @@ function computeAgeDetailed(inputDateValue){
   if(isNaN(d)) return null;
 
   const now = new Date();
-  // normalize to midnight to avoid timezone offset surprises
   const birth = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), todayDay() );
+
+  function todayDay(){ const n = new Date(); return n.getDate(); } // small helper
 
   let years = today.getFullYear() - birth.getFullYear();
   let months = today.getMonth() - birth.getMonth();
@@ -479,7 +476,6 @@ function computeAgeDetailed(inputDateValue){
 
   if(days < 0){
     months -= 1;
-    // get days in previous month
     const prev = new Date(today.getFullYear(), today.getMonth(), 0);
     days += prev.getDate();
   }
@@ -488,37 +484,28 @@ function computeAgeDetailed(inputDateValue){
     months += 12;
   }
 
-  // determine display
   let display = "";
   if(years >= 1){
-    display = String(years); // keep years as simple number string per your requirement
+    display = String(years);
   } else {
-    if(months >= 1){
-      display = `${months} months`;
-    } else {
-      display = `${days} days`;
-    }
+    if(months >= 1) display = `${months} months`;
+    else display = `${days} days`;
   }
 
-  // derive stage
   let stage = "";
-  if(years === 0){
-    if(months <= 10) stage = "Infant";
-    else stage = "Children";
-  } else if(years <= 17){
-    stage = "School Children";
-  } else if(years >= 60){
-    stage = "Elderly";
-  } else {
-    stage = "Adult";
-  }
+  if(years === 0) {
+    if(months <= 10) stage = "Infant"; else stage = "Children";
+  } else if(years <= 17) stage = "School Children";
+  else if(years >= 60) stage = "Elderly";
+  else stage = "Adult";
 
-  return { years: years, months: months, days: days, display: display, stage: stage };
+  return { years, months, days, display, stage };
 }
 
 /* ---------------- UI + state ---------------- */
 function ensureLoginOrRedirect(){
-  if(!localStorage.getItem("loggedIn")){ window.location.href = "main.html"; return false; }
+  // keep your previous behaviour; remove if not required
+  if(!localStorage.getItem("loggedIn")){ /*window.location.href = "main.html";*/ return false; }
   return true;
 }
 
@@ -526,7 +513,7 @@ let membersToCollect = 0;
 let currentMemberIndex = 0;
 let collectedMembers = [];
 
-/* update preview */
+/* ---------------- Preview update ---------------- */
 function updateMemberPreview(){
   const n = parseInt(document.getElementById("memberCount").value || 0);
   document.getElementById("previewCount").innerText = n;
@@ -535,16 +522,45 @@ function updateMemberPreview(){
   for(let i=0;i<n;i++){
     const mem = collectedMembers[i];
     const li = document.createElement('li');
-    li.innerText = mem ? `#${i+1} — ${mem["Name of Household Member/s"] || "(empty)"}` : `#${i+1} — (empty)`;
+
+    if(mem){
+      const name = mem["Name of Household Member/s"] || "(no name)";
+      const contact = mem["Contact no."] || mem["Contact"] || "";
+      // animal summary
+      const animals = [];
+      if(mem["Dog"] && mem["Dog Qty"]) animals.push(`Dog x${mem["Dog Qty"]}`);
+      else if(mem["Dog"]) animals.push("Dog");
+      if(mem["Cat"] && mem["Cat Qty"]) animals.push(`Cat x${mem["Cat Qty"]}`);
+      if(mem["Pig"] && mem["Pig Qty"]) animals.push(`Pig x${mem["Pig Qty"]}`);
+      if(mem["Cow"] && mem["Cow Qty"]) animals.push(`Cow x${mem["Cow Qty"]}`);
+      if(mem["Carabao"] && mem["Carabao Qty"]) animals.push(`Carabao x${mem["Carabao Qty"]}`);
+      if(mem["Chicken"] && mem["Chicken Qty"]) animals.push(`Chicken x${mem["Chicken Qty"]}`);
+      if(mem["Others"] && mem["Others Qty"]) animals.push(`${mem["Others"]} x${mem["Others Qty"]}`);
+
+      const animalText = animals.length ? ` — ${animals.join(", ")}` : "";
+
+      li.innerText = `#${i+1} — ${name}${contact ? " ("+contact+")" : ""}${animalText}`;
+    } else {
+      li.innerText = `#${i+1} — (empty)`;
+    }
+    li.style.cursor = "pointer";
+    li.title = "Click to edit this member";
+    li.addEventListener('click', () => {
+      // open panel on this index for editing
+      currentMemberIndex = i;
+      fillMemberPanel(i);
+      document.getElementById('panelTitle').innerText = `Member ${i+1} of ${n}`;
+      openPanel();
+    });
     list.appendChild(li);
   }
 }
 
-/* fill member panel with existing or blank */
+/* ---------------- Fill member panel ---------------- */
 function fillMemberPanel(idx){
   const mem = collectedMembers[idx] || {};
   document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
-  document.getElementById("memberContact").value = mem["Contact no."] || "";
+  document.getElementById("memberContact").value = mem["Contact no."] || mem["Contact"] || "";
   Array.from(document.getElementsByName("member_sex")).forEach(r => r.checked = (r.value === (mem["Sex"] || "")));
   document.getElementById("memberBirthdate").value = mem["Birthdate"] ? toInputDate(mem["Birthdate"]) : "";
   document.getElementById("memberAge").value = mem["Age"] || "";
@@ -558,20 +574,54 @@ function fillMemberPanel(idx){
   document.getElementById("memberInside").value = mem["No. of Individuals Inside Camp"] || "";
   document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || "";
   document.getElementById("memberReason").value = mem["Reasons for Displacement"] || "";
-  document.getElementById("member_tupad").checked = (mem["TUPAD"] === "Yes");
-  document.getElementById("member_local4ps").checked = (mem["Local 4Ps"] === "Yes");
-  document.getElementById("member_intl4ps").checked = (mem["National 4Ps"] === "Yes");
-  document.getElementById("member_locsp").checked = (mem["Local Social Pension"] === "Yes");
-  document.getElementById("member_intlsp").checked = (mem["National Social Pension"] === "Yes");
-  document.getElementById("member_solo").checked = (mem["Solo Parent Assistance"] === "Yes");
-  document.getElementById("member_relief").checked = (mem["Relief Goods"] === "Yes");
-  document.getElementById("member_cash").checked = (mem["Cash Subsidy"] === "Yes");
-  document.getElementById("memberAics").value = mem["AICS"] || "";
+
+  // animals
+  document.getElementById("member_animal_dog").checked = !!mem["Dog"];
+  document.getElementById("member_qty_dog").value = mem["Dog Qty"] || "";
+
+  document.getElementById("member_animal_cat").checked = !!mem["Cat"];
+  document.getElementById("member_qty_cat").value = mem["Cat Qty"] || "";
+
+  document.getElementById("member_animal_pig").checked = !!mem["Pig"];
+  document.getElementById("member_qty_pig").value = mem["Pig Qty"] || "";
+
+  document.getElementById("member_animal_cow").checked = !!mem["Cow"];
+  document.getElementById("member_qty_cow").value = mem["Cow Qty"] || "";
+
+  document.getElementById("member_animal_carabao").checked = !!mem["Carabao"];
+  document.getElementById("member_qty_carabao").value = mem["Carabao Qty"] || "";
+
+  document.getElementById("member_animal_chicken").checked = !!mem["Chicken"];
+  document.getElementById("member_qty_chicken").value = mem["Chicken Qty"] || "";
+
+  document.getElementById("member_animal_others").checked = !!mem["Others"];
+  document.getElementById("member_others_text").value = mem["Others"] || "";
+  document.getElementById("member_qty_others").value = mem["Others Qty"] || "";
 }
 
-/* collect member panel inputs into object that matches Master sheet keys */
+/* ---------------- toInputDate helper ---------------- */
+/* Convert DD/MM/YYYY back to yyyy-mm-dd for input[type=date] if needed */
+function toInputDate(val){
+  if(!val) return "";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(val)){
+    const [d,m,y] = val.split('/');
+    return `${y}-${m}-${d}`;
+  }
+  // fallback: try Date parse
+  const dt = new Date(val);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dt.getFullYear()}-${mm}-${dd}`;
+  }
+  return "";
+}
+
+/* ---------------- Collect member panel inputs ---------------- */
 function collectMemberDataFromPanel(){
   const name = document.getElementById("memberName").value.trim();
+  const contact = document.getElementById("memberContact").value.trim();
   const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
   const birth_input = document.getElementById("memberBirthdate").value || "";
   const birth_for_sheet = toSheetDateFormat(birth_input);
@@ -579,66 +629,121 @@ function collectMemberDataFromPanel(){
   const ageVal = ageObj ? ageObj.display : "";
   const stageVal = ageObj ? ageObj.stage : "";
 
- return {
-  "Name of Household Member/s": name,
-  "Sex": sex,
-  "Birthdate": birth_for_sheet,
-  "Age": ageVal,
-  "Stage": stageVal,
-  "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
-  "Status": document.getElementById("memberStatus").value || "",
-  "Transportation": document.getElementById("memberTransport").value || "",
-  "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
-  "Drop-Off Point": document.getElementById("memberDropoff").value || "",
-  "Name of Camp": document.getElementById("memberCamp").value || "",
-  "Capacity": document.getElementById("memberCampCap").value || "",
-  "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
-  "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
-  "Reasons for Displacement": document.getElementById("memberReason").value || "",
-  "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
-  "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
-  "National 4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
-  "Local Social Pension": document.getElementById("member_locsp").checked ? "Yes" : "No",
-  "National Social Pension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
-  "Solo Parent Assistance": document.getElementById("member_solo").checked ? "Yes" : "No",
-  "Relief Goods": document.getElementById("member_relief").checked ? "Yes" : "No",
-  "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
-  "AICS": document.getElementById("memberAics").value || "",
-  "Contact no.": document.getElementById("memberContact").value || ""
-};
+  // animals -> use clear keys (see note at top)
+  const dogOwner = document.getElementById("member_animal_dog").checked;
+  const dogQty = document.getElementById("member_qty_dog").value || "";
+
+  const catOwner = document.getElementById("member_animal_cat").checked;
+  const catQty = document.getElementById("member_qty_cat").value || "";
+
+  const pigOwner = document.getElementById("member_animal_pig").checked;
+  const pigQty = document.getElementById("member_qty_pig").value || "";
+
+  const cowOwner = document.getElementById("member_animal_cow").checked;
+  const cowQty = document.getElementById("member_qty_cow").value || "";
+
+  const carabaoOwner = document.getElementById("member_animal_carabao").checked;
+  const carabaoQty = document.getElementById("member_qty_carabao").value || "";
+
+  const chickenOwner = document.getElementById("member_animal_chicken").checked;
+  const chickenQty = document.getElementById("member_qty_chicken").value || "";
+
+  const othersOwner = document.getElementById("member_animal_others").checked;
+  const othersText = document.getElementById("member_others_text").value.trim();
+  const othersQty = document.getElementById("member_qty_others").value || "";
+
+  return {
+    "Name of Household Member/s": name,
+    "Contact no.": contact,
+    "Sex": sex,
+    "Birthdate": birth_for_sheet,
+    "Age": ageVal,
+    "Stage": stageVal,
+    "Persons with Disability (PWD)": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
+    "Status": document.getElementById("memberStatus").value || "",
+    "Transportation": document.getElementById("memberTransport").value || "",
+    "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
+    "Drop-Off Point": document.getElementById("memberDropoff").value || "",
+    "Name of Camp": document.getElementById("memberCamp").value || "",
+    "Capacity": document.getElementById("memberCampCap").value || "",
+    "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
+    "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
+    "Reasons for Displacement": document.getElementById("memberReason").value || "",
+    "TUPAD": document.getElementById("member_tupad") ? (document.getElementById("member_tupad").checked ? "Yes" : "No") : "No",
+    "Local 4Ps": document.getElementById("member_local4ps") ? (document.getElementById("member_local4ps").checked ? "Yes" : "No") : "No",
+    "National 4Ps": document.getElementById("member_intl4ps") ? (document.getElementById("member_intl4ps").checked ? "Yes" : "No") : "No",
+    "Local Social Pension": document.getElementById("member_locsp") ? (document.getElementById("member_locsp").checked ? "Yes" : "No") : "No",
+    "National Social Pension": document.getElementById("member_intlsp") ? (document.getElementById("member_intlsp").checked ? "Yes" : "No") : "No",
+    "Solo Parent Assistance": document.getElementById("member_solo") ? (document.getElementById("member_solo").checked ? "Yes" : "No") : "No",
+    "Relief Goods": document.getElementById("member_relief") ? (document.getElementById("member_relief").checked ? "Yes" : "No") : "No",
+    "Cash Subsidy": document.getElementById("member_cash") ? (document.getElementById("member_cash").checked ? "Yes" : "No") : "No",
+    "AICS": document.getElementById("memberAics").value || "",
+
+    /* animal keys */
+    "Dog": dogOwner ? "Yes" : "",
+    "Dog Qty": dogQty || "",
+    "Cat": catOwner ? "Yes" : "",
+    "Cat Qty": catQty || "",
+    "Pig": pigOwner ? "Yes" : "",
+    "Pig Qty": pigQty || "",
+    "Cow": cowOwner ? "Yes" : "",
+    "Cow Qty": cowQty || "",
+    "Carabao": carabaoOwner ? "Yes" : "",
+    "Carabao Qty": carabaoQty || "",
+    "Chicken": chickenOwner ? "Yes" : "",
+    "Chicken Qty": chickenQty || "",
+    "Others": othersOwner ? (othersText || "Others") : "",
+    "Others Qty": othersQty || ""
+  };
 }
 
-/* update member age/stage live when date changes */
-document.addEventListener('input', (ev) => {
-  if(ev.target && ev.target.id === "memberBirthdate"){
-    const v = ev.target.value;
-    const info = computeAgeDetailed(v);
-    document.getElementById("memberAge").value = info ? info.display : "";
-    document.getElementById("memberStage").value = info ? info.stage : "";
+/* ---------------- toSheetDateFormat helper ---------------- */
+function toSheetDateFormat(inputVal){
+  if(!inputVal) return "";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
+    const [y,m,d] = inputVal.split('-');
+    return `${d}/${m}/${y}`;
   }
-  if(ev.target && ev.target.id === "householdBirthdate"){
-    const v = ev.target.value;
-    const info = computeAgeDetailed(v);
-    document.getElementById("householdAge").value = info ? info.display : "";
-    document.getElementById("householdStage").value = info ? info.stage : "";
+  const dt = new Date(inputVal);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dd}/${mm}/${dt.getFullYear()}`;
   }
-});
+  return String(inputVal);
+}
+
+/* ---------------- open / close panel helpers ---------------- */
+function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
+function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
 
 /* ---------------- DOM loaded bindings ---------------- */
 document.addEventListener('DOMContentLoaded', () => {
-  if(!ensureLoginOrRedirect()) return;
-  document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
+  // optional login redirect - adjust to your needs
+  // ensureLoginOrRedirect();
 
-  // reset
+  // show staff name if present
+  if(document.getElementById("userName")) document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
+
+  // Reset button
   document.getElementById("resetBtn").addEventListener('click', () => {
     document.getElementById("headForm").reset();
     collectedMembers = [];
     updateMemberPreview();
     document.getElementById("householdAge").value = "";
     document.getElementById("householdStage").value = "";
+
+    // clear head animal qtys
+    ['dog','cat','pig','cow','carabao','chicken','others'].forEach(k => {
+      const cb = document.getElementById(`head_animal_${k}`);
+      const qty = document.getElementById(`head_qty_${k}`);
+      if(cb) cb.checked = false;
+      if(qty) qty.value = "";
+    });
+    document.getElementById("head_others_text") && (document.getElementById("head_others_text").value = "");
   });
 
-  // next (head -> members)
+  // Next (head -> members)
   document.getElementById("nextToMembers").addEventListener('click', () => {
     const barangay = document.getElementById("barangay").value.trim();
     const sitio = document.getElementById("sitio").value.trim();
@@ -650,12 +755,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMemberPreview();
 
     if(membersToCollect === 0){
-      // no members -> submit head only
-      submitHeadAndMembers();
+      // no members -> caller will submit. (Part 3 will implement submitHeadAndMembers)
+      alert("No members to collect. Proceed to save (Part 3 handles submission).");
       return;
     }
 
-    // open member panel first
+    // open first member panel
     fillMemberPanel(0);
     currentMemberIndex = 0;
     document.getElementById('panelTitle').innerText = `Member 1 of ${membersToCollect}`;
@@ -666,6 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById("panelClose").addEventListener('click', () => { closePanel(); });
   document.getElementById("memberBack").addEventListener('click', () => {
     if(currentMemberIndex > 0){
+      // save current
       collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
       currentMemberIndex--;
       fillMemberPanel(currentMemberIndex);
@@ -686,156 +792,211 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentMemberIndex++;
     if(currentMemberIndex >= membersToCollect){
-      // done
+      // done collecting members - close and let Part 3 handle submission
       closePanel();
-      submitHeadAndMembers();
+      alert("All members collected. Now you can save — Part 3 will submit head + members to the server.");
       return;
     }
     fillMemberPanel(currentMemberIndex);
     document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
   });
 
-  // live update household birthdate change (also handled by input listener)
-  document.getElementById("householdBirthdate").addEventListener('change', () => {
-    const info = computeAgeDetailed(document.getElementById("householdBirthdate").value);
-    document.getElementById("householdAge").value = info ? info.display : "";
-    document.getElementById("householdStage").value = info ? info.stage : "";
+  // Live age compute for member + head
+  document.addEventListener('input', (ev) => {
+    if(ev.target && ev.target.id === "memberBirthdate"){
+      const v = ev.target.value;
+      const info = computeAgeDetailed(v);
+      document.getElementById("memberAge").value = info ? info.display : "";
+      document.getElementById("memberStage").value = info ? info.stage : "";
+    }
+    if(ev.target && ev.target.id === "householdBirthdate"){
+      const v = ev.target.value;
+      const info = computeAgeDetailed(v);
+      document.getElementById("householdAge").value = info ? info.display : "";
+      document.getElementById("householdStage").value = info ? info.stage : "";
+    }
   });
 
-  // preview initial
+  // initial preview
   updateMemberPreview();
 });
+</script>
+<script>
 
-/* ---------------- open / close panel helpers ---------------- */
-function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
-function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
+const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec"; 
 
-/* ---------------- Submit head + members ---------------- */
-async function submitHeadAndMembers(){
-  // head birthdate -> DD/MM/YYYY
-  const headBirthInput = document.getElementById("householdBirthdate").value || "";
-  const headBirthForSheet = toSheetDateFormat(headBirthInput);
-  const headAgeInfo = computeAgeDetailed(headBirthInput);
-  const headAgeVal = headAgeInfo ? headAgeInfo.display : "";
-
-const head = {
-  "Barangay": document.getElementById("barangay").value || "",
-  "Sitio / Purok": document.getElementById("sitio").value || "",
-  "Name of Household Head": document.getElementById("householdHead").value || "",
-  "Contact no.": document.getElementById("contactNo").value || "",
-  "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-  "Birthdate": headBirthForSheet,
-  "Age": headAgeVal,
-  "Stage": headAgeInfo ? headAgeInfo.stage : "",
-  "No. of Household Member/s": document.getElementById("memberCount").value || "0",
-  "Persons with Disability (PWD)": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
-  "Reasons for Displacement": document.getElementById("reasons").value || "",
-  "Transportation": document.getElementById("head_transport").value || "",
-  "Designated Pick-Up Point": document.getElementById("pickup").value || "",
-  "Drop-Off Point": document.getElementById("dropoff").value || "",
-  "Status": document.getElementById("head_status").value || "",
-  "Name of Camp": document.getElementById("campName").value || "",
-  "Capacity": document.getElementById("capacity").value || "",
-  "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
-  "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
-  "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
-  "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
-  "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
-  "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
-  "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
-  "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
-  "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
-  "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
-  "AICS": document.getElementById("ass_aics").value || "",
-  "Submitted By": localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown",
-  "Submitted On": new Date().toLocaleString()
-};
-
-
-  // ensure members array length matches count
-  const expected = parseInt(document.getElementById("memberCount").value || 0);
-  const members = collectedMembers.slice(0);
-  for(let i=0;i<expected;i++){
-    if(!members[i]){
-      members[i] = {
-        "Name of Household Member/s": "",
-        "Sex": "",
-        "Birthdate": "",
-        "Age": "",
-        "Stage": "",
-        "Persons with Disability (PWD)": "No",
-        "Status": "",
-        "Transportation": "",
-        "Designated Pick-Up Point": "",
-        "Drop-Off Point": "",
-        "Name of Camp": "",
-        "Capacity": "",
-        "No. of Individuals Inside Camp": "",
-        "No. of Individuals Outside Camp": "",
-        "Reasons for Displacement": "",
-        "TUPAD": "No",
-        "Local 4Ps": "No",
-        "National 4Ps": "No",
-        "Local Social Pension": "No",
-        "National Social Pension": "No",
-        "Solo Parent Assistance": "No",
-        "Relief Goods": "No",
-        "Cash Subsidy": "No",
-        "AICS": ""
-      };
-    }
-    // ensure any birthdate in members are DD/MM/YYYY
-    if(members[i]["Birthdate"]){
-      // if user saved a raw yyyy-mm-dd in some path, convert
-      members[i]["Birthdate"] = (members[i]["Birthdate"].indexOf('/') === -1) ? toSheetDateFormat(members[i]["Birthdate"]) : members[i]["Birthdate"];
-    }
-  }
-
-  // build FormData
-  const form = new FormData();
-  form.append("action","createRecord");
-  form.append("head", JSON.stringify(head));
-  form.append("members", JSON.stringify(members));
-  form.append("submittedBy", localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown");
-
-  // UI disable
-  const submitBtn = document.getElementById("nextToMembers");
-  submitBtn.disabled = true;
-  submitBtn.innerText = "Saving...";
-
-  try{
-    console.log("Submitting HEAD:", head);
-    console.log("Submitting MEMBERS:", members);
-    const res = await fetch(API_URL, { method: "POST", body: form });
-    const text = await res.text();
-    console.log("RAW RESPONSE:", text);
-    let data;
-    try { data = JSON.parse(text); } catch(e){ throw new Error("Invalid response from server"); }
-
-    if(data.success){
-      alert("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
-      window.location.href = "records.html";
-    } else {
-      alert("Save failed: " + (data.message || "Unknown error"));
-      console.error("SAVE ERROR:", data);
-    }
-  }catch(err){
-    console.error("SUBMIT ERROR:", err);
-    alert("Network / Server error. Check console.");
-  }finally{
-    submitBtn.disabled = false;
-    submitBtn.innerText = "Save → Next Members";
-  }
+/* ------------------ Toast UI ------------------ */
+function showToast(msg, type="info"){
+  let box = document.createElement("div");
+  box.className = "toast "+type;
+  box.innerText = msg;
+  document.body.appendChild(box);
+  setTimeout(()=> box.classList.add("show"), 50);
+  setTimeout(()=> {
+    box.classList.remove("show");
+    setTimeout(()=> box.remove(), 400);
+  }, 2600);
 }
 
+/* Toast CSS */
+const toastStyle = document.createElement("style");
+toastStyle.innerHTML = `
+.toast {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #333;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: all .4s;
+  z-index: 99999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(-10px);
+}
+.toast.success { background:#2e7d32; }
+.toast.error { background:#c62828; }
+`;
+document.head.appendChild(toastStyle);
+
+/* ----------------- HEAD data collector ----------------- */
+function collectHeadData(){
+  const birth_input = document.getElementById("householdBirthdate").value;
+  const birth_sheet = toSheetDateFormat(birth_input);
+  const ageObj = computeAgeDetailed(birth_input);
+
+  const dog = document.getElementById("head_animal_dog").checked;
+  const cat = document.getElementById("head_animal_cat").checked;
+  const pig = document.getElementById("head_animal_pig").checked;
+  const cow = document.getElementById("head_animal_cow").checked;
+  const carabao = document.getElementById("head_animal_carabao").checked;
+  const chicken = document.getElementById("head_animal_chicken").checked;
+  const others = document.getElementById("head_animal_others").checked;
+
+  return {
+    "Coordinate": document.getElementById("coordinate").value.trim(),
+    "Barangay": document.getElementById("barangay").value.trim(),
+    "Sitio / Purok": document.getElementById("sitio").value.trim(),
+    "Name of Household Head": document.getElementById("householdHead").value.trim(),
+    "Contact no.": document.getElementById("householdContact").value.trim(),
+    "Sex": document.querySelector("input[name='household_sex']:checked")?.value || "",
+    "Birthdate": birth_sheet,
+    "Age": ageObj ? ageObj.display : "",
+    "Stage": ageObj ? ageObj.stage : "",
+    "No. of Household Member/s": document.getElementById("memberCount").value || "",
+
+    /* government support */
+    "Persons with Disability (PWD)": document.querySelector("input[name='household_pwd']:checked")?.value || "No",
+    "Status": document.getElementById("householdStatus").value || "",
+    "Transportation": document.getElementById("householdTransport").value || "",
+    "Designated Pick-Up Point": document.getElementById("householdPickup").value || "",
+    "Drop-Off Point": document.getElementById("householdDropoff").value || "",
+    "Name of Camp": document.getElementById("householdCamp").value || "",
+    "Capacity": document.getElementById("householdCampCap").value || "",
+    "No. of Individuals Inside Camp": document.getElementById("householdInside").value || "",
+    "No. of Individuals Outside Camp": document.getElementById("householdOutside").value || "",
+    "Reasons for Displacement": document.getElementById("householdReason").value || "",
+
+    "TUPAD": document.getElementById("head_tupad")?.checked ? "Yes":"No",
+    "Local 4Ps": document.getElementById("head_local4ps")?.checked ? "Yes":"No",
+    "National 4Ps": document.getElementById("head_intl4ps")?.checked ? "Yes":"No",
+    "Local Social Pension": document.getElementById("head_locsp")?.checked ? "Yes":"No",
+    "National Social Pension": document.getElementById("head_intlsp")?.checked ? "Yes":"No",
+    "Solo Parent Assistance": document.getElementById("head_solo")?.checked ? "Yes":"No",
+    "Cash Subsidy": document.getElementById("head_cash")?.checked ? "Yes":"No",
+    "Relief Goods": document.getElementById("head_relief")?.checked ? "Yes":"No",
+    "AICS": document.getElementById("householdAics").value || "",
+
+    /* -------- Domestic animals (HEAD) -------- */
+    "Dog": dog ? "Yes" : "",
+    "Dog Qty": dog ? document.getElementById("head_qty_dog").value : "",
+    "Cat": cat ? "Yes" : "",
+    "Cat Qty": cat ? document.getElementById("head_qty_cat").value : "",
+    "Pig": pig ? "Yes" : "",
+    "Pig Qty": pig ? document.getElementById("head_qty_pig").value : "",
+    "Cow": cow ? "Yes" : "",
+    "Cow Qty": cow ? document.getElementById("head_qty_cow").value : "",
+    "Carabao": carabao ? "Yes" : "",
+    "Carabao Qty": carabao ? document.getElementById("head_qty_carabao").value : "",
+    "Chicken": chicken ? "Yes" : "",
+    "Chicken Qty": chicken ? document.getElementById("head_qty_chicken").value : "",
+    "Others": others ? (document.getElementById("head_others_text").value || "Others") : "",
+    "Others Qty": others ? document.getElementById("head_qty_others").value : "",
+  };
+}
+
+/* -------------- Final Submit (SEND TO GOOGLE SHEETS) ---------------- */
+async function submitHeadAndMembers() {
+  try {
+    // validate
+    const barangay = document.getElementById("barangay").value.trim();
+    const sitio = document.getElementById("sitio").value.trim();
+    const headName = document.getElementById("householdHead").value.trim();
+
+    if(!barangay || !sitio || !headName){
+      showToast("Please complete Barangay, Sitio and Head Name","error");
+      return;
+    }
+
+    /* HEAD */
+    const headObj = collectHeadData();
+
+    /* MEMBERS collected from Part 2 */
+    const members = [...collectedMembers];
+
+    /* SubmittedBy = staff full name */
+    const submittedBy = localStorage.getItem("staffName") || "Unknown";
+
+    /* Build final payload */
+    const payload = {
+      action: "createRecord",
+      payload: JSON.stringify({
+        head: headObj,
+        members: members,
+        submittedBy: submittedBy
+      })
+    };
+
+    showToast("Saving, please wait...");
+
+    /* SEND POST */
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams(payload)
+    });
+    const text = await res.text();
+
+    console.log("RAW RESPONSE:", text);
+
+    let json;
+    try { json = JSON.parse(text); }
+    catch(err){
+      showToast("Save failed: invalid server response","error");
+      console.error(err);
+      return;
+    }
+
+    if(!json.success){
+      showToast(json.message || "Save error","error");
+      return;
+    }
+
+    showToast("Saved successfully!","success");
+
+    // RESET form entirely
+    document.getElementById("headForm").reset();
+    collectedMembers = [];
+    updateMemberPreview();
+
+  } catch (err) {
+    console.error(err);
+    showToast("Unexpected error saving","error");
+  }
+}
 </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
