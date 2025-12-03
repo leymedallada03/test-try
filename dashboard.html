@@ -29,6 +29,11 @@
     font-weight:800;
     color:#153b26
   }
+  .mini { font-size:13px; color:#55615a }
+  .barangay-breakdown{margin-top:12px;overflow:auto}
+  .break-table{width:100%;border-collapse:collapse}
+  .break-table th,.break-table td{padding:6px 8px;border-bottom:1px solid #eee;font-size:13px}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 </style>
 </head>
 
@@ -58,11 +63,7 @@
       <li><a href="dataForm.html">📝 Data Entry</a></li>
       <li><a href="records.html">📁 Records</a></li>
       <li><a href="charts.html">📈 Charts</a></li>
-
-      <!-- FIXED: Hidden by default -->
-      <li id="navUsers" style="display:none;">
-        <a href="users.html">👥 User Management</a>
-      </li>
+      <li id="navUsers" style="display:none;"><a href="users.html">👥 User Management</a></li>
     </ul>
   </aside>
 
@@ -73,21 +74,32 @@
       <div class="card">
         <h3>Total Household Heads</h3>
         <div id="totalHeads" class="card-value">0</div>
+        <div class="mini">(rows without member name)</div>
       </div>
 
       <div class="card">
         <h3>Total Household Members</h3>
         <div id="totalMembers" class="card-value">0</div>
+        <div class="mini">(all member rows)</div>
       </div>
 
       <div class="card">
-        <h3>Assigned Barangay</h3>
-        <div id="assignedBarangay" class="card-value">---</div>
+        <h3>Households with Coordinates</h3>
+        <div id="withCoords" class="card-value">0</div>
+        <div class="mini">Heads that provided lat,lng</div>
       </div>
 
       <div class="card">
         <h3>Last Updated</h3>
         <div id="lastUpdated" class="card-value">---</div>
+        <div class="mini">(mm/d/yyyy hh:mm:ss AM/PM)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Quick Totals</h3>
+      <div class="stat-grid" id="quickStats">
+        <!-- filled by script -->
       </div>
     </div>
 
@@ -96,157 +108,238 @@
       <canvas id="barangayChart" height="160"></canvas>
     </div>
 
-  </main>
+    <div class="card">
+      <h3>Barangay Breakdown</h3>
+      <div class="barangay-breakdown">
+        <table class="break-table" id="breakTable">
+          <thead><tr><th>Barangay</th><th>Heads</th><th>Members</th><th>Male</th><th>Female</th><th>With Coord</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
 
+  </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <script>
-/* ============================
-   ROLE CHECK — WORKS ON ALL PAGES
-   ============================ */
-
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+let chart = null;
 
-async function checkRole() {
-    try {
-        const res = await fetch(API_URL + "?action=sessionCheck");
-        const data = await res.json();
-
-        if (!data.success) {
-            return window.location.href = "index.html";
-        }
-
-        document.getElementById("userName").innerText = data.fullName || "";
-
-        // Admin → show User Management
-        if (data.role === "Admin") {
-            document.getElementById("navUsers").style.display = "block";
-        }
-
-        // Staff → hide User Management and block access
-        if (data.role === "Staff") {
-            document.getElementById("navUsers").style.display = "none";
-
-            if (location.pathname.includes("users.html")) {
-                return window.location.href = "index.html";
-            }
-        }
-
-    } catch (err) {
-        console.error(err);
-        window.location.href = "index.html";
-    }
-}
-
-checkRole();
-
-/* ============================
-   DASHBOARD LOGIC
-   ============================ */
-
-let refreshTimer = null;
-let currentChart = null;
-
-// case-insensitive field lookup
-function getField(obj, fieldName) {
-  if (!obj) return "";
-  const want = fieldName.toLowerCase().trim();
-  for (const k of Object.keys(obj)) {
-    if (k.toLowerCase().trim() === want) return obj[k];
+function getField(obj, name){
+  if(!obj) return "";
+  const want = String(name).toLowerCase().trim();
+  for(const k of Object.keys(obj)){
+    if(String(k).toLowerCase().trim() === want) return obj[k];
   }
   return "";
 }
 
-async function fetchRecords() {
-  const url = API_URL + "?action=getRecords";
-  const res = await fetch(url, { cache: "no-store" });
-  return await res.json();
+function formatTS(date){
+  if(!date) date = new Date();
+  const m = date.getMonth()+1;
+  const d = date.getDate();
+  const y = date.getFullYear();
+  let hh = date.getHours();
+  const mm = String(date.getMinutes()).padStart(2,'0');
+  const ss = String(date.getSeconds()).padStart(2,'0');
+  const ampm = hh>=12 ? 'PM' : 'AM';
+  hh = hh%12; hh = hh? hh:12;
+  return `${m}/${d}/${y} ${String(hh).padStart(2,'0')}:${mm}:${ss} ${ampm}`;
 }
 
-function destroyChart() {
-  if (currentChart) {
-    try { currentChart.destroy(); } catch(e) {}
-    currentChart = null;
-  }
+async function fetchRecords(){
+  const res = await fetch(`${API_URL}?action=getRecords`);
+  return res.json();
 }
 
-async function loadDashboard() {
-  try {
+function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart=null; } }
+
+async function loadDashboard(){
+  try{
     const data = await fetchRecords();
+    if(!data.success) throw new Error('Failed to fetch');
     const rows = data.rows || [];
 
-    let headCount = 0;
-    let memberCount = 0;
+    let totalHeads = 0, totalMembers = 0, headsWithCoords = 0;
+    const barangayMap = {}; // barangay => stats
 
-    const barangayMap = {};
-
+    // accumulate
     rows.forEach(r => {
-      const memberName = String(getField(r, "Name of Household Member/s")).trim();
-      const barangay = String(getField(r, "Barangay") || "Unknown").trim();
+      const isHead = String(getField(r,'Name of Household Member/s')||'').trim() === '';
+      const barangay = String(getField(r,'Barangay')||'Unknown').trim() || 'Unknown';
+      const sex = String(getField(r,'Sex')||'').trim().toLowerCase();
+      const coord = String(getField(r,'Coordinate')||'').trim();
 
-      const isHead = (memberName === "");
+      if(!barangayMap[barangay]){
+        barangayMap[barangay] = {
+          heads:0, members:0, male:0, female:0, coords:0,
+          pwds:0, status:{} , reasons:{}, livestock:{}, ageBuckets:{}, sitio:{}
+        };
+      }
 
-      if (isHead) headCount++;
-      else memberCount++;
+      const b = barangayMap[barangay];
 
-      if (!barangayMap[barangay]) barangayMap[barangay] = { heads: 0, members: 0 };
-      if (isHead) barangayMap[barangay].heads++;
-      else barangayMap[barangay].members++;
+      if(isHead){
+        totalHeads++; b.heads++;
+        if(coord) { headsWithCoords++; b.coords++; }
+        // sitio
+        const sitio = String(getField(r,'Sitio / Purok')||'').trim() || 'Unknown';
+        b.sitio[sitio] = (b.sitio[sitio]||0)+1;
+      } else {
+        totalMembers++; b.members++;
+      }
+
+      // sex
+      if(sex === 'male') b.male++; else if(sex === 'female') b.female++;
+
+      // PWD
+      if(String(getField(r,'Persons with Disability (PWD)')||'').toLowerCase().trim()==='yes') b.pwds++;
+
+      // Status (categorical)
+      const status = String(getField(r,'Status')||'').trim();
+      if(status){ b.status[status] = (b.status[status]||0)+1; }
+
+      // Reasons
+      const reason = String(getField(r,'Reasons for Displacement')||'').trim();
+      if(reason){ b.reasons[reason] = (b.reasons[reason]||0)+1; }
+
+      // Livestock — headers: Dog,Dog Qty.,Cat,Cat Qty.,Pig,Pig Qty.,Cow,Cow Qty.,Carabao,Carabao Qty.,Chicken ,Chicken Qty.,Others
+      ['Dog','Dog Qty.','Cat','Cat Qty.','Pig','Pig Qty.','Cow','Cow Qty.','Carabao','Carabao Qty.','Chicken','Chicken Qty.','Others'].forEach(key=>{
+        const val = String(getField(r,key) || '').trim();
+        if(!val) return;
+        // count presence and sum qty when field is qty
+        if(key.toLowerCase().includes('qty')){
+          const animal = key.replace(/\s*Qty\.?$/i,'');
+          const n = Number(val) || 0;
+          if(!b.livestock[animal]) b.livestock[animal] = {count:0, qty:0};
+          b.livestock[animal].qty += n;
+        } else if(key.toLowerCase().trim() === 'others'){
+          if(!b.livestock['Others']) b.livestock['Others'] = [];
+          if(val) b.livestock['Others'].push(val);
+        } else {
+          // yes/no or name — if value looks like yes/no
+          if(String(val).toLowerCase() === 'yes'){
+            if(!b.livestock[key]) b.livestock[key] = {count:0, qty:0};
+            b.livestock[key].count += 1;
+          } else if(!isNaN(Number(val)) && val!==''){
+            // sometimes qty mistakenly in non-qty column
+            if(!b.livestock[key]) b.livestock[key] = {count:0, qty:0};
+            b.livestock[key].qty += Number(val);
+          }
+        }
+      });
+
+      // Government support
+      ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'].forEach(k=>{
+        if(String(getField(r,k)||'').toLowerCase().trim()==='yes'){
+          b[k] = (b[k]||0)+1;
+        }
+      });
+
+      // Age grouping (approx using Age field if present)
+      const ageField = String(getField(r,'Age')||'').trim();
+      let y = null;
+      if(ageField){
+        // try to parse leading number
+        const m = ageField.match(/(\d+)/);
+        if(m) y = Number(m[1]);
+      }
+      const ab = y===null? 'Unknown' : (y<=5? '0-5' : y<=17? '6-17' : y<=59? '18-59' : '60+');
+      b.ageBuckets[ab] = (b.ageBuckets[ab]||0)+1;
+
+    }); // rows loop
+
+    // UI updates
+    document.getElementById('totalHeads').innerText = totalHeads;
+    document.getElementById('totalMembers').innerText = totalMembers;
+    document.getElementById('withCoords').innerText = headsWithCoords;
+    document.getElementById('lastUpdated').innerText = formatTS(new Date());
+
+    // quick stats box
+    const quick = document.getElementById('quickStats'); quick.innerHTML = '';
+    const totals = {male:0,female:0,pwd:0};
+    const livestockTotals = {}; const reasonsTotals = {}; const supportTotals = {};
+    Object.keys(barangayMap).forEach(bn=>{
+      const s = barangayMap[bn]; totals.male += s.male; totals.female += s.female; totals.pwd += s.pwds;
+      // livestock
+      Object.keys(s.livestock||{}).forEach(a=>{
+        if(a==='Others'){
+          livestockTotals['Others'] = (livestockTotals['Others']||0) + (s.livestock['Others']? s.livestock['Others'].length:0);
+        } else {
+          livestockTotals[a] = livestockTotals[a] || 0;
+          livestockTotals[a] += (s.livestock[a] && s.livestock[a].qty)? s.livestock[a].qty : (s.livestock[a]&&s.livestock[a].count? s.livestock[a].count:0);
+        }
+      });
+      // reasons
+      Object.keys(s.reasons||{}).forEach(r=> reasonsTotals[r] = (reasonsTotals[r]||0)+s.reasons[r]);
+      // support
+      ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'].forEach(k=>{
+        if(s[k]) supportTotals[k] = (supportTotals[k]||0) + s[k];
+      });
     });
 
-    // Update dashboard values
-    document.getElementById("totalHeads").innerText = headCount;
-    document.getElementById("totalMembers").innerText = memberCount;
-    document.getElementById("assignedBarangay").innerText = localStorage.getItem("assignedBarangay") || "---";
-    document.getElementById("lastUpdated").innerText = new Date().toLocaleString();
+    // populate quick stats
+    const kv = [
+      ['Male', totals.male], ['Female', totals.female], ['PWD', totals.pwd]
+    ];
+    kv.forEach(it=>{
+      const el = document.createElement('div'); el.className='card'; el.style.padding='10px';
+      el.innerHTML = `<div class="mini">${it[0]}</div><div class="card-value">${it[1]}</div>`;
+      quick.appendChild(el);
+    });
 
-    // Chart
+    // Livestock small list
+    const lvKeys = Object.keys(livestockTotals).slice(0,6);
+    lvKeys.forEach(k=>{
+      const el = document.createElement('div'); el.className='card'; el.style.padding='10px';
+      el.innerHTML = `<div class="mini">${k}</div><div class="card-value">${livestockTotals[k]}</div>`;
+      quick.appendChild(el);
+    });
+
+    // Chart — heads vs members per barangay
     destroyChart();
     const labels = Object.keys(barangayMap).sort();
-    const headData = labels.map(b => barangayMap[b].heads);
-    const memberData = labels.map(b => barangayMap[b].members);
-
-    const ctx = document.getElementById("barangayChart").getContext("2d");
-    currentChart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          { label:"Household Heads", data: headData, backgroundColor:"#2b9348" },
-          { label:"Household Members", data: memberData, backgroundColor:"#55a630" }
-        ]
-      },
-      options:{
-        responsive:true,
-        plugins:{ legend:{ position:"bottom" } },
-        scales:{ y:{ beginAtZero:true } }
-      }
+    const headsData = labels.map(l => barangayMap[l].heads || 0);
+    const membersData = labels.map(l => barangayMap[l].members || 0);
+    const ctx = document.getElementById('barangayChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type:'bar', data:{ labels, datasets:[{label:'Heads', data:headsData, backgroundColor:'#2b9348'},{label:'Members', data:membersData, backgroundColor:'#55a630'}] },
+      options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}} }
     });
 
-  } catch (err) {
-    console.error("Dashboard error:", err);
+    // breakdown table
+    const tbody = document.querySelector('#breakTable tbody'); tbody.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${l}</td><td>${s.heads||0}</td><td>${s.members||0}</td><td>${s.male||0}</td><td>${s.female||0}</td><td>${s.coords||0}</td>`;
+      tbody.appendChild(tr);
+    });
+
+  } catch(err){
+    console.error(err);
   }
 }
 
-function autoRefresh() {
-  if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(loadDashboard, 30000); // 30 seconds
+// support functions
+function autoRefresh(){ setInterval(loadDashboard, 30000); }
+
+// session + UI
+async function sessionCheck(){
+  try{
+    const r = await fetch(API_URL + '?action=sessionCheck');
+    const j = await r.json();
+    if(!j.success) return window.location.href = 'index.html';
+    document.getElementById('userName').innerText = j.fullName || '';
+    if(j.role === 'Admin') document.getElementById('navUsers').style.display = 'block';
+  }catch(e){ console.warn('session check failed'); }
 }
 
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  fetch(API_URL + "?action=logout");
-  window.location.href = "index.html";
-});
+document.getElementById('logoutBtn').addEventListener('click', ()=>{ fetch(API_URL+'?action=logout'); window.location.href='index.html'; });
 
-/* Init */
-loadDashboard();
-autoRefresh();
-
+// init
+window.addEventListener('DOMContentLoaded', async ()=>{ await sessionCheck(); await loadDashboard(); autoRefresh(); });
 </script>
 </body>
 </html>
-
-
-
