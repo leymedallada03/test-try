@@ -18,20 +18,7 @@
    --accent3: #ff7a00;  /* dark orange */
   --accent4: #ffa500;  /* light orange */
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-   .toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.search-box {
-  flex: 1; /* search becomes full width */
-}
-
-.push-right {
-  margin-left: auto; /* pushes items to the right */
-}
+   }
 .page-container{max-width:1200px;margin:20px auto;padding:12px;display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
 .topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;box-shadow:0 6px 20px rgba(5,40,25,0.12)}
 .brand{display:flex;gap:12px;align-items:center}.brand .logo{width:48px;height:48px;border-radius:8px;object-fit:contain}
@@ -41,8 +28,6 @@
 /* toolbar */
 .search-box{padding:8px 12px;border:1px solid #bbb;border-radius:8px;min-width:220px}
 .brgy-dropdown{padding:8px;border-radius:8px;border:1px solid #ccc}
-.btn-main{padding:6px 10px;border-radius:8px;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;border:0;font-weight:700;cursor:pointer}
-.btn-secondary{padding:6px 10px;border-radius:8px;border:1px solid #0f7a4a;background:#fff;color:#0f7a4a;font-weight:700;cursor:pointer}
 .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff; }
 .btn-export { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent3),var(--accent4)); color:#fff; }
 /* records wrapper/table */
@@ -79,7 +64,7 @@
 
 /* export dropdown */
 .export-wrapper{position:relative}
-.export-dropdown{position:absolute;top:36px;right:0;background:#fff;border:1px solid #ccc;border-radius:10px;width:170px;box-shadow:0 6px 18px rgba(0,0,0,0.12);z-index:9999}
+.export-dropdown{font-size:10px;position:absolute;top:36px;right:0;background:#fff;border:1px solid #ccc;border-radius:10px;width:170px;box-shadow:0 6px 18px rgba(0,0,0,0.12);z-index:9999}
 .export-dropdown div{padding:10px 14px;cursor:pointer}
 .export-dropdown div:hover{background:#e9fff0}
 .hidden{display:none}
@@ -449,6 +434,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
 </script>
 </body>
 </html>
+
 
 
 
