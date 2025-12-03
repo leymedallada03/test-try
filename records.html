@@ -7,177 +7,421 @@
 <link rel="stylesheet" href="styles.css"/>
 
 <style>
-/* compact adjustments requested */
-.icon-btn { background:none;border:none;font-size:14px;cursor:pointer;padding:4px;border-radius:6px; }
-.icon-btn:hover{background:#e8fff0}
-.records-table th, .records-table td{padding:6px 8px;font-size:13px;line-height:1.2}
-.records-table tr{height:34px}
-.actions-col, .select-col{width:90px}
-.select-col input, .row-select{transform:scale(1);}
-.member-row td{padding-left:14px}
-/* make "Show" toggle small & inline with row */
-.icon-show{font-size:13px;padding:4px 6px;border-radius:6px;border:1px solid rgba(6,30,20,0.06);background:transparent}
-.icon-small{font-size:14px}
-.legend-box{margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.legend-color{width:14px;height:14px;border-radius:4px;display:inline-block;margin-right:8px}
-/* search highlight distinct color */
+/* compact, finished styles for records page (overrides + small tweaks) */
+
+.page-container{max-width:1200px;margin:20px auto;padding:12px;display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;box-shadow:0 6px 20px rgba(5,40,25,0.12)}
+.brand{display:flex;gap:12px;align-items:center}.brand .logo{width:48px;height:48px;border-radius:8px;object-fit:contain}
+.sidebar{background:linear-gradient(180deg,rgba(255,255,255,0.35),rgba(255,255,255,0.20));border-radius:12px;padding:12px;height:calc(100vh - 120px);position:sticky;top:72px;overflow:auto}
+.content-area{background:linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,255,255,0.6));border-radius:12px;padding:18px;box-shadow:0 8px 22px rgba(10,20,16,0.06);min-height:72vh}
+
+/* toolbar */
+.search-box{padding:8px 12px;border:1px solid #bbb;border-radius:8px;min-width:220px}
+.brgy-dropdown{padding:8px;border-radius:8px;border:1px solid #ccc}
+.btn-main{padding:6px 10px;border-radius:8px;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;border:0;font-weight:700;cursor:pointer}
+.btn-secondary{padding:6px 10px;border-radius:8px;border:1px solid #0f7a4a;background:#fff;color:#0f7a4a;font-weight:700;cursor:pointer}
+
+/* records wrapper/table */
+.records-wrapper{margin-top:14px;background:rgba(255,255,255,0.95);border-radius:12px;box-shadow:0 8px 22px rgba(6,30,20,0.06);overflow:auto}
+.records-table{width:100%;min-width:1400px;border-collapse:collapse}
+.records-table th,.records-table td{padding:6px 8px;font-size:13px;border-bottom:1px solid rgba(15,122,74,0.12);vertical-align:middle}
+.records-table thead th{background:rgba(15,122,74,0.08);font-weight:800;position:sticky;top:0;z-index:6}
+.records-table tbody tr:hover{background:rgba(52,183,143,0.05)}
+
+/* sticky columns */
+.select-col{position:sticky;left:0;background:rgba(255,255,255,0.95);z-index:7;padding-left:10px}
+.actions-col{position:sticky;right:0;background:rgba(255,255,255,0.95);z-index:7}
+
+/* compact member rows */
+.member-row{background:#fafafa}
+.member-row.hidden{display:none}
+
+/* color coding */
+.mem-small{background:#d4f6ff !important}
+.mem-normal{background:#d9ffd9 !important}
+.mem-large{background:#fff7c2 !important}
+.mem-critical{background:#ffd6d6 !important}
+
+/* highlight */
 .hl{background:#fffe8a;padding:2px 3px;border-radius:4px}
-/* responsive */
-@media(max-width:980px){ .records-table{min-width:1100px} }
+
+/* icon buttons small */
+.icon-btn{background:none;border:0;font-size:14px;cursor:pointer;padding:4px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#0f7a4a}
+.icon-btn:hover{background:rgba(15,122,74,0.08);transform:translateY(-1px)}
+
+/* show toggle small, inline */
+.show-toggle{font-size:13px;padding:4px 6px;border-radius:6px;border:1px solid rgba(6,30,20,0.06);background:transparent;cursor:pointer;color:#0f7a4a}
+.show-toggle:hover{background:#e9fff4;}
+
+/* export dropdown */
+.export-wrapper{position:relative}
+.export-dropdown{position:absolute;top:36px;right:0;background:#fff;border:1px solid #ccc;border-radius:10px;width:170px;box-shadow:0 6px 18px rgba(0,0,0,0.12);z-index:9999}
+.export-dropdown div{padding:10px 14px;cursor:pointer}
+.export-dropdown div:hover{background:#e9fff0}
+.hidden{display:none}
+
+/* pagination buttons */
+#paginationArea button{padding:6px 10px;margin:0 3px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
+#paginationArea button.active{background:#0f7a4a;color:#fff;border-color:#0f7a4a;font-weight:700}
+
+/* legend */
+.legend-box{margin-top:16px;display:inline-block;background:#fff;padding:12px;border-radius:10px;border:1px solid rgba(6,30,20,0.04);box-shadow:0 4px 14px rgba(6,30,20,0.06)}
+.legend-item{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:13px}
+.legend-swatch{width:14px;height:14px;border-radius:4px}
 </style>
 </head>
-
 <body>
 <div class="page-container">
 
-<header class="topbar">
-  <button id="menuToggle" class="menu-btn">☰</button>
-  <div class="brand">
-    <img src="assets/MDRRMO Logo.png" class="logo"/>
-    <div><div class="title">PUROK KALIGTASAN</div><div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div></div>
-  </div>
-  <div class="user-info"><span id="userName"></span><button id="logoutBtn" class="logout-btn">Logout</button></div>
-</header>
+  <header class="topbar">
+    <div style="display:flex;gap:12px;align-items:center">
+      <button class="menu-btn" style="display:none">☰</button>
+      <div class="brand">
+        <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+        <div>
+          <div class="title">PUROK KALIGTASAN</div>
+          <div class="subtitle" style="font-size:12px;opacity:0.95">Disaster Risk Reduction & Management Office - Alitagtag</div>
+        </div>
+      </div>
+    </div>
 
-<aside class="sidebar" id="sidebar">...
-<ul>
-  <li><a href="dashboard.html">📊 Dashboard</a></li>
-  <li><a href="dataForm.html">📝 Data Entry</a></li>
-  <li><a href="records.html" class="active">📁 Records</a></li>
-  <li><a href="charts.html">📈 Charts</a></li>
-  <li class="admin-only"><a href="users.html">👥 User Management</a></li>
-</ul>
-</aside>
+    <div style="display:flex;gap:12px;align-items:center">
+      <span id="userName"></span>
+      <button id="logoutBtn" class="btn-secondary">Logout</button>
+    </div>
+  </header>
 
-<main class="content-area">
-<h2>📁 Household Records</h2>
+  <aside class="sidebar" id="sidebar">
+    <ul style="list-style:none;padding:6px;margin:0;display:flex;flex-direction:column;gap:6px">
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="dataForm.html">📝 Data Entry</a></li>
+      <li><a href="records.html" class="active">📁 Records</a></li>
+      <li><a href="charts.html">📈 Charts</a></li>
+      <li class="admin-only"><a href="users.html">👥 User Management</a></li>
+    </ul>
+  </aside>
 
-<div style="display:flex; justify-content:flex-end; gap:18px; margin-bottom:10px;">
-  <span>Rows: <strong class="green" id="rowCount">0</strong></span>
-  <span>Matches: <strong class="green" id="matchCount">0</strong></span>
-  <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
+  <main class="content-area">
+    <h2 style="margin-top:0">📁 Household Records</h2>
+
+    <!-- Counts -->
+    <div style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:12px">
+      <span>Rows: <strong class="green" id="rowCount">0</strong></span>
+      <span>Matches: <strong class="green" id="matchCount">0</strong></span>
+      <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
+    </div>
+
+    <!-- Toolbar -->
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center">
+      <input id="searchInput" class="search-box" placeholder="Search by Name / Barangay / ID..." />
+
+      <select id="filterBarangay" class="brgy-dropdown" aria-label="Filter by Barangay">
+        <option value="">All Barangays</option>
+        <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+        <option>Dalipit East</option><option>Dalipit West</option>
+        <option>Dominador East</option><option>Dominador West</option>
+        <option>Munlawin Sur</option><option>Munlawin Norte</option>
+        <option>Muzon Primero</option><option>Muzon Segundo</option>
+        <option>Pinagkurusan</option><option>Ping-As</option>
+        <option>Poblacion East</option><option>Poblacion West</option>
+        <option>San Jose</option><option>San Juan</option>
+        <option>Santa Cruz</option><option>Tadlac</option>
+      </select>
+
+      <button id="refreshBtn" class="btn-main">⟳ Refresh</button>
+
+      <div class="export-wrapper">
+        <button id="exportBtn" class="btn-secondary">📤 Export ▼</button>
+        <div id="exportDropdown" class="export-dropdown hidden" role="menu" aria-hidden="true">
+          <div onclick="exportAll()">Export All</div>
+          <div onclick="exportSelected()">Export Selected</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="records-wrapper">
+      <table class="records-table" aria-describedby="records table">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div id="paginationArea" style="margin-top:12px"></div>
+
+    <!-- Legend -->
+    <div class="legend-box" style="margin-top:10px">
+      <strong>Household Color Legend:</strong>
+      <div class="legend-item"><div class="legend-swatch" style="background:#d4f6ff"></div>1 Member</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#d9ffd9"></div>2–4 Members</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#fff7c2"></div>5–7 Members</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#ffd6d6"></div>8+ Members</div>
+    </div>
+
+  </main>
 </div>
 
-<div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px; align-items:center">
-  <input id="searchInput" class="search-box" placeholder="Search by Name / Barangay / ID..."/>
-  <select id="filterBarangay" class="brgy-dropdown"> <option value="">All Barangays</option> <!-- options kept as before --> </select>
-  <button id="refreshBtn" class="btn-main">⟳ Refresh</button>
-  <div class="export-wrapper">
-    <button id="exportBtn" class="btn-secondary">📤 Export ▾</button>
-    <div id="exportDropdown" class="export-dropdown hidden"><div onclick="exportAll()">Export All</div><div onclick="exportSelected()">Export Selected</div></div>
-  </div>
+<!-- Loading overlay -->
+<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.75);align-items:center;justify-content:center;z-index:9999">
+  <div style="background:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.12)">Loading records…</div>
 </div>
-
-<div class="records-wrapper">
-  <table class="records-table">
-    <thead id="tableHead"></thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-</div>
-
-<div id="paginationArea" style="margin-top:12px"></div>
-
-<div class="legend-box" style="margin-top:14px">
-  <div class="legend-card"> <strong>Household Color Legend:</strong>
-    <div><span class="legend-color" style="background:#d4f6ff"></span>1 Member</div>
-    <div><span class="legend-color" style="background:#d9ffd9"></span>2–4 Members</div>
-    <div><span class="legend-color" style="background:#fff7c2"></span>5–7 Members</div>
-    <div><span class="legend-color" style="background:#ffd6d6"></span>8+ Members</div>
-  </div>
-</div>
-
-</main>
-</div>
-
-<div id="loading" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.7); align-items:center; justify-content:center; z-index:9999;"><div style="padding:12px;background:white;border-radius:10px;">Loading records…</div></div>
 
 <script>
+/* ============ CONFIG ============ */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+
+/* ============ STATE ============ */
 let header = [];
 let rawRows = [];
 let groups = [];
 let selected = new Set();
-let currentPage = 1; const rowsPerPage = 25;
+let currentPage = 1;
+const rowsPerPage = 25;
 
-function showLoading(x){ document.getElementById('loading').style.display = x ? 'flex' : 'none'; }
-function highlight(text,q){ text = String(text||''); if(!q) return text; const r = new RegExp(q.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&'),'gi'); return text.replace(r,m=>`<span class="hl">${m}</span>`); }
+/* ============ UTIL ============ */
+function showLoading(yes){ document.getElementById("loading").style.display = yes ? "flex" : "none"; }
+function highlight(text,q){
+  text = String(text ?? "");
+  if(!q) return text;
+  const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
+  return text.replace(re, m => `<span class="hl">${m}</span>`);
+}
 
-async function loadRecords(){ showLoading(true);
+/* ============ LOAD RECORDS ============ */
+async function loadRecords(){
+  showLoading(true);
   try{
-    const barangay = document.getElementById('filterBarangay').value||'';
-    const q = document.getElementById('searchInput').value.trim();
+    const barangay = document.getElementById("filterBarangay").value || "";
+    const q = document.getElementById("searchInput").value.trim();
+
     const res = await fetch(`${SCRIPT_URL}?action=getRecords&filterBarangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`);
     const data = await res.json();
-    if(!data.success){ alert('Load failed'); showLoading(false); return; }
+    if(!data.success){ alert("Load failed: " + (data.message||"")); showLoading(false); return; }
+
     header = data.header || [];
     rawRows = data.rows || [];
-    groupRows(); currentPage=1; renderTable(); renderPagination(); updateCounts();
-  }catch(err){ console.error(err); alert('Error loading records'); }
+    groupRows();
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+    updateCounts();
+  } catch(err){
+    console.error(err);
+    alert("Error loading records");
+  }
   showLoading(false);
 }
 
-function groupRows(){ const map = {}; rawRows.forEach(r=>{ const id = String(r['Data ID']||''); if(!id) return; if(!map[id]) map[id]={dataID:id, head:null, members:[]}; const isHead = !r['Name of Household Member/s']; if(isHead && !map[id].head) map[id].head = r; else map[id].members.push(r); }); groups = Object.values(map).sort((a,b)=> Number(a.dataID)-Number(b.dataID)); }
+/* ============ GROUPING ============ */
+function groupRows(){
+  const map = {};
+  rawRows.forEach(r=>{
+    const id = String(r["Data ID"] || "");
+    if(!id) return;
+    if(!map[id]) map[id] = { dataID:id, head:null, members:[] };
 
-function renderTable(){ const thead = document.getElementById('tableHead'); const tbody = document.getElementById('tableBody'); thead.innerHTML = ''; tbody.innerHTML = '';
-  // build header using server header (but ensure exact expected order will be used for export)
-  let h = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
-  header.forEach(c=> h += `<th>${c}</th>`);
-  h += `<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>`;
-  thead.innerHTML = h;
+    const isHead = !r["Name of Household Member/s"] || String(r["Name of Household Member/s"]).trim() === "";
+    if(isHead && !map[id].head) map[id].head = r;
+    else map[id].members.push(r);
+  });
 
-  const start = (currentPage-1)*rowsPerPage; const page = groups.slice(start, start+rowsPerPage);
-  const keyword = document.getElementById('searchInput').value.trim();
+  // ensure head exists
+  Object.keys(map).forEach(k=>{
+    if(!map[k].head && map[k].members.length>0){
+      map[k].head = map[k].members.shift();
+    }
+  });
 
-  page.forEach(g=>{
-    const head = g.head||{}; const mCount = g.members.length;
-    let cls = mCount <=1 ? 'mem-small' : mCount<=4 ? 'mem-normal' : mCount<=7 ? 'mem-large' : 'mem-critical';
-    const tr = document.createElement('tr'); tr.className = cls;
-    const tdSel = document.createElement('td'); tdSel.className='select-col'; tdSel.innerHTML = `<input class="row-select" type="checkbox" data-id="${g.dataID}" ${selected.has(g.dataID)?'checked':''}>`; tr.appendChild(tdSel);
+  groups = Object.values(map).sort((a,b)=> Number(a.dataID) - Number(b.dataID));
+}
 
-    header.forEach(c=>{ const td = document.createElement('td'); td.innerHTML = highlight(head[c]||'', keyword); tr.appendChild(td); });
+/* ============ RENDER ============ */
+function renderTable(){
+  const thead = document.getElementById("tableHead");
+  const tbody = document.getElementById("tableBody");
+  thead.innerHTML = ""; tbody.innerHTML = "";
 
-    const tdM = document.createElement('td'); tdM.className='actions-col'; tdM.innerHTML = `<button class="icon-show" onclick="toggleMembers('${g.dataID}')">👁 Show (${mCount})</button>`; tr.appendChild(tdM);
+  // header row
+  let th = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
+  header.forEach(c => th += `<th>${c}</th>`);
+  th += `<th class="actions-col" style="min-width:96px">Members</th><th class="actions-col">Actions</th></tr>`;
+  thead.innerHTML = th;
 
-    const tdA = document.createElement('td'); tdA.className='actions-col'; tdA.innerHTML = `<button class="icon-btn" title="Edit" onclick="onEdit('${g.dataID}')">✏️</button> <button class="icon-btn" title="Delete" onclick="onDelete('${g.dataID}')">🗑️</button>`; tr.appendChild(tdA);
+  const start = (currentPage-1) * rowsPerPage;
+  const pageRows = groups.slice(start, start + rowsPerPage);
+  const keyword = document.getElementById("searchInput").value.trim();
+
+  pageRows.forEach(g=>{
+    const head = g.head || {};
+    const mCount = g.members.length;
+
+    let cls = mCount <= 1 ? "mem-small" : mCount <= 4 ? "mem-normal" : mCount <= 7 ? "mem-large" : "mem-critical";
+    const tr = document.createElement("tr"); tr.className = cls;
+
+    // checkbox
+    const tdSel = document.createElement("td"); tdSel.className = "select-col";
+    tdSel.innerHTML = `<input type="checkbox" class="row-select" data-id="${g.dataID}" ${selected.has(g.dataID) ? "checked" : ""}>`;
+    tr.appendChild(tdSel);
+
+    // header columns
+    header.forEach(col=>{
+      const td = document.createElement("td");
+      td.innerHTML = highlight(head[col] || "", keyword);
+      tr.appendChild(td);
+    });
+
+    // show toggle (small)
+    const tdShow = document.createElement("td"); tdShow.className = "actions-col";
+    tdShow.innerHTML = `<button class="show-toggle" onclick="toggleMembers('${g.dataID}')">👁 Show (${mCount})</button>`;
+    tr.appendChild(tdShow);
+
+    // icons (smaller)
+    const tdAct = document.createElement("td"); tdAct.className = "actions-col";
+    tdAct.innerHTML = `
+      <button class="icon-btn" title="Edit" onclick="onEdit('${g.dataID}')">✏️</button>
+      <button class="icon-btn" title="Delete" onclick="onDelete('${g.dataID}')">🗑️</button>
+    `;
+    tr.appendChild(tdAct);
 
     tbody.appendChild(tr);
 
+    // member rows
     g.members.forEach(m=>{
-      const mr = document.createElement('tr'); mr.className='member-row hidden'; mr.dataset.parent = g.dataID;
-      mr.appendChild(document.createElement('td'));
-      header.forEach(c=>{ const td=document.createElement('td'); td.innerHTML = highlight(m[c]||'', keyword); mr.appendChild(td); });
-      mr.appendChild(document.createElement('td')); mr.appendChild(document.createElement('td'));
+      const mr = document.createElement("tr");
+      mr.className = "member-row hidden";
+      mr.dataset.parent = g.dataID;
+      mr.appendChild(document.createElement("td")); // empty select col
+      header.forEach(col=>{
+        const td = document.createElement("td");
+        td.innerHTML = highlight(m[col] || "", keyword);
+        mr.appendChild(td);
+      });
+      mr.appendChild(document.createElement("td"));
+      mr.appendChild(document.createElement("td"));
       tbody.appendChild(mr);
     });
   });
 
-  // select all
-  document.getElementById('selectAll').onchange = function(){ page.forEach(g=>{ if(this.checked) selected.add(g.dataID); else selected.delete(g.dataID); }); renderTable(); };
-  document.querySelectorAll('.row-select').forEach(cb=> cb.onchange = function(){ const id=this.dataset.id; if(this.checked) selected.add(id); else selected.delete(id); updateCounts(); });
+  // select all logic for page
+  const selectAll = document.getElementById("selectAll");
+  if(selectAll){
+    selectAll.checked = pageRows.every(g => selected.has(g.dataID));
+    selectAll.onchange = function(){
+      pageRows.forEach(g => {
+        if(this.checked) selected.add(g.dataID); else selected.delete(g.dataID);
+      });
+      renderTable();
+      updateCounts();
+    };
+  }
+
+  // row selects
+  document.querySelectorAll(".row-select").forEach(cb=>{
+    cb.onchange = function(){
+      const id = this.dataset.id;
+      if(this.checked) selected.add(id); else selected.delete(id);
+      updateCounts();
+    };
+  });
+
+  updateCounts();
 }
 
-function toggleMembers(id){ document.querySelectorAll(`tr.member-row[data-parent="${id}"]`).forEach(r=> r.classList.toggle('hidden')); }
+/* ============ TOGGLE MEMBERS ============ */
+function toggleMembers(id){
+  document.querySelectorAll(`tr.member-row[data-parent="${id}"]`).forEach(r => r.classList.toggle("hidden"));
+}
 
-function renderPagination(){ const div = document.getElementById('paginationArea'); const total = Math.ceil(groups.length/rowsPerPage); if(total<=1){ div.innerHTML=''; return; } let html=''; for(let i=1;i<=total;i++) html += `<button onclick="gotoPage(${i})" class="${i===currentPage?'active':''}">${i}</button>`; div.innerHTML = html; }
-function gotoPage(p){ currentPage=p; renderTable(); renderPagination(); }
-function updateCounts(){ document.getElementById('rowCount').innerText = groups.length; document.getElementById('matchCount').innerText = groups.length; document.getElementById('selectedCount').innerText = selected.size; }
+/* ============ PAGINATION ============ */
+function renderPagination(){
+  const div = document.getElementById("paginationArea");
+  const total = Math.ceil(groups.length / rowsPerPage);
+  if(total <= 1){ div.innerHTML = ""; return; }
 
-function onEdit(id){ localStorage.setItem('edit_dataID', id); location.href='edit.html'; }
+  let html = "";
+  for(let i=1;i<=total;i++){
+    html += `<button onclick="gotoPage(${i})" class="${i===currentPage ? 'active' : ''}">${i}</button>`;
+  }
+  div.innerHTML = html;
+}
+function gotoPage(p){ if(p<1) p=1; currentPage=p; renderTable(); renderPagination(); }
 
-async function onDelete(id){ if(!confirm(`Delete household ${id}?`)) return; const fd = new FormData(); fd.append('action','deleteHousehold'); fd.append('dataID', id); try{ const res = await fetch(SCRIPT_URL, { method:'POST', body:fd }); const j = await res.json(); if(j.success){ alert(`Data has been deleted. Data ID: ${id} from Master and Barangay`); loadRecords(); } else { alert('Delete failed: ' + (j.message||'Unknown')); } }catch(e){ console.error(e); alert('Delete failed — see console'); } }
+/* ============ COUNTS ============ */
+function updateCounts(){
+  document.getElementById("rowCount").innerText = groups.length;
+  document.getElementById("matchCount").innerText = groups.length;
+  document.getElementById("selectedCount").innerText = selected.size;
+}
 
+/* ============ EDIT & DELETE ============ */
+function onEdit(id){
+  localStorage.setItem("edit_dataID", id);
+  location.href = "edit.html";
+}
+
+async function onDelete(id){
+  if(!confirm("Delete household " + id + "?")) return;
+
+  const fd = new FormData();
+  fd.append("action", "deleteHousehold");
+  fd.append("dataID", id);
+
+  try{
+    const res = await fetch(SCRIPT_URL, { method: "POST", body: fd });
+    const json = await res.json();
+
+    if(json.success){
+      // Show user-friendly formatted confirmation (explicit as requested)
+      alert(`Data has been deleted. Data ID: ${id} from Master and Barangay`);
+      // reload
+      await loadRecords();
+    } else {
+      alert("Delete failed: " + (json.message || JSON.stringify(json)));
+    }
+  }catch(err){
+    console.error("Delete error", err);
+    alert("Delete failed — see console");
+  }
+}
+
+/* ============ EXPORT ============ */
 function exportAll(){ exportCSV(groups); }
-function exportSelected(){ const arr = groups.filter(g=> selected.has(g.dataID)); if(!arr.length) return alert('No selected rows'); exportCSV(arr); }
-function exportCSV(list){ const cols = header.slice(); const lines=[]; lines.push(cols.join(',')); list.forEach(g=>{ lines.push(cols.map(c=> `"${String(g.head[c]||'').replace(/"/g,'""')}"`).join(',')); g.members.forEach(m=> lines.push(cols.map(c=> `"${String(m[c]||'').replace(/"/g,'""')}"`).join(','))); }); const blob = new Blob([lines.join('\r\n')], {type:'text/csv'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='records.csv'; a.click(); URL.revokeObjectURL(url); }
+function exportSelected(){
+  const arr = groups.filter(g => selected.has(g.dataID));
+  if(!arr.length) return alert("No selected rows");
+  exportCSV(arr);
+}
+function exportCSV(list){
+  const cols = header.slice();
+  const lines = [];
+  lines.push(cols.map(c => `"${c.replace(/"/g,'""')}"`).join(","));
+  list.forEach(g=>{
+    lines.push(cols.map(c => `"${(g.head[c]||"").toString().replace(/"/g,'""')}"`).join(","));
+    (g.members || []).forEach(m => lines.push(cols.map(c => `"${(m[c]||"").toString().replace(/"/g,'""')}"`).join(",")));
+  });
+  const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "records.csv"; a.click();
+  setTimeout(()=> URL.revokeObjectURL(url), 500);
+}
 
-// UI bindings
-document.getElementById('refreshBtn').onclick = loadRecords;
-document.getElementById('filterBarangay').onchange = loadRecords;
-document.getElementById('searchInput').oninput = ()=> setTimeout(loadRecords, 220);
-document.getElementById('exportBtn').onclick = ()=> document.getElementById('exportDropdown').classList.toggle('hidden');
-document.addEventListener('click', e=>{ const box=document.getElementById('exportDropdown'); const btn=document.getElementById('exportBtn'); if(!btn.contains(e.target) && !box.contains(e.target)) box.classList.add('hidden'); });
+/* ============ UI BINDINGS ============ */
+document.getElementById("refreshBtn").onclick = loadRecords;
+document.getElementById("filterBarangay").onchange = loadRecords;
+document.getElementById("searchInput").addEventListener("input", ()=> setTimeout(loadRecords, 260));
+document.getElementById("exportBtn").onclick = () => document.getElementById("exportDropdown").classList.toggle("hidden");
+document.addEventListener("click", e=>{
+  const box = document.getElementById("exportDropdown");
+  const btn = document.getElementById("exportBtn");
+  if(!btn.contains(e.target) && !box.contains(e.target)) box.classList.add("hidden");
+});
 
-window.onload = ()=>{ document.getElementById('userName').innerText = localStorage.getItem('staffName') || ''; loadRecords(); };
+/* ============ INIT ============ */
+window.addEventListener("DOMContentLoaded", ()=>{
+  document.getElementById("userName").innerText = localStorage.getItem("staffName") || localStorage.getItem("username") || "";
+  loadRecords();
+});
 </script>
 </body>
 </html>
