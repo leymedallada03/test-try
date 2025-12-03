@@ -45,6 +45,11 @@
   font-size: 13px;        /* smaller text */
   line-height: 1.4;       /* nicer spacing */
 }
+         }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
 
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
   .page-container{display:grid;grid-template-columns:260px 1fr;min-height:100vh;gap:18px}
@@ -1004,28 +1009,35 @@ document.getElementById("getLocationBtn").addEventListener("click", () => {
     }
   );
 });
-   document.getElementById("getLocationBtn").addEventListener("click", () => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude.toFixed(6);
-                const lng = position.coords.longitude.toFixed(6);
-                document.getElementById("coordinate").value = `${lat}, ${lng}`;
-            },
-            () => alert("Unable to retrieve location")
-        );
-    } else {
-        alert("Geolocation not supported.");
-    }
-});
+const map = L.map("map").setView([13.9423, 121.1035], 13); // Batangas center
 
-document.getElementById("pickOnMapBtn").addEventListener("click", () => {
-    alert("📍 Here you will open the map picker modal or page!");
-    // later: show a modal with your map
-});
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19
+  }).addTo(map);
+
+  let marker;
+
+  // Click to pick location
+  map.on("click", function (e) {
+      const lat = e.latlng.lat.toFixed(6);
+      const lng = e.latlng.lng.toFixed(6);
+
+      if (marker) map.removeLayer(marker);
+      marker = L.marker([lat, lng]).addTo(map);
+
+      // Send picked coordinate back to main window
+      window.opener.postMessage(
+          { type: "pickedLocation", lat: lat, lng: lng },
+          "*"
+      );
+
+      // Auto-close after picking
+      setTimeout(() => window.close(), 700);
+  });
 </script>
 </body>
 </html>
+
 
 
 
