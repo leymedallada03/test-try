@@ -2,6 +2,8 @@
 :root{
   --green-1: #0f7a4a;
   --green-2: #34b78f;
+  --accent3: #ff7a00;  /* dark orange */
+  --accent4: #ffa500;  /* light orange */
   --muted: #55615a;
   --bg: linear-gradient(180deg,#f3faf5,#eaf8f0);
   --glass: rgba(255,255,255,0.55);
@@ -14,6 +16,7 @@
   --transition: 260ms cubic-bezier(.2,.9,.3,1);
   --text-dark: #062018;
 }
+.btn-export { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent3),var(--accent4)); color:#fff; }
 
 /* Reset & base */
 *{box-sizing:border-box}
@@ -444,6 +447,7 @@ form label {
 .actions-cell {
   white-space: nowrap;
 }
+
 
 
 
