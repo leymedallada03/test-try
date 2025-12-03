@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Purok Kaligtasan — Data Entry of household</title>
-<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
    :root{
     --bg:#f6f8f7;
@@ -12,159 +12,807 @@
     --muted:#6b6f6b;
     --accent1:#0f7a4a;
     --accent2:#34b78f;
+    --accent3: #ff7a00;
+    --accent4: #ffa500;
+    --light-green: #e9f7f2;
+    --border: #e1e8e5;
     --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --shadow-dark: 0 6px 20px rgba(5,40,25,0.12);
     --radius:12px;
+    --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-  #disc {
-  margin-bottom: 10px;
-}
+   }
+
+   body {
+    background-color: var(--bg);
+    margin: 0;
+    min-height: 100vh;
+   }
+
+   .page-container{
+    max-width:1200px;
+    margin:20px auto;
+    padding:12px;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:18px;
+    align-items:start;
+    transition: grid-template-columns 0.3s ease;
+   }
+
+   .page-container.collapsed {
+    grid-template-columns: 60px 1fr;
+   }
+
+   /* Topbar - Enhanced */
+   .topbar{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-radius:var(--radius);
+    background:linear-gradient(90deg, var(--accent1), var(--accent2));
+    color:#fff;
+    box-shadow:var(--shadow-dark);
+   }
+
+   .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+   }
+
+   .brand .logo{
+    width:48px;
+    height:48px;
+    border-radius:var(--radius-sm);
+    object-fit:contain;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+    border: 2px solid rgba(255,255,255,0.2);
+   }
+
+   .brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+   }
+
+   .brand-text p {
+    font-size:12px;
+    opacity:0.95;
+    margin: 4px 0 0 0;
+   }
+
+   .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+   }
+
+   #userName {
+    font-weight: 600;
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   #logoutBtn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+   }
+
+   #logoutBtn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+   }
+
+   /* Sidebar - Collapsible */
+   .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
+    border-radius:var(--radius);
+    padding:12px;
+    height:calc(100vh - 120px);
+    position:sticky;
+    top:72px;
+    overflow:auto;
+    transition: width 0.3s ease;
+   }
+
+   .sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+   }
+
+   .sidebar-toggle {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+   }
+
+   .sidebar-toggle:hover {
+    transform: scale(1.1);
+   }
+
+   .sidebar ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex: 1;
+   }
+
+   .sidebar li a{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--muted);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+   }
+
+   .sidebar li a:hover{
+    background: var(--light-green);
+    color: var(--accent1);
+   }
+
+   .sidebar li a.active{
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   .sidebar li a .menu-icon {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+   }
+
+   .sidebar li a .menu-text {
+    transition: opacity 0.3s ease;
+   }
+
+   .page-container.collapsed .sidebar li a .menu-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+   }
+
+   /* Content Area - Fixed Size */
+   .content-area{
+    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 8px 22px rgba(10,20,16,0.06);
+    min-height:72vh;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+   }
+
+   /* Content Header - Fixed */
+   .content-header {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   }
+
+   .content-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--accent1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   #disc {
+    margin-bottom: 10px;
+    background: var(--light-green);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent1);
+    font-size: 0.9rem;
+    color: var(--muted);
+   }
+
+   /* Card Styling */
+   .card{ 
+     padding:16px;
+     border-radius:var(--radius);
+     background:var(--card-bg);
+     margin-bottom:12px;
+     box-shadow:var(--shadow);
+     border: 1px solid rgba(255,255,255,0.8);
+   }
+
+   .form-grid{ 
+     display:grid; 
+     grid-template-columns:repeat(2,1fr); 
+     gap:12px; 
+     align-items:start;
+   }
+
+   /* Label Styling */
+   label{
+     display:block;
+     font-weight:700;
+     margin-bottom:6px;
+     color:var(--accent1);
+     font-size: 0.9rem;
+   }
+
+   /* Input Fields */
+   input[type="text"], input[type="date"], input[type="number"], select, textarea{
+     width:100%;
+     padding:10px;
+     border-radius:var(--radius-sm);
+     border:2px solid var(--border);
+     font-size:0.9rem;
+     transition: all 0.3s ease;
+     background:#fff;
+   }
+
+   input[type="date"]::-webkit-calendar-picker-indicator{
+     filter:invert(20%) sepia(50%) saturate(600%) hue-rotate(120deg) brightness(90%);
+   }
+
+   input:focus, select:focus, textarea:focus{
+     outline:none;
+     border-color:var(--accent1);
+     box-shadow:0 0 0 3px rgba(15,122,74,0.1);
+   }
+
+   .small-muted{ 
+     font-size:0.85rem; 
+     color:var(--muted);
+     margin-top: 4px;
+   }
+
+   /* Radio / Checkbox Alignment - FIXED */
+   .radio-line, .checkbox-grid { 
+     display:flex; 
+     gap:16px; 
+     align-items:center; 
+     flex-wrap:wrap;
+     padding: 8px 0;
+   }
+
+   .radio-item, .checkbox-item{ 
+     display:flex; 
+     align-items:center; 
+     gap:8px; 
+     font-weight:600; 
+     color:var(--accent1);
+     cursor: pointer;
+   }
+
+   .radio-item input, .checkbox-item input{
+     transform:scale(1.1);
+     accent-color: var(--accent1);
+     cursor: pointer;
+   }
+
+   /* Member preview */
+   .member-preview{ 
+     margin-top:8px; 
+     font-size:0.9rem;
+     background: var(--light-green);
+     padding: 12px;
+     border-radius: var(--radius-sm);
+     max-height: 200px;
+     overflow-y: auto;
+   }
+
+   .member-preview li{ 
+     margin-bottom:6px;
+     padding: 4px 0;
+     border-bottom: 1px solid rgba(15,122,74,0.1);
+   }
+
+   /* Section Styling */
+   .section-title{
+     display:flex;
+     align-items:center;
+     gap:12px; 
+     margin-bottom:16px;
+   }
+
+   .section-title h3 {
+     margin: 0;
+     color: var(--accent1);
+   }
+
+   .chip{
+     padding:6px 12px;
+     border-radius:20px;
+     background:linear-gradient(90deg, var(--accent1), var(--accent2));
+     color:#fff;
+     font-size:0.9rem;
+     font-weight:700;
+     min-width: 32px;
+     text-align: center;
+   }
+
+   /* Divider */
+   .divider{
+     height:1px;
+     background:linear-gradient(90deg,transparent,rgba(6,30,20,0.04),transparent);
+     margin:12px 0;
+     border-radius:6px;
+   }
+
+   /* Sub Label */
+   .sub-label1 {
+     color: var(--muted);
+     display: block;
+     margin-left: 44px;
+     margin-bottom: 12px;
+     font-size: 0.85rem;
+     margin-top: -4px;
+   }
+
+   /* Government Support Grid - FIXED */
    .gov-support-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
-  gap: 10px 20px; /* row-gap, column-gap */
-  margin-top: 12px;
-}
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
+     gap: 12px 20px;
+     margin-top: 12px;
+   }
 
-.gov-support-grid .checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-}
-.sub-label1 {
-  color: var(--muted);
-  display: block;       /* makes it sit below the title */
-  margin-left: 39px;    /* indent */
-  margin-bottom: 10px;  /* space below */
-  font-size: 12px;
-   margin-top: -4px;    /* pulls text closer upward */
-}
-   textarea {
-  font-family: inherit;   /* use your website font */
-  font-size: 13px;        /* smaller text */
-  line-height: 1.4;       /* nicer spacing */
-}
+   .gov-support-grid .checkbox-item {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     padding: 8px 0;
+   }
 
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f4f6f5);color:#072016}
-  .page-container{display:grid;grid-template-columns:260px 1fr;min-height:100vh;gap:18px}
-  .sidebar{background:transparent;padding:18px}
-  .sidebar ul{list-style:none;padding:0;margin:0}
-  .sidebar li{margin-bottom:10px}
-  .sidebar a{display:block;padding:10px;border-radius:10px;text-decoration:none;color:#0b4630;font-weight:700}
-  .sidebar a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff}
-  .content-area{padding:18px}
-  h2{margin:8px 0 18px 0}
-  .card{ padding:16px;border-radius:var(--radius);background:var(--card-bg);margin-bottom:12px;box-shadow:var(--shadow) }
-  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-items:start }
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  label{display:block;font-weight:700;margin-bottom:6px;color:#0b4630}
-  input[type="text"], input[type="date"], input[type="number"], select, textarea{
-    width:100%;padding:10px;border-radius:10px;border:1px solid rgba(6,30,20,0.06);box-shadow:none;font-size:14px;
-    transition: box-shadow .18s ease, transform .12s ease;
-    background:#fff;
-  }
-  input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%) sepia(50%) saturate(600%) hue-rotate(120deg) brightness(90%)}
-  input:focus, select:focus, textarea:focus{outline:none;box-shadow:0 8px 22px rgba(6,30,20,0.06);transform:translateY(-1px)}
-  .small-muted{ font-size:12px; color:var(--muted) }
-  .member-preview{ margin-top:8px; font-size:14px }
-  .member-preview li{ margin-bottom:6px }
+   /* Domestic Animals Grid - FIXED */
+   .domestic-grid{ 
+     display:grid; 
+     grid-template-columns: repeat(2,1fr); 
+     gap:12px 20px; 
+     align-items:center;
+     margin-top: 12px;
+   }
 
-  /* radio / checkbox alignment */
-  .radio-line, .checkbox-grid { display:flex; gap:12px; align-items:center; flex-wrap:wrap }
-  .radio-item, .checkbox-item{ display:flex; align-items:center; gap:8px; font-weight:600; color:#0b4630 }
-  .radio-item input, .checkbox-item input{transform:scale(1.05)}
+   .animal-row{ 
+     display:flex; 
+     gap:12px; 
+     align-items:center; 
+     justify-content:space-between; 
+     background:var(--light-green);
+     padding:12px;
+     border-radius:var(--radius-sm);
+     border:1px solid var(--border);
+   }
 
-  /* member panel (slide-in) */
-  .member-panel { position: fixed; right: 0; top: 0; height: 100vh; width: 420px; max-width: 96%; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); box-shadow: -18px 0 40px rgba(6,30,20,0.12); transform: translateX(110%); transition: transform 320ms cubic-bezier(.2,.9,.3,1); z-index: 6000; padding: 18px; overflow-y: auto; border-radius: 8px 0 0 8px;}
-  .member-panel.open { transform: translateX(0%); }
-  .panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.32); opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 5900; }
-  .panel-overlay.show { opacity: 1; pointer-events: auto; }
+   .animal-left{
+     display:flex;
+     gap:8px;
+     align-items:center;
+   }
 
-  .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff; }
-  .btn.secondary { background: transparent; color: var(--accent1); border:1px solid rgba(6,30,20,0.06); }
+   .animal-left label{
+     margin:0;
+     font-weight:700;
+   }
 
-  .actions-row{display:flex;gap:8px;justify-content:flex-end}
+   .qty{
+     width:80px;
+     padding: 8px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+   }
 
-  /* domestic animals grid */
-  .domestic-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:10px 18px; align-items:center }
-  .animal-row{ display:flex; gap:8px; align-items:center; justify-content:space-between; background:#fbfffb;padding:8px;border-radius:10px;border:1px solid rgba(6,30,20,0.03) }
-  .animal-left{display:flex;gap:8px;align-items:center}
-  .animal-left label{margin:0;font-weight:700}
-  .qty{width:86px}
-  .others-box{width:100%;min-height:72px;padding:10px;border-radius:10px;border:1px solid rgba(6,30,20,0.06)}
+   .others-box{
+     width:100%;
+     min-height:80px;
+     padding:10px;
+     border-radius:var(--radius-sm);
+     border:2px solid var(--border);
+     font-family: inherit;
+     font-size: 0.9rem;
+   }
 
-  /* responsive */
-  @media (max-width:980px){
-    .page-container{grid-template-columns:1fr}
-    .sidebar{display:none}
-    .form-grid{grid-template-columns:1fr}
-    .domestic-grid{grid-template-columns:1fr}
-  }
+   /* Buttons */
+   .btn { 
+     border:0;
+     padding:10px 16px;
+     border-radius:var(--radius-sm);
+     cursor:pointer;
+     font-weight:600;
+     background: linear-gradient(90deg, var(--accent1), var(--accent2));
+     color:#fff;
+     font-size: 0.9rem;
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+     transition: all 0.2s ease;
+     white-space: nowrap;
+   }
 
-  /* subtle animations for selects */
-  select.animated{appearance:none;padding-right:36px;background-image:linear-gradient(45deg,transparent 50%,#0b4630 50%),linear-gradient(135deg,#0b4630 50%,transparent 50%);background-position:calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);background-size:6px 6px,6px 6px;background-repeat:no-repeat}
-  .section-title{display:flex;align-items:center;gap:10px; margin-bottom:10px}
-   .section-title1{display:flex;align-items:center;gap:10px;}
-  .chip{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;font-size:13px;font-weight:800}
-  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(6,30,20,0.04),transparent);margin:12px 0;border-radius:6px}
+   .btn:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 4px 12px rgba(15,122,74,0.2);
+   }
 
-  /* small helpers */
-  .muted{color:var(--muted);font-size:12px}
+   .btn.secondary { 
+     background: transparent; 
+     color: var(--accent1); 
+     border:2px solid var(--border);
+   }
+
+   .btn.secondary:hover {
+     background: var(--light-green);
+     border-color: var(--accent1);
+   }
+
+   /* Actions Row */
+   .actions-row{
+     display:flex;
+     gap:12px;
+     justify-content:flex-end;
+     margin-top: 16px;
+   }
+
+   /* Member Panel (Slide-in) - FIXED */
+   .member-panel { 
+     position: fixed; 
+     right: 0; 
+     top: 0; 
+     height: 100vh; 
+     width: 500px; 
+     max-width: 96%; 
+     background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); 
+     box-shadow: -18px 0 40px rgba(6,30,20,0.12); 
+     transform: translateX(110%); 
+     transition: transform 320ms cubic-bezier(.2,.9,.3,1); 
+     z-index: 6000; 
+     padding: 24px; 
+     overflow-y: auto; 
+     border-radius: 8px 0 0 8px;
+   }
+
+   .member-panel.open { 
+     transform: translateX(0%); 
+   }
+
+   .panel-overlay { 
+     position: fixed; 
+     inset: 0; 
+     background: rgba(0,0,0,0.32); 
+     opacity: 0; 
+     transition: opacity 200ms; 
+     pointer-events: none; 
+     z-index: 5900; 
+   }
+
+   .panel-overlay.show { 
+     opacity: 1; 
+     pointer-events: auto; 
+   }
+
+   .panel-header {
+     display: flex;
+     align-items: center;
+     gap: 12px;
+     margin-bottom: 20px;
+     padding-bottom: 12px;
+     border-bottom: 2px solid var(--light-green);
+   }
+
+   .panel-header h3 {
+     margin: 0;
+     color: var(--accent1);
+   }
+
+   /* Panel Chip */
+   .panel-chip {
+     padding: 6px 12px;
+     border-radius: 20px;
+     background: linear-gradient(90deg, var(--accent3), var(--accent4));
+     color: white;
+     font-size: 0.85rem;
+     font-weight: 700;
+   }
+
+   /* Member Form Grid in Panel - FIXED */
+   .panel-body .form-grid {
+     display: grid;
+     grid-template-columns: repeat(2, 1fr);
+     gap: 12px;
+   }
+
+   /* Panel Checkbox Grid - FIXED */
+   .panel-checkbox-grid {
+     display: grid;
+     grid-template-columns: repeat(2, 1fr);
+     gap: 8px 16px;
+     margin: 12px 0;
+     padding: 12px;
+     background: var(--light-green);
+     border-radius: var(--radius-sm);
+   }
+
+   .panel-checkbox-grid label {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     font-weight: 600;
+     color: var(--accent1);
+     cursor: pointer;
+   }
+
+   .panel-checkbox-grid input[type="checkbox"] {
+     accent-color: var(--accent1);
+     transform: scale(1.1);
+   }
+
+   /* Panel Actions */
+   .panel-actions {
+     display: flex;
+     gap: 12px;
+     justify-content: flex-end;
+     margin-top: 24px;
+     padding-top: 16px;
+     border-top: 2px solid var(--light-green);
+   }
+
+   /* Responsive */
+   @media (max-width: 768px) {
+     .page-container {
+         grid-template-columns: 1fr !important;
+         padding: 8px;
+         gap: 12px;
+     }
+     
+     .page-container.collapsed {
+         grid-template-columns: 1fr !important;
+     }
+     
+     .sidebar {
+         position: fixed;
+         top: 72px;
+         left: 0;
+         right: 0;
+         height: auto;
+         max-height: 0;
+         overflow: hidden;
+         z-index: 1000;
+         margin: 0;
+         padding: 0;
+         border-radius: 0 0 var(--radius) var(--radius);
+         background: white;
+         box-shadow: var(--shadow);
+         transition: max-height 0.3s ease;
+     }
+     
+     .sidebar.mobile-open {
+         max-height: 300px;
+         padding: 12px;
+         overflow-y: auto;
+     }
+     
+     .sidebar-container {
+         flex-direction: column;
+     }
+     
+     .sidebar-toggle {
+         display: none;
+     }
+     
+     .mobile-menu-toggle {
+         display: flex !important;
+         background: linear-gradient(135deg, var(--accent1), var(--accent2));
+         color: white;
+         border: none;
+         border-radius: var(--radius-sm);
+         width: 40px;
+         height: 40px;
+         align-items: center;
+         justify-content: center;
+         cursor: pointer;
+         font-size: 1.2rem;
+     }
+     
+     .content-area {
+         height: auto;
+         min-height: calc(100vh - 140px);
+     }
+     
+     .form-grid {
+         grid-template-columns: 1fr !important;
+     }
+     
+     .gov-support-grid {
+         grid-template-columns: repeat(2, 1fr) !important;
+     }
+     
+     .domestic-grid {
+         grid-template-columns: 1fr !important;
+     }
+     
+     .member-panel .form-grid {
+         grid-template-columns: 1fr !important;
+     }
+     
+     .panel-checkbox-grid {
+         grid-template-columns: 1fr !important;
+     }
+     
+     .user-info {
+         gap: 8px;
+     }
+     
+     #userName {
+         font-size: 0.9rem;
+         padding: 6px 12px;
+     }
+     
+     #logoutBtn {
+         padding: 6px 12px;
+         font-size: 0.85rem;
+     }
+     
+     .member-panel {
+         width: 100%;
+         max-width: 100%;
+         padding: 16px;
+     }
+     
+     .chip {
+         min-width: 28px;
+         padding: 4px 8px;
+     }
+   }
+
+   /* Mobile menu toggle button */
+   .mobile-menu-toggle {
+     display: none;
+   }
+
+   /* Select styling */
+   select.animated {
+     appearance: none;
+     padding-right: 36px;
+     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%230f7a4a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+     background-position: calc(100% - 12px) center;
+     background-repeat: no-repeat;
+     background-size: 12px;
+   }
+
+   /* Loading overlay */
+   .loading-overlay {
+     display: none;
+     position: fixed;
+     inset: 0;
+     background: rgba(255,255,255,0.9);
+     align-items: center;
+     justify-content: center;
+     z-index: 9999;
+     backdrop-filter: blur(2px);
+   }
+
+   .loading-spinner {
+     width: 40px;
+     height: 40px;
+     border: 3px solid var(--border);
+     border-top-color: var(--accent1);
+     border-radius: 50%;
+     animation: spin 1s linear infinite;
+   }
+
+   @keyframes spin {
+     to { transform: rotate(360deg); }
+   }
+
+   /* Coordinate container */
+   .coordinate-container {
+     display: flex;
+     gap: 8px;
+     align-items: flex-start;
+   }
+
+   .coordinate-container .btn {
+     white-space: nowrap;
+   }
 </style>
 </head>
 <body>
 <div class="page-container">
 
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="true">☰</button>
-
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
-      <div>
-        <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+      <div class="brand-text">
+        <h1>PUROK KALIGTASAN</h1>
+        <p>Disaster Risk Reduction & Management Office - Alitagtag</p>
       </div>
     </div>
 
-    <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
-      <div class="muted">Signed in as <strong id="userName"></strong></div>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+    <div class="user-info">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span id="userName"></span>
+      <button id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
     </div>
   </header>
 
   <aside class="sidebar" id="sidebar">
-    <ul>
-      <li><a href="dashboard.html" id="navUsers">📊 Dashboard</a></li>
-      <li><a href="dataForm.html" id="navUsers"  class="active" >📝 Data Entry</a></li>
-      <li><a href="records.html" id="navUsers" >📁 Records</a></li>
-      <li><a href="charts.html" id="navUsers" >📈 Charts</a></li>
-      <li id="navUsers" style="display:none;">
-    <a href="users.html">👥 User Management</a>
-    </ul>
+    <div class="sidebar-container">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <ul>
+        <li><a href="dashboard.html" title="Dashboard"><span class="menu-icon">📊</span> <span class="menu-text">Dashboard</span></a></li>
+        <li><a href="dataForm.html" class="active" title="Data Entry"><span class="menu-icon">📝</span> <span class="menu-text">Data Entry</span></a></li>
+        <li><a href="records.html" title="Records"><span class="menu-icon">📁</span> <span class="menu-text">Records</span></a></li>
+        <li><a href="charts.html" title="Charts"><span class="menu-icon">📈</span> <span class="menu-text">Charts</span></a></li>
+        <li class="admin-only"><a href="users.html" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
+      </ul>
+    </div>
   </aside>
 
   <main class="content-area" tabindex="-1">
-    <h2>📝 Household Information (Head)</h2>
-   <div class="small-muted" id="disc">This section captures all key information about the household head, including personal data, contact details, demographic profile, and any government support or programs currently availed. The information will help establish the primary point of contact and provide a clear understanding of the household’s overall status..</div>
+    <div class="content-header">
+      <h2><span style="color: var(--accent1);">📝</span> Household Information (Head)</h2>
+    </div>
+
+    <div id="disc">This section captures all key information about the household head, including personal data, contact details, demographic profile, and any government support or programs currently availed. The information will help establish the primary point of contact and provide a clear understanding of the household's overall status.</div>
 
     <form id="headForm" novalidate onsubmit="return false;">
       <!-- BASIC -->
       <div class="card form-section">
-        <div class="section-title"><div class="chip">1</div><h3>Basic Information </h3></div>
+        <div class="section-title"><div class="chip">1</div><h3>Basic Information</h3></div>
         <div class="form-grid">
           <div>
-  <label>Coordinate (optional)</label>
-  <input type="text" id="coordinate" placeholder="Latitude, Longitude (optional)" />
-
-  <div style="margin-top:6px; display:flex; gap:6px;">
-    <!-- GPS Button -->
-    <button type="button" id="getLocationBtn" class="btn secondary">
-      Get Current Location
-    </button>
-<div class="small-muted">Optional — paste `lat, lng` if available.</div>
+            <label>Coordinate (optional)</label>
+            <div class="coordinate-container">
+              <input type="text" id="coordinate" placeholder="Latitude, Longitude" style="flex: 1;" />
+              <button type="button" id="getLocationBtn" class="btn secondary">
+                <i class="fas fa-map-marker-alt"></i> Get Location
+              </button>
+            </div>
+            <div class="small-muted">Optional — paste `lat, lng` if available.</div>
           </div>
-             </div>
+          
           <div>
             <label>Barangay <span class="small">*</span></label>
             <select id="barangay" required class="animated">
@@ -248,13 +896,13 @@
               <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
             </select>
           </div>
-          </div>
         </div>
+      </div>
 
       <!-- DOMESTIC ANIMALS -->
       <div class="card">
-        <div class="section-title1"><div class="chip">3</div><h3>Household Livestock</h3></div>
-         <div class="sub-label1">Please check (✓) all items that apply.</div>
+        <div class="section-title"><div class="chip">3</div><h3>Household Livestock</h3></div>
+        <div class="sub-label1">Please check (✓) all items that apply.</div>
 
         <div class="domestic-grid">
           <div class="animal-row">
@@ -310,34 +958,40 @@
       <div class="card">
         <div class="section-title"><div class="chip">4</div><h3>Pickup / Transport / Camp Details</h3></div>
         <div class="form-grid">
-            <div>
+          <div>
             <label>Transportation</label>
             <select id="head_transport" class="animated">
               <option value="">Select...</option>
               <option>Individual with Transportation</option>
               <option>Individual needing Transportation</option>
             </select>
-               </div>
+          </div>
+          
           <div>
             <label>Designated Pick-Up Point</label>
             <input type="text" id="pickup" />
           </div>
+          
           <div>
             <label>Drop-Off Point</label>
             <input type="text" id="dropoff" />
           </div>
+          
           <div>
             <label>Name of Camp</label>
             <input type="text" id="campName" />
           </div>
+          
           <div>
             <label>Capacity</label>
             <input type="number" id="capacity" min="0" />
           </div>
+          
           <div>
             <label>No. of Individuals Inside Camp</label>
             <input type="number" id="insideCamp" min="0" />
           </div>
+          
           <div>
             <label>No. of Individuals Outside Camp</label>
             <input type="number" id="outsideCamp" min="0"/>
@@ -348,10 +1002,10 @@
             <select id="reasons" class="animated">
               <option value="">Select...</option>
               <option>Taal Volcano (With-in 14-15 KM Danger Zone)</option>
-               <option>Typhoon</option>
-               <option>Flood</option>
-               <option>Landslide</option>
-               <option>Earthquake</option>
+              <option>Typhoon</option>
+              <option>Flood</option>
+              <option>Landslide</option>
+              <option>Earthquake</option>
               <option>Others</option>
             </select>
           </div>
@@ -359,31 +1013,31 @@
       </div>
 
       <!-- GOVERNMENT SUPPORT -->
-<div class="card">
-  <div class="section-title1"><div class="chip">5</div><h3>Government Support</h3></div>
-<label class="sub-label1">Please check (✓) all items that apply.</label>
+      <div class="card">
+        <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
+        <div class="sub-label1">Please check (✓) all items that apply.</div>
 
-  <div class="gov-support-grid">
-    <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
-    <label class="checkbox-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
-    <label class="checkbox-item"><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
-    <label class="checkbox-item"><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
-    <label class="checkbox-item"><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
-    <label class="checkbox-item"><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
-    <label class="checkbox-item"><input type="checkbox" id="ass_relief"> Relief Goods</label>
-    <label class="checkbox-item"><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
-  </div>
-</div>
+        <div class="gov-support-grid">
+          <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_relief"> Relief Goods</label>
+          <label class="checkbox-item"><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
+        </div>
 
-          <div style="grid-column:1/-1;margin-top:8px;margin-bottom:8px">
-            <label>AICS (if any)</label>
-            <select id="ass_aics" class="animated">
-              <option value="">None</option>
-              <option>Shelter Assistance</option>
-              <option>Burial</option>
-              <option>Scholarship</option>
-            </select>
-          </div>
+        <div style="grid-column:1/-1;margin-top:16px">
+          <label>AICS (if any)</label>
+          <select id="ass_aics" class="animated">
+            <option value="">None</option>
+            <option>Shelter Assistance</option>
+            <option>Burial</option>
+            <option>Scholarship</option>
+          </select>
+        </div>
+      </div>
 
       <!-- MEMBERS PREVIEW + ACTION -->
       <div class="card">
@@ -391,22 +1045,34 @@
         <div class="small-muted">Member/s: <strong id="previewCount">0</strong></div>
         <ul id="membersPreview" class="member-preview"></ul>
 
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-          <button id="resetBtn" class="btn secondary" type="button">Reset</button>
-          <button id="nextToMembers" class="btn" type="button">Save → Next Members</button>
+        <div class="actions-row">
+          <button id="resetBtn" class="btn secondary" type="button">
+            <i class="fas fa-redo"></i> Reset
+          </button>
+          <button id="nextToMembers" class="btn" type="button">
+            <i class="fas fa-save"></i> Save & Continue to Members
+          </button>
         </div>
       </div>
     </form>
   </main>
 </div>
 
-<!-- overlay + member panel -->
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- Overlay + Member Panel -->
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
 <div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
-  <div class="panel-header" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-    <button id="panelClose" class="btn secondary" title="Close panel">←</button>
-    <h3 id="panelTitle">Member 1 of N</h3>
+  <div class="panel-header">
+    <button id="panelClose" class="btn secondary" title="Close panel">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div class="panel-chip" id="panelChip">Member 1</div>
+    <h3 id="panelTitle">Member Details</h3>
   </div>
 
   <div class="panel-body">
@@ -456,6 +1122,7 @@
         <div>
           <label>Status</label>
           <select id="memberStatus" class="member-status animated">
+            <option value="">Select...</option>
             <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
           </select>
         </div>
@@ -502,19 +1169,25 @@
         <div>
           <label>Reason for Displacement</label>
           <select id="memberReason" class="member-reason animated">
-              <option>Taal Volcano (With-in 14-15 KM Danger Zone)</option>
-               <option>Typhoon</option>
-               <option>Flood</option>
-               <option>Landslide</option>
-               <option>Earthquake</option>
-              <option>Others</option>
+            <option value="">Select...</option>
+            <option>Taal Volcano (With-in 14-15 KM Danger Zone)</option>
+            <option>Typhoon</option>
+            <option>Flood</option>
+            <option>Landslide</option>
+            <option>Earthquake</option>
+            <option>Others</option>
           </select>
         </div>
 
-        <div style="grid-column:1/-1; margin-top:8px">
-          <h4 style="margin:6px 0 8px 0">Government Support</h4>
-         <div class="small-muted">Please check (✓) all items that apply.</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px">
+        <!-- Government Support with Chip - ADDED -->
+        <div style="grid-column:1/-1; margin-top:16px">
+          <div class="section-title">
+            <div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">GOV</div>
+            <h4>Government Support</h4>
+          </div>
+          <div class="small-muted">Please check (✓) all items that apply.</div>
+          
+          <div class="panel-checkbox-grid">
             <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
             <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
             <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
@@ -525,7 +1198,7 @@
             <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
           </div>
 
-          <div style="margin-top:8px">
+          <div style="margin-top:16px">
             <label>AICS (if any)</label>
             <select id="memberAics" class="member_aics animated">
               <option value="">None</option>
@@ -535,12 +1208,15 @@
             </select>
           </div>
         </div>
-
       </div>
 
-      <div class="panel-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <button id="memberBack" class="btn secondary" type="button">Back</button>
-        <button id="memberNext" class="btn" type="button">Save & Next</button>
+      <div class="panel-actions">
+        <button id="memberBack" class="btn secondary" type="button">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <button id="memberNext" class="btn" type="button">
+          Save & Next <i class="fas fa-arrow-right"></i>
+        </button>
       </div>
     </form>
   </div>
@@ -565,6 +1241,7 @@ function toSheetDateFormat(inputVal){
   }
   return String(inputVal);
 }
+
 function toInputDate(val){
   if(!val) return "";
   if(/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
@@ -680,6 +1357,10 @@ function fillMemberPanel(idx){
   document.getElementById("member_relief").checked = (mem["Relief Goods"] === "Yes");
   document.getElementById("member_cash").checked = (mem["Cash Subsidy"] === "Yes");
   document.getElementById("memberAics").value = mem["AICS"] || "";
+  
+  // Update panel chip
+  document.getElementById("panelChip").textContent = `Member ${idx + 1}`;
+  document.getElementById("panelTitle").textContent = `of ${membersToCollect}`;
 }
 
 /* collect member data */
@@ -742,6 +1423,13 @@ document.addEventListener('DOMContentLoaded', () => {
   ensureLoginOrRedirect();
   document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
 
+  // Check if user is admin
+  const isAdmin = localStorage.getItem("userRole") === "admin";
+  const adminItems = document.querySelectorAll(".admin-only");
+  adminItems.forEach(item => {
+    item.style.display = isAdmin ? "block" : "none";
+  });
+
   // reset
   document.getElementById("resetBtn").addEventListener('click', () => {
     document.getElementById("headForm").reset();
@@ -757,10 +1445,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const sitio = document.getElementById("sitio").value.trim();
     const headName = document.getElementById("householdHead").value.trim();
     const headContact = document.getElementById("contactNo").value.trim();
-    if(!barangay || !sitio || !headName || !headContact){ alert("Please fill Barangay, Sitio/Purok, Name of Household Head and Contact no."); return; }
+    if(!barangay || !sitio || !headName || !headContact){ 
+      alert("Please fill Barangay, Sitio/Purok, Name of Household Head and Contact no."); 
+      return; 
+    }
 
     membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
-    collectedMembers = []; currentMemberIndex = 0;
+    collectedMembers = []; 
+    currentMemberIndex = 0;
     updateMemberPreview();
 
     if(membersToCollect === 0){
@@ -772,7 +1464,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // open member panel first
     fillMemberPanel(0);
     currentMemberIndex = 0;
-    document.getElementById('panelTitle').innerText = `Member 1 of ${membersToCollect}`;
     openPanel();
   });
 
@@ -783,7 +1474,6 @@ document.addEventListener('DOMContentLoaded', () => {
       collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
       currentMemberIndex--;
       fillMemberPanel(currentMemberIndex);
-      document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
       updateMemberPreview();
     } else {
       closePanel();
@@ -794,7 +1484,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById("memberNext").addEventListener('click', () => {
     const name = document.getElementById("memberName").value.trim();
     const contact = document.getElementById("memberContact").value.trim();
-    if(!name || !contact){ alert("Please enter member's name and contact no."); return; }
+    if(!name || !contact){ 
+      alert("Please enter member's name and contact no."); 
+      return; 
+    }
 
     collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
     updateMemberPreview();
@@ -807,7 +1500,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     fillMemberPanel(currentMemberIndex);
-    document.getElementById('panelTitle').innerText = `Member ${currentMemberIndex+1} of ${membersToCollect}`;
   });
 
   document.getElementById("householdBirthdate").addEventListener('change', () => {
@@ -816,12 +1508,50 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("householdStage").value = info ? info.stage : "";
   });
 
+  // GPS Coordinate Button
+  document.getElementById("getLocationBtn").addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    // Show loading
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    loadingOverlay.style.display = "flex";
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lng = pos.coords.longitude.toFixed(6);
+        document.getElementById("coordinate").value = `${lat}, ${lng}`;
+        loadingOverlay.style.display = "none";
+        alert("Location captured successfully!");
+      },
+      (err) => {
+        loadingOverlay.style.display = "none";
+        alert("Unable to retrieve GPS location. Please allow location access.");
+        console.error("GPS Error:", err);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 0
+      }
+    );
+  });
+
   updateMemberPreview();
 });
 
 /* panel helpers */
-function openPanel(){ document.getElementById("memberPanel").classList.add("open"); document.getElementById("panelOverlay").classList.add("show"); }
-function closePanel(){ document.getElementById("memberPanel").classList.remove("open"); document.getElementById("panelOverlay").classList.remove("show"); }
+function openPanel(){ 
+  document.getElementById("memberPanel").classList.add("open"); 
+  document.getElementById("panelOverlay").classList.add("show"); 
+}
+function closePanel(){ 
+  document.getElementById("memberPanel").classList.remove("open"); 
+  document.getElementById("panelOverlay").classList.remove("show"); 
+}
 
 /* ---------------- Submit head + members ---------------- */
 async function submitHeadAndMembers(){
@@ -877,7 +1607,7 @@ async function submitHeadAndMembers(){
     "Chicken Qty.": document.getElementById("chicken_qty").value || "",
     "Others": document.getElementById("animals_others").value || "",
     "Submitted By": localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown",
-    "Submitted On": new Date().toLocaleString() // the server will replace with formatted timestamp, but we include for debugging
+    "Submitted On": new Date().toLocaleString()
   };
 
   // ensure members length matches selected
@@ -929,7 +1659,7 @@ async function submitHeadAndMembers(){
   // UI disable
   const submitBtn = document.getElementById("nextToMembers");
   submitBtn.disabled = true;
-  submitBtn.innerText = "Saving...";
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
   try{
     console.log("Submitting HEAD:", head);
@@ -956,80 +1686,77 @@ async function submitHeadAndMembers(){
     alert("Network / Server error: " + (err.message || err));
   }finally{
     submitBtn.disabled = false;
-    submitBtn.innerText = "Save → Next Members";
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save & Continue to Members';
   }
 }
-// ======================================================
-// 📌 GPS COORDINATE BUTTON — CLEAN FINAL VERSION
-// ======================================================
-document.getElementById("getLocationBtn").addEventListener("click", () => {
 
-  // Check browser support
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported by your browser.");
-    return;
-  }
-
-  // Request position
-  navigator.geolocation.getCurrentPosition(
-
-    // SUCCESS
-    (pos) => {
-      const lat = pos.coords.latitude.toFixed(6);
-      const lng = pos.coords.longitude.toFixed(6);
-
-      // Put coordinates into the input
-      document.getElementById("coordinate").value = `${lat}, ${lng}`;
-
-      alert("Location captured successfully!");
-    },
-
-    // ERROR
-    (err) => {
-      alert("Unable to retrieve GPS location. Please allow location access.");
-      console.error("GPS Error:", err);
-    },
-
-    // Options
-    {
-      enableHighAccuracy: true,
-      timeout: 8000,
-      maximumAge: 0
+/* ============ SIDEBAR COLLAPSE ============ */
+function toggleSidebar() {
+    const pageContainer = document.querySelector('.page-container');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const icon = sidebarToggle.querySelector('i');
+    
+    pageContainer.classList.toggle('collapsed');
+    
+    if (pageContainer.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        sidebarToggle.title = "Expand sidebar";
+    } else {
+        icon.className = 'fas fa-bars';
+        sidebarToggle.title = "Collapse sidebar";
     }
-  );
+}
+
+/* ============ MOBILE SIDEBAR TOGGLE ============ */
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const icon = mobileToggle.querySelector('i');
+    
+    sidebar.classList.toggle('mobile-open');
+    
+    if (sidebar.classList.contains('mobile-open')) {
+        icon.className = 'fas fa-times';
+        mobileToggle.title = "Close menu";
+    } else {
+        icon.className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+}
+
+/* ============ CLOSE MOBILE SIDEBAR ON CLICK OUTSIDE ============ */
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target) && sidebar.classList.contains('mobile-open')) {
+            sidebar.classList.remove('mobile-open');
+            mobileToggle.querySelector('i').className = 'fas fa-bars';
+            mobileToggle.title = "Open menu";
+        }
+    }
+});
+
+/* ============ UI BINDINGS ============ */
+// Desktop sidebar toggle
+document.getElementById('sidebarToggle').onclick = toggleSidebar;
+
+// Mobile sidebar toggle
+document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
+
+/* ============ WINDOW RESIZE HANDLER ============ */
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        // On desktop, ensure sidebar is not in mobile-open state
+        const sidebar = document.getElementById('sidebar');
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        
+        sidebar.classList.remove('mobile-open');
+        mobileToggle.querySelector('i').className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
 });
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
