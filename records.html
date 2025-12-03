@@ -92,22 +92,25 @@
    }
 
    #userName {
-    font-weight: 500;
+    font-weight: 600;
     background: rgba(255,255,255,0.1);
-    padding: 4px 10px;
+    padding: 8px 16px;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
    }
 
    #logoutBtn {
     background: rgba(255,255,255,0.15);
     color: white;
     border: 1px solid rgba(255,255,255,0.3);
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     transition: all 0.2s ease;
    }
 
@@ -189,10 +192,10 @@
     box-shadow: 0 4px 8px rgba(15,122,74,0.2);
    }
 
-   .sidebar li a i {
-    width: 20px;
+   .sidebar li a .menu-icon {
+    font-size: 1.2rem;
+    width: 24px;
     text-align: center;
-    font-size: 1rem;
     flex-shrink: 0;
    }
 
@@ -617,21 +620,70 @@
     to { transform: rotate(360deg); }
    }
 
-   /* Responsive */
+   /* Mobile Styles */
    @media (max-width: 768px) {
     .page-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         padding: 8px;
+        gap: 12px;
     }
     
     .page-container.collapsed {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
     }
     
     .sidebar {
-        position: static;
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
         height: auto;
-        margin-bottom: 12px;
+        max-height: 0;
+        overflow: hidden;
+        z-index: 1000;
+        margin: 0;
+        padding: 0;
+        border-radius: 0 0 var(--radius) var(--radius);
+        background: white;
+        box-shadow: var(--shadow);
+        transition: max-height 0.3s ease;
+    }
+    
+    .sidebar.mobile-open {
+        max-height: 300px;
+        padding: 12px;
+        overflow-y: auto;
+    }
+    
+    .sidebar-container {
+        flex-direction: column;
+    }
+    
+    .sidebar-toggle {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex !important;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: white;
+        border: none;
+        border-radius: var(--radius-sm);
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    
+    .content-area {
+        height: auto;
+        min-height: calc(100vh - 140px);
+    }
+    
+    .records-wrapper {
+        height: calc(100vh - 450px);
     }
     
     .toolbar {
@@ -643,9 +695,37 @@
         max-width: 100%;
     }
     
-    .stats-container {
-        justify-content: center;
+    .brgy-dropdown {
+        width: 100%;
     }
+    
+    .stats-container {
+        justify-content: space-between;
+    }
+    
+    .stat-item {
+        flex: 1;
+        min-width: auto;
+    }
+    
+    .user-info {
+        gap: 8px;
+    }
+    
+    #userName {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    
+    #logoutBtn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+   }
+
+   /* Mobile menu toggle button */
+   .mobile-menu-toggle {
+    display: none;
    }
 
    /* Search icon */
@@ -683,6 +763,9 @@
     </div>
 
     <div class="user-info">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
       <span id="userName"></span>
       <button id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -697,18 +780,18 @@
       </button>
       
       <ul>
-        <li><a href="dashboard.html" title="Dashboard"><i class="fas fa-chart-bar"></i> <span class="menu-text">Dashboard</span></a></li>
-        <li><a href="dataForm.html" title="Data Entry"><i class="fas fa-edit"></i> <span class="menu-text">Data Entry</span></a></li>
-        <li><a href="records.html" class="active" title="Records"><i class="fas fa-folder"></i> <span class="menu-text">Records</span></a></li>
-        <li><a href="charts.html" title="Charts"><i class="fas fa-chart-line"></i> <span class="menu-text">Charts</span></a></li>
-        <li class="admin-only"><a href="users.html" title="User Management"><i class="fas fa-users"></i> <span class="menu-text">User Management</span></a></li>
+        <li><a href="dashboard.html" title="Dashboard"><span class="menu-icon">📊</span> <span class="menu-text">Dashboard</span></a></li>
+        <li><a href="dataForm.html" title="Data Entry"><span class="menu-icon">📝</span> <span class="menu-text">Data Entry</span></a></li>
+        <li><a href="records.html" class="active" title="Records"><span class="menu-icon">📁</span> <span class="menu-text">Records</span></a></li>
+        <li><a href="charts.html" title="Charts"><span class="menu-icon">📈</span> <span class="menu-text">Charts</span></a></li>
+        <li class="admin-only"><a href="users.html" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
       </ul>
     </div>
   </aside>
 
   <main class="content-area">
     <div class="content-header">
-      <h2><i class="fas fa-folder"></i> Household Records</h2>
+      <h2><span style="color: var(--accent1);">📁</span> Household Records</h2>
     </div>
 
     <!-- Counts - Top Right -->
@@ -1101,6 +1184,37 @@ function toggleSidebar() {
     }
 }
 
+/* ============ MOBILE SIDEBAR TOGGLE ============ */
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const icon = mobileToggle.querySelector('i');
+    
+    sidebar.classList.toggle('mobile-open');
+    
+    if (sidebar.classList.contains('mobile-open')) {
+        icon.className = 'fas fa-times';
+        mobileToggle.title = "Close menu";
+    } else {
+        icon.className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+}
+
+/* ============ CLOSE MOBILE SIDEBAR ON CLICK OUTSIDE ============ */
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target) && sidebar.classList.contains('mobile-open')) {
+            sidebar.classList.remove('mobile-open');
+            mobileToggle.querySelector('i').className = 'fas fa-bars';
+            mobileToggle.title = "Open menu";
+        }
+    }
+});
+
 /* ============ UI BINDINGS ============ */
 document.getElementById("refreshBtn").onclick = loadRecords;
 document.getElementById("filterBarangay").onchange = loadRecords;
@@ -1128,13 +1242,30 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// Sidebar toggle
+// Desktop sidebar toggle
 document.getElementById('sidebarToggle').onclick = toggleSidebar;
+
+// Mobile sidebar toggle
+document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
+
+/* ============ WINDOW RESIZE HANDLER ============ */
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        // On desktop, ensure sidebar is not in mobile-open state
+        const sidebar = document.getElementById('sidebar');
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        
+        sidebar.classList.remove('mobile-open');
+        mobileToggle.querySelector('i').className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+});
 
 /* ============ INIT ============ */
 window.addEventListener("DOMContentLoaded", () => {
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
-    document.getElementById("userName").innerText = `👤 ${userName}`;
+    // Remove 👤 emoji from user display
+    document.getElementById("userName").innerText = userName;
     
     // Check if user is admin
     const isAdmin = localStorage.getItem("userRole") === "admin";
@@ -1142,6 +1273,13 @@ window.addEventListener("DOMContentLoaded", () => {
     adminItems.forEach(item => {
         item.style.display = isAdmin ? "block" : "none";
     });
+    
+    // Check screen width and adjust sidebar
+    if (window.innerWidth <= 768) {
+        // On mobile, collapse sidebar by default
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.remove('mobile-open');
+    }
     
     loadRecords();
 });
