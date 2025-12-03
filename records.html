@@ -36,7 +36,12 @@
     display:grid;
     grid-template-columns:260px 1fr;
     gap:18px;
-    align-items:start
+    align-items:start;
+    transition: grid-template-columns 0.3s ease;
+   }
+
+   .page-container.collapsed {
+    grid-template-columns: 60px 1fr;
    }
 
    /* Topbar - Enhanced */
@@ -45,9 +50,9 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:16px 20px;
+    padding:10px 14px;
     border-radius:var(--radius);
-    background:linear-gradient(135deg, var(--accent1), var(--accent2));
+    background:linear-gradient(90deg, var(--accent1), var(--accent2));
     color:#fff;
     box-shadow:var(--shadow-dark);
    }
@@ -69,14 +74,13 @@
    }
 
    .brand-text h1 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     margin: 0;
-    letter-spacing: 0.5px;
    }
 
    .brand-text p {
-    font-size: 0.75rem;
+    font-size:12px;
     opacity:0.95;
     margin: 4px 0 0 0;
    }
@@ -84,25 +88,26 @@
    .user-info {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
    }
 
    #userName {
     font-weight: 500;
     background: rgba(255,255,255,0.1);
-    padding: 6px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
    }
 
    #logoutBtn {
     background: rgba(255,255,255,0.15);
     color: white;
     border: 1px solid rgba(255,255,255,0.3);
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-weight: 500;
+    font-size: 0.85rem;
     transition: all 0.2s ease;
    }
 
@@ -111,17 +116,41 @@
     transform: translateY(-1px);
    }
 
-   /* Sidebar - Enhanced */
+   /* Sidebar - Collapsible */
    .sidebar{
-    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+    background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
     border-radius:var(--radius);
-    padding:16px 12px;
+    padding:12px;
     height:calc(100vh - 120px);
     position:sticky;
     top:72px;
     overflow:auto;
-    box-shadow: var(--shadow);
-    border: 1px solid rgba(255,255,255,0.8);
+    transition: width 0.3s ease;
+   }
+
+   .sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+   }
+
+   .sidebar-toggle {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+   }
+
+   .sidebar-toggle:hover {
+    transform: scale(1.1);
    }
 
    .sidebar ul{
@@ -130,139 +159,132 @@
     margin:0;
     display:flex;
     flex-direction:column;
-    gap:6px
+    gap:6px;
+    flex: 1;
    }
 
    .sidebar li a{
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 12px;
     text-decoration: none;
     color: var(--muted);
     border-radius: var(--radius-sm);
     transition: all 0.3s ease;
     font-weight: 500;
-    border: 1px solid transparent;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
    }
 
    .sidebar li a:hover{
     background: var(--light-green);
     color: var(--accent1);
-    transform: translateX(4px);
    }
 
    .sidebar li a.active{
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
     color: #fff;
-    box-shadow: 0 4px 12px rgba(15,122,74,0.2);
-    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
    }
 
    .sidebar li a i {
     width: 20px;
     text-align: center;
     font-size: 1rem;
+    flex-shrink: 0;
    }
 
-   /* Content Area - Enhanced */
+   .sidebar li a .menu-text {
+    transition: opacity 0.3s ease;
+   }
+
+   .page-container.collapsed .sidebar li a .menu-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+   }
+
+   /* Content Area - Fixed Size */
    .content-area{
-    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
     border-radius:var(--radius);
-    padding:24px;
-    box-shadow:var(--shadow);
+    padding:18px;
+    box-shadow:0 8px 22px rgba(10,20,16,0.06);
     min-height:72vh;
-    border: 1px solid rgba(255,255,255,0.8);
+    height: calc(100vh - 120px);
+    overflow-y: auto;
    }
 
-   /* Header */
+   /* Content Header - Fixed */
    .content-header {
+    margin-top: 0;
+    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 16px;
    }
 
    .content-header h2 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: var(--accent1);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
    }
 
-   /* Stats Cards */
+   /* Stats - Fixed Position */
    .stats-container {
     display: flex;
+    justify-content: flex-end;
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
    }
 
-   .stat-card {
-    background: white;
-    padding: 16px;
-    border-radius: var(--radius-sm);
-    border-left: 4px solid var(--accent1);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    min-width: 140px;
-    flex: 1;
+   .stat-item {
+    text-align: center;
+    min-width: 80px;
    }
 
-   .stat-card h3 {
-    font-size: 0.8rem;
+   .stat-item span {
+    font-size: 0.85rem;
     color: var(--muted);
-    margin: 0 0 8px 0;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
    }
 
-   .stat-card .value {
-    font-size: 1.8rem;
+   .stat-item .value {
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--accent1);
+    display: block;
    }
 
-   /* Toolbar - Enhanced */
+   /* Toolbar - Fixed Layout */
    .toolbar {
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+    align-items:center;
     background: var(--light-green);
-    padding: 16px;
+    padding: 12px;
     border-radius: var(--radius-sm);
-    margin-bottom: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    justify-content: space-between;
-   }
-
-   .search-container {
-    flex: 1;
-    min-width: 250px;
-    position: relative;
-   }
-
-   .search-container i {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    font-size: 0.9rem;
    }
 
    .search-box{
-    width: 100%;
-    padding:10px 12px 10px 36px;
+    padding:8px 12px;
     border:1px solid var(--border);
     border-radius:var(--radius-sm);
-    font-size:0.9rem;
+    min-width:220px;
+    font-size: 0.9rem;
     background: white;
-    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 300px;
    }
 
    .search-box:focus {
@@ -271,21 +293,14 @@
     box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
    }
 
-   .filter-container {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-   }
-
    .brgy-dropdown{
-    padding:10px 12px;
-    border:1px solid var(--border);
+    padding:8px;
     border-radius:var(--radius-sm);
+    border:1px solid var(--border);
     background: white;
     color: var(--muted);
-    font-size:0.9rem;
-    min-width: 180px;
+    font-size: 0.9rem;
+    min-width: 160px;
     cursor: pointer;
    }
 
@@ -296,40 +311,42 @@
 
    .btn {
     border:0;
-    padding:10px 16px;
+    padding:10px 14px;
     border-radius:var(--radius-sm);
     cursor:pointer;
     font-weight:600;
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
     color:#fff;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
    }
 
    .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(15,122,74,0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
    }
 
    .btn-export {
-    background: linear-gradient(135deg, var(--accent3), var(--accent4));
+    background: linear-gradient(90deg, var(--accent3), var(--accent4));
    }
 
    .btn-export:hover {
-    box-shadow: 0 4px 12px rgba(255,122,0,0.2);
+    box-shadow: 0 4px 8px rgba(255,122,0,0.2);
    }
 
-   /* Records Table - Enhanced */
+   /* Records Table - Fixed */
    .records-wrapper{
     margin-top:14px;
     background:rgba(255,255,255,0.95);
     border-radius:var(--radius);
     box-shadow:var(--shadow);
     overflow:auto;
-    border: 1px solid var(--border);
+    height: calc(100vh - 380px);
+    min-height: 300px;
    }
 
    .records-table{
@@ -339,20 +356,21 @@
    }
 
    .records-table th{
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    color: white;
-    padding: 14px 12px;
+    background:rgba(15,122,74,0.08);
+    padding: 10px 12px;
     text-align: left;
-    font-weight: 600;
-    position: sticky;
-    top: 0;
-    z-index: 6;
-    border: none;
+    font-weight:800;
+    position:sticky;
+    top:0;
+    z-index:6;
+    font-size: 0.85rem;
+    color: var(--accent1);
+    border-bottom: 2px solid rgba(15,122,74,0.1);
    }
 
    .records-table td{
-    padding:12px;
-    font-size:0.9rem;
+    padding:8px 12px;
+    font-size:0.85rem;
     border-bottom:1px solid rgba(15,122,74,0.08);
     vertical-align:middle;
     color: var(--muted);
@@ -366,18 +384,18 @@
    .select-col{
     position:sticky;
     left:0;
-    background:rgba(255,255,255,0.98);
+    background:rgba(255,255,255,0.95);
     z-index:7;
     padding-left:12px;
-    border-right: 1px solid var(--border);
+    border-right: 1px solid rgba(15,122,74,0.1);
    }
 
    .actions-col{
     position:sticky;
     right:0;
-    background:rgba(255,255,255,0.98);
+    background:rgba(255,255,255,0.95);
     z-index:7;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid rgba(15,122,74,0.1);
    }
 
    /* Checkbox styling */
@@ -397,27 +415,26 @@
     display:none;
    }
 
-   /* Color coding - Enhanced */
-   .mem-small{background:#e3f2fd !important}
-   .mem-normal{background:#e8f5e9 !important}
-   .mem-large{background:#fffde7 !important}
-   .mem-critical{background:#ffebee !important}
+   /* Color coding */
+   .mem-small{background:#d4f6ff !important}
+   .mem-normal{background:#d9ffd9 !important}
+   .mem-large{background:#fff7c2 !important}
+   .mem-critical{background:#ffd6d6 !important}
 
    /* Highlight */
    .hl{
-    background:#fff3cd;
-    padding:2px 4px;
+    background:#fffe8a;
+    padding:2px 3px;
     border-radius:4px;
-    font-weight:600;
    }
 
-   /* Icon buttons - Enhanced */
+   /* Icon buttons */
    .icon-btn{
     background:none;
     border:0;
-    font-size:1rem;
+    font-size:0.9rem;
     cursor:pointer;
-    padding:6px;
+    padding:4px;
     border-radius:6px;
     display:inline-flex;
     align-items:center;
@@ -431,19 +448,18 @@
     transform:translateY(-1px);
    }
 
-   /* Show toggle - Enhanced */
+   /* Show toggle */
    .show-toggle{
-    font-size:0.85rem;
+    font-size:0.8rem;
     padding:6px 10px;
-    border-radius:var(--radius-sm);
-    border:1px solid var(--border);
-    background:var(--light-green);
+    border-radius:6px;
+    border:1px solid rgba(6,30,20,0.06);
+    background:transparent;
     cursor:pointer;
     color:var(--accent1);
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 6px;
-    font-weight: 500;
+    gap: 4px;
     transition: all 0.2s ease;
    }
 
@@ -452,13 +468,13 @@
     border-color: var(--accent1);
    }
 
-   /* Export dropdown - Enhanced */
+   /* Export dropdown */
    .export-wrapper{
     position:relative;
    }
 
    .export-dropdown{
-    font-size:0.9rem;
+    font-size:0.85rem;
     position:absolute;
     top:100%;
     right:0;
@@ -466,18 +482,18 @@
     background:#fff;
     border:1px solid var(--border);
     border-radius:var(--radius-sm);
-    width:180px;
+    width:160px;
     box-shadow:var(--shadow);
     z-index:9999;
     overflow: hidden;
    }
 
    .export-dropdown div{
-    padding:12px 16px;
+    padding:10px 14px;
     cursor:pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     transition: all 0.2s ease;
    }
 
@@ -489,31 +505,32 @@
    .export-dropdown div i {
     width: 16px;
     text-align: center;
+    font-size: 0.9rem;
    }
 
    .hidden{
     display:none;
    }
 
-   /* Pagination - Enhanced */
+   /* Pagination - Fixed Position */
    #paginationArea {
-    margin-top: 20px;
+    margin-top: 12px;
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
    }
 
    #paginationArea button{
-    padding:8px 12px;
+    padding:6px 10px;
     margin:0 2px;
-    border-radius:var(--radius-sm);
+    border-radius:6px;
     border:1px solid var(--border);
     background:#fff;
     cursor:pointer;
     color: var(--muted);
-    font-weight: 500;
-    min-width: 36px;
+    font-size: 0.85rem;
+    min-width: 32px;
     transition: all 0.2s ease;
    }
 
@@ -523,48 +540,48 @@
    }
 
    #paginationArea button.active{
-    background:linear-gradient(135deg, var(--accent1), var(--accent2));
+    background:var(--accent1);
     color:#fff;
     border-color:var(--accent1);
-    font-weight:600;
+    font-weight:700;
    }
 
-   /* Legend - Enhanced */
+   /* Legend - Fixed Position */
    .legend-box{
-    margin-top:20px;
+    margin-top:16px;
     display:inline-block;
     background:#fff;
-    padding:16px;
-    border-radius:var(--radius);
-    border:1px solid var(--border);
-    box-shadow:var(--shadow);
+    padding:12px;
+    border-radius:var(--radius-sm);
+    border:1px solid rgba(6,30,20,0.04);
+    box-shadow:0 4px 14px rgba(6,30,20,0.06);
    }
 
-   .legend-box h3 {
-    margin: 0 0 12px 0;
+   .legend-box h4 {
+    margin: 0 0 8px 0;
     font-size: 0.9rem;
     color: var(--muted);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
    }
 
    .legend-item{
     display:flex;
-    gap:10px;
+    gap:8px;
     align-items:center;
-    margin:8px 0;
-    font-size:0.85rem;
+    margin:6px 0;
+    font-size:0.8rem;
    }
 
    .legend-swatch{
-    width:16px;
-    height:16px;
+    width:14px;
+    height:14px;
     border-radius:4px;
     flex-shrink: 0;
    }
 
-   /* Loading overlay - Enhanced */
+   /* Loading overlay */
    #loading {
     display:none;
     position:fixed;
@@ -578,18 +595,18 @@
 
    .loading-content {
     background:#fff;
-    padding:24px 32px;
+    padding:20px 24px;
     border-radius:var(--radius);
     box-shadow:var(--shadow-dark);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
    }
 
    .loading-spinner {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border: 3px solid var(--border);
     border-top-color: var(--accent1);
     border-radius: 50%;
@@ -607,20 +624,14 @@
         padding: 8px;
     }
     
+    .page-container.collapsed {
+        grid-template-columns: 1fr;
+    }
+    
     .sidebar {
         position: static;
         height: auto;
         margin-bottom: 12px;
-    }
-    
-    .sidebar ul {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    
-    .sidebar li {
-        flex: 1;
-        min-width: 140px;
     }
     
     .toolbar {
@@ -628,24 +639,35 @@
         align-items: stretch;
     }
     
-    .search-container {
-        min-width: 100%;
+    .search-box {
+        max-width: 100%;
     }
     
-    .filter-container {
-        width: 100%;
-    }
-    
-    .brgy-dropdown {
-        flex: 1;
+    .stats-container {
+        justify-content: center;
     }
    }
 
-   /* Order for toolbar items */
-   .search-container { order: 1; }
-   .filter-container .brgy-dropdown { order: 2; }
-   #refreshBtn { order: 3; }
-   .export-wrapper { order: 4; }
+   /* Search icon */
+   .search-container {
+    position: relative;
+    flex: 1;
+    max-width: 300px;
+   }
+
+   .search-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.9rem;
+   }
+
+   .search-container .search-box {
+    padding-left: 32px;
+    width: 100%;
+   }
 </style>
 </head>
 <body>
@@ -669,13 +691,19 @@
   </header>
 
   <aside class="sidebar" id="sidebar">
-    <ul>
-      <li><a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
-      <li><a href="dataForm.html"><i class="fas fa-edit"></i> Data Entry</a></li>
-      <li><a href="records.html" class="active"><i class="fas fa-folder"></i> Records</a></li>
-      <li><a href="charts.html"><i class="fas fa-chart-line"></i> Charts</a></li>
-      <li class="admin-only"><a href="users.html"><i class="fas fa-users"></i> User Management</a></li>
-    </ul>
+    <div class="sidebar-container">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <ul>
+        <li><a href="dashboard.html" title="Dashboard"><i class="fas fa-chart-bar"></i> <span class="menu-text">Dashboard</span></a></li>
+        <li><a href="dataForm.html" title="Data Entry"><i class="fas fa-edit"></i> <span class="menu-text">Data Entry</span></a></li>
+        <li><a href="records.html" class="active" title="Records"><i class="fas fa-folder"></i> <span class="menu-text">Records</span></a></li>
+        <li><a href="charts.html" title="Charts"><i class="fas fa-chart-line"></i> <span class="menu-text">Charts</span></a></li>
+        <li class="admin-only"><a href="users.html" title="User Management"><i class="fas fa-users"></i> <span class="menu-text">User Management</span></a></li>
+      </ul>
+    </div>
   </aside>
 
   <main class="content-area">
@@ -683,18 +711,18 @@
       <h2><i class="fas fa-folder"></i> Household Records</h2>
     </div>
 
-    <!-- Stats -->
+    <!-- Counts - Top Right -->
     <div class="stats-container">
-      <div class="stat-card">
-        <h3>Total Records</h3>
+      <div class="stat-item">
+        <span>Rows</span>
         <div class="value" id="rowCount">0</div>
       </div>
-      <div class="stat-card">
-        <h3>Filtered Results</h3>
+      <div class="stat-item">
+        <span>Matches</span>
         <div class="value" id="matchCount">0</div>
       </div>
-      <div class="stat-card">
-        <h3>Selected Items</h3>
+      <div class="stat-item">
+        <span>Selected</span>
         <div class="value" id="selectedCount">0</div>
       </div>
     </div>
@@ -706,35 +734,33 @@
         <input id="searchInput" class="search-box" placeholder="Search by Name / Barangay / ID..." />
       </div>
 
-      <div class="filter-container">
-        <select id="filterBarangay" class="brgy-dropdown" aria-label="Filter by Barangay">
-          <option value="">All Barangays</option>
-          <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-          <option>Dalipit East</option><option>Dalipit West</option>
-          <option>Dominador East</option><option>Dominador West</option>
-          <option>Munlawin Sur</option><option>Munlawin Norte</option>
-          <option>Muzon Primero</option><option>Muzon Segundo</option>
-          <option>Pinagkurusan</option><option>Ping-As</option>
-          <option>Poblacion East</option><option>Poblacion West</option>
-          <option>San Jose</option><option>San Juan</option>
-          <option>Santa Cruz</option><option>Tadlac</option>
-        </select>
+      <select id="filterBarangay" class="brgy-dropdown" aria-label="Filter by Barangay">
+        <option value="">All Barangays</option>
+        <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+        <option>Dalipit East</option><option>Dalipit West</option>
+        <option>Dominador East</option><option>Dominador West</option>
+        <option>Munlawin Sur</option><option>Munlawin Norte</option>
+        <option>Muzon Primero</option><option>Muzon Segundo</option>
+        <option>Pinagkurusan</option><option>Ping-As</option>
+        <option>Poblacion East</option><option>Poblacion West</option>
+        <option>San Jose</option><option>San Juan</option>
+        <option>Santa Cruz</option><option>Tadlac</option>
+      </select>
 
-        <button id="refreshBtn" class="btn">
-          <i class="fas fa-redo"></i> Refresh
+      <button id="refreshBtn" class="btn">
+        <i class="fas fa-redo"></i> Refresh
+      </button>
+
+      <div class="export-wrapper">
+        <button id="exportBtn" class="btn btn-export">
+          <i class="fas fa-download"></i> Export ▼
         </button>
-
-        <div class="export-wrapper">
-          <button id="exportBtn" class="btn btn-export">
-            <i class="fas fa-download"></i> Export ▼
-          </button>
-          <div id="exportDropdown" class="export-dropdown hidden" role="menu" aria-hidden="true">
-            <div onclick="exportAll()">
-              <i class="fas fa-file-export"></i> Export All
-            </div>
-            <div onclick="exportSelected()">
-              <i class="fas fa-check-circle"></i> Export Selected
-            </div>
+        <div id="exportDropdown" class="export-dropdown hidden" role="menu" aria-hidden="true">
+          <div onclick="exportAll()">
+            <i class="fas fa-file-export"></i> Export All
+          </div>
+          <div onclick="exportSelected()">
+            <i class="fas fa-check-circle"></i> Export Selected
           </div>
         </div>
       </div>
@@ -749,15 +775,15 @@
     </div>
 
     <!-- Pagination -->
-    <div id="paginationArea"></div>
+    <div id="paginationArea" style="margin-top:12px"></div>
 
     <!-- Legend -->
     <div class="legend-box">
-      <h3><i class="fas fa-palette"></i> Household Color Legend</h3>
-      <div class="legend-item"><div class="legend-swatch" style="background:#e3f2fd"></div>1 Member</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:#e8f5e9"></div>2–4 Members</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:#fffde7"></div>5–7 Members</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:#ffebee"></div>8+ Members</div>
+      <h4><i class="fas fa-palette"></i> Household Color Legend</h4>
+      <div class="legend-item"><div class="legend-swatch" style="background:#d4f6ff"></div>1 Member</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#d9ffd9"></div>2–4 Members</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#fff7c2"></div>5–7 Members</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#ffd6d6"></div>8+ Members</div>
     </div>
 
   </main>
@@ -785,8 +811,7 @@ const rowsPerPage = 25;
 
 /* ============ UTIL ============ */
 function showLoading(yes){ 
-    const loading = document.getElementById("loading");
-    loading.style.display = yes ? "flex" : "none"; 
+    document.getElementById("loading").style.display = yes ? "flex" : "none"; 
 }
 
 function highlight(text,q){
@@ -856,9 +881,9 @@ function renderTable(){
     thead.innerHTML = ""; tbody.innerHTML = "";
 
     // header row
-    let th = `<tr><th class="select-col"><input id="selectAll" type="checkbox" title="Select all"></th>`;
+    let th = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
     header.forEach(c => th += `<th>${c}</th>`);
-    th += `<th class="actions-col" style="min-width:96px">Members</th><th class="actions-col" style="min-width:100px">Actions</th></tr>`;
+    th += `<th class="actions-col" style="min-width:96px">Members</th><th class="actions-col">Actions</th></tr>`;
     thead.innerHTML = th;
 
     const start = (currentPage-1) * rowsPerPage;
@@ -889,10 +914,7 @@ function renderTable(){
         // show toggle
         const tdShow = document.createElement("td"); 
         tdShow.className = "actions-col";
-        tdShow.innerHTML = `
-            <button class="show-toggle" onclick="toggleMembers('${g.dataID}')">
-                <i class="fas fa-eye"></i> Show (${mCount})
-            </button>`;
+        tdShow.innerHTML = `<button class="show-toggle" onclick="toggleMembers('${g.dataID}')"><i class="fas fa-eye"></i> Show (${mCount})</button>`;
         tr.appendChild(tdShow);
 
         // action buttons
@@ -981,29 +1003,9 @@ function renderPagination(){
     }
 
     let html = "";
-    const maxVisible = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisible/2));
-    let endPage = Math.min(total, startPage + maxVisible - 1);
-    
-    if(endPage - startPage + 1 < maxVisible){
-        startPage = Math.max(1, endPage - maxVisible + 1);
-    }
-    
-    // Previous button
-    if(currentPage > 1){
-        html += `<button onclick="gotoPage(${currentPage-1})"><i class="fas fa-chevron-left"></i></button>`;
-    }
-    
-    // Page numbers
-    for(let i=startPage; i<=endPage; i++){
+    for(let i=1;i<=total;i++){
         html += `<button onclick="gotoPage(${i})" class="${i===currentPage ? 'active' : ''}">${i}</button>`;
     }
-    
-    // Next button
-    if(currentPage < total){
-        html += `<button onclick="gotoPage(${currentPage+1})"><i class="fas fa-chevron-right"></i></button>`;
-    }
-    
     div.innerHTML = html;
 }
 
@@ -1077,9 +1079,26 @@ function exportCSV(list){
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); 
     a.href = url; 
-    a.download = `purok_kaligtasan_records_${new Date().toISOString().split('T')[0]}.csv`; 
+    a.download = "records.csv"; 
     a.click();
     setTimeout(()=> URL.revokeObjectURL(url), 500);
+}
+
+/* ============ SIDEBAR COLLAPSE ============ */
+function toggleSidebar() {
+    const pageContainer = document.querySelector('.page-container');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const icon = sidebarToggle.querySelector('i');
+    
+    pageContainer.classList.toggle('collapsed');
+    
+    if (pageContainer.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        sidebarToggle.title = "Expand sidebar";
+    } else {
+        icon.className = 'fas fa-bars';
+        sidebarToggle.title = "Collapse sidebar";
+    }
 }
 
 /* ============ UI BINDINGS ============ */
@@ -1090,7 +1109,7 @@ document.getElementById("filterBarangay").onchange = loadRecords;
 let searchTimeout;
 document.getElementById("searchInput").addEventListener("input", () => {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(loadRecords, 300);
+    searchTimeout = setTimeout(loadRecords, 260);
 });
 
 // Export dropdown toggle
@@ -1108,6 +1127,9 @@ document.addEventListener("click", (e) => {
         dropdown.classList.add("hidden");
     }
 });
+
+// Sidebar toggle
+document.getElementById('sidebarToggle').onclick = toggleSidebar;
 
 /* ============ INIT ============ */
 window.addEventListener("DOMContentLoaded", () => {
