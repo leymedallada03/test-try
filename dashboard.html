@@ -32,7 +32,7 @@
   .mini { font-size:13px; color:#55615a }
   .barangay-breakdown{margin-top:12px;overflow:auto}
   .break-table{width:100%;border-collapse:collapse}
-  .break-table th,.break-table td{padding:6px 8px;border-bottom:1px solid #eee;font-size:13px}
+  .break-table th,.break-table td{padding:6px 8px;border-bottom:1px solid #eee;font-size:13px;text-align:center}
   .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 </style>
 </head>
@@ -112,7 +112,7 @@
       <h3>Barangay Breakdown</h3>
       <div class="barangay-breakdown">
         <table class="break-table" id="breakTable">
-          <thead><tr><th>Barangay</th><th>Heads</th><th>Members</th><th>Male</th><th>Female</th><th>With Coord</th></tr></thead>
+          <thead><tr><th>Barangay</th><th>PWD</th><th>Male</th><th>Female</th><th>With Coord</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -313,7 +313,7 @@ async function loadDashboard(){
     labels.forEach(l=>{
       const s = barangayMap[l];
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td><td>${s.heads||0}</td><td>${s.members||0}</td><td>${s.male||0}</td><td>${s.female||0}</td><td>${s.coords||0}</td>`;
+      tr.innerHTML = `<td>${l}</td><td>${s.pwds||0}</td><td>${s.male||0}</td><td>${s.female||0}</td><td>${s.coords||0}</td>`;
       tbody.appendChild(tr);
     });
 
