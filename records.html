@@ -20,6 +20,7 @@
 .brgy-dropdown{padding:8px;border-radius:8px;border:1px solid #ccc}
 .btn-main{padding:6px 10px;border-radius:8px;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;border:0;font-weight:700;cursor:pointer}
 .btn-secondary{padding:6px 10px;border-radius:8px;border:1px solid #0f7a4a;background:#fff;color:#0f7a4a;font-weight:700;cursor:pointer}
+.btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff; }
 
 /* records wrapper/table */
 .records-wrapper{margin-top:14px;background:rgba(255,255,255,0.95);border-radius:12px;box-shadow:0 8px 22px rgba(6,30,20,0.06);overflow:auto}
@@ -128,7 +129,7 @@
         <option>Santa Cruz</option><option>Tadlac</option>
       </select>
 
-      <button id="refreshBtn" class="btn-main">⟳ Refresh</button>
+      <button id="refreshBtn" class="btn">⟳ Refresh</button>
 
       <div class="export-wrapper">
         <button id="exportBtn" class="btn-secondary">📤 Export ▼</button>
@@ -425,3 +426,4 @@ window.addEventListener("DOMContentLoaded", ()=>{
 </script>
 </body>
 </html>
+
