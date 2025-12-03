@@ -119,7 +119,7 @@
     transform: translateY(-1px);
    }
 
-   /* Sidebar - Collapsible */
+   /* Sidebar - Collapsible with Icon Size Change */
    .sidebar{
     background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
     border-radius:var(--radius);
@@ -197,6 +197,18 @@
     width: 24px;
     text-align: center;
     flex-shrink: 0;
+    transition: all 0.3s ease;
+   }
+
+   /* When sidebar is collapsed, make icons bigger and green */
+   .page-container.collapsed .sidebar li a .menu-icon {
+    font-size: 1.4rem;
+    color: var(--accent1);
+    transform: scale(1.1);
+   }
+
+   .page-container.collapsed .sidebar li a.active .menu-icon {
+    color: white;
    }
 
    .sidebar li a .menu-text {
@@ -209,7 +221,7 @@
     overflow: hidden;
    }
 
-   /* Content Area - Fixed Size */
+   /* Content Area - Fixed Size with No Overflow */
    .content-area{
     background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
     border-radius:var(--radius);
@@ -218,6 +230,9 @@
     min-height:72vh;
     height: calc(100vh - 120px);
     overflow-y: auto;
+     /* Prevent content from overflowing */
+    max-width: 100%;
+    box-sizing: border-box;
    }
 
    /* Content Header - Fixed */
@@ -246,6 +261,7 @@
     border-left: 3px solid var(--accent1);
     font-size: 0.9rem;
     color: var(--muted);
+    line-height: 1.5;
    }
 
    /* Card Styling */
@@ -256,6 +272,8 @@
      margin-bottom:12px;
      box-shadow:var(--shadow);
      border: 1px solid rgba(255,255,255,0.8);
+     /* Prevent card content from overflowing */
+     overflow: hidden;
    }
 
    .form-grid{ 
@@ -274,7 +292,7 @@
      font-size: 0.9rem;
    }
 
-   /* Input Fields */
+   /* Input Fields - Fixed to prevent bumping */
    input[type="text"], input[type="date"], input[type="number"], select, textarea{
      width:100%;
      padding:10px;
@@ -283,6 +301,18 @@
      font-size:0.9rem;
      transition: all 0.3s ease;
      background:#fff;
+     box-sizing: border-box; /* Include padding in width calculation */
+     min-width: 0; /* Prevent flexbox overflow */
+   }
+
+   /* Fix for input elements to prevent bumping */
+   .page-container.collapsed .content-area input[type="text"],
+   .page-container.collapsed .content-area input[type="date"],
+   .page-container.collapsed .content-area input[type="number"],
+   .page-container.collapsed .content-area select,
+   .page-container.collapsed .content-area textarea {
+     width: 100%;
+     max-width: 100%;
    }
 
    input[type="date"]::-webkit-calendar-picker-indicator{
@@ -299,6 +329,12 @@
      font-size:0.85rem; 
      color:var(--muted);
      margin-top: 4px;
+   }
+
+   /* Required field indicator */
+   .required {
+     color: #dc2626;
+     margin-left: 2px;
    }
 
    /* Radio / Checkbox Alignment - FIXED */
@@ -366,22 +402,13 @@
      text-align: center;
    }
 
-   /* Divider */
-   .divider{
-     height:1px;
-     background:linear-gradient(90deg,transparent,rgba(6,30,20,0.04),transparent);
-     margin:12px 0;
-     border-radius:6px;
-   }
-
-   /* Sub Label */
-   .sub-label1 {
+   /* Instruction label - Fixed alignment */
+   .instruction-label {
      color: var(--muted);
      display: block;
-     margin-left: 44px;
-     margin-bottom: 12px;
+     margin: 0 0 12px 44px; /* Align with chip + text */
      font-size: 0.85rem;
-     margin-top: -4px;
+     line-height: 1.4;
    }
 
    /* Government Support Grid - FIXED */
@@ -399,52 +426,81 @@
      padding: 8px 0;
    }
 
-   /* Domestic Animals Grid - FIXED */
-   .domestic-grid{ 
-     display:grid; 
-     grid-template-columns: repeat(2,1fr); 
-     gap:12px 20px; 
-     align-items:center;
+   /* Domestic Animals Grid - REDESIGNED */
+   .domestic-grid-container {
      margin-top: 12px;
    }
 
-   .animal-row{ 
-     display:flex; 
-     gap:12px; 
-     align-items:center; 
-     justify-content:space-between; 
-     background:var(--light-green);
-     padding:12px;
-     border-radius:var(--radius-sm);
-     border:1px solid var(--border);
-   }
-
-   .animal-left{
-     display:flex;
-     gap:8px;
+   .domestic-grid{ 
+     display:grid; 
+     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+     gap:12px;
      align-items:center;
    }
 
-   .animal-left label{
-     margin:0;
-     font-weight:700;
+   .animal-card {
+     background: var(--light-green);
+     padding: 16px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+     transition: all 0.3s ease;
+     display: flex;
+     flex-direction: column;
+     gap: 12px;
+   }
+
+   .animal-card:hover {
+     border-color: var(--accent1);
+     transform: translateY(-2px);
+     box-shadow: 0 4px 12px rgba(15,122,74,0.1);
+   }
+
+   .animal-header {
+     display: flex;
+     align-items: center;
+     gap: 12px;
+     margin-bottom: 8px;
+   }
+
+   .animal-header label {
+     margin: 0;
+     font-size: 1rem;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+   }
+
+   .animal-qty {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+   }
+
+   .animal-qty label {
+     margin: 0;
+     font-weight: 600;
+     color: var(--muted);
+     font-size: 0.9rem;
    }
 
    .qty{
-     width:80px;
+     width: 80px;
      padding: 8px;
      border-radius: var(--radius-sm);
      border: 2px solid var(--border);
+     text-align: center;
    }
 
    .others-box{
      width:100%;
      min-height:80px;
-     padding:10px;
+     padding:12px;
      border-radius:var(--radius-sm);
      border:2px solid var(--border);
      font-family: inherit;
      font-size: 0.9rem;
+     margin-top: 8px;
+     resize: vertical;
    }
 
    /* Buttons */
@@ -469,6 +525,28 @@
      box-shadow: 0 4px 12px rgba(15,122,74,0.2);
    }
 
+   /* Reset Button - Same as Export Button in records.html */
+   .btn-reset { 
+     background: linear-gradient(90deg, var(--accent3), var(--accent4)) !important;
+     color:#fff !important;
+     border: none !important;
+   }
+
+   .btn-reset:hover {
+     box-shadow: 0 4px 12px rgba(255,122,0,0.2) !important;
+   }
+
+   /* Back Button - Same as Export Button */
+   .btn-back {
+     background: linear-gradient(90deg, var(--accent3), var(--accent4)) !important;
+     color:#fff !important;
+     border: none !important;
+   }
+
+   .btn-back:hover {
+     box-shadow: 0 4px 12px rgba(255,122,0,0.2) !important;
+   }
+
    .btn.secondary { 
      background: transparent; 
      color: var(--accent1); 
@@ -486,6 +564,18 @@
      gap:12px;
      justify-content:flex-end;
      margin-top: 16px;
+   }
+
+   /* Coordinate container */
+   .coordinate-container {
+     display: flex;
+     gap: 8px;
+     align-items: flex-start;
+     flex-wrap: wrap;
+   }
+
+   .coordinate-container .btn {
+     white-space: nowrap;
    }
 
    /* Member Panel (Slide-in) - FIXED */
@@ -591,6 +681,31 @@
      border-top: 2px solid var(--light-green);
    }
 
+   /* Loading overlay */
+   .loading-overlay {
+     display: none;
+     position: fixed;
+     inset: 0;
+     background: rgba(255,255,255,0.9);
+     align-items: center;
+     justify-content: center;
+     z-index: 9999;
+     backdrop-filter: blur(2px);
+   }
+
+   .loading-spinner {
+     width: 40px;
+     height: 40px;
+     border: 3px solid var(--border);
+     border-top-color: var(--accent1);
+     border-radius: 50%;
+     animation: spin 1s linear infinite;
+   }
+
+   @keyframes spin {
+     to { transform: rotate(360deg); }
+   }
+
    /* Responsive */
    @media (max-width: 768px) {
      .page-container {
@@ -651,10 +766,12 @@
      .content-area {
          height: auto;
          min-height: calc(100vh - 140px);
+         padding: 16px;
      }
      
      .form-grid {
          grid-template-columns: 1fr !important;
+         gap: 16px;
      }
      
      .gov-support-grid {
@@ -697,6 +814,15 @@
          min-width: 28px;
          padding: 4px 8px;
      }
+     
+     .instruction-label {
+         margin-left: 0;
+         margin-top: 8px;
+     }
+     
+     .section-title {
+         flex-wrap: wrap;
+     }
    }
 
    /* Mobile menu toggle button */
@@ -714,40 +840,20 @@
      background-size: 12px;
    }
 
-   /* Loading overlay */
-   .loading-overlay {
+   /* Error message styling */
+   .error-message {
+     color: #dc2626;
+     font-size: 0.85rem;
+     margin-top: 4px;
      display: none;
-     position: fixed;
-     inset: 0;
-     background: rgba(255,255,255,0.9);
-     align-items: center;
-     justify-content: center;
-     z-index: 9999;
-     backdrop-filter: blur(2px);
    }
 
-   .loading-spinner {
-     width: 40px;
-     height: 40px;
-     border: 3px solid var(--border);
-     border-top-color: var(--accent1);
-     border-radius: 50%;
-     animation: spin 1s linear infinite;
+   .input-error {
+     border-color: #dc2626 !important;
    }
 
-   @keyframes spin {
-     to { transform: rotate(360deg); }
-   }
-
-   /* Coordinate container */
-   .coordinate-container {
-     display: flex;
-     gap: 8px;
-     align-items: flex-start;
-   }
-
-   .coordinate-container .btn {
-     white-space: nowrap;
+   .input-error:focus {
+     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
    }
 </style>
 </head>
@@ -805,7 +911,7 @@
           <div>
             <label>Coordinate (optional)</label>
             <div class="coordinate-container">
-              <input type="text" id="coordinate" placeholder="Latitude, Longitude" style="flex: 1;" />
+              <input type="text" id="coordinate" placeholder="Latitude, Longitude" />
               <button type="button" id="getLocationBtn" class="btn secondary">
                 <i class="fas fa-map-marker-alt"></i> Get Location
               </button>
@@ -814,7 +920,7 @@
           </div>
           
           <div>
-            <label>Barangay <span class="small">*</span></label>
+            <label>Barangay <span class="required">*</span></label>
             <select id="barangay" required class="animated">
               <option value="">Select Barangay...</option>
               <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
@@ -827,7 +933,7 @@
           </div>
 
           <div>
-            <label>Sitio / Purok <span class="small">*</span></label>
+            <label>Sitio / Purok <span class="required">*</span></label>
             <select id="sitio" required class="animated">
               <option value="">Select...</option>
               <option>Purok I</option><option>Purok II</option><option>Purok III</option>
@@ -837,17 +943,20 @@
           </div>
 
           <div>
-            <label>Name of Household Head <span class="small">*</span></label>
+            <label>Name of Household Head <span class="required">*</span></label>
             <input type="text" id="householdHead" required />
           </div>
 
           <div>
-            <label>Contact no. <span class="small">*</span></label>
-            <input type="text" id="contactNo" placeholder="09XXXXXXXXX" required />
+            <label>Contact no. <span class="required">*</span></label>
+            <input type="text" id="contactNo" placeholder="09XXXXXXXXX" required 
+                   pattern="^(09|\+639)\d{9}$" 
+                   title="Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)" />
+            <div class="error-message" id="contactError">Please enter a valid Philippine mobile number (09XXXXXXXXX)</div>
           </div>
 
           <div>
-            <label>Sex <span class="small">*</span></label>
+            <label>Sex <span class="required">*</span></label>
             <div class="radio-line">
               <label class="radio-item"><input type="radio" name="head_sex" value="Male" required> Male</label>
               <label class="radio-item"><input type="radio" name="head_sex" value="Female"> Female</label>
@@ -855,7 +964,7 @@
           </div>
 
           <div>
-            <label>Birthdate <span class="small">*</span></label>
+            <label>Birthdate <span class="required">*</span></label>
             <input type="date" id="householdBirthdate" required />
           </div>
 
@@ -870,8 +979,8 @@
           </div>
 
           <div>
-            <label>No. of Household Member/s <span class="small">*</span></label>
-            <input type="number" id="memberCount" min="0" value="0" />
+            <label>No. of Household Member/s <span class="required">*</span></label>
+            <input type="number" id="memberCount" min="0" value="0" required />
             <div class="small-muted">Set to 0 if no other members.</div>
           </div>
         </div>
@@ -899,55 +1008,75 @@
         </div>
       </div>
 
-      <!-- DOMESTIC ANIMALS -->
+      <!-- DOMESTIC ANIMALS - REDESIGNED -->
       <div class="card">
         <div class="section-title"><div class="chip">3</div><h3>Household Livestock</h3></div>
-        <div class="sub-label1">Please check (✓) all items that apply.</div>
+        <div class="instruction-label">Please check (✓) all items that apply.</div>
 
-        <div class="domestic-grid">
-          <div class="animal-row">
-            <div class="animal-left">
-              <label class="checkbox-item"><input type="checkbox" id="dog_chk"> Dog</label>
+        <div class="domestic-grid-container">
+          <div class="domestic-grid">
+            <div class="animal-card">
+              <div class="animal-header">
+                <label class="checkbox-item"><input type="checkbox" id="dog_chk"> <span style="font-size: 1.2rem;">🐕</span> Dog</label>
+              </div>
+              <div class="animal-qty">
+                <label>Quantity:</label>
+                <input type="number" id="dog_qty" class="qty" min="0" placeholder="0" />
+              </div>
             </div>
-            <div><input type="number" id="dog_qty" class="qty" min="0" placeholder="Qty" /></div>
+
+            <div class="animal-card">
+              <div class="animal-header">
+                <label class="checkbox-item"><input type="checkbox" id="cat_chk"> <span style="font-size: 1.2rem;">🐈</span> Cat</label>
+              </div>
+              <div class="animal-qty">
+                <label>Quantity:</label>
+                <input type="number" id="cat_qty" class="qty" min="0" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="animal-card">
+              <div class="animal-header">
+                <label class="checkbox-item"><input type="checkbox" id="pig_chk"> <span style="font-size: 1.2rem;">🐖</span> Pig</label>
+              </div>
+              <div class="animal-qty">
+                <label>Quantity:</label>
+                <input type="number" id="pig_qty" class="qty" min="0" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="animal-card">
+              <div class="animal-header">
+                <label class="checkbox-item"><input type="checkbox" id="cow_chk"> <span style="font-size: 1.2rem;">🐄</span> Cow</label>
+              </div>
+              <div class="animal-qty">
+                <label>Quantity:</label>
+                <input type="number" id="cow_qty" class="qty" min="0" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="animal-card">
+              <div class="animal-header">
+                <label class="checkbox-item"><input type="checkbox" id="carabao_chk"> <span style="font-size: 1.2rem;">🐃</span> Carabao</label>
+              </div>
+              <div class="animal-qty">
+                <label>Quantity:</label>
+                <input type="number" id="carabao_qty" class="qty" min="0" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="animal-card">
+              <div class="animal-header">
+                <label class="checkbox-item"><input type="checkbox" id="chicken_chk"> <span style="font-size: 1.2rem;">🐔</span> Chicken</label>
+              </div>
+              <div class="animal-qty">
+                <label>Quantity:</label>
+                <input type="number" id="chicken_qty" class="qty" min="0" placeholder="0" />
+              </div>
+            </div>
           </div>
 
-          <div class="animal-row">
-            <div class="animal-left">
-              <label class="checkbox-item"><input type="checkbox" id="cat_chk"> Cat</label>
-            </div>
-            <div><input type="number" id="cat_qty" class="qty" min="0" placeholder="Qty" /></div>
-          </div>
-
-          <div class="animal-row">
-            <div class="animal-left">
-              <label class="checkbox-item"><input type="checkbox" id="pig_chk"> Pig</label>
-            </div>
-            <div><input type="number" id="pig_qty" class="qty" min="0" placeholder="Qty" /></div>
-          </div>
-
-          <div class="animal-row">
-            <div class="animal-left">
-              <label class="checkbox-item"><input type="checkbox" id="cow_chk"> Cow</label>
-            </div>
-            <div><input type="number" id="cow_qty" class="qty" min="0" placeholder="Qty" /></div>
-          </div>
-
-          <div class="animal-row">
-            <div class="animal-left">
-              <label class="checkbox-item"><input type="checkbox" id="carabao_chk"> Carabao</label>
-            </div>
-            <div><input type="number" id="carabao_qty" class="qty" min="0" placeholder="Qty" /></div>
-          </div>
-
-          <div class="animal-row">
-            <div class="animal-left">
-              <label class="checkbox-item"><input type="checkbox" id="chicken_chk"> Chicken</label>
-            </div>
-            <div><input type="number" id="chicken_qty" class="qty" min="0" placeholder="Qty" /></div>
-          </div>
-
-          <div style="grid-column:1/-1">
+          <div style="margin-top: 16px;">
             <label>Others (describe — max ~2 sentences)</label>
             <textarea id="animals_others" class="others-box" placeholder="Describe other domestic animals or notes..."></textarea>
           </div>
@@ -1015,7 +1144,7 @@
       <!-- GOVERNMENT SUPPORT -->
       <div class="card">
         <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
-        <div class="sub-label1">Please check (✓) all items that apply.</div>
+        <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="gov-support-grid">
           <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
@@ -1046,8 +1175,8 @@
         <ul id="membersPreview" class="member-preview"></ul>
 
         <div class="actions-row">
-          <button id="resetBtn" class="btn secondary" type="button">
-            <i class="fas fa-redo"></i> Reset
+          <button id="resetBtn" class="btn btn-reset" type="button">
+            <i class="fas fa-redo"></i> Reset Form
           </button>
           <button id="nextToMembers" class="btn" type="button">
             <i class="fas fa-save"></i> Save & Continue to Members
@@ -1068,7 +1197,7 @@
 
 <div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
   <div class="panel-header">
-    <button id="panelClose" class="btn secondary" title="Close panel">
+    <button id="panelClose" class="btn btn-back" title="Close panel">
       <i class="fas fa-arrow-left"></i>
     </button>
     <div class="panel-chip" id="panelChip">Member 1</div>
@@ -1079,13 +1208,16 @@
     <form id="memberForm" onsubmit="return false;">
       <div class="form-grid">
         <div>
-          <label>Member Name <span class="small">*</span></label>
+          <label>Member Name <span class="required">*</span></label>
           <input type="text" id="memberName" class="member-name" required />
         </div>
 
         <div>
-          <label>Contact no. <span class="small">*</span></label>
-          <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX" required />
+          <label>Contact no. <span class="required">*</span></label>
+          <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX" required
+                 pattern="^(09|\+639)\d{9}$"
+                 title="Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)" />
+          <div class="error-message" id="memberContactError">Please enter a valid Philippine mobile number (09XXXXXXXXX)</div>
         </div>
 
         <div>
@@ -1185,7 +1317,7 @@
             <div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">GOV</div>
             <h4>Government Support</h4>
           </div>
-          <div class="small-muted">Please check (✓) all items that apply.</div>
+          <div class="instruction-label">Please check (✓) all items that apply.</div>
           
           <div class="panel-checkbox-grid">
             <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
@@ -1211,7 +1343,7 @@
       </div>
 
       <div class="panel-actions">
-        <button id="memberBack" class="btn secondary" type="button">
+        <button id="memberBack" class="btn btn-back" type="button">
           <i class="fas fa-arrow-left"></i> Back
         </button>
         <button id="memberNext" class="btn" type="button">
@@ -1225,6 +1357,66 @@
 <script>
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+
+/* ============ PHILIPPINE MOBILE NUMBER VALIDATION ============ */
+function validatePhilippineMobileNumber(number) {
+    // Remove spaces and special characters
+    const cleaned = number.replace(/\s+/g, '').replace(/[^\d+]/g, '');
+    
+    // Pattern for Philippine mobile numbers:
+    // 09XXXXXXXXX (11 digits starting with 09)
+    // +639XXXXXXXXX (13 digits starting with +639)
+    const pattern = /^(09|\+639)\d{9}$/;
+    
+    if (!pattern.test(cleaned)) {
+        return false;
+    }
+    
+    // Additional check: ensure it's exactly 11 digits for 09 format or 13 for +639 format
+    if (cleaned.startsWith('09') && cleaned.length !== 11) {
+        return false;
+    }
+    if (cleaned.startsWith('+639') && cleaned.length !== 13) {
+        return false;
+    }
+    
+    return true;
+}
+
+function formatPhilippineMobileNumber(number) {
+    const cleaned = number.replace(/\s+/g, '').replace(/[^\d+]/g, '');
+    
+    if (cleaned.startsWith('+639')) {
+        // Format: +639 XX XXX XXXX
+        return cleaned.replace(/(\+639)(\d{2})(\d{3})(\d{4})/, '$1 $2 $3 $4');
+    } else if (cleaned.startsWith('09')) {
+        // Format: 09XX XXX XXXX
+        return cleaned.replace(/(09\d{2})(\d{3})(\d{4})/, '$1 $2 $3');
+    }
+    
+    return number;
+}
+
+/* ============ INPUT VALIDATION FUNCTIONS ============ */
+function validateContactInput(input, errorElement) {
+    const value = input.value.trim();
+    const isValid = validatePhilippineMobileNumber(value);
+    
+    if (value && !isValid) {
+        input.classList.add('input-error');
+        errorElement.style.display = 'block';
+        return false;
+    } else {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        
+        // Format the number if valid
+        if (isValid) {
+            input.value = formatPhilippineMobileNumber(value);
+        }
+        return true;
+    }
+}
 
 /* ---------------- helpers ---------------- */
 function toSheetDateFormat(inputVal){
@@ -1430,13 +1622,53 @@ document.addEventListener('DOMContentLoaded', () => {
     item.style.display = isAdmin ? "block" : "none";
   });
 
+  // Contact number validation
+  const contactInput = document.getElementById("contactNo");
+  const contactError = document.getElementById("contactError");
+  
+  contactInput.addEventListener('blur', () => {
+    validateContactInput(contactInput, contactError);
+  });
+  
+  contactInput.addEventListener('input', () => {
+    // Clear error while typing
+    contactInput.classList.remove('input-error');
+    contactError.style.display = 'none';
+  });
+
+  // Member contact number validation
+  const memberContactInput = document.getElementById("memberContact");
+  const memberContactError = document.getElementById("memberContactError");
+  
+  if (memberContactInput) {
+    memberContactInput.addEventListener('blur', () => {
+      validateContactInput(memberContactInput, memberContactError);
+    });
+    
+    memberContactInput.addEventListener('input', () => {
+      memberContactInput.classList.remove('input-error');
+      memberContactError.style.display = 'none';
+    });
+  }
+
   // reset
   document.getElementById("resetBtn").addEventListener('click', () => {
-    document.getElementById("headForm").reset();
-    collectedMembers = [];
-    updateMemberPreview();
-    document.getElementById("householdAge").value = "";
-    document.getElementById("householdStage").value = "";
+    if (confirm("Are you sure you want to reset the form? All entered data will be lost.")) {
+      document.getElementById("headForm").reset();
+      collectedMembers = [];
+      updateMemberPreview();
+      document.getElementById("householdAge").value = "";
+      document.getElementById("householdStage").value = "";
+      
+      // Clear any error states
+      contactInput.classList.remove('input-error');
+      contactError.style.display = 'none';
+      
+      if (memberContactInput) {
+        memberContactInput.classList.remove('input-error');
+        memberContactError.style.display = 'none';
+      }
+    }
   });
 
   // next (head -> members)
@@ -1445,9 +1677,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const sitio = document.getElementById("sitio").value.trim();
     const headName = document.getElementById("householdHead").value.trim();
     const headContact = document.getElementById("contactNo").value.trim();
+    
+    // Validate required fields
     if(!barangay || !sitio || !headName || !headContact){ 
       alert("Please fill Barangay, Sitio/Purok, Name of Household Head and Contact no."); 
       return; 
+    }
+    
+    // Validate contact number
+    if (!validateContactInput(contactInput, contactError)) {
+      alert("Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)");
+      contactInput.focus();
+      return;
     }
 
     membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
@@ -1484,9 +1725,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById("memberNext").addEventListener('click', () => {
     const name = document.getElementById("memberName").value.trim();
     const contact = document.getElementById("memberContact").value.trim();
+    
     if(!name || !contact){ 
       alert("Please enter member's name and contact no."); 
       return; 
+    }
+    
+    // Validate member contact number
+    if (!validateContactInput(memberContactInput, memberContactError)) {
+      alert("Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)");
+      memberContactInput.focus();
+      return;
     }
 
     collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
@@ -1538,6 +1787,29 @@ document.addEventListener('DOMContentLoaded', () => {
         maximumAge: 0
       }
     );
+  });
+
+  // Animal quantity input handling
+  document.querySelectorAll('.animal-card input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const qtyInput = this.closest('.animal-card').querySelector('.qty');
+      if (this.checked) {
+        qtyInput.disabled = false;
+        qtyInput.value = qtyInput.value || '1';
+      } else {
+        qtyInput.disabled = true;
+        qtyInput.value = '';
+      }
+    });
+  });
+
+  // Initialize animal card states
+  document.querySelectorAll('.animal-card').forEach(card => {
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    const qtyInput = card.querySelector('.qty');
+    if (!checkbox.checked) {
+      qtyInput.disabled = true;
+    }
   });
 
   updateMemberPreview();
@@ -1757,6 +2029,20 @@ window.addEventListener('resize', function() {
         mobileToggle.title = "Open menu";
     }
 });
+
+/* ============ INPUT WIDTH FIX ============ */
+// Fix input widths when sidebar collapses/expands
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function() {
+        // Force reflow to fix input widths
+        setTimeout(() => {
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.style.width = '100%';
+            });
+        }, 300); // Match the transition duration
+    });
+}
 </script>
 </body>
 </html>
