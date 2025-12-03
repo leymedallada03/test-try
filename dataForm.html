@@ -173,9 +173,9 @@
       Pick on Map
 </button>
 <div class="small-muted">Optional — paste `lat, lng` if available.</div>
-
           </div>
-
+             </div>
+           </div>
           <div>
             <label>Barangay <span class="small">*</span></label>
             <select id="barangay" required class="animated">
@@ -1009,34 +1009,10 @@ document.getElementById("getLocationBtn").addEventListener("click", () => {
     }
   );
 });
-const map = L.map("map").setView([13.9423, 121.1035], 13); // Batangas center
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19
-  }).addTo(map);
-
-  let marker;
-
-  // Click to pick location
-  map.on("click", function (e) {
-      const lat = e.latlng.lat.toFixed(6);
-      const lng = e.latlng.lng.toFixed(6);
-
-      if (marker) map.removeLayer(marker);
-      marker = L.marker([lat, lng]).addTo(map);
-
-      // Send picked coordinate back to main window
-      window.opener.postMessage(
-          { type: "pickedLocation", lat: lat, lng: lng },
-          "*"
-      );
-
-      // Auto-close after picking
-      setTimeout(() => window.close(), 700);
-  });
 </script>
 </body>
 </html>
+
 
 
 
