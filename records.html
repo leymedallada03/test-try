@@ -69,31 +69,17 @@
 .legend-item{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:10px}
 .legend-swatch{width:14px;height:14px;border-radius:4px}
 
-  /* Redesigned Toolbar Layout */
-.toolbar {
+.count-row {
   display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+/* Search row - full width */
+.search-row {
   width: 100%;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.toolbar-left {
-  flex: 1; /* search box takes all available space */
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.count-box {
-  display: flex;
-  gap: 12px;
-  font-size: 13px;
+  margin-bottom: 10px;
 }
 
 .search-box {
@@ -104,6 +90,70 @@
   font-size: 14px;
 }
 
+/* Bottom action row - all right aligned */
+.action-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.brgy-dropdown {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+}
+
+/* Buttons - you can keep your existing style */
+.btn-main,
+.btn-secondary {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-main {
+  background: #007bff;
+  color: white;
+  border: none;
+}
+
+.btn-secondary {
+  background: #eee;
+  border: 1px solid #aaa;
+}
+
+/* Export dropdown menu */
+.export-wrapper {
+  position: relative;
+}
+
+.export-dropdown {
+  position: absolute;
+  right: 0;
+  top: 36px;
+  background: white;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 5px 0;
+  width: 140px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.export-dropdown div {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.export-dropdown div:hover {
+  background: #f5f5f5;
+}
+
+.hidden {
+  display: none;
+}
 </style>
 </head>
 <body>
@@ -141,45 +191,48 @@
     <h2 style="margin-top:0">📁 Household Records</h2>
 
     <!-- Counts -->
-    <<div class="toolbar">
-  
-  <!-- LEFT: Full-width Search -->
-  <div class="toolbar-left">
-    <input id="searchInput" class="search-box" placeholder="Search by Name / Barangay / ID..." />
-  </div>
+    <div class="count-row">
+  <span id="rowCountLabel">Count: <strong id="rowCount">0</strong></span>
+</div>
 
-  <!-- RIGHT: Dropdown + Counts + Buttons -->
-  <div class="toolbar-right">
-    
-    <select id="filterBarangay" class="brgy-dropdown">
-      <option value="">All Barangays</option>
-      <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-      <option>Dalipit East</option><option>Dalipit West</option>
-      <option>Dominador East</option><option>Dominador West</option>
-      <option>Munlawin Sur</option><option>Munlawin Norte</option>
-      <option>Muzon Primero</option><option>Muzon Segundo</option>
-      <option>Pinagkurusan</option><option>Ping-As</option>
-      <option>Poblacion East</option><option>Poblacion West</option>
-      <option>San Jose</option><option>San Juan</option>
-      <option>Santa Cruz</option><option>Tadlac</option>
-    </select>
+<!-- MIDDLE: Full-width Search -->
+<div class="search-row">
+  <input id="searchInput" class="search-box" placeholder="Search..." />
+</div>
 
-    <div class="count-box">
-      <span>Rows: <strong id="rowCount">0</strong></span>
-      <span>Matches: <strong id="matchCount">0</strong></span>
-      <span>Selected: <strong id="selectedCount">0</strong></span>
+<!-- BOTTOM: Dropdown + Buttons (right aligned) -->
+<div class="action-row">
+  <select id="filterBarangay" class="brgy-dropdown">
+    <option value="">All Barangays</option>
+    <option>Balagbag</option>
+    <option>Concepcion</option>
+    <option>Concordia</option>
+    <option>Dalipit East</option>
+    <option>Dalipit West</option>
+    <option>Dominador East</option>
+    <option>Dominador West</option>
+    <option>Munlawin Sur</option>
+    <option>Munlawin Norte</option>
+    <option>Muzon Primero</option>
+    <option>Muzon Segundo</option>
+    <option>Pinagkurusan</option>
+    <option>Ping-As</option>
+    <option>Poblacion East</option>
+    <option>Poblacion West</option>
+    <option>San Jose</option>
+    <option>San Juan</option>
+    <option>Santa Cruz</option>
+    <option>Tadlac</option>
+  </select>
+
+  <button id="refreshBtn" class="btn-main">Refresh</button>
+
+  <div class="export-wrapper">
+    <button id="exportBtn" class="btn-secondary">Export ▼</button>
+    <div id="exportDropdown" class="export-dropdown hidden">
+      <div onclick="exportAll()">Export All</div>
+      <div onclick="exportSelected()">Export Selected</div>
     </div>
-
-    <button id="refreshBtn" class="btn-main">⟳ Refresh</button>
-
-    <div class="export-wrapper">
-      <button id="exportBtn" class="btn-secondary">📤 Export ▼</button>
-      <div id="exportDropdown" class="export-dropdown hidden">
-        <div onclick="exportAll()">Export All</div>
-        <div onclick="exportSelected()">Export Selected</div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -469,5 +522,6 @@ window.addEventListener("DOMContentLoaded", ()=>{
 </script>
 </body>
 </html>
+
 
 
