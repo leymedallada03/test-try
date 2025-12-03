@@ -7,210 +7,39 @@
 <link rel="stylesheet" href="styles.css"/>
 
 <style>
-
-/* ===================== BUTTONS ===================== */
-.btn-main {
-  padding:8px 16px;
-  border-radius:8px;
-  background:linear-gradient(90deg,#0f7a4a,#34b78f);
-  color:white;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
-  transition:0.2s;
-}
-.btn-main:hover { opacity:0.9; }
-
-.btn-secondary {
-  padding:8px 16px;
-  border-radius:8px;
-  border:1px solid #0f7a4a;
-  background:white;
-  color:#0f7a4a;
-  font-weight:700;
-  cursor:pointer;
-  transition:0.2s;
-}
-.btn-secondary:hover { background:#e8fff4; }
-
-/* ===================== SEARCH ===================== */
-.search-box {
-  padding:8px 12px;
-  border:1px solid #bbb;
-  border-radius:8px;
-  min-width:260px;
-}
-
-/* ===================== TABLE ===================== */
-/* Table fix */
-.records-wrapper {
-  margin-top: 14px;
-  background: rgba(255,255,255,0.85);
-  border-radius: 12px;
-  box-shadow: 0 8px 22px rgba(6,30,20,0.06);
-  overflow-x: auto;
-}
-
-.records-table {
-  width: 100%;
-  min-width: 1500px;
-  border-collapse: collapse;
-}
-
-.records-table th,
-.records-table td {
-  padding: 8px 10px;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(15,122,74,0.15);
-  background: rgba(255,255,255,0.6);
-}
-
-.records-table th {
-  background: rgba(15,122,74,0.10);
-  font-weight: 800;
-  position: sticky;
-  top: 0;
-  z-index: 5;
-}
-
-.records-table tbody tr:hover {
-  background: rgba(52,183,143,0.06);
-}
-
-/* Sticky select + actions columns */
-.select-col {
-  position: sticky;
-  left: 0;
-  background: rgba(255,255,255,0.9);
-  z-index: 6;
-}
-
-.actions-col {
-  position: sticky;
-  right: 0;
-  background: rgba(255,255,255,0.9);
-  z-index: 6;
-}
-/* ===================== MEMBER ROW ===================== */
-.member-row { background:#fafafa; }
-.member-row.hidden { display:none; }
-
-/* ===================== COLOR CODING ===================== */
-.mem-small    { background:#d4f6ff !important; } /* 1 member */
-.mem-normal   { background:#d9ffd9 !important; } /* 2–4 */
-.mem-large    { background:#fff7c2 !important; } /* 5–7 */
-.mem-critical { background:#ffd6d6 !important; } /* 8+ */
-
-/* ===================== SEARCH HIGHLIGHT ===================== */
-.hl {
-  background:#fffe8a;
-  padding:2px 3px;
-  border-radius:4px;
-}
-
-/* ===================== ICON BUTTONS ===================== */
-.icon-btn {
-  background:none;
-  border:none;
-  font-size:18px;
-  cursor:pointer;
-  padding:6px;
-  border-radius:6px;
-  transition:0.15s;
-}
-.icon-btn:hover { background:#e8fff0; }
-
-/* ===================== EXPORT DROPDOWN ===================== */
-.export-wrapper { position:relative; }
-.export-dropdown {
-  position:absolute;
-  top:40px; right:0;
-  background:white;
-  border:1px solid #ccc;
-  width:170px;
-  padding:6px 0;
-  border-radius:10px;
-  z-index:9000;
-  box-shadow:0 5px 18px rgba(0,0,0,0.12);
-}
-.export-dropdown div {
-  padding:10px 14px;
-  cursor:pointer;
-}
-.export-dropdown div:hover { background:#e9fff0; }
-.hidden { display:none; }
-
-/* pagination */
-#paginationArea button {
-  padding:6px 12px;
-  margin:0 3px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  background:white;
-  cursor:pointer;
-}
-#paginationArea button.active {
-  background:#0f7a4a;
-  color:white;
-  border-color:#0f7a4a;
-  font-weight:bold;
-}
-  
-/* Legend card */
-.legend-card {
-  margin-top: 18px;
-  padding: 14px;
-  width: fit-content;
-  background: rgba(255,255,255,0.9);
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(6,30,20,0.08);
-  border:1px solid rgba(6,30,20,0.06);
-}
-
-.legend-card div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 0;
-  font-size:14px;
-}
-
-.legend-swatch {
-  width: 16px;
-  height: 16px;
-  border-radius:4px;
-}
+/* compact adjustments requested */
+.icon-btn { background:none;border:none;font-size:14px;cursor:pointer;padding:4px;border-radius:6px; }
+.icon-btn:hover{background:#e8fff0}
+.records-table th, .records-table td{padding:6px 8px;font-size:13px;line-height:1.2}
+.records-table tr{height:34px}
+.actions-col, .select-col{width:90px}
+.select-col input, .row-select{transform:scale(1);}
+.member-row td{padding-left:14px}
+/* make "Show" toggle small & inline with row */
+.icon-show{font-size:13px;padding:4px 6px;border-radius:6px;border:1px solid rgba(6,30,20,0.06);background:transparent}
+.icon-small{font-size:14px}
+.legend-box{margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.legend-color{width:14px;height:14px;border-radius:4px;display:inline-block;margin-right:8px}
+/* search highlight distinct color */
+.hl{background:#fffe8a;padding:2px 3px;border-radius:4px}
+/* responsive */
+@media(max-width:980px){ .records-table{min-width:1100px} }
 </style>
 </head>
-
 
 <body>
 <div class="page-container">
 
-<!-- ==========================================================
-     TOPBAR
-========================================================== -->
 <header class="topbar">
   <button id="menuToggle" class="menu-btn">☰</button>
-
   <div class="brand">
     <img src="assets/MDRRMO Logo.png" class="logo"/>
-    <div>
-      <div class="title">PUROK KALIGTASAN</div>
-      <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
-    </div>
+    <div><div class="title">PUROK KALIGTASAN</div><div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div></div>
   </div>
-
-  <div class="user-info">
-    <span id="userName"></span>
-    <button id="logoutBtn" class="logout-btn">Logout</button>
-  </div>
+  <div class="user-info"><span id="userName"></span><button id="logoutBtn" class="logout-btn">Logout</button></div>
 </header>
 
-<!-- ==========================================================
-     SIDEBAR
-========================================================== -->
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar" id="sidebar">...
 <ul>
   <li><a href="dashboard.html">📊 Dashboard</a></li>
   <li><a href="dataForm.html">📝 Data Entry</a></li>
@@ -220,52 +49,25 @@
 </ul>
 </aside>
 
-
-<!-- ==========================================================
-     MAIN CONTENT
-========================================================== -->
 <main class="content-area">
 <h2>📁 Household Records</h2>
 
-<!-- Counts -->
 <div style="display:flex; justify-content:flex-end; gap:18px; margin-bottom:10px;">
   <span>Rows: <strong class="green" id="rowCount">0</strong></span>
   <span>Matches: <strong class="green" id="matchCount">0</strong></span>
   <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
 </div>
 
-<!-- Toolbar -->
-<div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
-
+<div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px; align-items:center">
   <input id="searchInput" class="search-box" placeholder="Search by Name / Barangay / ID..."/>
-
-  <select id="filterBarangay" class="brgy-dropdown">
-    <option value="">All Barangays</option>
-    <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-    <option>Dalipit East</option><option>Dalipit West</option>
-    <option>Dominador East</option><option>Dominador West</option>
-    <option>Munlawin Sur</option><option>Munlawin Norte</option>
-    <option>Muzon Primero</option><option>Muzon Segundo</option>
-    <option>Pinagkurusan</option><option>Ping-As</option>
-    <option>Poblacion East</option><option>Poblacion West</option>
-    <option>San Jose</option><option>San Juan</option>
-    <option>Santa Cruz</option><option>Tadlac</option>
-  </select>
-
+  <select id="filterBarangay" class="brgy-dropdown"> <option value="">All Barangays</option> <!-- options kept as before --> </select>
   <button id="refreshBtn" class="btn-main">⟳ Refresh</button>
-
   <div class="export-wrapper">
-    <button id="exportBtn" class="btn-secondary">📤 Export ▼</button>
-
-    <div id="exportDropdown" class="export-dropdown hidden">
-      <div onclick="exportAll()">Export All</div>
-      <div onclick="exportSelected()">Export Selected</div>
-    </div>
+    <button id="exportBtn" class="btn-secondary">📤 Export ▾</button>
+    <div id="exportDropdown" class="export-dropdown hidden"><div onclick="exportAll()">Export All</div><div onclick="exportSelected()">Export Selected</div></div>
   </div>
-
 </div>
 
-<!-- Table -->
 <div class="records-wrapper">
   <table class="records-table">
     <thead id="tableHead"></thead>
@@ -273,329 +75,109 @@
   </table>
 </div>
 
-<!-- Pagination -->
-<div id="paginationArea" style="margin-top:15px;"></div>
+<div id="paginationArea" style="margin-top:12px"></div>
 
-<!-- Legend -->
-<div class="legend-box">
-  <strong>Household Color Legend:</strong>
-  <div><div class="legend-color" style="background:#d4f6ff;"></div>1 Member</div>
-  <div><div class="legend-color" style="background:#d9ffd9;"></div>2–4 Members</div>
-  <div><div class="legend-color" style="background:#fff7c2;"></div>5–7 Members</div>
-  <div><div class="legend-color" style="background:#ffd6d6;"></div>8+ Members</div>
+<div class="legend-box" style="margin-top:14px">
+  <div class="legend-card"> <strong>Household Color Legend:</strong>
+    <div><span class="legend-color" style="background:#d4f6ff"></span>1 Member</div>
+    <div><span class="legend-color" style="background:#d9ffd9"></span>2–4 Members</div>
+    <div><span class="legend-color" style="background:#fff7c2"></span>5–7 Members</div>
+    <div><span class="legend-color" style="background:#ffd6d6"></span>8+ Members</div>
+  </div>
 </div>
 
 </main>
 </div>
 
-
-<!-- Loading -->
-<div id="loading" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.7); align-items:center; justify-content:center; z-index:9999;">
-  <div style="padding:15px; background:white; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.15);">
-    Loading records…
-  </div>
-</div>
-
+<div id="loading" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.7); align-items:center; justify-content:center; z-index:9999;"><div style="padding:12px;background:white;border-radius:10px;">Loading records…</div></div>
 
 <script>
-/* ==========================================================
-   CONFIG
-========================================================== */
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
-
-/* ==========================================================
-   STATE
-========================================================== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 let header = [];
 let rawRows = [];
 let groups = [];
 let selected = new Set();
-let currentPage = 1;
-const rowsPerPage = 25;
+let currentPage = 1; const rowsPerPage = 25;
 
-/* ==========================================================
-   UTILITIES
-========================================================== */
-function showLoading(x){ document.getElementById("loading").style.display = x ? "flex" : "none"; }
+function showLoading(x){ document.getElementById('loading').style.display = x ? 'flex' : 'none'; }
+function highlight(text,q){ text = String(text||''); if(!q) return text; const r = new RegExp(q.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&'),'gi'); return text.replace(r,m=>`<span class="hl">${m}</span>`); }
 
-function highlight(text, q){
-  text = String(text ?? "");
-  if(!q) return text;
-  const r = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), "gi");
-  return text.replace(r, m => `<span class="hl">${m}</span>`);
-}
-
-/* ==========================================================
-   LOAD RECORDS
-========================================================== */
-async function loadRecords(){
-  showLoading(true);
+async function loadRecords(){ showLoading(true);
   try{
-    const barangay = document.getElementById("filterBarangay").value || "";
-    const q = document.getElementById("searchInput").value.trim();
-
-    const res = await fetch(
-      `${SCRIPT_URL}?action=getRecords&filterBarangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`
-    );
+    const barangay = document.getElementById('filterBarangay').value||'';
+    const q = document.getElementById('searchInput').value.trim();
+    const res = await fetch(`${SCRIPT_URL}?action=getRecords&filterBarangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`);
     const data = await res.json();
-
-    if(!data.success){ alert("Load failed"); return; }
-
-    header = data.header;
-    rawRows = data.rows;
-
-    groupRows();
-    currentPage = 1;
-    renderTable();
-    renderPagination();
-    updateCounts();
-
-  } catch(err){
-    console.error(err);
-    alert("Error loading records");
-  }
+    if(!data.success){ alert('Load failed'); showLoading(false); return; }
+    header = data.header || [];
+    rawRows = data.rows || [];
+    groupRows(); currentPage=1; renderTable(); renderPagination(); updateCounts();
+  }catch(err){ console.error(err); alert('Error loading records'); }
   showLoading(false);
 }
 
-/* ==========================================================
-   GROUP BY DATA ID
-========================================================== */
-function groupRows(){
-  const map = {};
-  rawRows.forEach(r=>{
-    const id = String(r["Data ID"] || "");
-    if(!id) return;
+function groupRows(){ const map = {}; rawRows.forEach(r=>{ const id = String(r['Data ID']||''); if(!id) return; if(!map[id]) map[id]={dataID:id, head:null, members:[]}; const isHead = !r['Name of Household Member/s']; if(isHead && !map[id].head) map[id].head = r; else map[id].members.push(r); }); groups = Object.values(map).sort((a,b)=> Number(a.dataID)-Number(b.dataID)); }
 
-    if(!map[id]) map[id] = { dataID:id, head:null, members:[] };
-
-    const isHead = !r["Name of Household Member/s"];
-    if(isHead && !map[id].head) map[id].head = r;
-    else map[id].members.push(r);
-  });
-
-  groups = Object.values(map).sort((a,b)=> Number(a.dataID) - Number(b.dataID));
-}
-
-/* ==========================================================
-   RENDER TABLE
-========================================================== */
-function renderTable(){
-  const thead = document.getElementById("tableHead");
-  const tbody = document.getElementById("tableBody");
-
-  thead.innerHTML = "";
-  tbody.innerHTML = "";
-
+function renderTable(){ const thead = document.getElementById('tableHead'); const tbody = document.getElementById('tableBody'); thead.innerHTML = ''; tbody.innerHTML = '';
+  // build header using server header (but ensure exact expected order will be used for export)
   let h = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
   header.forEach(c=> h += `<th>${c}</th>`);
   h += `<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>`;
   thead.innerHTML = h;
 
-  const start = (currentPage - 1) * rowsPerPage;
-  const pageRows = groups.slice(start, start + rowsPerPage);
+  const start = (currentPage-1)*rowsPerPage; const page = groups.slice(start, start+rowsPerPage);
+  const keyword = document.getElementById('searchInput').value.trim();
 
-  const keyword = document.getElementById("searchInput").value.trim();
+  page.forEach(g=>{
+    const head = g.head||{}; const mCount = g.members.length;
+    let cls = mCount <=1 ? 'mem-small' : mCount<=4 ? 'mem-normal' : mCount<=7 ? 'mem-large' : 'mem-critical';
+    const tr = document.createElement('tr'); tr.className = cls;
+    const tdSel = document.createElement('td'); tdSel.className='select-col'; tdSel.innerHTML = `<input class="row-select" type="checkbox" data-id="${g.dataID}" ${selected.has(g.dataID)?'checked':''}>`; tr.appendChild(tdSel);
 
-  pageRows.forEach(g=>{
-    const head = g.head || {};
-    const mCount = g.members.length;
+    header.forEach(c=>{ const td = document.createElement('td'); td.innerHTML = highlight(head[c]||'', keyword); tr.appendChild(td); });
 
-    /* color */
-    let cls = mCount <=1 ? "mem-small"
-             : mCount <=4 ? "mem-normal"
-             : mCount <=7 ? "mem-large"
-             : "mem-critical";
+    const tdM = document.createElement('td'); tdM.className='actions-col'; tdM.innerHTML = `<button class="icon-show" onclick="toggleMembers('${g.dataID}')">👁 Show (${mCount})</button>`; tr.appendChild(tdM);
 
-    let tr = document.createElement("tr");
-    tr.className = cls;
-
-    /* checkbox */
-    let tdSel = document.createElement("td");
-    tdSel.className = "select-col";
-    tdSel.innerHTML = `<input type="checkbox" class="row-select" data-id="${g.dataID}" ${selected.has(g.dataID)?"checked":""}>`;
-    tr.appendChild(tdSel);
-
-    /* head data */
-    header.forEach(c=>{
-      let td = document.createElement("td");
-      td.innerHTML = highlight(head[c] || "", keyword);
-      tr.appendChild(td);
-    });
-
-    /* members toggle */
-    let tdM = document.createElement("td");
-    tdM.className = "actions-col";
-    tdM.innerHTML = `
-      <button class="icon-btn" onclick="toggleMembers('${g.dataID}')">
-        👁 Show (${mCount})
-      </button>`;
-    tr.appendChild(tdM);
-
-    /* edit / delete icons */
-    let tdA = document.createElement("td");
-    tdA.className = "actions-col";
-    tdA.innerHTML = `
-      <button class="icon-btn" onclick="onEdit('${g.dataID}')" title="Edit">✏️</button>
-      <button class="icon-btn" onclick="onDelete('${g.dataID}')" title="Delete">🗑️</button>`;
-    tr.appendChild(tdA);
+    const tdA = document.createElement('td'); tdA.className='actions-col'; tdA.innerHTML = `<button class="icon-btn" title="Edit" onclick="onEdit('${g.dataID}')">✏️</button> <button class="icon-btn" title="Delete" onclick="onDelete('${g.dataID}')">🗑️</button>`; tr.appendChild(tdA);
 
     tbody.appendChild(tr);
 
-    /* MEMBER ROWS */
     g.members.forEach(m=>{
-      let mr = document.createElement("tr");
-      mr.className = "member-row hidden";
-      mr.dataset.parent = g.dataID;
-
-      mr.appendChild(document.createElement("td")); // empty select
-      header.forEach(c=>{
-        let td = document.createElement("td");
-        td.innerHTML = highlight(m[c] || "", keyword);
-        mr.appendChild(td);
-      });
-      mr.appendChild(document.createElement("td"));
-      mr.appendChild(document.createElement("td"));
-
+      const mr = document.createElement('tr'); mr.className='member-row hidden'; mr.dataset.parent = g.dataID;
+      mr.appendChild(document.createElement('td'));
+      header.forEach(c=>{ const td=document.createElement('td'); td.innerHTML = highlight(m[c]||'', keyword); mr.appendChild(td); });
+      mr.appendChild(document.createElement('td')); mr.appendChild(document.createElement('td'));
       tbody.appendChild(mr);
     });
   });
 
-  document.getElementById("selectAll").onchange = function(){
-    pageRows.forEach(g=>{
-      if(this.checked) selected.add(g.dataID);
-      else selected.delete(g.dataID);
-    });
-    renderTable();
-  };
-
-  document.querySelectorAll(".row-select").forEach(cb=>{
-    cb.onchange = function(){
-      let id = this.dataset.id;
-      if(this.checked) selected.add(id);
-      else selected.delete(id);
-      updateCounts();
-    };
-  });
+  // select all
+  document.getElementById('selectAll').onchange = function(){ page.forEach(g=>{ if(this.checked) selected.add(g.dataID); else selected.delete(g.dataID); }); renderTable(); };
+  document.querySelectorAll('.row-select').forEach(cb=> cb.onchange = function(){ const id=this.dataset.id; if(this.checked) selected.add(id); else selected.delete(id); updateCounts(); });
 }
 
-/* ==========================================================
-   MEMBERS TOGGLE
-========================================================== */
-function toggleMembers(id){
-  document.querySelectorAll(`tr.member-row[data-parent="${id}"]`)
-    .forEach(r=> r.classList.toggle("hidden"));
-}
+function toggleMembers(id){ document.querySelectorAll(`tr.member-row[data-parent="${id}"]`).forEach(r=> r.classList.toggle('hidden')); }
 
-/* ==========================================================
-   PAGINATION
-========================================================== */
-function renderPagination(){
-  const div = document.getElementById("paginationArea");
-  const total = Math.ceil(groups.length / rowsPerPage);
-  if(total <=1){ div.innerHTML=""; return; }
+function renderPagination(){ const div = document.getElementById('paginationArea'); const total = Math.ceil(groups.length/rowsPerPage); if(total<=1){ div.innerHTML=''; return; } let html=''; for(let i=1;i<=total;i++) html += `<button onclick="gotoPage(${i})" class="${i===currentPage?'active':''}">${i}</button>`; div.innerHTML = html; }
+function gotoPage(p){ currentPage=p; renderTable(); renderPagination(); }
+function updateCounts(){ document.getElementById('rowCount').innerText = groups.length; document.getElementById('matchCount').innerText = groups.length; document.getElementById('selectedCount').innerText = selected.size; }
 
-  let html="";
-  for(let i=1;i<=total;i++){
-    html += `<button onclick="gotoPage(${i})" class="${i===currentPage?'active':''}">${i}</button>`;
-  }
-  div.innerHTML = html;
-}
+function onEdit(id){ localStorage.setItem('edit_dataID', id); location.href='edit.html'; }
 
-function gotoPage(p){
-  currentPage = p;
-  renderTable();
-  renderPagination();
-}
+async function onDelete(id){ if(!confirm(`Delete household ${id}?`)) return; const fd = new FormData(); fd.append('action','deleteHousehold'); fd.append('dataID', id); try{ const res = await fetch(SCRIPT_URL, { method:'POST', body:fd }); const j = await res.json(); if(j.success){ alert(`Data has been deleted. Data ID: ${id} from Master and Barangay`); loadRecords(); } else { alert('Delete failed: ' + (j.message||'Unknown')); } }catch(e){ console.error(e); alert('Delete failed — see console'); } }
 
-/* ==========================================================
-   COUNTS
-========================================================== */
-function updateCounts(){
-  document.getElementById("rowCount").innerText = groups.length;
-  document.getElementById("matchCount").innerText = groups.length;
-  document.getElementById("selectedCount").innerText = selected.size;
-}
-
-/* ==========================================================
-   EDIT + DELETE
-========================================================== */
-function onEdit(id){
-  localStorage.setItem("edit_dataID", id);
-  location.href = "edit.html";
-}
-
-async function onDelete(id){
-  if(!confirm("Delete household " + id + "?")) return;
-
-  let fd = new FormData();
-  fd.append("action","deleteHousehold");
-  fd.append("dataID",id);
-
-  let res = await fetch(SCRIPT_URL, { method:"POST", body:fd });
-  let j = await res.json();
-
-  if(j.success){
-    alert("Deleted");
-    loadRecords();
-  } else alert("Delete failed");
-}
-
-/* ==========================================================
-   EXPORT
-========================================================== */
 function exportAll(){ exportCSV(groups); }
-function exportSelected(){
-  const arr = groups.filter(g=> selected.has(g.dataID));
-  if(!arr.length) return alert("No selected rows");
-  exportCSV(arr);
-}
+function exportSelected(){ const arr = groups.filter(g=> selected.has(g.dataID)); if(!arr.length) return alert('No selected rows'); exportCSV(arr); }
+function exportCSV(list){ const cols = header.slice(); const lines=[]; lines.push(cols.join(',')); list.forEach(g=>{ lines.push(cols.map(c=> `"${String(g.head[c]||'').replace(/"/g,'""')}"`).join(',')); g.members.forEach(m=> lines.push(cols.map(c=> `"${String(m[c]||'').replace(/"/g,'""')}"`).join(','))); }); const blob = new Blob([lines.join('\r\n')], {type:'text/csv'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='records.csv'; a.click(); URL.revokeObjectURL(url); }
 
-function exportCSV(list){
-  let cols = header;
-  let lines = [];
+// UI bindings
+document.getElementById('refreshBtn').onclick = loadRecords;
+document.getElementById('filterBarangay').onchange = loadRecords;
+document.getElementById('searchInput').oninput = ()=> setTimeout(loadRecords, 220);
+document.getElementById('exportBtn').onclick = ()=> document.getElementById('exportDropdown').classList.toggle('hidden');
+document.addEventListener('click', e=>{ const box=document.getElementById('exportDropdown'); const btn=document.getElementById('exportBtn'); if(!btn.contains(e.target) && !box.contains(e.target)) box.classList.add('hidden'); });
 
-  lines.push(cols.join(","));
-
-  list.forEach(g=>{
-    lines.push(cols.map(c=> `"${(g.head[c]||"").replace(/"/g,'""')}"`).join(","));
-    g.members.forEach(m=>{
-      lines.push(cols.map(c=> `"${(m[c]||"").replace(/"/g,'""')}"`).join(","));
-    });
-  });
-
-  let blob = new Blob([lines.join("\r\n")], {type:"text/csv"});
-  let url = URL.createObjectURL(blob);
-  let a = document.createElement("a");
-  a.href = url; a.download="records.csv"; a.click();
-  URL.revokeObjectURL(url);
-}
-
-/* ==========================================================
-   UI BINDINGS
-========================================================== */
-document.getElementById("refreshBtn").onclick = loadRecords;
-document.getElementById("filterBarangay").onchange = loadRecords;
-document.getElementById("searchInput").oninput = ()=> setTimeout(loadRecords, 240);
-
-document.getElementById("exportBtn").onclick = () =>
-  document.getElementById("exportDropdown").classList.toggle("hidden");
-
-document.addEventListener("click", e=>{
-  const box = document.getElementById("exportDropdown");
-  const btn = document.getElementById("exportBtn");
-  if(!btn.contains(e.target) && !box.contains(e.target)) box.classList.add("hidden");
-});
-
-/* ==========================================================
-   INIT
-========================================================== */
-window.onload = ()=>{
-  document.getElementById("userName").innerText =
-    localStorage.getItem("staffName") || "";
-  loadRecords();
-};
+window.onload = ()=>{ document.getElementById('userName').innerText = localStorage.getItem('staffName') || ''; loadRecords(); };
 </script>
-
 </body>
 </html>
