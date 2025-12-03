@@ -15,6 +15,8 @@
     --accent2:#34b78f;
     --shadow: 0 6px 18px rgba(6,30,20,0.06);
     --radius:12px;
+   --accent3: #ff7a00;  /* dark orange */
+  --accent4: #ffa500;  /* light orange */
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
 .page-container{max-width:1200px;margin:20px auto;padding:12px;display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
@@ -29,7 +31,7 @@
 .btn-main{padding:6px 10px;border-radius:8px;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;border:0;font-weight:700;cursor:pointer}
 .btn-secondary{padding:6px 10px;border-radius:8px;border:1px solid #0f7a4a;background:#fff;color:#0f7a4a;font-weight:700;cursor:pointer}
 .btn { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff; }
-
+.btn-export { border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background: linear-gradient(90deg,var(--accent3),var(--accent4)); color:#fff; }
 /* records wrapper/table */
 .records-wrapper{margin-top:14px;background:rgba(255,255,255,0.95);border-radius:12px;box-shadow:0 8px 22px rgba(6,30,20,0.06);overflow:auto}
 .records-table{width:100%;min-width:1400px;border-collapse:collapse}
@@ -140,7 +142,7 @@
       <button id="refreshBtn" class="btn">⟳ Refresh</button>
 
       <div class="export-wrapper">
-        <button id="exportBtn" class="btn-secondary">📤 Export ▼</button>
+        <button id="exportBtn" class="btn-export">📤 Export ▼</button>
         <div id="exportDropdown" class="export-dropdown hidden" role="menu" aria-hidden="true">
           <div onclick="exportAll()">Export All</div>
           <div onclick="exportSelected()">Export Selected</div>
@@ -434,5 +436,6 @@ window.addEventListener("DOMContentLoaded", ()=>{
 </script>
 </body>
 </html>
+
 
 
