@@ -200,15 +200,20 @@
     transition: all 0.3s ease;
    }
 
-   /* When sidebar is collapsed, make icons bigger and green */
+   /* When sidebar is collapsed, make Data Entry icon bigger and stand-alone */
    .page-container.collapsed .sidebar li a .menu-icon {
-    font-size: 1.4rem;
-    color: var(--accent1);
-    transform: scale(1.1);
+    font-size: 1.6rem; /* Bigger size */
+    transform: scale(1.2);
    }
-
+   
+   /* For active tab in collapsed state - icon remains white */
    .page-container.collapsed .sidebar li a.active .menu-icon {
     color: white;
+   }
+   
+   /* For inactive tabs in collapsed state - return to original color (no green) */
+   .page-container.collapsed .sidebar li a:not(.active) .menu-icon {
+    color: var(--muted); /* Original muted color, not green */
    }
 
    .sidebar li a .menu-text {
@@ -387,8 +392,9 @@
    }
 
    .section-title h3 {
-     margin: 0;
-     color: var(--accent1);
+    margin: 0;
+    color: var(--accent1);
+    flex: 1; /* Allow title to take available space */
    }
 
    .chip{
@@ -400,30 +406,51 @@
      font-weight:700;
      min-width: 32px;
      text-align: center;
+     flex-shrink: 0; /* Prevent chip from shrinking */
    }
 
    /* Instruction label - Fixed alignment */
    .instruction-label {
      color: var(--muted);
      display: block;
-     margin: 0 0 12px 44px; /* Align with chip + text */
+     margin: 0 0 16px 44px; /* Align with chip + text */
      font-size: 0.85rem;
      line-height: 1.4;
    }
 
-   /* Government Support Grid - FIXED */
+   /* Government Support Grid - FIXED ALIGNMENT */
    .gov-support-grid {
      display: grid;
      grid-template-columns: repeat(3, 1fr);
-     gap: 12px 20px;
+     gap: 12px 24px; /* Increased horizontal gap for better spacing */
      margin-top: 12px;
+     align-items: center; /* Align items vertically */
    }
 
    .gov-support-grid .checkbox-item {
      display: flex;
      align-items: center;
-     gap: 8px;
-     padding: 8px 0;
+     gap: 10px;
+     padding: 10px 0;
+     min-height: 40px; /* Consistent height for all items */
+   }
+
+   /* Ensure all checkboxes and labels are perfectly aligned */
+   .gov-support-grid .checkbox-item input[type="checkbox"] {
+     margin: 0;
+     flex-shrink: 0;
+     width: 18px;
+     height: 18px;
+   }
+
+   .gov-support-grid .checkbox-item label {
+     margin: 0;
+     font-weight: 600;
+     color: var(--accent1);
+     cursor: pointer;
+     flex: 1;
+     display: flex;
+     align-items: center;
    }
 
    /* Domestic Animals Grid - REDESIGNED */
@@ -578,7 +605,7 @@
      white-space: nowrap;
    }
 
-   /* Member Panel (Slide-in) - FIXED */
+   /* Member Panel (Slide-in) - FIXED with Better Button Spacing */
    .member-panel { 
      position: fixed; 
      right: 0; 
@@ -594,6 +621,8 @@
      padding: 24px; 
      overflow-y: auto; 
      border-radius: 8px 0 0 8px;
+     display: flex;
+     flex-direction: column;
    }
 
    .member-panel.open { 
@@ -622,6 +651,7 @@
      margin-bottom: 20px;
      padding-bottom: 12px;
      border-bottom: 2px solid var(--light-green);
+     flex-shrink: 0; /* Prevent header from shrinking */
    }
 
    .panel-header h3 {
@@ -637,6 +667,15 @@
      color: white;
      font-size: 0.85rem;
      font-weight: 700;
+     flex-shrink: 0;
+   }
+
+   /* Panel Body with Scroll */
+   .panel-body {
+     flex: 1;
+     overflow-y: auto;
+     padding-right: 8px; /* Space for scrollbar */
+     margin-bottom: 20px; /* Space for buttons */
    }
 
    /* Member Form Grid in Panel - FIXED */
@@ -646,39 +685,58 @@
      gap: 12px;
    }
 
-   /* Panel Checkbox Grid - FIXED */
+   /* Panel Checkbox Grid - FIXED ALIGNMENT (same as main form) */
    .panel-checkbox-grid {
      display: grid;
      grid-template-columns: repeat(2, 1fr);
-     gap: 8px 16px;
+     gap: 12px 24px; /* Same spacing as main form */
      margin: 12px 0;
      padding: 12px;
      background: var(--light-green);
      border-radius: var(--radius-sm);
+     align-items: center; /* Align items vertically */
    }
 
    .panel-checkbox-grid label {
      display: flex;
      align-items: center;
-     gap: 8px;
+     gap: 10px;
      font-weight: 600;
      color: var(--accent1);
      cursor: pointer;
+     min-height: 40px; /* Consistent height */
    }
 
    .panel-checkbox-grid input[type="checkbox"] {
      accent-color: var(--accent1);
      transform: scale(1.1);
+     width: 18px;
+     height: 18px;
+     flex-shrink: 0;
+     margin: 0;
    }
 
-   /* Panel Actions */
+   /* Panel Actions - FIXED SPACING (Always visible at bottom) */
    .panel-actions {
      display: flex;
-     gap: 12px;
+     gap: 16px; /* Increased gap for better spacing */
      justify-content: flex-end;
-     margin-top: 24px;
-     padding-top: 16px;
+     margin-top: auto; /* Push to bottom */
+     padding-top: 20px;
+     padding-bottom: 10px;
      border-top: 2px solid var(--light-green);
+     background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98));
+     position: sticky;
+     bottom: 0;
+     z-index: 10;
+     flex-shrink: 0; /* Prevent buttons from shrinking */
+   }
+
+   /* Make buttons larger in panel */
+   .panel-actions .btn {
+     padding: 12px 20px;
+     font-size: 1rem;
+     min-width: 120px; /* Minimum width for better visibility */
    }
 
    /* Loading overlay */
@@ -704,6 +762,22 @@
 
    @keyframes spin {
      to { transform: rotate(360deg); }
+   }
+
+   /* Error message styling */
+   .error-message {
+     color: #dc2626;
+     font-size: 0.85rem;
+     margin-top: 4px;
+     display: none;
+   }
+
+   .input-error {
+     border-color: #dc2626 !important;
+   }
+
+   .input-error:focus {
+     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
    }
 
    /* Responsive */
@@ -776,6 +850,7 @@
      
      .gov-support-grid {
          grid-template-columns: repeat(2, 1fr) !important;
+         gap: 12px 16px !important;
      }
      
      .domestic-grid {
@@ -788,6 +863,7 @@
      
      .panel-checkbox-grid {
          grid-template-columns: 1fr !important;
+         gap: 12px !important;
      }
      
      .user-info {
@@ -823,6 +899,17 @@
      .section-title {
          flex-wrap: wrap;
      }
+     
+     /* Mobile: Make panel buttons full width */
+     .panel-actions {
+         flex-direction: column;
+         gap: 12px;
+     }
+     
+     .panel-actions .btn {
+         width: 100%;
+         justify-content: center;
+     }
    }
 
    /* Mobile menu toggle button */
@@ -838,22 +925,6 @@
      background-position: calc(100% - 12px) center;
      background-repeat: no-repeat;
      background-size: 12px;
-   }
-
-   /* Error message styling */
-   .error-message {
-     color: #dc2626;
-     font-size: 0.85rem;
-     margin-top: 4px;
-     display: none;
-   }
-
-   .input-error {
-     border-color: #dc2626 !important;
-   }
-
-   .input-error:focus {
-     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
    }
 </style>
 </head>
@@ -1141,20 +1212,44 @@
         </div>
       </div>
 
-      <!-- GOVERNMENT SUPPORT -->
+      <!-- GOVERNMENT SUPPORT - FIXED ALIGNMENT -->
       <div class="card">
         <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="gov-support-grid">
-          <label class="checkbox-item"><input type="checkbox" id="ass_tupad"> TUPAD</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_local4ps"> Local 4Ps</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_intl4ps"> National 4Ps</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_locsp"> Local Social Pension</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_intlsp"> National Social Pension</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_solo"> Solo Parent Assistance</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_relief"> Relief Goods</label>
-          <label class="checkbox-item"><input type="checkbox" id="ass_cash"> Cash Subsidy</label>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_tupad">
+            <label for="ass_tupad">TUPAD</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_local4ps">
+            <label for="ass_local4ps">Local 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_intl4ps">
+            <label for="ass_intl4ps">National 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_locsp">
+            <label for="ass_locsp">Local Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_intlsp">
+            <label for="ass_intlsp">National Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_solo">
+            <label for="ass_solo">Solo Parent Assistance</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_relief">
+            <label for="ass_relief">Relief Goods</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="ass_cash">
+            <label for="ass_cash">Cash Subsidy</label>
+          </div>
         </div>
 
         <div style="grid-column:1/-1;margin-top:16px">
@@ -1311,7 +1406,7 @@
           </select>
         </div>
 
-        <!-- Government Support with Chip - ADDED -->
+        <!-- Government Support with Chip - FIXED ALIGNMENT -->
         <div style="grid-column:1/-1; margin-top:16px">
           <div class="section-title">
             <div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">GOV</div>
@@ -1320,14 +1415,38 @@
           <div class="instruction-label">Please check (✓) all items that apply.</div>
           
           <div class="panel-checkbox-grid">
-            <label><input type="checkbox" id="member_tupad" class="member_tupad"> TUPAD</label>
-            <label><input type="checkbox" id="member_local4ps" class="member_local4ps"> Local 4Ps</label>
-            <label><input type="checkbox" id="member_intl4ps" class="member_intl4ps"> National 4Ps</label>
-            <label><input type="checkbox" id="member_locsp" class="member_locsp"> Local Social Pension</label>
-            <label><input type="checkbox" id="member_intlsp" class="member_intlsp"> National Social Pension</label>
-            <label><input type="checkbox" id="member_solo" class="member_solo"> Solo Parent Assistance</label>
-            <label><input type="checkbox" id="member_cash" class="member_cash"> Cash Subsidy</label>
-            <label><input type="checkbox" id="member_relief" class="member_relief"> Relief Goods</label>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_tupad" class="member_tupad">
+              <label for="member_tupad">TUPAD</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_local4ps" class="member_local4ps">
+              <label for="member_local4ps">Local 4Ps</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
+              <label for="member_intl4ps">National 4Ps</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_locsp" class="member_locsp">
+              <label for="member_locsp">Local Social Pension</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_intlsp" class="member_intlsp">
+              <label for="member_intlsp">National Social Pension</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_solo" class="member_solo">
+              <label for="member_solo">Solo Parent Assistance</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_cash" class="member_cash">
+              <label for="member_cash">Cash Subsidy</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="member_relief" class="member_relief">
+              <label for="member_relief">Relief Goods</label>
+            </div>
           </div>
 
           <div style="margin-top:16px">
@@ -1342,6 +1461,7 @@
         </div>
       </div>
 
+      <!-- Panel Actions - Always visible at bottom -->
       <div class="panel-actions">
         <button id="memberBack" class="btn btn-back" type="button">
           <i class="fas fa-arrow-left"></i> Back
