@@ -7,8 +7,16 @@
 <link rel="stylesheet" href="styles.css"/>
 
 <style>
-/* compact, finished styles for records page (overrides + small tweaks) */
-
+   :root{
+    --bg:#f6f8f7;
+    --card-bg:#fff;
+    --muted:#6b6f6b;
+    --accent1:#0f7a4a;
+    --accent2:#34b78f;
+    --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --radius:12px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
 .page-container{max-width:1200px;margin:20px auto;padding:12px;display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
 .topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;box-shadow:0 6px 20px rgba(5,40,25,0.12)}
 .brand{display:flex;gap:12px;align-items:center}.brand .logo{width:48px;height:48px;border-radius:8px;object-fit:contain}
@@ -426,4 +434,5 @@ window.addEventListener("DOMContentLoaded", ()=>{
 </script>
 </body>
 </html>
+
 
