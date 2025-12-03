@@ -154,9 +154,16 @@
         <div class="section-title"><div class="chip">1</div><h3>Basic Information </h3></div>
         <div class="form-grid">
           <div>
-            <label>Coordinate (optional)</label>
-            <input type="text" id="coordinate" placeholder="Latitude, Longitude (optional)"/>
-            <div class="small-muted">Optional — paste `lat, lng` if available.</div>
+<label>Coordinate (optional)</label>
+<input type="text" id="coordinate" placeholder="Latitude, Longitude (optional)"/>
+
+<!-- 📌 Button to get GPS coordinates -->
+<button type="button" id="getLocationBtn" class="btn secondary" style="margin-top:6px;">
+  Get Current Location
+</button>
+
+<div class="small-muted">Optional — paste `lat, lng` if available.</div>
+
           </div>
 
           <div>
@@ -953,9 +960,49 @@ async function submitHeadAndMembers(){
     submitBtn.innerText = "Save → Next Members";
   }
 }
+// ======================================================
+// 📌 GPS COORDINATE BUTTON — CLEAN FINAL VERSION
+// ======================================================
+document.getElementById("getLocationBtn").addEventListener("click", () => {
+
+  // Check browser support
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser.");
+    return;
+  }
+
+  // Request position
+  navigator.geolocation.getCurrentPosition(
+
+    // SUCCESS
+    (pos) => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+
+      // Put coordinates into the input
+      document.getElementById("coordinate").value = `${lat}, ${lng}`;
+
+      alert("Location captured successfully!");
+    },
+
+    // ERROR
+    (err) => {
+      alert("Unable to retrieve GPS location. Please allow location access.");
+      console.error("GPS Error:", err);
+    },
+
+    // Options
+    {
+      enableHighAccuracy: true,
+      timeout: 8000,
+      maximumAge: 0
+    }
+  );
+});
 </script>
 </body>
 </html>
+
 
 
 
