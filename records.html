@@ -7,157 +7,107 @@
 <link rel="stylesheet" href="styles.css"/>
 
 <style>
-/* ==========================================================
-   GLOBAL RECORDS PAGE DESIGN (modern + consistent with dataForm)
-========================================================== */
-.page-container { display:flex; }
-
-/* Topbar, Sidebar inherited from styles.css */
-
-/* ===================== BUTTONS ===================== */
-.btn-main {
-  padding:8px 16px;
-  border-radius:8px;
-  background:linear-gradient(90deg,#0f7a4a,#34b78f);
-  color:white;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
-  transition:0.2s;
+/* Highlight for search results */
+.hl {
+  background: #ffeb8a;
+  padding: 1px 2px;
+  border-radius: 4px;
 }
-.btn-main:hover { opacity:0.9; }
 
-.btn-secondary {
-  padding:8px 16px;
-  border-radius:8px;
-  border:1px solid #0f7a4a;
+/* Export dropdown */
+.export-wrapper { position:relative; }
+.export-dropdown {
+  position:absolute;
+  top:45px;
+  right:0;
   background:white;
-  color:#0f7a4a;
-  font-weight:700;
-  cursor:pointer;
-  transition:0.2s;
+  border:1px solid #ddd;
+  border-radius:10px;
+  width:170px;
+  padding:6px 0;
+  box-shadow:0 4px 18px rgba(0,0,0,0.12);
+  z-index:999;
 }
-.btn-secondary:hover { background:#e8fff4; }
+.export-dropdown div { padding:10px 14px; cursor:pointer; }
+.export-dropdown div:hover { background:#e9fff0; }
 
-/* ===================== SEARCH ===================== */
-.search-box {
-  padding:8px 12px;
-  border:1px solid #bbb;
-  border-radius:8px;
-  min-width:260px;
-}
+.hidden { display:none; }
 
-/* ===================== TABLE ===================== */
+/* Table fix */
 .records-wrapper {
-  overflow:auto;
-  background:white;
-  border-radius:12px;
-  box-shadow:0 3px 12px rgba(0,0,0,0.08);
+  margin-top: 14px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 12px;
+  box-shadow: 0 8px 22px rgba(6,30,20,0.06);
+  overflow-x: auto;
 }
 
 .records-table {
-  width:100%;
-  border-collapse:collapse;
-  min-width:1300px;
+  width: 100%;
+  min-width: 1500px;
+  border-collapse: collapse;
 }
 
 .records-table th,
 .records-table td {
-  padding:10px 12px;
-  border-bottom:1px solid #eee;
-  white-space:nowrap;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(15,122,74,0.15);
+  background: rgba(255,255,255,0.6);
+}
+
+.records-table th {
+  background: rgba(15,122,74,0.10);
+  font-weight: 800;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.records-table tbody tr:hover {
+  background: rgba(52,183,143,0.06);
+}
+
+/* Sticky select + actions columns */
+.select-col {
+  position: sticky;
+  left: 0;
+  background: rgba(255,255,255,0.9);
+  z-index: 6;
+}
+
+.actions-col {
+  position: sticky;
+  right: 0;
+  background: rgba(255,255,255,0.9);
+  z-index: 6;
+}
+
+/* Legend card */
+.legend-card {
+  margin-top: 18px;
+  padding: 14px;
+  width: fit-content;
+  background: rgba(255,255,255,0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(6,30,20,0.08);
+  border:1px solid rgba(6,30,20,0.06);
+}
+
+.legend-card div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
   font-size:14px;
 }
 
-.records-table thead th {
-  background:#f4f7f4;
-  position:sticky;
-  top:0; z-index:20;
-  font-weight:700;
-}
-
-.select-col { position:sticky; left:0; background:#fff; z-index:30; }
-.actions-col { position:sticky; right:0; background:#fff; z-index:30; }
-
-/* ===================== MEMBER ROW ===================== */
-.member-row { background:#fafafa; }
-.member-row.hidden { display:none; }
-
-/* ===================== COLOR CODING ===================== */
-.mem-small    { background:#d4f6ff !important; } /* 1 member */
-.mem-normal   { background:#d9ffd9 !important; } /* 2–4 */
-.mem-large    { background:#fff7c2 !important; } /* 5–7 */
-.mem-critical { background:#ffd6d6 !important; } /* 8+ */
-
-/* ===================== SEARCH HIGHLIGHT ===================== */
-.hl {
-  background:#fffe8a;
-  padding:2px 3px;
+.legend-swatch {
+  width: 16px;
+  height: 16px;
   border-radius:4px;
 }
 
-/* ===================== ICON BUTTONS ===================== */
-.icon-btn {
-  background:none;
-  border:none;
-  font-size:18px;
-  cursor:pointer;
-  padding:6px;
-  border-radius:6px;
-  transition:0.15s;
-}
-.icon-btn:hover { background:#e8fff0; }
-
-/* ===================== EXPORT DROPDOWN ===================== */
-.export-wrapper { position:relative; }
-.export-dropdown {
-  position:absolute;
-  top:40px; right:0;
-  background:white;
-  border:1px solid #ccc;
-  width:170px;
-  padding:6px 0;
-  border-radius:10px;
-  z-index:9000;
-  box-shadow:0 5px 18px rgba(0,0,0,0.12);
-}
-.export-dropdown div {
-  padding:10px 14px;
-  cursor:pointer;
-}
-.export-dropdown div:hover { background:#e9fff0; }
-.hidden { display:none; }
-
-/* ===================== LEGEND ===================== */
-.legend-box {
-  margin-top:15px;
-  padding:12px;
-  background:#fff;
-  border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.06);
-  width:max-content;
-  font-size:14px;
-}
-.legend-box div { margin:4px 0; display:flex; align-items:center; gap:8px; }
-.legend-color {
-  width:20px; height:20px; border-radius:6px;
-}
-
-/* pagination */
-#paginationArea button {
-  padding:6px 12px;
-  margin:0 3px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  background:white;
-  cursor:pointer;
-}
-#paginationArea button.active {
-  background:#0f7a4a;
-  color:white;
-  border-color:#0f7a4a;
-  font-weight:bold;
-}
 </style>
 </head>
 
@@ -165,14 +115,12 @@
 <body>
 <div class="page-container">
 
-<!-- ==========================================================
-     TOPBAR
-========================================================== -->
+<!-- Topbar -->
 <header class="topbar">
   <button id="menuToggle" class="menu-btn">☰</button>
 
   <div class="brand">
-    <img src="assets/MDRRMO Logo.png" class="logo"/>
+    <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
     <div>
       <div class="title">PUROK KALIGTASAN</div>
       <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
@@ -185,39 +133,33 @@
   </div>
 </header>
 
-<!-- ==========================================================
-     SIDEBAR
-========================================================== -->
+<!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
 <ul>
   <li><a href="dashboard.html">📊 Dashboard</a></li>
   <li><a href="dataForm.html">📝 Data Entry</a></li>
-  <li><a href="records.html" class="active">📁 Records</a></li>
+  <li><a class="active" href="records.html">📁 Records</a></li>
   <li><a href="charts.html">📈 Charts</a></li>
   <li class="admin-only"><a href="users.html">👥 User Management</a></li>
 </ul>
 </aside>
 
-
-<!-- ==========================================================
-     MAIN CONTENT
-========================================================== -->
+<!-- Main Content -->
 <main class="content-area">
+
 <h2>📁 Household Records</h2>
 
-<!-- Counts -->
-<div style="display:flex; justify-content:flex-end; gap:18px; margin-bottom:10px;">
+<!-- Counters -->
+<div style="display:flex; gap:20px; justify-content:flex-end; margin-bottom:10px;">
   <span>Rows: <strong class="green" id="rowCount">0</strong></span>
   <span>Matches: <strong class="green" id="matchCount">0</strong></span>
   <span>Selected: <strong class="green" id="selectedCount">0</strong></span>
 </div>
 
-<!-- Toolbar -->
-<div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
-
+<!-- Search + Filters -->
+<div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
   <input id="searchInput" class="search-box" placeholder="Search by Name / Barangay / ID..."/>
-
-  <select id="filterBarangay" class="brgy-dropdown">
+  <select id="filterBarangay" class="search-box" style="max-width:260px;">
     <option value="">All Barangays</option>
     <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
     <option>Dalipit East</option><option>Dalipit West</option>
@@ -230,134 +172,133 @@
     <option>Santa Cruz</option><option>Tadlac</option>
   </select>
 
-  <button id="refreshBtn" class="btn-main">⟳ Refresh</button>
+  <button id="refreshBtn" class="btn">🔄 Refresh</button>
 
   <div class="export-wrapper">
-    <button id="exportBtn" class="btn-secondary">📤 Export ▼</button>
-
+    <button id="exportBtn" class="btn secondary" style="background:white; color:#0f7a4a;">📤 Export ▼</button>
     <div id="exportDropdown" class="export-dropdown hidden">
       <div onclick="exportAll()">Export All</div>
       <div onclick="exportSelected()">Export Selected</div>
     </div>
   </div>
-
 </div>
 
-<!-- Table -->
+<!-- Table Area -->
 <div class="records-wrapper">
-  <table class="records-table">
+  <table id="recordsTable" class="records-table">
     <thead id="tableHead"></thead>
     <tbody id="tableBody"></tbody>
   </table>
 </div>
 
-<!-- Pagination -->
-<div id="paginationArea" style="margin-top:15px;"></div>
-
 <!-- Legend -->
-<div class="legend-box">
-  <strong>Household Color Legend:</strong>
-  <div><div class="legend-color" style="background:#d4f6ff;"></div>1 Member</div>
-  <div><div class="legend-color" style="background:#d9ffd9;"></div>2–4 Members</div>
-  <div><div class="legend-color" style="background:#fff7c2;"></div>5–7 Members</div>
-  <div><div class="legend-color" style="background:#ffd6d6;"></div>8+ Members</div>
+<div class="legend-card">
+  <div><div class="legend-swatch" style="background:#cfefff"></div>1 Member</div>
+  <div><div class="legend-swatch" style="background:#d5f8d5"></div>2–4 Members</div>
+  <div><div class="legend-swatch" style="background:#fff3c2"></div>5–7 Members</div>
+  <div><div class="legend-swatch" style="background:#ffd2d2"></div>8+ Members</div>
 </div>
+
+<!-- Pagination -->
+<div id="paginationArea" style="text-align:center; margin-top:18px;"></div>
 
 </main>
 </div>
 
-
 <!-- Loading -->
 <div id="loading" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.7); align-items:center; justify-content:center; z-index:9999;">
-  <div style="padding:15px; background:white; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.15);">
+  <div style="padding:15px; background:white; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.1);">
     Loading records…
   </div>
 </div>
 
 
 <script>
-/* ==========================================================
+/* ============================================================
    CONFIG
-========================================================== */
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+============================================================ */
+const SCRIPT_URL = "YOUR_SCRIPT_URL_HERE"; /* <-- replace */
 
-/* ==========================================================
+/* ============================================================
    STATE
-========================================================== */
+============================================================ */
 let header = [];
 let rawRows = [];
 let groups = [];
 let selected = new Set();
 let currentPage = 1;
-const rowsPerPage = 25;
+const rowsPerPage = 20;
 
-/* ==========================================================
-   UTILITIES
-========================================================== */
-function showLoading(x){ document.getElementById("loading").style.display = x ? "flex" : "none"; }
+/* ============================================================
+   UTIL UTIL
+============================================================ */
+function showLoading(x){
+  document.getElementById("loading").style.display = x ? "flex":"none";
+}
 
 function highlight(text, q){
   text = String(text ?? "");
   if(!q) return text;
-  const r = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), "gi");
-  return text.replace(r, m => `<span class="hl">${m}</span>`);
+  const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
+  return text.replace(re, m => `<span class="hl">${m}</span>`);
 }
 
-/* ==========================================================
+/* ============================================================
    LOAD RECORDS
-========================================================== */
+============================================================ */
 async function loadRecords(){
   showLoading(true);
-  try{
-    const barangay = document.getElementById("filterBarangay").value || "";
-    const q = document.getElementById("searchInput").value.trim();
 
-    const res = await fetch(
-      `${SCRIPT_URL}?action=getRecords&filterBarangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`
-    );
+  try{
+    const barangay = document.getElementById("filterBarangay").value;
+    const q = document.getElementById("searchInput").value;
+
+    const url = `${SCRIPT_URL}?action=getRecords&filterBarangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`;
+
+    const res = await fetch(url);
     const data = await res.json();
 
-    if(!data.success){ alert("Load failed"); return; }
+    if(!data.success){
+      alert("Failed to load records");
+      return;
+    }
 
     header = data.header;
     rawRows = data.rows;
 
-    groupRows();
+    groupData();
     currentPage = 1;
     renderTable();
     renderPagination();
     updateCounts();
 
-  } catch(err){
+  }catch(err){
     console.error(err);
-    alert("Error loading records");
   }
+
   showLoading(false);
 }
 
-/* ==========================================================
-   GROUP BY DATA ID
-========================================================== */
-function groupRows(){
-  const map = {};
+/* ============================================================
+   GROUP BY ID
+============================================================ */
+function groupData(){
+  let map = {};
+
   rawRows.forEach(r=>{
-    const id = String(r["Data ID"] || "");
-    if(!id) return;
+    let id = String(r["Data ID"]);
+    if(!map[id]) map[id] = { head:null, members:[], dataID:id };
 
-    if(!map[id]) map[id] = { dataID:id, head:null, members:[] };
-
-    const isHead = !r["Name of Household Member/s"];
-    if(isHead && !map[id].head) map[id].head = r;
+    if(!r["Name of Household Member/s"]) map[id].head = r;
     else map[id].members.push(r);
   });
 
-  groups = Object.values(map).sort((a,b)=> Number(a.dataID) - Number(b.dataID));
+  groups = Object.values(map).sort((a,b)=>Number(a.dataID)-Number(b.dataID));
 }
 
-/* ==========================================================
+/* ============================================================
    RENDER TABLE
-========================================================== */
+============================================================ */
 function renderTable(){
   const thead = document.getElementById("tableHead");
   const tbody = document.getElementById("tableBody");
@@ -365,212 +306,188 @@ function renderTable(){
   thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  let h = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
-  header.forEach(c=> h += `<th>${c}</th>`);
-  h += `<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>`;
-  thead.innerHTML = h;
+  const q = document.getElementById("searchInput").value;
 
-  const start = (currentPage - 1) * rowsPerPage;
-  const pageRows = groups.slice(start, start + rowsPerPage);
+  let th = `<tr>
+    <th class="select-col"><input type="checkbox" id="selectAll"></th>
+  `;
 
-  const keyword = document.getElementById("searchInput").value.trim();
+  header.forEach(h => th += `<th>${h}</th>`);
+  th += `<th class="actions-col">Actions</th></tr>`;
 
-  pageRows.forEach(g=>{
-    const head = g.head || {};
-    const mCount = g.members.length;
+  thead.innerHTML = th;
 
-    /* color */
-    let cls = mCount <=1 ? "mem-small"
-             : mCount <=4 ? "mem-normal"
-             : mCount <=7 ? "mem-large"
-             : "mem-critical";
+  const start = (currentPage-1)*rowsPerPage;
+  const slice = groups.slice(start,start+rowsPerPage);
+
+  slice.forEach(g=>{
+    const h = g.head || {};
+    const memCount = g.members.length;
 
     let tr = document.createElement("tr");
-    tr.className = cls;
 
-    /* checkbox */
     let tdSel = document.createElement("td");
     tdSel.className = "select-col";
     tdSel.innerHTML = `<input type="checkbox" class="row-select" data-id="${g.dataID}" ${selected.has(g.dataID)?"checked":""}>`;
     tr.appendChild(tdSel);
 
-    /* head data */
-    header.forEach(c=>{
+    header.forEach(col=>{
       let td = document.createElement("td");
-      td.innerHTML = highlight(head[c] || "", keyword);
+      td.innerHTML = highlight(h[col] || "", q);
       tr.appendChild(td);
     });
 
-    /* members toggle */
-    let tdM = document.createElement("td");
-    tdM.className = "actions-col";
-    tdM.innerHTML = `
-      <button class="icon-btn" onclick="toggleMembers('${g.dataID}')">
-        👁 Show (${mCount})
-      </button>`;
-    tr.appendChild(tdM);
-
-    /* edit / delete icons */
-    let tdA = document.createElement("td");
-    tdA.className = "actions-col";
-    tdA.innerHTML = `
-      <button class="icon-btn" onclick="onEdit('${g.dataID}')" title="Edit">✏️</button>
-      <button class="icon-btn" onclick="onDelete('${g.dataID}')" title="Delete">🗑️</button>`;
-    tr.appendChild(tdA);
+    let actions = document.createElement("td");
+    actions.className = "actions-col";
+    actions.innerHTML = `
+      <button onclick="toggleMembers('${g.dataID}')">👁 (${memCount})</button>
+      <button onclick="onEdit('${g.dataID}')">✏️</button>
+      <button onclick="onDelete('${g.dataID}')">🗑</button>
+    `;
+    tr.appendChild(actions);
 
     tbody.appendChild(tr);
 
-    /* MEMBER ROWS */
     g.members.forEach(m=>{
       let mr = document.createElement("tr");
       mr.className = "member-row hidden";
       mr.dataset.parent = g.dataID;
 
-      mr.appendChild(document.createElement("td")); // empty select
-      header.forEach(c=>{
-        let td = document.createElement("td");
-        td.innerHTML = highlight(m[c] || "", keyword);
-        mr.appendChild(td);
+      mr.innerHTML = `<td></td>`; /* Empty select column */
+
+      header.forEach(col=>{
+        mr.innerHTML += `<td>${highlight(m[col]||"", q)}</td>`;
       });
-      mr.appendChild(document.createElement("td"));
-      mr.appendChild(document.createElement("td"));
+
+      mr.innerHTML += `<td></td>`; /* actions empty */
 
       tbody.appendChild(mr);
     });
   });
 
   document.getElementById("selectAll").onchange = function(){
-    pageRows.forEach(g=>{
-      if(this.checked) selected.add(g.dataID);
-      else selected.delete(g.dataID);
+    slice.forEach(g=>{
+      this.checked ? selected.add(g.dataID) : selected.delete(g.dataID);
     });
     renderTable();
   };
 
   document.querySelectorAll(".row-select").forEach(cb=>{
     cb.onchange = function(){
-      let id = this.dataset.id;
-      if(this.checked) selected.add(id);
-      else selected.delete(id);
+      const id = this.dataset.id;
+      this.checked ? selected.add(id) : selected.delete(id);
       updateCounts();
     };
   });
 }
 
-/* ==========================================================
-   MEMBERS TOGGLE
-========================================================== */
+/* TOGGLE MEMBERS */
 function toggleMembers(id){
   document.querySelectorAll(`tr.member-row[data-parent="${id}"]`)
-    .forEach(r=> r.classList.toggle("hidden"));
+    .forEach(r => r.classList.toggle("hidden"));
 }
 
-/* ==========================================================
-   PAGINATION
-========================================================== */
+/* PAGINATION */
 function renderPagination(){
-  const div = document.getElementById("paginationArea");
-  const total = Math.ceil(groups.length / rowsPerPage);
-  if(total <=1){ div.innerHTML=""; return; }
+  let total = Math.ceil(groups.length/rowsPerPage);
+  let div = document.getElementById("paginationArea");
+  if(total<=1){ div.innerHTML=""; return; }
 
   let html="";
   for(let i=1;i<=total;i++){
-    html += `<button onclick="gotoPage(${i})" class="${i===currentPage?'active':''}">${i}</button>`;
+    html += `<button onclick="gotoPage(${i})" class="${i===currentPage?"btn":"btn secondary"}" style="margin:2px;">${i}</button>`;
   }
   div.innerHTML = html;
 }
-
 function gotoPage(p){
-  currentPage = p;
+  currentPage=p;
   renderTable();
   renderPagination();
 }
 
-/* ==========================================================
-   COUNTS
-========================================================== */
+/* COUNTS */
 function updateCounts(){
   document.getElementById("rowCount").innerText = groups.length;
   document.getElementById("matchCount").innerText = groups.length;
   document.getElementById("selectedCount").innerText = selected.size;
 }
 
-/* ==========================================================
-   EDIT + DELETE
-========================================================== */
+/* EDIT */
 function onEdit(id){
   localStorage.setItem("edit_dataID", id);
-  location.href = "edit.html";
+  location.href="edit.html";
 }
 
+/* DELETE */
 async function onDelete(id){
   if(!confirm("Delete household " + id + "?")) return;
 
   let fd = new FormData();
   fd.append("action","deleteHousehold");
-  fd.append("dataID",id);
+  fd.append("dataID", id);
 
-  let res = await fetch(SCRIPT_URL, { method:"POST", body:fd });
-  let j = await res.json();
+  const res = await fetch(SCRIPT_URL, {method:"POST", body:fd});
+  const json = await res.json();
 
-  if(j.success){
+  if(json.success){
     alert("Deleted");
     loadRecords();
-  } else alert("Delete failed");
+  } else {
+    alert("Delete failed");
+  }
 }
 
-/* ==========================================================
-   EXPORT
-========================================================== */
+/* EXPORT */
 function exportAll(){ exportCSV(groups); }
 function exportSelected(){
-  const arr = groups.filter(g=> selected.has(g.dataID));
-  if(!arr.length) return alert("No selected rows");
-  exportCSV(arr);
+  let list = groups.filter(g=>selected.has(g.dataID));
+  if(!list.length){ alert("No selected rows"); return; }
+  exportCSV(list);
 }
 
 function exportCSV(list){
   let cols = header;
   let lines = [];
-
   lines.push(cols.join(","));
 
   list.forEach(g=>{
-    lines.push(cols.map(c=> `"${(g.head[c]||"").replace(/"/g,'""')}"`).join(","));
+    let h = g.head;
+    lines.push(cols.map(c => `"${(h[c]||"").replace(/"/g,'""')}"`).join(","));
+
     g.members.forEach(m=>{
-      lines.push(cols.map(c=> `"${(m[c]||"").replace(/"/g,'""')}"`).join(","));
+      lines.push(cols.map(c => `"${(m[c]||"").replace(/"/g,'""')}"`).join(","));
     });
   });
 
-  let blob = new Blob([lines.join("\r\n")], {type:"text/csv"});
+  let blob = new Blob([lines.join("\r\n")],{type:"text/csv"});
   let url = URL.createObjectURL(blob);
   let a = document.createElement("a");
-  a.href = url; a.download="records.csv"; a.click();
+  a.href=url;
+  a.download="records.csv";
+  a.click();
   URL.revokeObjectURL(url);
 }
 
-/* ==========================================================
-   UI BINDINGS
-========================================================== */
+/* BINDINGS */
 document.getElementById("refreshBtn").onclick = loadRecords;
 document.getElementById("filterBarangay").onchange = loadRecords;
-document.getElementById("searchInput").oninput = ()=> setTimeout(loadRecords, 240);
+document.getElementById("searchInput").oninput = () => setTimeout(loadRecords,250);
 
-document.getElementById("exportBtn").onclick = () =>
+document.getElementById("exportBtn").onclick = ()=>{
   document.getElementById("exportDropdown").classList.toggle("hidden");
+};
 
-document.addEventListener("click", e=>{
-  const box = document.getElementById("exportDropdown");
-  const btn = document.getElementById("exportBtn");
-  if(!btn.contains(e.target) && !box.contains(e.target)) box.classList.add("hidden");
+document.addEventListener("click",e=>{
+  let d = document.getElementById("exportDropdown");
+  let b = document.getElementById("exportBtn");
+  if(!b.contains(e.target) && !d.contains(e.target)){
+    d.classList.add("hidden");
+  }
 });
 
-/* ==========================================================
-   INIT
-========================================================== */
-window.onload = ()=>{
-  document.getElementById("userName").innerText =
-    localStorage.getItem("staffName") || "";
+/* INIT */
+window.onload = function(){
+  document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
   loadRecords();
 };
 </script>
