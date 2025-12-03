@@ -1,25 +1,533 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Login — MDRRMO Alitagtag</title><link rel="stylesheet" href="styles.css"/></head>
-<body class="loginBody">
-<div style="max-width:420px;margin:80px auto;padding:18px">
-  <div class="card" style="text-align:center;">
-    <img src="assets/logo.png" alt="logo" style="width:85px;height:85px;margin-bottom:12px"/>
-    <h2>PUROK KALIGTASAN<br/>ALITAGTAG MDRRMO</h2>
-    <p class="small muted">Authorized Personnel Only</p>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login — Purok Kaligtasan | MDRRMO Alitagtag</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #0f7a4a;
+            --secondary-green: #34b78f;
+            --accent-orange: #ff7a00;
+            --light-green: #e9f7f2;
+            --dark-green: #0a5c38;
+            --light-gray: #f8faf9;
+            --medium-gray: #e1e8e5;
+            --text-dark: #1e2e28;
+            --text-light: #6b6f6b;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(6, 30, 20, 0.1);
+            --shadow-light: 0 4px 12px rgba(6, 30, 20, 0.05);
+            --radius: 16px;
+            --radius-sm: 8px;
+        }
 
-    <div id="loginError" style="display:none;color:#a00;margin:8px 0"></div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
 
-    <form id="loginForm" style="display:grid;gap:8px;margin-top:12px">
-      <p id="statusText" style="margin-bottom:10px; font-size:14px;"></p>
-      <input type="text" id="username" placeholder="Username" required style="padding:10px;border-radius:8px"/>
-      <input type="password" id="password" placeholder="Password" required style="padding:10px;border-radius:8px"/>
-      <button type="submit" class="btn" style="margin-bottom:10px">Login</button>
-    </form>
-  </div>
-</div>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--light-green) 0%, #f0f9f5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-<script src="index.js"></script>
+        /* Background decorative elements */
+        .bg-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(15, 122, 74, 0.05);
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -100px;
+            background: rgba(255, 122, 0, 0.05);
+        }
+
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 10%;
+            background: rgba(52, 183, 143, 0.05);
+        }
+
+        /* Login container */
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header section */
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            padding: 32px 24px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .logo-circle img {
+            width: 70px;
+            height: 70px;
+            filter: brightness(0) invert(1);
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Badge */
+        .badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-orange);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form section */
+        .login-form-container {
+            padding: 36px 32px;
+        }
+
+        .form-title {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-subtitle {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 28px;
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(15, 122, 74, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #a0a8a4;
+        }
+
+        /* Error message */
+        #loginError {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            color: #dc2626;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Status text */
+        #statusText {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--light-gray);
+            border-radius: var(--radius-sm);
+        }
+
+        /* Login button */
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(15, 122, 74, 0.25);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        .login-footer {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--medium-gray);
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .footer-note {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-container {
+                max-width: 100%;
+            }
+            
+            .login-header {
+                padding: 28px 20px;
+            }
+            
+            .login-form-container {
+                padding: 28px 20px;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+            }
+            
+            .circle-1, .circle-2, .circle-3 {
+                display: none;
+            }
+        }
+
+        /* Password toggle */
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* Loading state */
+        .btn-loading .btn-text {
+            visibility: hidden;
+        }
+
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background pattern -->
+    <div class="bg-pattern">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+    </div>
+
+    <!-- Login container -->
+    <div class="login-container">
+        <!-- Header section -->
+        <div class="login-header">
+            <div class="badge">SECURE LOGIN</div>
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <img src="assets/logo.png" alt="MDRRMO Logo">
+                </div>
+                <h1 class="header-title">PUROK KALIGTASAN</h1>
+                <p class="header-subtitle">MDRRMO Alitagtag Household Records System</p>
+            </div>
+        </div>
+
+        <!-- Form section -->
+        <div class="login-form-container">
+            <h2 class="form-title">Welcome Back</h2>
+            <p class="form-subtitle">Please enter your credentials to access the system</p>
+
+            <!-- Error message -->
+            <div id="loginError" style="display:none;"></div>
+
+            <!-- Status message -->
+            <p id="statusText"></p>
+
+            <!-- Login form -->
+            <form id="loginForm">
+                <!-- Username field -->
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-with-icon">
+                        <i class="input-icon fas fa-user"></i>
+                        <input type="text" 
+                               id="username" 
+                               class="form-input" 
+                               placeholder="Enter your username" 
+                               required
+                               autocomplete="username">
+                    </div>
+                </div>
+
+                <!-- Password field -->
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-with-icon">
+                        <i class="input-icon fas fa-lock"></i>
+                        <input type="password" 
+                               id="password" 
+                               class="form-input" 
+                               placeholder="Enter your password" 
+                               required
+                               autocomplete="current-password">
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Login button -->
+                <button type="submit" class="login-btn" id="loginButton">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span class="btn-text">Login to System</span>
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                <p><i class="fas fa-shield-alt" style="margin-right: 6px;"></i> Authorized Personnel Only</p>
+                <p class="footer-note">Unauthorized access is strictly prohibited</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password visibility toggle
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginButton');
+            const errorDiv = document.getElementById('loginError');
+            
+            // Clear previous errors
+            errorDiv.style.display = 'none';
+            
+            // Validate inputs
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.classList.add('btn-loading');
+            loginBtn.disabled = true;
+            
+            // Simulate login process (replace with actual API call)
+            setTimeout(() => {
+                // For demo purposes, accept any non-empty credentials
+                // In production, replace with actual authentication
+                if (username && password) {
+                    // Successful login
+                    window.location.href = 'dashboard.html';
+                } else {
+                    showError('Invalid username or password');
+                    loginBtn.classList.remove('btn-loading');
+                    loginBtn.disabled = false;
+                }
+            }, 1500);
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Auto-hide error after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Set status message
+        window.addEventListener('DOMContentLoaded', () => {
+            const statusText = document.getElementById('statusText');
+            const hour = new Date().getHours();
+            
+            if (hour < 12) {
+                statusText.textContent = 'Good morning! Please login to continue.';
+            } else if (hour < 18) {
+                statusText.textContent = 'Good afternoon! Please login to continue.';
+            } else {
+                statusText.textContent = 'Good evening! Please login to continue.';
+            }
+            
+            // Focus on username field
+            document.getElementById('username').focus();
+        });
+
+        // Add enter key navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const focused = document.activeElement;
+                if (focused.id === 'username') {
+                    document.getElementById('password').focus();
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+  <script src="index.js"></script>
 </body>
 </html>
-
