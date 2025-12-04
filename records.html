@@ -22,16 +22,6 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
-      #disc {
-    margin-bottom: 10px;
-    background: var(--light-green);
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    border-left: 3px solid var(--accent1);
-    font-size: 0.8rem;
-    color: var(--muted);
-    line-height: 1.5;
-   }
 
    body {
     background-color: var(--bg);
@@ -228,6 +218,8 @@
     min-height:72vh;
     height: calc(100vh - 120px);
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
    }
 
    /* Content Header - Fixed */
@@ -379,32 +371,32 @@
 
    /* Records Table - Fixed */
    .records-wrapper{
-    margin-top:14px;
+    flex: 1;
     background:rgba(255,255,255,0.95);
     border-radius:var(--radius);
     box-shadow:var(--shadow);
     overflow:auto;
-    height: calc(100vh - 380px);
-    min-height: 300px;
     position: relative;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
    }
 
    .records-table{
     width:100%;
     min-width:1400px;
     border-collapse:collapse;
-    font-size: 10px;
+    font-size: 12px;
    }
 
    .records-table th{
     background:rgba(15,122,74,0.12);
-    padding: 10px 8px;
+    padding: 12px 8px;
     text-align: center;
     font-weight: 700;
     position: sticky;
     top: 0;
     z-index: 6;
-    font-size: 10px;
+    font-size: 12px;
     color: var(--accent1);
     border-bottom: 2px solid rgba(15,122,74,0.15);
     white-space: nowrap;
@@ -412,8 +404,8 @@
    }
 
    .records-table td{
-    padding: 6px 8px;
-    font-size: 10px;
+    padding: 10px 8px;
+    font-size: 12px;
     border-bottom: 1px solid rgba(15,122,74,0.08);
     vertical-align: middle;
     color: var(--muted);
@@ -617,24 +609,25 @@
     font-weight:700;
    }
 
-   /* Legend - Fixed Position */
+   /* Legend - Compact Horizontal Layout */
    .legend-container {
-    margin-top: 16px;
-    display: flex;
-    justify-content: flex-end;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    box-shadow: 0 2px 8px rgba(6,30,20,0.04);
+    margin-top: 0;
+    border-top: 2px solid var(--accent1);
    }
 
-   .legend-box{
-    background:#fff;
-    padding:12px 16px;
-    border-radius:var(--radius-sm);
-    border:1px solid rgba(6,30,20,0.04);
-    box-shadow:0 4px 14px rgba(6,30,20,0.06);
-    max-width: 250px;
+   .legend-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
    }
 
    .legend-box h4 {
-    margin: 0 0 10px 0;
+    margin: 0;
     font-size: 0.9rem;
     color: var(--muted);
     display: flex;
@@ -642,18 +635,25 @@
     gap: 6px;
    }
 
+   .legend-items {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+   }
+
    .legend-item{
     display:flex;
-    gap:10px;
+    gap:6px;
     align-items:center;
-    margin:8px 0;
     font-size:0.8rem;
+    white-space: nowrap;
    }
 
    .legend-swatch{
-    width:16px;
-    height:16px;
-    border-radius:4px;
+    width:14px;
+    height:14px;
+    border-radius:3px;
     flex-shrink: 0;
     border: 1px solid rgba(0,0,0,0.1);
    }
@@ -756,10 +756,6 @@
         min-height: calc(100vh - 140px);
     }
     
-    .records-wrapper {
-        height: calc(100vh - 450px);
-    }
-    
     .toolbar {
         flex-direction: column;
         align-items: stretch;
@@ -802,8 +798,20 @@
         font-size: 0.85rem;
     }
     
-    .legend-container {
-        justify-content: center;
+    .legend-items {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+    }
+    
+    .records-table {
+        font-size: 11px;
+    }
+    
+    .records-table th,
+    .records-table td {
+        font-size: 11px;
+        padding: 8px 6px;
     }
    }
 
@@ -876,9 +884,6 @@
     <div class="content-header">
       <h2><span style="color: var(--accent1);">📁</span> Household Records</h2>
     </div>
-      <!-- Description -->
-<div id="disc">This section displays all collected household data in one place. Users can easily view, search, and review information gathered from each household, helping ensure accurate monitoring, validation, and decision-making for community programs and emergency operations.</div>
-
 
     <!-- Counts - Top Right -->
     <div class="stats-container">
@@ -948,16 +953,18 @@
     </div>
 
     <!-- Pagination -->
-    <div id="paginationArea" style="margin-top:12px"></div>
+    <div id="paginationArea"></div>
 
-    <!-- Legend - Right Aligned -->
+    <!-- Legend - Compact Horizontal Layout -->
     <div class="legend-container">
       <div class="legend-box">
-        <h4><i class="fas fa-palette"></i> Household Color Legend</h4>
-        <div class="legend-item"><div class="legend-swatch" style="background:#d4f6ff"></div>1 Member</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#d9ffd9"></div>2–4 Members</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#fff7c2"></div>5–7 Members</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#ffd6d6"></div>8+ Members</div>
+        <h4><i class="fas fa-palette"></i> Household Color Legend:</h4>
+        <div class="legend-items">
+          <div class="legend-item"><div class="legend-swatch" style="background:#d4f6ff"></div>1 Member</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#d9ffd9"></div>2–4 Members</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#fff7c2"></div>5–7 Members</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#ffd6d6"></div>8+ Members</div>
+        </div>
       </div>
     </div>
 
@@ -1003,7 +1010,8 @@ async function loadRecords(){
         const barangay = document.getElementById("filterBarangay").value || "";
         const q = document.getElementById("searchInput").value.trim();
 
-        const res = await fetch(`${SCRIPT_URL}?action=getRecords&filterBarangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`);
+        // Send both filter parameters to the backend
+        const res = await fetch(`${SCRIPT_URL}?action=getRecords&barangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`);
         const data = await res.json();
         
         if(!data.success){ 
@@ -1064,10 +1072,16 @@ function renderTable(){
     const start = (currentPage-1) * rowsPerPage;
     const pageRows = groups.slice(start, start + rowsPerPage);
     const keyword = document.getElementById("searchInput").value.trim();
+    const selectedBarangay = document.getElementById("filterBarangay").value;
 
     pageRows.forEach(g=>{
         const head = g.head || {};
         const mCount = g.members.length;
+
+        // Skip if barangay filter is applied and doesn't match
+        if (selectedBarangay && head["Barangay"] !== selectedBarangay) {
+            return;
+        }
 
         let cls = mCount <= 1 ? "mem-small" : mCount <= 4 ? "mem-normal" : mCount <= 7 ? "mem-large" : "mem-critical";
         const tr = document.createElement("tr"); 
@@ -1082,7 +1096,22 @@ function renderTable(){
         // header columns
         header.forEach(col=>{
             const td = document.createElement("td");
-            td.innerHTML = highlight(head[col] || "", keyword);
+            const cellValue = head[col] || "";
+            // Fix for Submitted On column if it shows "aN/aN/NaN NaN:aN:aN AM"
+            if (col === "Submitted On" && String(cellValue).includes("NaN")) {
+                // Try to get the actual date from the raw data
+                const rawData = rawRows.find(r => 
+                    String(r["Data ID"]) === String(g.dataID) && 
+                    (!r["Name of Household Member/s"] || String(r["Name of Household Member/s"]).trim() === "")
+                );
+                if (rawData && rawData[col] && !String(rawData[col]).includes("NaN")) {
+                    td.innerHTML = highlight(rawData[col], keyword);
+                } else {
+                    td.innerHTML = "Invalid Date";
+                }
+            } else {
+                td.innerHTML = highlight(cellValue, keyword);
+            }
             tr.appendChild(td);
         });
 
@@ -1115,7 +1144,22 @@ function renderTable(){
             mr.appendChild(document.createElement("td")); // empty select col
             header.forEach(col=>{
                 const td = document.createElement("td");
-                td.innerHTML = highlight(m[col] || "", keyword);
+                const cellValue = m[col] || "";
+                // Fix for Submitted On column in member rows
+                if (col === "Submitted On" && String(cellValue).includes("NaN")) {
+                    // Try to get the actual date from the raw data
+                    const rawData = rawRows.find(r => 
+                        String(r["Data ID"]) === String(g.dataID) && 
+                        String(r["Name of Household Member/s"] || "").trim() === String(m["Name of Household Member/s"] || "").trim()
+                    );
+                    if (rawData && rawData[col] && !String(rawData[col]).includes("NaN")) {
+                        td.innerHTML = highlight(rawData[col], keyword);
+                    } else {
+                        td.innerHTML = "Invalid Date";
+                    }
+                } else {
+                    td.innerHTML = highlight(cellValue, keyword);
+                }
                 mr.appendChild(td);
             });
             mr.appendChild(document.createElement("td")); // empty members column
@@ -1124,6 +1168,9 @@ function renderTable(){
         });
     });
 
+    // Update counts based on filtered rows
+    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
+    
     // select all logic for page
     const selectAll = document.getElementById("selectAll");
     if(selectAll){
@@ -1171,7 +1218,10 @@ function toggleMembers(id){
 /* ============ PAGINATION ============ */
 function renderPagination(){
     const div = document.getElementById("paginationArea");
-    const total = Math.ceil(groups.length / rowsPerPage);
+    const selectedBarangay = document.getElementById("filterBarangay").value;
+    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
+    const total = Math.ceil(filteredGroups.length / rowsPerPage);
+    
     if(total <= 1){ 
         div.innerHTML = ""; 
         return; 
@@ -1193,9 +1243,20 @@ function gotoPage(p){
 
 /* ============ COUNTS ============ */
 function updateCounts(){
+    const selectedBarangay = document.getElementById("filterBarangay").value;
+    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
+    
     document.getElementById("rowCount").innerText = groups.length;
-    document.getElementById("matchCount").innerText = groups.length;
-    document.getElementById("selectedCount").innerText = selected.size;
+    document.getElementById("matchCount").innerText = filteredGroups.length;
+    
+    // Count selected items from filtered groups only
+    let selectedCount = 0;
+    filteredGroups.forEach(g => {
+        if (selected.has(g.dataID)) {
+            selectedCount++;
+        }
+    });
+    document.getElementById("selectedCount").innerText = selectedCount;
 }
 
 /* ============ EDIT & DELETE ============ */
@@ -1229,11 +1290,15 @@ async function onDelete(id){
 
 /* ============ EXPORT ============ */
 function exportAll(){ 
-    exportCSV(groups); 
+    const selectedBarangay = document.getElementById("filterBarangay").value;
+    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
+    exportCSV(filteredGroups); 
 }
 
 function exportSelected(){
-    const arr = groups.filter(g => selected.has(g.dataID));
+    const selectedBarangay = document.getElementById("filterBarangay").value;
+    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
+    const arr = filteredGroups.filter(g => selected.has(g.dataID));
     if(!arr.length) return alert("No selected rows");
     exportCSV(arr);
 }
@@ -1378,4 +1443,3 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-
