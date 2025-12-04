@@ -519,11 +519,6 @@
                 // For demo purposes, accept any non-empty credentials
                 // In production, replace with actual authentication
                 if (username && password) {
-                    // Store login state
-                    localStorage.setItem('loggedIn', 'true');
-                    localStorage.setItem('staffName', username);
-                    localStorage.setItem('userRole', username === 'admin' ? 'admin' : 'user');
-                    
                     // Successful login
                     window.location.href = 'dashboard.html';
                 } else {
@@ -560,11 +555,6 @@
             
             // Focus on username field
             document.getElementById('username').focus();
-            
-            // Check if user is already logged in
-            if (localStorage.getItem('loggedIn')) {
-                window.location.href = 'dashboard.html';
-            }
         });
 
         // Add enter key navigation
@@ -577,8 +567,7 @@
                 }
             }
         });
-
-        // Prevent zoom on iOS
+                // Prevent zoom on iOS
         document.addEventListener('touchstart', function(event) {
             if (event.touches.length > 1) {
                 event.preventDefault();
@@ -594,5 +583,6 @@
         window.addEventListener('resize', setAppHeight);
         window.addEventListener('DOMContentLoaded', setAppHeight);
     </script>
+  <script src="index.js"></script>
 </body>
 </html>
