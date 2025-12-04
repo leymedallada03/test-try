@@ -11,29 +11,39 @@
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
     gap:12px;
-    margin:12px 0 18px 0
+    margin:12px 0 18px 0;
   }
   .card{
     padding:12px;
     border-radius:10px;
     background:#fff;
-    box-shadow:0 6px 18px rgba(6,30,20,0.04)
+    box-shadow:0 6px 18px rgba(6,30,20,0.04);
   }
-  .card h3{
-    margin:0 0 8px 0;
-    font-size:14px;
-    color:#0f7a4a
-  }
-  .card-value{
-    font-size:22px;
-    font-weight:800;
-    color:#153b26
-  }
+  .card h3{ margin:0 0 8px 0; font-size:14px; color:#0f7a4a }
+  .card-value{ font-size:22px; font-weight:800; color:#153b26 }
   .mini { font-size:13px; color:#55615a }
-  .barangay-breakdown{margin-top:12px;overflow:auto}
-  .break-table{width:100%;border-collapse:collapse}
-  .break-table th,.break-table td{padding:6px 8px;border-bottom:1px solid #eee;font-size:13px;text-align:center}
   .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+
+  /* breakdown layout */
+  .break-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:12px;
+    margin-top:12px;
+    align-items:start;
+  }
+  .break-card { padding:12px; border-radius:10px; background:#fff; box-shadow:0 6px 18px rgba(6,30,20,0.04); overflow:auto; }
+  .break-card h4 { margin:0 0 8px 0; font-size:14px; color:#0f7a4a; }
+  .break-table { width:100%; border-collapse:collapse; text-align:center; }
+  .break-table th, .break-table td { padding:6px 8px; border-bottom:1px solid #eee; font-size:13px; }
+  .break-table thead th { background: rgba(15,122,74,0.06); font-weight:700; position: sticky; top:0; z-index:2; }
+  .center-wrap { display:flex; justify-content:center; }
+  .small-muted { font-size:12px; color:#55615a; margin-top:8px; }
+
+  /* responsive tweak */
+  @media(max-width:900px){
+    .break-grid { grid-template-columns:1fr; }
+  }
 </style>
 </head>
 
@@ -69,6 +79,7 @@
 
   <main class="content-area" tabindex="-1">
     <h2>📊 Dashboard Overview</h2>
+      <div id="disc">This section captures all key information about the household head, including personal data, contact details, demographic profile, and any government support or programs currently availed. The information will help establish the primary point of contact and provide a clear understanding of the household's overall status.</div>
 
     <div class="dashboard-cards">
       <div class="card">
@@ -92,15 +103,13 @@
       <div class="card">
         <h3>Last Updated</h3>
         <div id="lastUpdated" class="card-value">---</div>
-        <div class="mini">(mm/d/yyyy hh:mm:ss AM/PM)</div>
+        <div class="mini">(m/d/yyyy hh:mm:ss AM/PM)</div>
       </div>
     </div>
 
     <div class="card">
       <h3>Quick Totals</h3>
-      <div class="stat-grid" id="quickStats">
-        <!-- filled by script -->
-      </div>
+      <div class="stat-grid" id="quickStats"></div>
     </div>
 
     <div class="card">
@@ -108,24 +117,105 @@
       <canvas id="barangayChart" height="160"></canvas>
     </div>
 
-    <div class="card">
-      <h3>Barangay Breakdown</h3>
-      <div class="barangay-breakdown">
-        <table class="break-table" id="breakTable">
-          <thead><tr><th>Barangay</th><th>PWD</th><th>Male</th><th>Female</th><th>With Coord</th></tr></thead>
-          <tbody></tbody>
-        </table>
+    <!-- breakdowns grid -->
+    <div class="break-grid">
+
+      <!-- Basic barangay summary (PWD + male/female/coords) -->
+      <div class="break-card">
+        <h4>Barangay Summary (PWD / Sex / With Coord)</h4>
+        <div class="center-wrap">
+          <table class="break-table" id="tblSummary">
+            <thead>
+              <tr><th>Barangay</th><th>PWD</th><th>Male</th><th>Female</th><th>With Coord</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+
+      <!-- Government support -->
+      <div class="break-card">
+        <h4>Government Support (per Barangay)</h4>
+        <div class="center-wrap">
+          <table class="break-table" id="tblSupport">
+            <thead>
+              <tr>
+                <th>Barangay</th>
+                <th>TUPAD</th><th>Local 4Ps</th><th>National 4Ps</th>
+                <th>Local SP</th><th>National SP</th><th>Solo Parent</th><th>Relief Goods</th><th>Cash Subsidy</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Status breakdown -->
+      <div class="break-card">
+        <h4>Status Breakdown (per Barangay)</h4>
+        <div class="center-wrap">
+          <table class="break-table" id="tblStatus">
+            <thead>
+              <tr>
+                <th>Barangay</th>
+                <th>With Sickness</th><th>Pregnant</th><th>Solo Parent</th><th>Lactating</th>
+                <th>Severe Illness</th><th>HIV Positive</th><th>LGBTQ+</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Age buckets -->
+      <div class="break-card">
+        <h4>Age Buckets (per Barangay)</h4>
+        <div class="center-wrap">
+          <table class="break-table" id="tblAge">
+            <thead><tr><th>Barangay</th><th>0-5</th><th>6-17</th><th>18-59</th><th>60+</th><th>Unknown</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sitio/Purok -->
+      <div class="break-card">
+        <h4>Sitio / Purok Distribution (per Barangay)</h4>
+        <div class="center-wrap">
+          <table class="break-table" id="tblSitio">
+            <thead><tr><th>Barangay</th><th>I</th><th>II</th><th>III</th><th>IV</th><th>V</th><th>VI</th><th>VII</th><th>Unknown</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Livestock -->
+      <div class="break-card">
+        <h4>Household Livestock (per Barangay)</h4>
+        <div class="center-wrap">
+          <table class="break-table" id="tblLivestock">
+            <thead>
+              <tr><th>Barangay</th><th>Dog (qty)</th><th>Cat (qty)</th><th>Pig (qty)</th><th>Cow (qty)</th><th>Carabao (qty)</th><th>Chicken (qty)</th><th>Others (list)</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- end break-grid -->
+
+    <div class="small-muted">Tip: click Refresh or reopen page to recalc. Tables are centered and responsive.</div>
 
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+/* CONFIG */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 let chart = null;
 
+/* helpers */
 function getField(obj, name){
   if(!obj) return "";
   const want = String(name).toLowerCase().trim();
@@ -134,7 +224,6 @@ function getField(obj, name){
   }
   return "";
 }
-
 function formatTS(date){
   if(!date) date = new Date();
   const m = date.getMonth()+1;
@@ -147,25 +236,21 @@ function formatTS(date){
   hh = hh%12; hh = hh? hh:12;
   return `${m}/${d}/${y} ${String(hh).padStart(2,'0')}:${mm}:${ss} ${ampm}`;
 }
+async function fetchRecords(){ const res = await fetch(`${API_URL}?action=getRecords`); return res.json(); }
+function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart = null; } }
 
-async function fetchRecords(){
-  const res = await fetch(`${API_URL}?action=getRecords`);
-  return res.json();
-}
-
-function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart=null; } }
-
+/* main */
 async function loadDashboard(){
   try{
     const data = await fetchRecords();
-    if(!data.success) throw new Error('Failed to fetch');
+    if(!data.success) throw new Error('Failed fetch');
     const rows = data.rows || [];
 
+    // init containers
     let totalHeads = 0, totalMembers = 0, headsWithCoords = 0;
-    const barangayMap = {}; // barangay => stats
+    const barangayMap = {}; // bn -> stats
 
-    // accumulate
-    rows.forEach(r => {
+    rows.forEach(r=>{
       const isHead = String(getField(r,'Name of Household Member/s')||'').trim() === '';
       const barangay = String(getField(r,'Barangay')||'Unknown').trim() || 'Unknown';
       const sex = String(getField(r,'Sex')||'').trim().toLowerCase();
@@ -173,22 +258,19 @@ async function loadDashboard(){
 
       if(!barangayMap[barangay]){
         barangayMap[barangay] = {
-          heads:0, members:0, male:0, female:0, coords:0,
-          pwds:0, status:{} , reasons:{}, livestock:{}, ageBuckets:{}, sitio:{}
+          heads:0, members:0, male:0, female:0, coords:0, pwds:0,
+          status:{}, reasons:{}, livestock:{}, ageBuckets:{}, sitio:{},
+          // support counters:
+          support: {
+            "TUPAD":0, "Local 4Ps":0, "National 4Ps":0, "Local Social Pension":0, "National Social Pension":0,
+            "Solo Parent Assistance":0, "Relief Goods":0, "Cash Subsidy":0
+          }
         };
       }
-
       const b = barangayMap[barangay];
 
-      if(isHead){
-        totalHeads++; b.heads++;
-        if(coord) { headsWithCoords++; b.coords++; }
-        // sitio
-        const sitio = String(getField(r,'Sitio / Purok')||'').trim() || 'Unknown';
-        b.sitio[sitio] = (b.sitio[sitio]||0)+1;
-      } else {
-        totalMembers++; b.members++;
-      }
+      if(isHead){ totalHeads++; b.heads++; if(coord){ headsWithCoords++; b.coords++; } }
+      else { totalMembers++; b.members++; }
 
       // sex
       if(sex === 'male') b.male++; else if(sex === 'female') b.female++;
@@ -196,150 +278,219 @@ async function loadDashboard(){
       // PWD
       if(String(getField(r,'Persons with Disability (PWD)')||'').toLowerCase().trim()==='yes') b.pwds++;
 
-      // Status (categorical)
-      const status = String(getField(r,'Status')||'').trim();
-      if(status){ b.status[status] = (b.status[status]||0)+1; }
+      // STATUS accumulation (map by known statuses)
+      const statusRaw = String(getField(r,'Status')||'').trim();
+      if(statusRaw){
+        // sometimes multiple statuses? we treat as single if exact
+        b.status[statusRaw] = (b.status[statusRaw]||0) + 1;
+      }
 
       // Reasons
       const reason = String(getField(r,'Reasons for Displacement')||'').trim();
-      if(reason){ b.reasons[reason] = (b.reasons[reason]||0)+1; }
+      if(reason) b.reasons[reason] = (b.reasons[reason]||0) + 1;
 
-      // Livestock — headers: Dog,Dog Qty.,Cat,Cat Qty.,Pig,Pig Qty.,Cow,Cow Qty.,Carabao,Carabao Qty.,Chicken ,Chicken Qty.,Others
-      ['Dog','Dog Qty.','Cat','Cat Qty.','Pig','Pig Qty.','Cow','Cow Qty.','Carabao','Carabao Qty.','Chicken','Chicken Qty.','Others'].forEach(key=>{
+      // Sitio / Purok
+      const sitioRaw = String(getField(r,'Sitio / Purok')||'').trim();
+      let sitioKey = 'Unknown';
+      if(sitioRaw){
+        // normalize: allow "Purok I" or "I" variants
+        const m = sitioRaw.match(/I{1,3}|IV|V|VI|VII|\b1\b|\b2\b|\b3\b|\b4\b|\b5\b|\b6\b|\b7\b/i);
+        if(m){
+          sitioKey = m[0].toString().replace(/\b1\b/,'I').replace(/\b2\b/,'II').replace(/\b3\b/,'III').replace(/\b4\b/,'IV').replace(/\b5\b/,'V').replace(/\b6\b/,'VI').replace(/\b7\b/,'VII').toUpperCase();
+        } else {
+          sitioKey = sitioRaw;
+        }
+      }
+      b.sitio[sitioKey] = (b.sitio[sitioKey]||0) + 1;
+
+      // Livestock keys present in spreadsheet header (qty fields are separate)
+      const livestockKeys = ['Dog','Dog Qty.','Cat','Cat Qty.','Pig','Pig Qty.','Cow','Cow Qty.','Carabao','Carabao Qty.','Chicken','Chicken Qty.','Others'];
+      livestockKeys.forEach(key=>{
         const val = String(getField(r,key) || '').trim();
         if(!val) return;
-        // count presence and sum qty when field is qty
         if(key.toLowerCase().includes('qty')){
-          const animal = key.replace(/\s*Qty\.?$/i,'');
+          const animal = key.replace(/\s*Qty\.?$/i,'').trim();
           const n = Number(val) || 0;
-          if(!b.livestock[animal]) b.livestock[animal] = {count:0, qty:0};
+          if(!b.livestock[animal]) b.livestock[animal] = {qty:0, count:0};
           b.livestock[animal].qty += n;
         } else if(key.toLowerCase().trim() === 'others'){
           if(!b.livestock['Others']) b.livestock['Others'] = [];
           if(val) b.livestock['Others'].push(val);
         } else {
-          // yes/no or name — if value looks like yes/no
+          // column like 'Dog' may be 'Yes' or blank or number -> if 'Yes' increment count else if numeric treat as qty
           if(String(val).toLowerCase() === 'yes'){
-            if(!b.livestock[key]) b.livestock[key] = {count:0, qty:0};
+            if(!b.livestock[key]) b.livestock[key] = {qty:0, count:0};
             b.livestock[key].count += 1;
-          } else if(!isNaN(Number(val)) && val!==''){
-            // sometimes qty mistakenly in non-qty column
-            if(!b.livestock[key]) b.livestock[key] = {count:0, qty:0};
+          } else if(!isNaN(Number(val)) && val !== ''){
+            if(!b.livestock[key]) b.livestock[key] = {qty:0, count:0};
             b.livestock[key].qty += Number(val);
           }
         }
       });
 
-      // Government support
+      // Government support flags
       ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'].forEach(k=>{
-        if(String(getField(r,k)||'').toLowerCase().trim()==='yes'){
-          b[k] = (b[k]||0)+1;
+        if(String(getField(r,k)||'').toLowerCase().trim() === 'yes'){
+          b.support[k] = (b.support[k]||0) + 1;
         }
       });
 
-      // Age grouping (approx using Age field if present)
+      // Age buckets from Age field (try to parse number)
       const ageField = String(getField(r,'Age')||'').trim();
       let y = null;
       if(ageField){
-        // try to parse leading number
         const m = ageField.match(/(\d+)/);
         if(m) y = Number(m[1]);
       }
-      const ab = y===null? 'Unknown' : (y<=5? '0-5' : y<=17? '6-17' : y<=59? '18-59' : '60+');
-      b.ageBuckets[ab] = (b.ageBuckets[ab]||0)+1;
+      const ab = (y === null) ? 'Unknown' : (y <=5 ? '0-5' : y <=17 ? '6-17' : y <=59 ? '18-59' : '60+');
+      b.ageBuckets[ab] = (b.ageBuckets[ab]||0) + 1;
+    });
 
-    }); // rows loop
-
-    // UI updates
+    // Update top cards
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
     document.getElementById('withCoords').innerText = headsWithCoords;
     document.getElementById('lastUpdated').innerText = formatTS(new Date());
 
-    // quick stats box
-    const quick = document.getElementById('quickStats'); quick.innerHTML = '';
-    const totals = {male:0,female:0,pwd:0};
-    const livestockTotals = {}; const reasonsTotals = {}; const supportTotals = {};
+    // Quick totals
+    const quick = document.getElementById('quickStats');
+    quick.innerHTML = '';
+    let totals = {male:0, female:0, pwd:0};
+    const livestockTotals = {}, reasonsTotals = {}, supportTotals = {};
     Object.keys(barangayMap).forEach(bn=>{
-      const s = barangayMap[bn]; totals.male += s.male; totals.female += s.female; totals.pwd += s.pwds;
-      // livestock
-      Object.keys(s.livestock||{}).forEach(a=>{
-        if(a==='Others'){
-          livestockTotals['Others'] = (livestockTotals['Others']||0) + (s.livestock['Others']? s.livestock['Others'].length:0);
+      const s = barangayMap[bn];
+      totals.male += s.male; totals.female += s.female; totals.pwd += s.pwds;
+      // livestock aggregation
+      Object.keys(s.livestock || {}).forEach(a=>{
+        if(a === 'Others'){
+          livestockTotals['Others'] = (livestockTotals['Others']||0) + (s.livestock['Others'] ? s.livestock['Others'].length : 0);
         } else {
           livestockTotals[a] = livestockTotals[a] || 0;
-          livestockTotals[a] += (s.livestock[a] && s.livestock[a].qty)? s.livestock[a].qty : (s.livestock[a]&&s.livestock[a].count? s.livestock[a].count:0);
+          livestockTotals[a] += (s.livestock[a] && s.livestock[a].qty) ? s.livestock[a].qty : (s.livestock[a] && s.livestock[a].count ? s.livestock[a].count : 0);
         }
       });
       // reasons
-      Object.keys(s.reasons||{}).forEach(r=> reasonsTotals[r] = (reasonsTotals[r]||0)+s.reasons[r]);
-      // support
-      ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'].forEach(k=>{
-        if(s[k]) supportTotals[k] = (supportTotals[k]||0) + s[k];
-      });
+      Object.keys(s.reasons || {}).forEach(r => reasonsTotals[r] = (reasonsTotals[r]||0) + s.reasons[r]);
+      // support totals
+      Object.keys(s.support || {}).forEach(k => { supportTotals[k] = (supportTotals[k]||0) + s.support[k]; });
     });
 
-    // populate quick stats
-    const kv = [
-      ['Male', totals.male], ['Female', totals.female], ['PWD', totals.pwd]
-    ];
-    kv.forEach(it=>{
-      const el = document.createElement('div'); el.className='card'; el.style.padding='10px';
-      el.innerHTML = `<div class="mini">${it[0]}</div><div class="card-value">${it[1]}</div>`;
-      quick.appendChild(el);
+    // show male/female/pwd
+    [['Male', totals.male], ['Female', totals.female], ['PWD', totals.pwd]].forEach(it=>{
+      const div = document.createElement('div'); div.className = 'card'; div.style.padding = '10px';
+      div.innerHTML = `<div class="mini">${it[0]}</div><div class="card-value">${it[1]}</div>`;
+      quick.appendChild(div);
+    });
+    // livestock (top few)
+    Object.keys(livestockTotals).slice(0,6).forEach(k=>{
+      const div = document.createElement('div'); div.className='card'; div.style.padding='10px';
+      div.innerHTML = `<div class="mini">${k}</div><div class="card-value">${livestockTotals[k]}</div>`;
+      quick.appendChild(div);
     });
 
-    // Livestock small list
-    const lvKeys = Object.keys(livestockTotals).slice(0,6);
-    lvKeys.forEach(k=>{
-      const el = document.createElement('div'); el.className='card'; el.style.padding='10px';
-      el.innerHTML = `<div class="mini">${k}</div><div class="card-value">${livestockTotals[k]}</div>`;
-      quick.appendChild(el);
-    });
-
-    // Chart — heads vs members per barangay
+    // Chart: heads vs members per barangay (same as before)
     destroyChart();
     const labels = Object.keys(barangayMap).sort();
     const headsData = labels.map(l => barangayMap[l].heads || 0);
     const membersData = labels.map(l => barangayMap[l].members || 0);
     const ctx = document.getElementById('barangayChart').getContext('2d');
     chart = new Chart(ctx, {
-      type:'bar', data:{ labels, datasets:[{label:'Heads', data:headsData, backgroundColor:'#2b9348'},{label:'Members', data:membersData, backgroundColor:'#55a630'}] },
-      options:{ responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}} }
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Heads', data: headsData, backgroundColor: '#2b9348' }, { label: 'Members', data: membersData, backgroundColor: '#55a630' }] },
+      options: { responsive:true, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:true } } }
     });
 
-    // breakdown table
-    const tbody = document.querySelector('#breakTable tbody'); tbody.innerHTML = '';
-    labels.forEach(l=>{
+    // Populate all breakdown tables (centered)
+    // 1) Summary table (PWD / sex / coords)
+    const tbodySummary = document.querySelector('#tblSummary tbody'); tbodySummary.innerHTML = '';
+    labels.forEach(l => {
       const s = barangayMap[l];
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${l}</td><td>${s.pwds||0}</td><td>${s.male||0}</td><td>${s.female||0}</td><td>${s.coords||0}</td>`;
-      tbody.appendChild(tr);
+      tbodySummary.appendChild(tr);
+    });
+
+    // 2) Government Support
+    const supportKeys = ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'];
+    const tbodySupport = document.querySelector('#tblSupport tbody'); tbodySupport.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const cells = supportKeys.map(k => s.support && s.support[k] ? s.support[k] : 0);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+      tbodySupport.appendChild(tr);
+    });
+
+    // 3) Status breakdown (normalized to your list)
+    const statusKeys = ['With Sickness','Pregnant','Solo Parent','Lactating','Severe Illness','HIV Positive','LGBTQ Plus'];
+    const tbodyStatus = document.querySelector('#tblStatus tbody'); tbodyStatus.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const cells = statusKeys.map(k => s.status && s.status[k] ? s.status[k] : 0);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+      tbodyStatus.appendChild(tr);
+    });
+
+    // 4) Age buckets
+    const ageKeys = ['0-5','6-17','18-59','60+','Unknown'];
+    const tbodyAge = document.querySelector('#tblAge tbody'); tbodyAge.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const cells = ageKeys.map(k => s.ageBuckets && s.ageBuckets[k] ? s.ageBuckets[k] : 0);
+      const tr = document.createElement('tr'); tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+      tbodyAge.appendChild(tr);
+    });
+
+    // 5) Sitio / Purok (I-VII + Unknown)
+    const sitios = ['I','II','III','IV','V','VI','VII','Unknown'];
+    const tbodySitio = document.querySelector('#tblSitio tbody'); tbodySitio.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const cells = sitios.map(pk => s.sitio && s.sitio[pk] ? s.sitio[pk] : 0);
+      const tr = document.createElement('tr'); tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+      tbodySitio.appendChild(tr);
+    });
+
+    // 6) Livestock: show total qty (or count) and list others
+    const tbodyLiv = document.querySelector('#tblLivestock tbody'); tbodyLiv.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const animals = ['Dog','Cat','Pig','Cow','Carabao','Chicken'];
+      const cells = animals.map(a => {
+        const data = s.livestock && (s.livestock[a] || s.livestock[a==='Dog' ? 'Dog' : a]);
+        if(!data) return 0;
+        return (data.qty && data.qty > 0) ? data.qty : (data.count || 0);
+      });
+      const others = (s.livestock && s.livestock['Others']) ? s.livestock['Others'].slice(0,5).join('; ') : '';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('') + `<td>${others}</td>`;
+      tbodyLiv.appendChild(tr);
     });
 
   } catch(err){
-    console.error(err);
+    console.error('Load dashboard error', err);
   }
 }
 
-// support functions
-function autoRefresh(){ setInterval(loadDashboard, 30000); }
-
-// session + UI
+/* session + ui */
 async function sessionCheck(){
-  try{
+  try {
     const r = await fetch(API_URL + '?action=sessionCheck');
     const j = await r.json();
     if(!j.success) return window.location.href = 'index.html';
     document.getElementById('userName').innerText = j.fullName || '';
     if(j.role === 'Admin') document.getElementById('navUsers').style.display = 'block';
-  }catch(e){ console.warn('session check failed'); }
+  } catch(e){ console.warn('session check failed'); }
 }
 
 document.getElementById('logoutBtn').addEventListener('click', ()=>{ fetch(API_URL+'?action=logout'); window.location.href='index.html'; });
 
-// init
-window.addEventListener('DOMContentLoaded', async ()=>{ await sessionCheck(); await loadDashboard(); autoRefresh(); });
+window.addEventListener('DOMContentLoaded', async ()=>{
+  await sessionCheck();
+  await loadDashboard();
+  setInterval(loadDashboard, 30000);
+});
 </script>
 </body>
 </html>
