@@ -1158,7 +1158,7 @@
         <div class="section-title"><div class="chip">1</div><h3>Basic Information</h3></div>
         <div class="form-grid">
           <div>
-            <label>Coordinate (optional)</label>
+            <label>Coordinates (optional)</label>
             <div class="coordinate-container">
               <input type="text" id="coordinate" placeholder="Latitude, Longitude" />
               <button type="button" id="getLocationBtn" class="btn secondary">
@@ -1192,7 +1192,7 @@
           </div>
 
           <div>
-            <label>Name of Household Head <span class="required">*</span></label>
+            <label>Household Head Full Name<span class="required">*</span></label>
             <input type="text" id="householdHead" required />
           </div>
 
@@ -1259,7 +1259,7 @@
 
       <!-- DOMESTIC ANIMALS - REDESIGNED -->
       <div class="card">
-        <div class="section-title"><div class="chip">3</div><h3>Household Livestock</h3></div>
+        <div class="section-title"><div class="chip">3</div><h3>Domestic Livestock</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="domestic-grid-container">
@@ -1326,52 +1326,52 @@
           </div>
 
           <div style="margin-top: 16px;">
-            <label>Others (describe — max ~2 sentences)</label>
-            <textarea id="animals_others" class="others-box" placeholder="Describe other domestic animals or notes..."></textarea>
+            <label>Others</label>
+            <textarea id="animals_others" class="others-box" placeholder="Use this field to describe other animals owned in a brief sentence (e.g., “5 goats and 2 ducks”)."></textarea>
           </div>
         </div>
       </div>
 
       <!-- PICKUP / TRANSPORT / CAMP -->
       <div class="card">
-        <div class="section-title"><div class="chip">4</div><h3>Pickup / Transport / Camp Details</h3></div>
+        <div class="section-title"><div class="chip">4</div><h3>Transportation & Evacuation Details</h3></div>
         <div class="form-grid">
           <div>
             <label>Transportation</label>
             <select id="head_transport" class="animated">
               <option value="">Select...</option>
-              <option>Individual with Transportation</option>
-              <option>Individual needing Transportation</option>
+              <option>Has Transportation/option>
+              <option>Needs Transportation</option>
             </select>
           </div>
           
           <div>
-            <label>Designated Pick-Up Point</label>
+            <label>Pick-Up Location</label>
             <input type="text" id="pickup" />
           </div>
           
           <div>
-            <label>Drop-Off Point</label>
+            <label>Drop-Off Location</label>
             <input type="text" id="dropoff" />
           </div>
           
           <div>
-            <label>Name of Camp</label>
+            <label>Evacuation Camp Name</label>
             <input type="text" id="campName" />
           </div>
           
           <div>
-            <label>Capacity</label>
+            <label>Camp Capacity</label>
             <input type="number" id="capacity" min="0" />
           </div>
           
           <div>
-            <label>No. of Individuals Inside Camp</label>
+            <label>Individuals Currently in Camp”</label>
             <input type="number" id="insideCamp" min="0" />
           </div>
           
           <div>
-            <label>No. of Individuals Outside Camp</label>
+            <label>Individuals Outside Camp</label>
             <input type="number" id="outsideCamp" min="0"/>
           </div>
 
@@ -1379,7 +1379,7 @@
             <label>Reason for Displacement</label>
             <select id="reasons" class="animated">
               <option value="">Select...</option>
-              <option>Taal Volcano (With-in 14-15 KM Danger Zone)</option>
+              <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
               <option>Typhoon</option>
               <option>Flood</option>
               <option>Landslide</option>
@@ -1392,7 +1392,7 @@
 
       <!-- GOVERNMENT SUPPORT - FIXED ALIGNMENT -->
       <div class="card">
-        <div class="section-title"><div class="chip">5</div><h3>Government Support</h3></div>
+        <div class="section-title"><div class="chip">5</div><h3>Government Assistance Programs</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="gov-support-grid">
@@ -1474,14 +1474,14 @@
       <i class="fas fa-arrow-left"></i>
     </button>
     <div class="panel-chip" id="panelChip">Member 1</div>
-    <h3 id="panelTitle">Member Details</h3>
+    <h3 id="panelTitle">Household Member Details</h3>
   </div>
 
   <div class="panel-body">
     <form id="memberForm" onsubmit="return false;">
       <div class="form-grid">
         <div>
-          <label>Member Name <span class="required">*</span></label>
+          <label>Household Member Full name<span class="required">*</span></label>
           <input type="text" id="memberName" class="member-name" required />
         </div>
 
@@ -1494,16 +1494,16 @@
         </div>
 
         <div>
-          <label>Sex</label>
+          <label >Sex</label>
           <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex"> Male</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex" required> Male</label>
             <label class="radio-item"><input type="radio" name="member_sex" value="Female" class="member-sex"> Female</label>
           </div>
         </div>
 
         <div>
           <label>Birthdate</label>
-          <input type="date" id="memberBirthdate" class="member-birthdate" />
+          <input type="date" id="memberBirthdate" class="member-birthdate" required/>
         </div>
 
         <div>
@@ -1512,7 +1512,7 @@
         </div>
 
         <div>
-          <label>PWD</label>
+          <label>Persons with Disability (PWD)</label>
           <div class="radio-line">
             <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" class="member-pwd"> Yes</label>
             <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked class="member-pwd"> No</label>
@@ -1536,38 +1536,38 @@
           <label>Transportation</label>
           <select id="memberTransport" class="member-transport animated">
             <option value="">Select...</option>
-            <option>Individual with Transportation</option>
-            <option>Individual needing Transportation</option>
+            <option>Has Transportation</option>
+            <option>Needs Transportation</option>
           </select>
         </div>
 
         <div>
-          <label>Designated Pick-Up Point</label>
+          <label>Pick-Up Location</label>
           <input type="text" id="memberPickup" class="member-pickup"/>
         </div>
 
         <div>
-          <label>Drop-Off Point</label>
+          <label>Drop-Off Location</label>
           <input type="text" id="memberDropoff" class="member-dropoff"/>
         </div>
 
         <div>
-          <label>Name of Camp</label>
+          <label>Evacuation Camp Name</label>
           <input type="text" id="memberCamp" class="member-camp"/>
         </div>
 
         <div>
-          <label>Capacity</label>
+          <label>Camp Capacity</label>
           <input type="number" id="memberCampCap" class="member-cap" min="0"/>
         </div>
 
         <div>
-          <label>No. of Individuals Inside Camp</label>
+          <label>Individuals Currently in Camp</label>
           <input type="number" id="memberInside" class="member-inside" min="0"/>
         </div>
 
         <div>
-          <label>No. of Individuals Outside Camp</label>
+          <label>Individuals Outside Camp</label>
           <input type="number" id="memberOutside" class="member-outside" min="0"/>
         </div>
 
@@ -1575,7 +1575,7 @@
           <label>Reason for Displacement</label>
           <select id="memberReason" class="member-reason animated">
             <option value="">Select...</option>
-            <option>Taal Volcano (With-in 14-15 KM Danger Zone)</option>
+            <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
             <option>Typhoon</option>
             <option>Flood</option>
             <option>Landslide</option>
@@ -1588,7 +1588,7 @@
         <div style="grid-column:1/-1; margin-top:16px">
           <div class="section-title">
             <div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">GOV</div>
-            <h4>Government Support</h4>
+            <h4>Government Assistance Programs</h4>
           </div>
           <div class="instruction-label">Please check (✓) all items that apply.</div>
           
@@ -2344,3 +2344,4 @@ if (sidebarToggle) {
 </script>
 </body>
 </html>
+
