@@ -250,29 +250,34 @@
     gap: 8px;
    }
 
-   /* Stats - Fixed Position */
+   /* Stats - Made Smaller */
    .stats-container {
     display: flex;
     justify-content: flex-end;
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 16px;
     flex-wrap: wrap;
    }
 
    .stat-item {
     text-align: center;
-    min-width: 80px;
+    min-width: 70px;
+    padding: 6px 8px;
+    background: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
    }
 
    .stat-item span {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--muted);
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
    }
 
    .stat-item .value {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--accent1);
     display: block;
@@ -398,28 +403,35 @@
     font-size: 12px;
    }
 
+   /* Fixed: Table header and cells made smaller with proper z-index */
    .records-table th{
-    background:rgba(15,122,74,0.12);
-    padding: 12px 8px;
+    background: var(--light-green);
+    padding: 8px 6px;
     text-align: center;
-    font-weight: 700;
+    font-weight: 600;
     position: sticky;
     top: 0;
-    z-index: 6;
-    font-size: 12px;
+    z-index: 100;
+    font-size: 11px;
     color: var(--accent1);
     border-bottom: 2px solid rgba(15,122,74,0.15);
     white-space: nowrap;
     vertical-align: middle;
+    height: 36px;
+    box-sizing: border-box;
    }
 
+   /* Fixed: Reduced row height for data rows */
    .records-table td{
-    padding: 10px 8px;
-    font-size: 12px;
+    padding: 6px 5px;
+    font-size: 11px;
     border-bottom: 1px solid rgba(15,122,74,0.08);
     vertical-align: middle;
     color: var(--muted);
     text-align: center;
+    height: 32px;
+    box-sizing: border-box;
+    line-height: 1.2;
    }
 
    .records-table tbody tr:hover{
@@ -431,7 +443,7 @@
     position:sticky;
     left:0;
     background: rgba(255,255,255,0.95);
-    z-index:7;
+    z-index:50;
     padding-left:8px;
     border-right: 1px solid rgba(15,122,74,0.1);
    }
@@ -440,7 +452,7 @@
     position:sticky;
     right:0;
     background: #2c3e50;
-    z-index:7;
+    z-index:50;
     border-left: 1px solid rgba(255,255,255,0.1);
    }
 
@@ -449,18 +461,21 @@
     background: #2c3e50;
     color: white;
     font-weight: 700;
+    z-index: 101;
    }
 
    .records-table th:last-child,
    .records-table th:nth-last-child(2) {
     background: #2c3e50;
     color: white;
+    z-index: 101;
    }
 
    .records-table td.actions-col {
     background: #2c3e50;
     color: white;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 49;
    }
 
    .records-table td:nth-last-child(1),
@@ -468,6 +483,7 @@
     background: #2c3e50;
     color: white;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 49;
    }
 
    /* Checkbox styling */
@@ -787,11 +803,21 @@
     
     .stats-container {
         justify-content: space-between;
+        gap: 8px;
     }
     
     .stat-item {
         flex: 1;
         min-width: auto;
+        padding: 5px 6px;
+    }
+    
+    .stat-item span {
+        font-size: 0.7rem;
+    }
+    
+    .stat-item .value {
+        font-size: 0.9rem;
     }
     
     .user-info {
@@ -816,12 +842,45 @@
     
     .records-table {
         font-size: 11px;
+        min-width: 1200px;
+    }
+    
+    .records-table th,
+    .records-table td {
+        font-size: 10px;
+        padding: 5px 4px;
+    }
+    
+    .records-table th {
+        height: 32px;
+    }
+    
+    .records-table td {
+        height: 28px;
+    }
+   }
+
+   /* Tablet Styles */
+   @media (min-width: 769px) and (max-width: 1024px) {
+    .page-container {
+        max-width: 95%;
+        grid-template-columns: 220px 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+    
+    .content-area {
+        padding: 15px;
+    }
+    
+    .records-table {
+        min-width: 1300px;
     }
     
     .records-table th,
     .records-table td {
         font-size: 11px;
-        padding: 8px 6px;
+        padding: 7px 5px;
     }
    }
 
@@ -1455,4 +1514,3 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-
