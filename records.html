@@ -400,38 +400,38 @@
     width:100%;
     min-width:1400px;
     border-collapse:collapse;
-    font-size: 12px;
+    font-size: 16px; /* Changed from 14px to 16px */
    }
 
    /* Fixed: Table header and cells made smaller with proper z-index */
    .records-table th{
     background: var(--light-green);
-    padding: 8px 6px;
+    padding: 12px 10px; /* Increased padding for larger text */
     text-align: center;
     font-weight: 600;
     position: sticky;
     top: 0;
     z-index: 100;
-    font-size: 11px;
+    font-size: 16px; /* Changed from 14px to 16px */
     color: var(--accent1);
     border-bottom: 2px solid rgba(15,122,74,0.15);
     white-space: nowrap;
     vertical-align: middle;
-    height: 36px;
+    height: 48px; /* Increased height for larger text */
     box-sizing: border-box;
    }
 
    /* Fixed: Reduced row height for data rows */
    .records-table td{
-    padding: 6px 5px;
-    font-size: 11px;
+    padding: 10px 8px; /* Increased padding for larger text */
+    font-size: 16px; /* Changed from 14px to 16px */
     border-bottom: 1px solid rgba(15,122,74,0.08);
     vertical-align: middle;
     color: var(--muted);
     text-align: center;
-    height: 32px;
+    height: 42px; /* Increased height for larger text */
     box-sizing: border-box;
-    line-height: 1.2;
+    line-height: 1.4; /* Increased line height */
    }
 
    .records-table tbody tr:hover{
@@ -488,8 +488,8 @@
 
    /* Checkbox styling */
    .select-col input[type="checkbox"] {
-    width: 14px;
-    height: 14px;
+    width: 16px; /* Increased from 14px */
+    height: 16px; /* Increased from 14px */
     cursor: pointer;
     accent-color: var(--accent1);
    }
@@ -520,7 +520,7 @@
    .icon-btn{
     background:none;
     border:0;
-    font-size:0.85rem;
+    font-size:1rem; /* Increased from 0.85rem */
     cursor:pointer;
     padding:4px;
     border-radius:4px;
@@ -538,8 +538,8 @@
 
    /* Show toggle */
    .show-toggle{
-    font-size:0.75rem;
-    padding:5px 8px;
+    font-size:0.85rem; /* Increased from 0.75rem */
+    padding:6px 10px; /* Increased padding */
     border-radius:4px;
     border:1px solid rgba(255,255,255,0.3);
     background:rgba(255,255,255,0.1);
@@ -841,22 +841,22 @@
     }
     
     .records-table {
-        font-size: 11px;
+        font-size: 14px; /* Changed from 12px to 14px */
         min-width: 1200px;
     }
     
     .records-table th,
     .records-table td {
-        font-size: 10px;
-        padding: 5px 4px;
+        font-size: 14px; /* Changed from 12px to 14px */
+        padding: 8px 6px; /* Increased padding for mobile */
     }
     
     .records-table th {
-        height: 32px;
+        height: 42px; /* Increased height for mobile */
     }
     
     .records-table td {
-        height: 28px;
+        height: 38px; /* Increased height for mobile */
     }
    }
 
@@ -879,8 +879,8 @@
     
     .records-table th,
     .records-table td {
-        font-size: 11px;
-        padding: 7px 5px;
+        font-size: 15px; /* Changed from 13px to 15px */
+        padding: 10px 8px; /* Increased padding for tablet */
     }
    }
 
