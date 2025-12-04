@@ -4,46 +4,532 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Purok Kaligtasan — Dashboard</title>
-<link rel="stylesheet" href="styles.css"/>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  .dashboard-cards{
+   :root{
+    --bg:#f6f8f7;
+    --card-bg:#fff;
+    --muted:#6b6f6b;
+    --accent1:#0f7a4a;
+    --accent2:#34b78f;
+    --accent3: #ff7a00;
+    --accent4: #ffa500;
+    --light-green: #e9f7f2;
+    --border: #e1e8e5;
+    --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --shadow-dark: 0 6px 20px rgba(5,40,25,0.12);
+    --radius:12px;
+    --radius-sm:8px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+   }
+
+   body {
+    background-color: var(--bg);
+    margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+   }
+
+   .page-container{
+    max-width:1200px;
+    margin:20px auto;
+    padding:12px;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:18px;
+    align-items:start;
+    transition: grid-template-columns 0.3s ease;
+   }
+
+   .page-container.collapsed {
+    grid-template-columns: 60px 1fr;
+   }
+
+   /* Topbar - Matching dataForm.html */
+   .topbar{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-radius:var(--radius);
+    background:linear-gradient(90deg, var(--accent1), var(--accent2));
+    color:#fff;
+    box-shadow:var(--shadow-dark);
+   }
+
+   .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+   }
+
+   .brand .logo{
+    width:48px;
+    height:48px;
+    border-radius:var(--radius-sm);
+    object-fit:contain;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+    border: 2px solid rgba(255,255,255,0.2);
+   }
+
+   .brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+   }
+
+   .brand-text p {
+    font-size:12px;
+    opacity:0.95;
+    margin: 4px 0 0 0;
+   }
+
+   .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+   }
+
+   #userName {
+    font-weight: 600;
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   #logoutBtn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+   }
+
+   #logoutBtn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+   }
+
+   /* Sidebar - Matching dataForm.html */
+   .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
+    border-radius:var(--radius);
+    padding:12px;
+    height:calc(100vh - 120px);
+    position:sticky;
+    top:72px;
+    overflow:auto;
+    transition: width 0.3s ease;
+   }
+
+   .sidebar ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+   }
+
+   .sidebar li a{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--muted);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+   }
+
+   .sidebar li a:hover{
+    background: var(--light-green);
+    color: var(--accent1);
+   }
+
+   .sidebar li a.active{
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   .sidebar li a .menu-icon {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+   }
+
+   /* Content Area - Matching dataForm.html */
+   .content-area{
+    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 8px 22px rgba(10,20,16,0.06);
+    min-height:72vh;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+   }
+
+   /* Content Header - Matching dataForm.html */
+   .content-header {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   }
+
+   .content-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--accent1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   /* Description - Matching dataForm.html */
+   #disc {
+    margin-bottom: 16px;
+    background: var(--light-green);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent1);
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+   }
+
+   /* Card Styling */
+   .card{ 
+     padding:16px;
+     border-radius:var(--radius);
+     background:var(--card-bg);
+     margin-bottom:12px;
+     box-shadow:var(--shadow);
+     border: 1px solid rgba(255,255,255,0.8);
+     overflow: hidden;
+   }
+
+   /* Dashboard Cards */
+   .dashboard-cards{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
     gap:12px;
     margin:12px 0 18px 0;
-  }
-  .card{
-    padding:12px;
-    border-radius:10px;
-    background:#fff;
-    box-shadow:0 6px 18px rgba(6,30,20,0.04);
-  }
-  .card h3{ margin:0 0 8px 0; font-size:14px; color:#0f7a4a }
-  .card-value{ font-size:22px; font-weight:800; color:#153b26 }
-  .mini { font-size:13px; color:#55615a }
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+   }
 
-  /* breakdown layout */
-  .break-grid {
+   .card h3{ 
+     margin:0 0 8px 0; 
+     font-size:0.9rem; 
+     color:var(--accent1);
+     font-weight: 700;
+   }
+   
+   .card-value{ 
+     font-size:1.8rem; 
+     font-weight:800; 
+     color:#153b26;
+     line-height: 1.2;
+   }
+   
+   .mini { 
+     font-size:0.8rem; 
+     color:var(--muted);
+     margin-top: 4px;
+   }
+   
+   .stat-grid{
+     display:grid;
+     grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+     gap:12px;
+   }
+
+   /* Full-width breakdown layout */
+   .break-grid {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:12px;
-    margin-top:12px;
+    gap:16px;
+    margin-top:16px;
     align-items:start;
-  }
-  .break-card { padding:12px; border-radius:10px; background:#fff; box-shadow:0 6px 18px rgba(6,30,20,0.04); overflow:auto; }
-  .break-card h4 { margin:0 0 8px 0; font-size:14px; color:#0f7a4a; }
-  .break-table { width:100%; border-collapse:collapse; text-align:center; }
-  .break-table th, .break-table td { padding:6px 8px; border-bottom:1px solid #eee; font-size:13px; }
-  .break-table thead th { background: rgba(15,122,74,0.06); font-weight:700; position: sticky; top:0; z-index:2; }
-  .center-wrap { display:flex; justify-content:center; }
-  .small-muted { font-size:12px; color:#55615a; margin-top:8px; }
+    width:100%;
+   }
 
-  /* responsive tweak */
-  @media(max-width:900px){
-    .break-grid { grid-template-columns:1fr; }
-  }
+   .break-card { 
+     padding:16px; 
+     border-radius:var(--radius); 
+     background:var(--card-bg); 
+     box-shadow:var(--shadow);
+     overflow:auto;
+     max-width:100%;
+     width:100%;
+   }
+
+   .break-card h4 { 
+     margin:0 0 12px 0; 
+     font-size:0.95rem; 
+     color:var(--accent1);
+     font-weight: 700;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+   }
+
+   .break-table { 
+     width:100%; 
+     border-collapse:collapse; 
+     text-align:center;
+     font-size:0.85rem;
+   }
+
+   .break-table th, .break-table td { 
+     padding:8px 10px; 
+     border-bottom:1px solid var(--border);
+   }
+
+   .break-table thead th { 
+     background: rgba(15,122,74,0.08); 
+     font-weight:700; 
+     color: var(--accent1);
+     position: sticky; 
+     top:0; 
+     z-index:2;
+     white-space: nowrap;
+   }
+
+   .break-table tbody tr:hover {
+     background: var(--light-green);
+   }
+
+   .center-wrap { 
+     display:flex; 
+     justify-content:center;
+     overflow-x: auto;
+   }
+
+   .small-muted { 
+     font-size:0.85rem; 
+     color:var(--muted); 
+     margin-top:8px;
+     text-align: center;
+   }
+
+   /* Improved responsive design */
+   @media (max-width: 768px) {
+     .page-container {
+         grid-template-columns: 1fr !important;
+         padding: 8px;
+         gap: 12px;
+         max-width: 100%;
+     }
+     
+     .page-container.collapsed {
+         grid-template-columns: 1fr !important;
+     }
+     
+     .sidebar {
+         position: fixed;
+         top: 72px;
+         left: 0;
+         right: 0;
+         height: auto;
+         max-height: 0;
+         overflow: hidden;
+         z-index: 1000;
+         margin: 0;
+         padding: 0;
+         border-radius: 0 0 var(--radius) var(--radius);
+         background: white;
+         box-shadow: var(--shadow);
+         transition: max-height 0.3s ease;
+     }
+     
+     .sidebar.mobile-open {
+         max-height: 300px;
+         padding: 12px;
+         overflow-y: auto;
+     }
+     
+     .content-area {
+         height: auto;
+         min-height: calc(100vh - 140px);
+         padding: 16px;
+     }
+     
+     .dashboard-cards {
+         grid-template-columns: repeat(2, 1fr);
+         gap: 10px;
+     }
+     
+     .break-grid {
+         grid-template-columns: 1fr;
+         gap: 12px;
+     }
+     
+     .break-card {
+         padding: 12px;
+         overflow-x: auto;
+     }
+     
+     .break-table {
+         font-size: 0.8rem;
+     }
+     
+     .break-table th, .break-table td {
+         padding: 6px 8px;
+     }
+     
+     .card-value {
+         font-size: 1.5rem;
+     }
+   }
+
+   /* Small mobile devices */
+   @media (max-width: 480px) {
+     .dashboard-cards {
+         grid-template-columns: 1fr;
+     }
+     
+     .stat-grid {
+         grid-template-columns: repeat(2, 1fr);
+         gap: 8px;
+     }
+     
+     .brand-text h1 {
+         font-size: 1rem;
+     }
+     
+     .brand-text p {
+         font-size: 0.7rem;
+     }
+     
+     #userName {
+         font-size: 0.8rem;
+         padding: 4px 8px;
+     }
+     
+     .content-header h2 {
+         font-size: 1.2rem;
+     }
+     
+     .card {
+         padding: 12px;
+     }
+   }
+
+   /* Tablet-specific improvements */
+   @media (min-width: 769px) and (max-width: 1024px) {
+     .page-container {
+         max-width: 95%;
+         padding: 10px;
+         gap: 16px;
+     }
+     
+     .break-grid {
+         grid-template-columns: repeat(2, 1fr);
+         gap: 14px;
+     }
+     
+     .dashboard-cards {
+         grid-template-columns: repeat(2, 1fr);
+     }
+   }
+
+   /* Sidebar toggle for mobile */
+   .mobile-menu-toggle {
+     display: none;
+     background: linear-gradient(135deg, var(--accent1), var(--accent2));
+     color: white;
+     border: none;
+     border-radius: var(--radius-sm);
+     width: 36px;
+     height: 36px;
+     align-items: center;
+     justify-content: center;
+     cursor: pointer;
+     font-size: 1rem;
+     -webkit-tap-highlight-color: transparent;
+     touch-action: manipulation;
+   }
+
+   @media (max-width: 768px) {
+     .mobile-menu-toggle {
+         display: flex !important;
+     }
+     
+     .sidebar-toggle {
+         display: none;
+     }
+   }
+
+   /* Print styles */
+   @media print {
+     .sidebar, .topbar, .btn, .mobile-menu-toggle {
+         display: none !important;
+     }
+     
+     .page-container {
+         grid-template-columns: 1fr !important;
+         margin: 0;
+         padding: 0;
+     }
+     
+     .content-area {
+         box-shadow: none;
+         background: white;
+         height: auto;
+         overflow: visible;
+     }
+     
+     .card {
+         box-shadow: none;
+         border: 1px solid #ddd;
+         break-inside: avoid;
+     }
+   }
+
+   /* High DPI/Retina display improvements */
+   @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+     .logo {
+         image-rendering: -webkit-optimize-contrast;
+         image-rendering: crisp-edges;
+     }
+   }
+
+   /* Chart container */
+   #barangayChart {
+     width: 100% !important;
+     height: 160px !important;
+   }
+
+   /* Last updated styling */
+   #lastUpdated {
+     font-size: 0.95rem;
+     font-weight: 600;
+     color: var(--accent1);
+   }
 </style>
 </head>
 
@@ -51,35 +537,47 @@
 <div class="page-container">
 
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
-
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
-      <div>
-        <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+      <div class="brand-text">
+        <h1>PUROK KALIGTASAN</h1>
+        <p>Disaster Risk Reduction & Management Office - Alitagtag</p>
       </div>
     </div>
 
     <div class="user-info">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
       <span id="userName"></span>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+      <button id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
     </div>
   </header>
 
-  <aside class="sidebar">
-    <ul>
-      <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
-      <li><a href="dataForm.html">📝 Data Entry</a></li>
-      <li><a href="records.html">📁 Records</a></li>
-      <li><a href="charts.html">📈 Charts</a></li>
-      <li id="navUsers" style="display:none;"><a href="users.html">👥 User Management</a></li>
-    </ul>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-container">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <ul>
+        <li><a href="dashboard.html" class="active"><span class="menu-icon">📊</span> <span class="menu-text">Dashboard</span></a></li>
+        <li><a href="dataForm.html"><span class="menu-icon">📝</span> <span class="menu-text">Data Entry</span></a></li>
+        <li><a href="records.html"><span class="menu-icon">📁</span> <span class="menu-text">Records</span></a></li>
+        <li><a href="charts.html"><span class="menu-icon">📈</span> <span class="menu-text">Charts</span></a></li>
+        <li class="admin-only" id="navUsers" style="display:none;"><a href="users.html"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
+      </ul>
+    </div>
   </aside>
 
   <main class="content-area" tabindex="-1">
-    <h2>📊 Dashboard Overview</h2>
-      <div id="disc">This section captures all key information about the household head, including personal data, contact details, demographic profile, and any government support or programs currently availed. The information will help establish the primary point of contact and provide a clear understanding of the household's overall status.</div>
+    <div class="content-header">
+      <h2><span style="color: var(--accent1);">📊</span> Dashboard Overview</h2>
+    </div>
+
+    <div id="disc">This dashboard provides a comprehensive overview of all household data collected. Monitor key metrics, track government support distribution, analyze demographic patterns, and view detailed breakdowns per barangay to make informed decisions for disaster risk reduction and management initiatives.</div>
 
     <div class="dashboard-cards">
       <div class="card">
@@ -117,12 +615,12 @@
       <canvas id="barangayChart" height="160"></canvas>
     </div>
 
-    <!-- breakdowns grid -->
+    <!-- breakdowns grid - Full width but contained -->
     <div class="break-grid">
 
       <!-- Basic barangay summary (PWD + male/female/coords) -->
       <div class="break-card">
-        <h4>Barangay Summary (PWD / Sex / With Coord)</h4>
+        <h4><i class="fas fa-chart-bar" style="color: var(--accent1);"></i> Barangay Summary</h4>
         <div class="center-wrap">
           <table class="break-table" id="tblSummary">
             <thead>
@@ -135,7 +633,7 @@
 
       <!-- Government support -->
       <div class="break-card">
-        <h4>Government Support (per Barangay)</h4>
+        <h4><i class="fas fa-hand-holding-heart" style="color: var(--accent1);"></i> Government Support (per Barangay)</h4>
         <div class="center-wrap">
           <table class="break-table" id="tblSupport">
             <thead>
@@ -152,7 +650,7 @@
 
       <!-- Status breakdown -->
       <div class="break-card">
-        <h4>Status Breakdown (per Barangay)</h4>
+        <h4><i class="fas fa-user-tag" style="color: var(--accent1);"></i> Status Breakdown (per Barangay)</h4>
         <div class="center-wrap">
           <table class="break-table" id="tblStatus">
             <thead>
@@ -169,7 +667,7 @@
 
       <!-- Age buckets -->
       <div class="break-card">
-        <h4>Age Buckets (per Barangay)</h4>
+        <h4><i class="fas fa-user-clock" style="color: var(--accent1);"></i> Age Buckets (per Barangay)</h4>
         <div class="center-wrap">
           <table class="break-table" id="tblAge">
             <thead><tr><th>Barangay</th><th>0-5</th><th>6-17</th><th>18-59</th><th>60+</th><th>Unknown</th></tr></thead>
@@ -180,7 +678,7 @@
 
       <!-- Sitio/Purok -->
       <div class="break-card">
-        <h4>Sitio / Purok Distribution (per Barangay)</h4>
+        <h4><i class="fas fa-map-marker-alt" style="color: var(--accent1);"></i> Sitio / Purok Distribution</h4>
         <div class="center-wrap">
           <table class="break-table" id="tblSitio">
             <thead><tr><th>Barangay</th><th>I</th><th>II</th><th>III</th><th>IV</th><th>V</th><th>VI</th><th>VII</th><th>Unknown</th></tr></thead>
@@ -191,7 +689,7 @@
 
       <!-- Livestock -->
       <div class="break-card">
-        <h4>Household Livestock (per Barangay)</h4>
+        <h4><i class="fas fa-paw" style="color: var(--accent1);"></i> Household Livestock (per Barangay)</h4>
         <div class="center-wrap">
           <table class="break-table" id="tblLivestock">
             <thead>
@@ -204,7 +702,7 @@
 
     </div><!-- end break-grid -->
 
-    <div class="small-muted">Tip: click Refresh or reopen page to recalc. Tables are centered and responsive.</div>
+    <div class="small-muted">Tip: Data refreshes automatically every 30 seconds. Tables are responsive and scrollable on smaller screens.</div>
 
   </main>
 </div>
@@ -214,6 +712,7 @@
 /* CONFIG */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 let chart = null;
+let lastUpdateTime = null;
 
 /* helpers */
 function getField(obj, name){
@@ -224,6 +723,7 @@ function getField(obj, name){
   }
   return "";
 }
+
 function formatTS(date){
   if(!date) date = new Date();
   const m = date.getMonth()+1;
@@ -236,7 +736,28 @@ function formatTS(date){
   hh = hh%12; hh = hh? hh:12;
   return `${m}/${d}/${y} ${String(hh).padStart(2,'0')}:${mm}:${ss} ${ampm}`;
 }
-async function fetchRecords(){ const res = await fetch(`${API_URL}?action=getRecords`); return res.json(); }
+
+async function fetchRecords(){ 
+  const res = await fetch(`${API_URL}?action=getRecords`); 
+  return res.json(); 
+}
+
+async function fetchLastUpdated(){
+  try {
+    // Try to get the last update time from server
+    const res = await fetch(`${API_URL}?action=getLastUpdated`);
+    const data = await res.json();
+    if(data.success && data.lastUpdated) {
+      lastUpdateTime = new Date(data.lastUpdated);
+      return formatTS(lastUpdateTime);
+    }
+  } catch(err) {
+    console.warn('Could not fetch last updated time:', err);
+  }
+  // Fallback to current time if server doesn't provide
+  return formatTS(new Date());
+}
+
 function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart = null; } }
 
 /* main */
@@ -245,6 +766,10 @@ async function loadDashboard(){
     const data = await fetchRecords();
     if(!data.success) throw new Error('Failed fetch');
     const rows = data.rows || [];
+
+    // Get last updated time
+    const lastUpdatedStr = await fetchLastUpdated();
+    document.getElementById('lastUpdated').innerText = lastUpdatedStr || formatTS(new Date());
 
     // init containers
     let totalHeads = 0, totalMembers = 0, headsWithCoords = 0;
@@ -350,7 +875,6 @@ async function loadDashboard(){
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
     document.getElementById('withCoords').innerText = headsWithCoords;
-    document.getElementById('lastUpdated').innerText = formatTS(new Date());
 
     // Quick totals
     const quick = document.getElementById('quickStats');
@@ -396,8 +920,44 @@ async function loadDashboard(){
     const ctx = document.getElementById('barangayChart').getContext('2d');
     chart = new Chart(ctx, {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Heads', data: headsData, backgroundColor: '#2b9348' }, { label: 'Members', data: membersData, backgroundColor: '#55a630' }] },
-      options: { responsive:true, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:true } } }
+      data: { 
+        labels, 
+        datasets: [
+          { label: 'Heads', data: headsData, backgroundColor: '#0f7a4a' }, 
+          { label: 'Members', data: membersData, backgroundColor: '#34b78f' }
+        ] 
+      },
+      options: { 
+        responsive:true, 
+        maintainAspectRatio: false,
+        plugins:{ 
+          legend:{ 
+            position:'bottom',
+            labels: {
+              font: {
+                size: 12
+              }
+            }
+          } 
+        }, 
+        scales:{ 
+          y:{ 
+            beginAtZero:true,
+            ticks: {
+              font: {
+                size: 11
+              }
+            }
+          },
+          x: {
+            ticks: {
+              font: {
+                size: 11
+              }
+            }
+          }
+        } 
+      }
     });
 
     // Populate all breakdown tables (centered)
@@ -464,12 +1024,13 @@ async function loadDashboard(){
       });
       const others = (s.livestock && s.livestock['Others']) ? s.livestock['Others'].slice(0,5).join('; ') : '';
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('') + `<td>${others}</td>`;
+      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('') + `<td title="${others}">${others.length > 30 ? others.substring(0, 30) + '...' : others}</td>`;
       tbodyLiv.appendChild(tr);
     });
 
   } catch(err){
     console.error('Load dashboard error', err);
+    document.getElementById('lastUpdated').innerText = 'Error loading data';
   }
 }
 
@@ -484,12 +1045,83 @@ async function sessionCheck(){
   } catch(e){ console.warn('session check failed'); }
 }
 
-document.getElementById('logoutBtn').addEventListener('click', ()=>{ fetch(API_URL+'?action=logout'); window.location.href='index.html'; });
+/* Sidebar toggle functionality */
+function toggleSidebar() {
+    const pageContainer = document.querySelector('.page-container');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const icon = sidebarToggle.querySelector('i');
+    
+    pageContainer.classList.toggle('collapsed');
+    
+    if (pageContainer.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        sidebarToggle.title = "Expand sidebar";
+    } else {
+        icon.className = 'fas fa-bars';
+        sidebarToggle.title = "Collapse sidebar";
+    }
+}
 
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const icon = mobileToggle.querySelector('i');
+    
+    sidebar.classList.toggle('mobile-open');
+    
+    if (sidebar.classList.contains('mobile-open')) {
+        icon.className = 'fas fa-times';
+        mobileToggle.title = "Close menu";
+    } else {
+        icon.className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+}
+
+/* Close mobile sidebar on click outside */
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target) && sidebar.classList.contains('mobile-open')) {
+            sidebar.classList.remove('mobile-open');
+            mobileToggle.querySelector('i').className = 'fas fa-bars';
+            mobileToggle.title = "Open menu";
+        }
+    }
+});
+
+/* Window resize handler */
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        // On desktop, ensure sidebar is not in mobile-open state
+        const sidebar = document.getElementById('sidebar');
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        
+        sidebar.classList.remove('mobile-open');
+        mobileToggle.querySelector('i').className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+});
+
+/* Event listeners */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{ 
+  fetch(API_URL+'?action=logout'); 
+  window.location.href='index.html'; 
+});
+
+// Desktop sidebar toggle
+document.getElementById('sidebarToggle').onclick = toggleSidebar;
+
+// Mobile sidebar toggle
+document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
+
+/* Initialize dashboard */
 window.addEventListener('DOMContentLoaded', async ()=>{
   await sessionCheck();
   await loadDashboard();
-  setInterval(loadDashboard, 30000);
+  setInterval(loadDashboard, 30000); // Refresh every 30 seconds
 });
 </script>
 </body>
