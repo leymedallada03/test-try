@@ -2138,12 +2138,12 @@ function fillMemberPanel(idx){
   
   // Transportation & Evacuation Details
   document.getElementById("memberTransport").value = mem["Transportation"] || "";
-  document.getElementById("memberPickup").value = mem["Designated Pick-Up Point"] || "";
-  document.getElementById("memberDropoff").value = mem["Drop-Off Point"] || "";
-  document.getElementById("memberCamp").value = mem["Name of Camp"] || "";
+  document.getElementById("memberPickup").value = mem["Designated Pick-Up Point"] || mem["Pick-Up Location"] || "";
+  document.getElementById("memberDropoff").value = mem["Drop-Off Point"] || mem["Drop-Off Location"] || "";
+  document.getElementById("memberCamp").value = mem["Name of Camp"] || mem["Evacuation Camp Name"] || "";
   document.getElementById("memberCampCap").value = mem["Capacity"] || "";
-  document.getElementById("memberInside").value = mem["No. of Individuals Inside Camp"] || "";
-  document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || "";
+  document.getElementById("memberInside").value = mem["No. of Individuals Inside Camp"] || mem["Individuals Currently in Camp"] || "";
+  document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || mem["Individuals Outside Camp"] || "";
   document.getElementById("memberReason").value = mem["Reasons for Displacement"] || "";
   
   // Government Assistance Programs
@@ -2198,11 +2198,16 @@ function collectMemberDataFromPanel(){
     "Country": document.getElementById("memberCountry").value || "",
     "Transportation": document.getElementById("memberTransport").value || "",
     "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
+    "Pick-Up Location": document.getElementById("memberPickup").value || "", // Compatibility field
     "Drop-Off Point": document.getElementById("memberDropoff").value || "",
+    "Drop-Off Location": document.getElementById("memberDropoff").value || "", // Compatibility field
     "Name of Camp": document.getElementById("memberCamp").value || "",
+    "Evacuation Camp Name": document.getElementById("memberCamp").value || "", // Compatibility field
     "Capacity": document.getElementById("memberCampCap").value || "",
     "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
+    "Individuals Currently in Camp": document.getElementById("memberInside").value || "", // Compatibility field
     "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
+    "Individuals Outside Camp": document.getElementById("memberOutside").value || "", // Compatibility field
     "Reasons for Displacement": document.getElementById("memberReason").value || "",
     "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
     "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
@@ -2675,6 +2680,7 @@ async function submitHeadAndMembers(){
 
   const head = {
     "Coordinate": document.getElementById("coordinate").value || "",
+    "Coordinates": document.getElementById("coordinate").value || "", // Added for compatibility
     "Barangay": document.getElementById("barangay").value || "",
     "Sitio / Purok": document.getElementById("sitio").value || "",
     "Name of Household Head": document.getElementById("householdHead").value || "",
@@ -2696,11 +2702,16 @@ async function submitHeadAndMembers(){
     "Country": document.getElementById("country").value || "",
     "Transportation": document.getElementById("head_transport").value || "",
     "Designated Pick-Up Point": document.getElementById("pickup").value || "",
+    "Pick-Up Location": document.getElementById("pickup").value || "", // Added for compatibility
     "Drop-Off Point": document.getElementById("dropoff").value || "",
+    "Drop-Off Location": document.getElementById("dropoff").value || "", // Added for compatibility
     "Name of Camp": document.getElementById("campName").value || "",
+    "Evacuation Camp Name": document.getElementById("campName").value || "", // Added for compatibility
     "Capacity": document.getElementById("capacity").value || "",
     "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
+    "Individuals Currently in Camp": document.getElementById("insideCamp").value || "", // Added for compatibility
     "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
+    "Individuals Outside Camp": document.getElementById("outsideCamp").value || "", // Added for compatibility
     "Reasons for Displacement": document.getElementById("reasons").value || "",
     "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
     "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
@@ -2752,11 +2763,16 @@ async function submitHeadAndMembers(){
         "Country": "",
         "Transportation": "",
         "Designated Pick-Up Point": "",
+        "Pick-Up Location": "", // Added for compatibility
         "Drop-Off Point": "",
+        "Drop-Off Location": "", // Added for compatibility
         "Name of Camp": "",
+        "Evacuation Camp Name": "", // Added for compatibility
         "Capacity": "",
         "No. of Individuals Inside Camp": "",
+        "Individuals Currently in Camp": "", // Added for compatibility
         "No. of Individuals Outside Camp": "",
+        "Individuals Outside Camp": "", // Added for compatibility
         "Reasons for Displacement": "",
         "TUPAD": "No",
         "Local 4Ps": "No",
@@ -2900,5 +2916,6 @@ if (sidebarToggle) {
 </script>
 </body>
 </html>
+
 
 
