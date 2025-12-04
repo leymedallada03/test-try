@@ -827,6 +827,49 @@
      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
    }
 
+   /* ============ NEW EDUCATIONAL/ECONOMIC SECTION STYLING ============ */
+   .conditional-field {
+     margin-top: 12px;
+     display: none;
+     animation: fadeIn 0.3s ease;
+   }
+
+   .conditional-field.show {
+     display: block;
+   }
+
+   @keyframes fadeIn {
+     from { opacity: 0; transform: translateY(-5px); }
+     to { opacity: 1; transform: translateY(0); }
+   }
+
+   /* Head name with checkbox container */
+   .head-name-container {
+     display: flex;
+     align-items: center;
+     gap: 16px;
+     flex-wrap: wrap;
+   }
+
+   .head-name-container input[type="text"] {
+     flex: 1;
+     min-width: 200px;
+   }
+
+   .head-registration {
+     display: flex;
+     gap: 16px;
+     margin-top: 8px;
+     padding: 12px;
+     background: var(--light-green);
+     border-radius: var(--radius-sm);
+     border-left: 3px solid var(--accent1);
+   }
+
+   .head-registration .radio-item {
+     margin: 0;
+   }
+
    /* ============ RESPONSIVE DESIGN ============ */
    /* Tablet-specific improvements */
    @media (min-width: 769px) and (max-width: 1024px) {
@@ -1020,6 +1063,18 @@
      input[type="date"] {
          min-height: 48px;
      }
+     
+     /* Mobile adjustments for new sections */
+     .head-name-container {
+         flex-direction: column;
+         align-items: stretch;
+         gap: 12px;
+     }
+     
+     .head-registration {
+         flex-direction: column;
+         gap: 12px;
+     }
    }
 
    /* Small mobile devices */
@@ -1191,9 +1246,28 @@
             </select>
           </div>
 
-          <div>
+          <div style="grid-column: 1 / -1;">
             <label>Household Head Full Name<span class="required">*</span></label>
-            <input type="text" id="householdHead" required />
+            <div class="head-name-container">
+              <input type="text" id="householdHead" required />
+            </div>
+          </div>
+
+          <div>
+            <div class="checkbox-item" style="margin-bottom: 8px;">
+              <input type="checkbox" id="headRegisteredCheckbox">
+              <label for="headRegisteredCheckbox">FishR/RBIS Registered</label>
+            </div>
+            
+            <div id="headRegistrationField" class="conditional-field">
+              <label>FishR Registered/RBIS Registered</label>
+              <select id="headRegistration" class="animated">
+                <option value="">Select...</option>
+                <option value="FishR Registered">FishR Registered</option>
+                <option value="RBIS Registered">RBIS Registered</option>
+                <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
+              </select>
+            </div>
           </div>
 
           <div>
@@ -1235,9 +1309,63 @@
         </div>
       </div>
 
+      <!-- NEW: EDUCATIONAL & ECONOMIC STATUS -->
+      <div class="card">
+        <div class="section-title"><div class="chip">2</div><h3>Educational & Economic Status</h3></div>
+        <div class="form-grid">
+          <div>
+            <label>Educational Attainment</label>
+            <select id="educationalAttainment" class="animated">
+              <option value="">Select...</option>
+              <option value="No Formal Education">No Formal Education</option>
+              <option value="Elementary Level">Elementary Level</option>
+              <option value="Elementary Graduate">Elementary Graduate</option>
+              <option value="High School Level">High School Level</option>
+              <option value="High School Graduate">High School Graduate</option>
+              <option value="Senior High School Level">Senior High School Level</option>
+              <option value="Senior High School Graduate">Senior High School Graduate</option>
+              <option value="College Level">College Level</option>
+              <option value="College Graduate">College Graduate</option>
+            </select>
+          </div>
+
+          <div id="collegeCourseField" class="conditional-field">
+            <label>College Graduate Course</label>
+            <input type="text" id="collegeCourse" placeholder="Enter course name" />
+          </div>
+
+          <div>
+            <label>Employment</label>
+            <select id="employment" class="animated">
+              <option value="">Select...</option>
+              <option value="Employed">Employed</option>
+              <option value="Unemployed">Unemployed</option>
+            </select>
+          </div>
+
+          <div id="jobTitleField" class="conditional-field">
+            <label>Job Title</label>
+            <input type="text" id="jobTitle" placeholder="Enter job title" />
+          </div>
+
+          <div>
+            <label>Overseas Filipino Worker (OFW)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="ofw_status" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="ofw_status" value="No" checked> No</label>
+            </div>
+          </div>
+
+          <div id="countryField" class="conditional-field">
+            <label>Country</label>
+            <input type="text" id="country" placeholder="Enter country name" />
+          </div>
+        </div>
+      </div>
+
       <!-- HEALTH & STATUS -->
       <div class="card">
-        <div class="section-title"><div class="chip">2</div><h3>Health and Status</h3></div>
+        <div class="section-title"><div class="chip">3</div><h3>Health and Status</h3></div>
         <div class="form-grid">
           <div>
             <label>Persons with Disability (PWD)</label>
@@ -1259,7 +1387,7 @@
 
       <!-- DOMESTIC ANIMALS - REDESIGNED -->
       <div class="card">
-        <div class="section-title"><div class="chip">3</div><h3>Domestic Livestock</h3></div>
+        <div class="section-title"><div class="chip">4</div><h3>Domestic Livestock</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="domestic-grid-container">
@@ -1327,20 +1455,20 @@
 
           <div style="margin-top: 16px;">
             <label>Others</label>
-            <textarea id="animals_others" class="others-box" placeholder="Use this field to describe other animals owned in a brief sentence (e.g., “5 goats and 2 ducks”)."></textarea>
+            <textarea id="animals_others" class="others-box" placeholder="Use this field to describe other animals owned in a brief sentence (e.g., '5 goats and 2 ducks')."></textarea>
           </div>
         </div>
       </div>
 
       <!-- PICKUP / TRANSPORT / CAMP -->
       <div class="card">
-        <div class="section-title"><div class="chip">4</div><h3>Transportation & Evacuation Details</h3></div>
+        <div class="section-title"><div class="chip">5</div><h3>Transportation & Evacuation Details</h3></div>
         <div class="form-grid">
           <div>
             <label>Transportation</label>
             <select id="head_transport" class="animated">
               <option value="">Select...</option>
-              <option>Has Transportation/option>
+              <option>Has Transportation</option>
               <option>Needs Transportation</option>
             </select>
           </div>
@@ -1366,7 +1494,7 @@
           </div>
           
           <div>
-            <label>Individuals Currently in Camp”</label>
+            <label>Individuals Currently in Camp</label>
             <input type="number" id="insideCamp" min="0" />
           </div>
           
@@ -1392,7 +1520,7 @@
 
       <!-- GOVERNMENT SUPPORT - FIXED ALIGNMENT -->
       <div class="card">
-        <div class="section-title"><div class="chip">5</div><h3>Government Assistance Programs</h3></div>
+        <div class="section-title"><div class="chip">6</div><h3>Government Assistance Programs</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="gov-support-grid">
@@ -1443,7 +1571,7 @@
 
       <!-- MEMBERS PREVIEW + ACTION -->
       <div class="card">
-        <div class="section-title"><div class="chip">6</div><h3>Members to be collected</h3></div>
+        <div class="section-title"><div class="chip">7</div><h3>Members to be collected</h3></div>
         <div class="small-muted">Member/s: <strong id="previewCount">0</strong></div>
         <ul id="membersPreview" class="member-preview"></ul>
 
@@ -1479,163 +1607,247 @@
 
   <div class="panel-body">
     <form id="memberForm" onsubmit="return false;">
-      <div class="form-grid">
-        <div>
-          <label>Household Member Full name<span class="required">*</span></label>
-          <input type="text" id="memberName" class="member-name" required />
-        </div>
-
-        <div>
-          <label>Contact no. <span class="required">*</span></label>
-          <input type="text" id="memberContact" class="member-contact" placeholder="09XXXXXXXXX" required
-                 pattern="^(09|\+639)\d{9}$"
-                 title="Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)" />
-          <div class="error-message" id="memberContactError">Please enter a valid Philippine mobile number (09XXXXXXXXX)</div>
-        </div>
-
-        <div>
-          <label >Sex</label>
-          <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_sex" value="Male" class="member-sex" required> Male</label>
-            <label class="radio-item"><input type="radio" name="member_sex" value="Female" class="member-sex"> Female</label>
+      <!-- Basic Information -->
+      <div class="card form-section">
+        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">1</div><h3>Basic Information</h3></div>
+        <div class="form-grid">
+          <div style="grid-column: 1 / -1;">
+            <label>Household Member Full Name<span class="required">*</span></label>
+            <input type="text" id="memberName" required />
           </div>
-        </div>
 
-        <div>
-          <label>Birthdate</label>
-          <input type="date" id="memberBirthdate" class="member-birthdate" required/>
-        </div>
-
-        <div>
-          <label>Age</label>
-          <input type="text" id="memberAge" class="member-age" readonly />
-        </div>
-
-        <div>
-          <label>Persons with Disability (PWD)</label>
-          <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" class="member-pwd"> Yes</label>
-            <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked class="member-pwd"> No</label>
-          </div>
-        </div>
-
-        <div>
-          <label>Age Category</label>
-          <input type="text" id="memberStage" class="member-stage" readonly />
-        </div>
-
-        <div>
-          <label>Status</label>
-          <select id="memberStatus" class="member-status animated">
-            <option value="">Select...</option>
-            <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Transportation</label>
-          <select id="memberTransport" class="member-transport animated">
-            <option value="">Select...</option>
-            <option>Has Transportation</option>
-            <option>Needs Transportation</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Pick-Up Location</label>
-          <input type="text" id="memberPickup" class="member-pickup"/>
-        </div>
-
-        <div>
-          <label>Drop-Off Location</label>
-          <input type="text" id="memberDropoff" class="member-dropoff"/>
-        </div>
-
-        <div>
-          <label>Evacuation Camp Name</label>
-          <input type="text" id="memberCamp" class="member-camp"/>
-        </div>
-
-        <div>
-          <label>Camp Capacity</label>
-          <input type="number" id="memberCampCap" class="member-cap" min="0"/>
-        </div>
-
-        <div>
-          <label>Individuals Currently in Camp</label>
-          <input type="number" id="memberInside" class="member-inside" min="0"/>
-        </div>
-
-        <div>
-          <label>Individuals Outside Camp</label>
-          <input type="number" id="memberOutside" class="member-outside" min="0"/>
-        </div>
-
-        <div>
-          <label>Reason for Displacement</label>
-          <select id="memberReason" class="member-reason animated">
-            <option value="">Select...</option>
-            <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
-            <option>Typhoon</option>
-            <option>Flood</option>
-            <option>Landslide</option>
-            <option>Earthquake</option>
-            <option>Others</option>
-          </select>
-        </div>
-
-        <!-- Government Support with Chip - FIXED ALIGNMENT -->
-        <div style="grid-column:1/-1; margin-top:16px">
-          <div class="section-title">
-            <div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">GOV</div>
-            <h4>Government Assistance Programs</h4>
-          </div>
-          <div class="instruction-label">Please check (✓) all items that apply.</div>
-          
-          <div class="panel-checkbox-grid">
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_tupad" class="member_tupad">
-              <label for="member_tupad">TUPAD</label>
+          <div>
+            <div class="checkbox-item" style="margin-bottom: 8px;">
+              <input type="checkbox" id="memberRegisteredCheckbox">
+              <label for="memberRegisteredCheckbox">Member Registered</label>
             </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_local4ps" class="member_local4ps">
-              <label for="member_local4ps">Local 4Ps</label>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
-              <label for="member_intl4ps">National 4Ps</label>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_locsp" class="member_locsp">
-              <label for="member_locsp">Local Social Pension</label>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_intlsp" class="member_intlsp">
-              <label for="member_intlsp">National Social Pension</label>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_solo" class="member_solo">
-              <label for="member_solo">Solo Parent Assistance</label>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_cash" class="member_cash">
-              <label for="member_cash">Cash Subsidy</label>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="member_relief" class="member_relief">
-              <label for="member_relief">Relief Goods</label>
+            
+            <div id="memberRegistrationField" class="conditional-field">
+              <label>Member Registered</label>
+              <select id="memberRegistration" class="animated">
+                <option value="">Select...</option>
+                <option value="FishR Registered">FishR Registered</option>
+                <option value="RBIS Registered">RBIS Registered</option>
+                <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
+              </select>
             </div>
           </div>
 
-          <div style="margin-top:16px">
-            <label>AICS (if any)</label>
-            <select id="memberAics" class="member_aics animated">
-              <option value="">None</option>
-              <option>Shelter Assistance</option>
-              <option>Burial</option>
-              <option>Scholarship</option>
+          <div>
+            <label>Contact no. <span class="required">*</span></label>
+            <input type="text" id="memberContact" placeholder="09XXXXXXXXX" required
+                   pattern="^(09|\+639)\d{9}$"
+                   title="Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)" />
+            <div class="error-message" id="memberContactError">Please enter a valid Philippine mobile number (09XXXXXXXXX)</div>
+          </div>
+
+          <div>
+            <label>Sex <span class="required">*</span></label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="member_sex" value="Male" required> Male</label>
+              <label class="radio-item"><input type="radio" name="member_sex" value="Female"> Female</label>
+            </div>
+          </div>
+
+          <div>
+            <label>Birthdate <span class="required">*</span></label>
+            <input type="date" id="memberBirthdate" required />
+          </div>
+
+          <div>
+            <label>Age</label>
+            <input type="text" id="memberAge" readonly />
+          </div>
+
+          <div>
+            <label>Age Category</label>
+            <input type="text" id="memberStage" readonly />
+          </div>
+        </div>
+      </div>
+
+      <!-- Educational & Economic Status -->
+      <div class="card">
+        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">2</div><h3>Educational & Economic Status</h3></div>
+        <div class="form-grid">
+          <div>
+            <label>Educational Attainment</label>
+            <select id="memberEducationalAttainment" class="animated">
+              <option value="">Select...</option>
+              <option value="No Formal Education">No Formal Education</option>
+              <option value="Elementary Level">Elementary Level</option>
+              <option value="Elementary Graduate">Elementary Graduate</option>
+              <option value="High School Level">High School Level</option>
+              <option value="High School Graduate">High School Graduate</option>
+              <option value="Senior High School Level">Senior High School Level</option>
+              <option value="Senior High School Graduate">Senior High School Graduate</option>
+              <option value="College Level">College Level</option>
+              <option value="College Graduate">College Graduate</option>
             </select>
           </div>
+
+          <div id="memberCollegeCourseField" class="conditional-field">
+            <label>College Graduate Course</label>
+            <input type="text" id="memberCollegeCourse" placeholder="Enter course name" />
+          </div>
+
+          <div>
+            <label>Employment</label>
+            <select id="memberEmployment" class="animated">
+              <option value="">Select...</option>
+              <option value="Employed">Employed</option>
+              <option value="Unemployed">Unemployed</option>
+            </select>
+          </div>
+
+          <div id="memberJobTitleField" class="conditional-field">
+            <label>Job Title</label>
+            <input type="text" id="memberJobTitle" placeholder="Enter job title" />
+          </div>
+
+          <div>
+            <label>Overseas Filipino Worker (OFW)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="member_ofw_status" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="member_ofw_status" value="No" checked> No</label>
+            </div>
+          </div>
+
+          <div id="memberCountryField" class="conditional-field">
+            <label>Country</label>
+            <input type="text" id="memberCountry" placeholder="Enter country name" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Health and Status -->
+      <div class="card">
+        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">3</div><h3>Health and Status</h3></div>
+        <div class="form-grid">
+          <div>
+            <label>Persons with Disability (PWD)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked> No</label>
+            </div>
+          </div>
+
+          <div>
+            <label>Status</label>
+            <select id="memberStatus" class="animated">
+              <option value="">Select...</option>
+              <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transportation & Evacuation Details -->
+      <div class="card">
+        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">4</div><h3>Transportation & Evacuation Details</h3></div>
+        <div class="form-grid">
+          <div>
+            <label>Transportation</label>
+            <select id="memberTransport" class="animated">
+              <option value="">Select...</option>
+              <option>Has Transportation</option>
+              <option>Needs Transportation</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Pick-Up Location</label>
+            <input type="text" id="memberPickup" />
+          </div>
+          
+          <div>
+            <label>Drop-Off Location</label>
+            <input type="text" id="memberDropoff" />
+          </div>
+          
+          <div>
+            <label>Evacuation Camp Name</label>
+            <input type="text" id="memberCamp" />
+          </div>
+          
+          <div>
+            <label>Camp Capacity</label>
+            <input type="number" id="memberCampCap" min="0" />
+          </div>
+          
+          <div>
+            <label>Individuals Currently in Camp</label>
+            <input type="number" id="memberInside" min="0" />
+          </div>
+          
+          <div>
+            <label>Individuals Outside Camp</label>
+            <input type="number" id="memberOutside" min="0"/>
+          </div>
+
+          <div style="grid-column:1/-1">
+            <label>Reason for Displacement</label>
+            <select id="memberReason" class="animated">
+              <option value="">Select...</option>
+              <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
+              <option>Typhoon</option>
+              <option>Flood</option>
+              <option>Landslide</option>
+              <option>Earthquake</option>
+              <option>Others</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Government Assistance Programs -->
+      <div class="card">
+        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">5</div><h3>Government Assistance Programs</h3></div>
+        <div class="instruction-label">Please check (✓) all items that apply.</div>
+
+        <div class="gov-support-grid">
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_tupad">
+            <label for="member_tupad">TUPAD</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_local4ps">
+            <label for="member_local4ps">Local 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_intl4ps">
+            <label for="member_intl4ps">National 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_locsp">
+            <label for="member_locsp">Local Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_intlsp">
+            <label for="member_intlsp">National Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_solo">
+            <label for="member_solo">Solo Parent Assistance</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_relief">
+            <label for="member_relief">Relief Goods</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_cash">
+            <label for="member_cash">Cash Subsidy</label>
+          </div>
+        </div>
+
+        <div style="grid-column:1/-1;margin-top:16px">
+          <label>AICS (if any)</label>
+          <select id="memberAics" class="animated">
+            <option value="">None</option>
+            <option>Shelter Assistance</option>
+            <option>Burial</option>
+            <option>Scholarship</option>
+          </select>
         </div>
       </div>
 
@@ -1823,13 +2035,43 @@ function updateMemberPreview(){
 /* fill member panel */
 function fillMemberPanel(idx){
   const mem = collectedMembers[idx] || {};
+  
+  // Basic Information
   document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
+  
+  // Set checkbox based on whether registration field has value
+  const hasRegistration = mem["FishR Registered/RBIS Registered"] && mem["FishR Registered/RBIS Registered"] !== "";
+  document.getElementById("memberRegisteredCheckbox").checked = hasRegistration;
+  
+  // Show/hide registration field based on checkbox
+  const memberRegistrationField = document.getElementById("memberRegistrationField");
+  if (hasRegistration) {
+    memberRegistrationField.classList.add('show');
+    document.getElementById("memberRegistration").value = mem["FishR Registered/RBIS Registered"] || "";
+  } else {
+    memberRegistrationField.classList.remove('show');
+    document.getElementById("memberRegistration").value = "";
+  }
+  
   document.getElementById("memberContact").value = mem["Contact no."] || "";
   Array.from(document.getElementsByName("member_sex")).forEach(r => r.checked = (r.value === (mem["Sex"] || "")));
   document.getElementById("memberBirthdate").value = mem["Birthdate"] ? toInputDate(mem["Birthdate"]) : "";
   document.getElementById("memberAge").value = mem["Age"] || "";
   document.getElementById("memberStage").value = mem["Stage"] || "";
+  
+  // Educational & Economic Status
+  document.getElementById("memberEducationalAttainment").value = mem["Educational Attainment"] || "";
+  document.getElementById("memberCollegeCourse").value = mem["College Graduate Course"] || "";
+  document.getElementById("memberEmployment").value = mem["Employment"] || "";
+  document.getElementById("memberJobTitle").value = mem["Job Title"] || "";
+  Array.from(document.getElementsByName("member_ofw_status")).forEach(r => r.checked = (r.value === (mem["Overseas Filipino Worker(OFW)"] || "")));
+  document.getElementById("memberCountry").value = mem["Country"] || "";
+  
+  // Health and Status
+  Array.from(document.getElementsByName("member_pwd")).forEach(r => r.checked = (r.value === (mem["PWD"] || "")));
   document.getElementById("memberStatus").value = mem["Status"] || "";
+  
+  // Transportation & Evacuation Details
   document.getElementById("memberTransport").value = mem["Transportation"] || "";
   document.getElementById("memberPickup").value = mem["Designated Pick-Up Point"] || "";
   document.getElementById("memberDropoff").value = mem["Drop-Off Point"] || "";
@@ -1838,6 +2080,8 @@ function fillMemberPanel(idx){
   document.getElementById("memberInside").value = mem["No. of Individuals Inside Camp"] || "";
   document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || "";
   document.getElementById("memberReason").value = mem["Reasons for Displacement"] || "";
+  
+  // Government Assistance Programs
   document.getElementById("member_tupad").checked = (mem["TUPAD"] === "Yes");
   document.getElementById("member_local4ps").checked = (mem["Local 4Ps"] === "Yes");
   document.getElementById("member_intl4ps").checked = (mem["National 4Ps"] === "Yes");
@@ -1848,6 +2092,9 @@ function fillMemberPanel(idx){
   document.getElementById("member_cash").checked = (mem["Cash Subsidy"] === "Yes");
   document.getElementById("memberAics").value = mem["AICS"] || "";
   
+  // Handle conditional fields
+  setupMemberConditionalFields();
+  
   // Update panel chip
   document.getElementById("panelChip").textContent = `Member ${idx + 1}`;
   document.getElementById("panelTitle").textContent = `of ${membersToCollect}`;
@@ -1856,22 +2103,34 @@ function fillMemberPanel(idx){
 /* collect member data */
 function collectMemberDataFromPanel(){
   const name = document.getElementById("memberName").value.trim();
-  const sex = document.querySelector("input[name='member_sex']:checked")?.value || "";
   const birth_input = document.getElementById("memberBirthdate").value || "";
   const birth_for_sheet = toSheetDateFormat(birth_input);
   const ageObj = computeAgeDetailed(birth_input);
   const ageVal = ageObj ? ageObj.display : "";
   const stageVal = ageObj ? ageObj.stage : "";
 
+  // Get registration value only if checkbox is checked
+  let registrationValue = "";
+  if (document.getElementById("memberRegisteredCheckbox").checked) {
+    registrationValue = document.getElementById("memberRegistration").value || "";
+  }
+
   return {
     "Name of Household Member/s": name,
+    "FishR Registered/RBIS Registered": registrationValue,
     "Contact no.": document.getElementById("memberContact").value || "",
-    "Sex": sex,
+    "Sex": document.querySelector("input[name='member_sex']:checked")?.value || "",
     "Birthdate": birth_for_sheet,
     "Age": ageVal,
     "Stage": stageVal,
-    "PWD": (document.querySelector("input[name='member_pwd']:checked")?.value || "No"),
+    "PWD": document.querySelector("input[name='member_pwd']:checked")?.value || "No",
     "Status": document.getElementById("memberStatus").value || "",
+    "Educational Attainment": document.getElementById("memberEducationalAttainment").value || "",
+    "College Graduate Course": document.getElementById("memberCollegeCourse").value || "",
+    "Employment": document.getElementById("memberEmployment").value || "",
+    "Job Title": document.getElementById("memberJobTitle").value || "",
+    "Overseas Filipino Worker(OFW)": document.querySelector("input[name='member_ofw_status']:checked")?.value || "No",
+    "Country": document.getElementById("memberCountry").value || "",
     "Transportation": document.getElementById("memberTransport").value || "",
     "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
     "Drop-Off Point": document.getElementById("memberDropoff").value || "",
@@ -1890,6 +2149,209 @@ function collectMemberDataFromPanel(){
     "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
     "AICS": document.getElementById("memberAics").value || ""
   };
+}
+
+/* ============ CONDITIONAL FIELD HANDLERS ============ */
+function setupConditionalFields() {
+    // Head Registered Checkbox -> Registration Field
+    const headRegisteredCheckbox = document.getElementById('headRegisteredCheckbox');
+    const headRegistrationField = document.getElementById('headRegistrationField');
+    const headRegistrationSelect = document.getElementById('headRegistration');
+    
+    if (headRegisteredCheckbox) {
+        headRegisteredCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                headRegistrationField.classList.add('show');
+                headRegistrationSelect.required = true;
+            } else {
+                headRegistrationField.classList.remove('show');
+                headRegistrationSelect.required = false;
+                headRegistrationSelect.value = '';
+            }
+        });
+        
+        // Initialize based on current value
+        if (headRegisteredCheckbox.checked) {
+            headRegistrationField.classList.add('show');
+            headRegistrationSelect.required = true;
+        }
+    }
+    
+    // Member Registered Checkbox -> Registration Field
+    const memberRegisteredCheckbox = document.getElementById('memberRegisteredCheckbox');
+    const memberRegistrationField = document.getElementById('memberRegistrationField');
+    const memberRegistrationSelect = document.getElementById('memberRegistration');
+    
+    if (memberRegisteredCheckbox) {
+        memberRegisteredCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                memberRegistrationField.classList.add('show');
+                memberRegistrationSelect.required = true;
+            } else {
+                memberRegistrationField.classList.remove('show');
+                memberRegistrationSelect.required = false;
+                memberRegistrationSelect.value = '';
+            }
+        });
+        
+        // Initialize based on current value
+        if (memberRegisteredCheckbox.checked) {
+            memberRegistrationField.classList.add('show');
+            memberRegistrationSelect.required = true;
+        }
+    }
+    
+    // Educational Attainment -> College Course
+    const educationSelect = document.getElementById('educationalAttainment');
+    const collegeCourseField = document.getElementById('collegeCourseField');
+    const collegeCourseInput = document.getElementById('collegeCourse');
+    
+    if (educationSelect) {
+        educationSelect.addEventListener('change', function() {
+            if (this.value === 'College Graduate') {
+                collegeCourseField.classList.add('show');
+                collegeCourseInput.required = true;
+            } else {
+                collegeCourseField.classList.remove('show');
+                collegeCourseInput.required = false;
+                collegeCourseInput.value = '';
+            }
+        });
+        
+        // Initialize based on current value
+        if (educationSelect.value === 'College Graduate') {
+            collegeCourseField.classList.add('show');
+            collegeCourseInput.required = true;
+        }
+    }
+    
+    // Employment -> Job Title
+    const employmentSelect = document.getElementById('employment');
+    const jobTitleField = document.getElementById('jobTitleField');
+    const jobTitleInput = document.getElementById('jobTitle');
+    
+    if (employmentSelect) {
+        employmentSelect.addEventListener('change', function() {
+            if (this.value === 'Employed') {
+                jobTitleField.classList.add('show');
+                jobTitleInput.required = true;
+            } else {
+                jobTitleField.classList.remove('show');
+                jobTitleInput.required = false;
+                jobTitleInput.value = '';
+            }
+        });
+        
+        // Initialize based on current value
+        if (employmentSelect.value === 'Employed') {
+            jobTitleField.classList.add('show');
+            jobTitleInput.required = true;
+        }
+    }
+    
+    // OFW Status -> Country
+    const ofwRadios = document.querySelectorAll('input[name="ofw_status"]');
+    const countryField = document.getElementById('countryField');
+    const countryInput = document.getElementById('country');
+    
+    if (ofwRadios.length > 0) {
+        ofwRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'Yes') {
+                    countryField.classList.add('show');
+                    countryInput.required = true;
+                } else {
+                    countryField.classList.remove('show');
+                    countryInput.required = false;
+                    countryInput.value = '';
+                }
+            });
+        });
+        
+        // Initialize based on current value
+        const checkedOfw = document.querySelector('input[name="ofw_status"]:checked');
+        if (checkedOfw && checkedOfw.value === 'Yes') {
+            countryField.classList.add('show');
+            countryInput.required = true;
+        }
+    }
+}
+
+function setupMemberConditionalFields() {
+    // Member Educational Attainment -> College Course
+    const memberEducationSelect = document.getElementById('memberEducationalAttainment');
+    const memberCollegeCourseField = document.getElementById('memberCollegeCourseField');
+    const memberCollegeCourseInput = document.getElementById('memberCollegeCourse');
+    
+    if (memberEducationSelect) {
+        memberEducationSelect.addEventListener('change', function() {
+            if (this.value === 'College Graduate') {
+                memberCollegeCourseField.classList.add('show');
+                memberCollegeCourseInput.required = true;
+            } else {
+                memberCollegeCourseField.classList.remove('show');
+                memberCollegeCourseInput.required = false;
+                memberCollegeCourseInput.value = '';
+            }
+        });
+        
+        // Initialize based on current value
+        if (memberEducationSelect.value === 'College Graduate') {
+            memberCollegeCourseField.classList.add('show');
+            memberCollegeCourseInput.required = true;
+        }
+    }
+    
+    // Member Employment -> Job Title
+    const memberEmploymentSelect = document.getElementById('memberEmployment');
+    const memberJobTitleField = document.getElementById('memberJobTitleField');
+    const memberJobTitleInput = document.getElementById('memberJobTitle');
+    
+    if (memberEmploymentSelect) {
+        memberEmploymentSelect.addEventListener('change', function() {
+            if (this.value === 'Employed') {
+                memberJobTitleField.classList.add('show');
+                memberJobTitleInput.required = true;
+            } else {
+                memberJobTitleField.classList.remove('show');
+                memberJobTitleInput.required = false;
+                memberJobTitleInput.value = '';
+            }
+        });
+        
+        // Initialize based on current value
+        if (memberEmploymentSelect.value === 'Employed') {
+            memberJobTitleField.classList.add('show');
+            memberJobTitleInput.required = true;
+        }
+    }
+    
+    // Member OFW Status -> Country
+    const memberOfwRadios = document.querySelectorAll('input[name="member_ofw_status"]');
+    const memberCountryField = document.getElementById('memberCountryField');
+    const memberCountryInput = document.getElementById('memberCountry');
+    
+    if (memberOfwRadios.length > 0) {
+        memberOfwRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'Yes') {
+                    memberCountryField.classList.add('show');
+                    memberCountryInput.required = true;
+                } else {
+                    memberCountryField.classList.remove('show');
+                    memberCountryInput.required = false;
+                    memberCountryInput.value = '';
+                }
+            });
+        });
+        
+        // Initialize based on current value
+        const checkedMemberOfw = document.querySelector('input[name="member_ofw_status"]:checked');
+        if (checkedMemberOfw && checkedMemberOfw.value === 'Yes') {
+            memberCountryField.classList.add('show');
+            memberCountryInput.required = true;
+        }
+    }
 }
 
 /* live age update */
@@ -1919,6 +2381,9 @@ document.addEventListener('DOMContentLoaded', () => {
   adminItems.forEach(item => {
     item.style.display = isAdmin ? "block" : "none";
   });
+
+  // Setup conditional fields
+  setupConditionalFields();
 
   // Contact number validation
   const contactInput = document.getElementById("contactNo");
@@ -1957,6 +2422,12 @@ document.addEventListener('DOMContentLoaded', () => {
       updateMemberPreview();
       document.getElementById("householdAge").value = "";
       document.getElementById("householdStage").value = "";
+      
+      // Clear conditional fields
+      document.getElementById('collegeCourseField').classList.remove('show');
+      document.getElementById('jobTitleField').classList.remove('show');
+      document.getElementById('countryField').classList.remove('show');
+      document.getElementById('headRegistrationField').classList.remove('show');
       
       // Clear any error states
       contactInput.classList.remove('input-error');
@@ -2131,11 +2602,18 @@ async function submitHeadAndMembers(){
   const headAgeInfo = computeAgeDetailed(headBirthInput);
   const headAgeVal = headAgeInfo ? headAgeInfo.display : "";
 
+  // Get head registration value only if checkbox is checked
+  let headRegistrationValue = "";
+  if (document.getElementById("headRegisteredCheckbox").checked) {
+    headRegistrationValue = document.getElementById("headRegistration").value || "";
+  }
+
   const head = {
     "Coordinate": document.getElementById("coordinate").value || "",
     "Barangay": document.getElementById("barangay").value || "",
     "Sitio / Purok": document.getElementById("sitio").value || "",
     "Name of Household Head": document.getElementById("householdHead").value || "",
+    "FishR Registered/RBIS Registered": headRegistrationValue,
     "Contact no.": document.getElementById("contactNo").value || "",
     "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
     "Birthdate": headBirthForSheet,
@@ -2145,6 +2623,12 @@ async function submitHeadAndMembers(){
     "PWD": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
     "Stage": headAgeInfo ? headAgeInfo.stage : "",
     "Status": document.getElementById("head_status").value || "",
+    "Educational Attainment": document.getElementById("educationalAttainment").value || "",
+    "College Graduate Course": document.getElementById("collegeCourse").value || "",
+    "Employment": document.getElementById("employment").value || "",
+    "Job Title": document.getElementById("jobTitle").value || "",
+    "Overseas Filipino Worker(OFW)": document.querySelector("input[name='ofw_status']:checked")?.value || "No",
+    "Country": document.getElementById("country").value || "",
     "Transportation": document.getElementById("head_transport").value || "",
     "Designated Pick-Up Point": document.getElementById("pickup").value || "",
     "Drop-Off Point": document.getElementById("dropoff").value || "",
@@ -2187,6 +2671,7 @@ async function submitHeadAndMembers(){
     if(!members[i]){
       members[i] = {
         "Name of Household Member/s": "",
+        "FishR Registered/RBIS Registered": "",
         "Contact no.": "",
         "Sex": "",
         "Birthdate": "",
@@ -2194,6 +2679,12 @@ async function submitHeadAndMembers(){
         "Stage": "",
         "PWD": "No",
         "Status": "",
+        "Educational Attainment": "",
+        "College Graduate Course": "",
+        "Employment": "",
+        "Job Title": "",
+        "Overseas Filipino Worker(OFW)": "No",
+        "Country": "",
         "Transportation": "",
         "Designated Pick-Up Point": "",
         "Drop-Off Point": "",
@@ -2344,6 +2835,3 @@ if (sidebarToggle) {
 </script>
 </body>
 </html>
-
-
-
