@@ -4,46 +4,582 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Purok Kaligtasan — Dashboard</title>
-<link rel="stylesheet" href="styles.css"/>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  .dashboard-cards{
+   :root{
+    --bg:#f6f8f7;
+    --card-bg:#fff;
+    --muted:#6b6f6b;
+    --accent1:#0f7a4a;
+    --accent2:#34b78f;
+    --accent3: #ff7a00;
+    --accent4: #ffa500;
+    --light-green: #e9f7f2;
+    --border: #e1e8e5;
+    --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --shadow-dark: 0 6px 20px rgba(5,40,25,0.12);
+    --radius:12px;
+    --radius-sm:8px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+   }
+
+   body {
+    background-color: var(--bg);
+    margin: 0;
+    min-height: 100vh;
+   }
+
+   .page-container{
+    max-width:1200px;
+    margin:20px auto;
+    padding:12px;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:18px;
+    align-items:start;
+    transition: grid-template-columns 0.3s ease;
+   }
+
+   .page-container.collapsed {
+    grid-template-columns: 60px 1fr;
+   }
+
+   /* Topbar - Enhanced */
+   .topbar{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-radius:var(--radius);
+    background:linear-gradient(90deg, var(--accent1), var(--accent2));
+    color:#fff;
+    box-shadow:var(--shadow-dark);
+   }
+
+   .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+   }
+
+   .brand .logo{
+    width:48px;
+    height:48px;
+    border-radius:var(--radius-sm);
+    object-fit:contain;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+    border: 2px solid rgba(255,255,255,0.2);
+   }
+
+   .brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+   }
+
+   .brand-text p {
+    font-size:12px;
+    opacity:0.95;
+    margin: 4px 0 0 0;
+   }
+
+   .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+   }
+
+   #userName {
+    font-weight: 600;
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   #logoutBtn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+   }
+
+   #logoutBtn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+   }
+
+   /* Sidebar - Collapsible */
+   .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
+    border-radius:var(--radius);
+    padding:12px;
+    height:calc(100vh - 120px);
+    position:sticky;
+    top:72px;
+    overflow:auto;
+    transition: width 0.3s ease;
+   }
+
+   .sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+   }
+
+   .sidebar-toggle {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+   }
+
+   .sidebar-toggle:hover {
+    transform: scale(1.1);
+   }
+
+   .sidebar ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex: 1;
+   }
+
+   .sidebar li a{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--muted);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+   }
+
+   .sidebar li a:hover{
+    background: var(--light-green);
+    color: var(--accent1);
+   }
+
+   .sidebar li a.active{
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   .sidebar li a .menu-icon {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+   }
+
+   .sidebar li a .menu-text {
+    transition: opacity 0.3s ease;
+   }
+
+   .page-container.collapsed .sidebar li a .menu-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+   }
+
+   /* Content Area - Fixed Size */
+   .content-area{
+    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 8px 22px rgba(10,20,16,0.06);
+    min-height:72vh;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+   }
+
+   /* Content Header - Fixed */
+   .content-header {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   }
+
+   .content-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--accent1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   /* Description Styling */
+   .description {
+    background: var(--light-green);
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--accent1);
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+   }
+
+   .description p {
+    margin: 0;
+   }
+
+   /* Dashboard Cards */
+   .dashboard-cards{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
     gap:12px;
     margin:12px 0 18px 0;
-  }
-  .card{
-    padding:12px;
-    border-radius:10px;
-    background:#fff;
-    box-shadow:0 6px 18px rgba(6,30,20,0.04);
-  }
-  .card h3{ margin:0 0 8px 0; font-size:14px; color:#0f7a4a }
-  .card-value{ font-size:22px; font-weight:800; color:#153b26 }
-  .mini { font-size:13px; color:#55615a }
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+   }
 
-  /* breakdown layout */
-  .break-grid {
+   .card{
+    padding:16px;
+    border-radius:var(--radius);
+    background:var(--card-bg);
+    box-shadow:var(--shadow);
+    transition: transform 0.2s ease;
+   }
+
+   .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(6,30,20,0.1);
+   }
+
+   .card h3{ 
+    margin:0 0 8px 0; 
+    font-size:14px; 
+    color:var(--accent1);
+    font-weight: 600;
+   }
+
+   .card-value{ 
+    font-size:22px; 
+    font-weight:800; 
+    color:#153b26;
+    margin: 8px 0;
+   }
+
+   .mini { 
+    font-size:13px; 
+    color:var(--muted);
+   }
+
+   .stat-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:12px;
-    margin-top:12px;
-    align-items:start;
-  }
-  .break-card { padding:12px; border-radius:10px; background:#fff; box-shadow:0 6px 18px rgba(6,30,20,0.04); overflow:auto; }
-  .break-card h4 { margin:0 0 8px 0; font-size:14px; color:#0f7a4a; }
-  .break-table { width:100%; border-collapse:collapse; text-align:center; }
-  .break-table th, .break-table td { padding:6px 8px; border-bottom:1px solid #eee; font-size:13px; }
-  .break-table thead th { background: rgba(15,122,74,0.06); font-weight:700; position: sticky; top:0; z-index:2; }
-  .center-wrap { display:flex; justify-content:center; }
-  .small-muted { font-size:12px; color:#55615a; margin-top:8px; }
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:8px;
+    margin-top: 12px;
+   }
 
-  /* responsive tweak */
-  @media(max-width:900px){
-    .break-grid { grid-template-columns:1fr; }
-  }
+   /* Barangay Breakdown - FULL WIDTH STACK */
+   .breakdown-section {
+    margin-top: 24px;
+    width: 100%;
+   }
+
+   .breakdown-section h3 {
+    font-size: 1.2rem;
+    color: var(--accent1);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--light-green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   .breakdown-table-container {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    width: 100%;
+   }
+
+   .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 600px;
+   }
+
+   .breakdown-table th {
+    background: rgba(15,122,74,0.08);
+    padding: 12px 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--accent1);
+    border-bottom: 2px solid rgba(15,122,74,0.1);
+    position: sticky;
+    left: 0;
+    white-space: nowrap;
+   }
+
+   .breakdown-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(15,122,74,0.08);
+    font-size: 0.85rem;
+    color: var(--muted);
+   }
+
+   .breakdown-table tbody tr:hover {
+    background: rgba(52,183,143,0.05);
+   }
+
+   .breakdown-table th:first-child,
+   .breakdown-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: var(--card-bg);
+    z-index: 1;
+    text-align: left;
+    font-weight: 600;
+    color: var(--accent1);
+   }
+
+   .breakdown-table th:first-child {
+    background: rgba(15,122,74,0.1);
+   }
+
+   /* Legend Box */
+   .legend-box{
+    margin-top:16px;
+    display:inline-block;
+    background:#fff;
+    padding:12px;
+    border-radius:var(--radius-sm);
+    border:1px solid rgba(6,30,20,0.04);
+    box-shadow:0 4px 14px rgba(6,30,20,0.06);
+   }
+
+   .legend-box h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+   }
+
+   .legend-item{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin:6px 0;
+    font-size:0.8rem;
+   }
+
+   .legend-swatch{
+    width:14px;
+    height:14px;
+    border-radius:4px;
+    flex-shrink: 0;
+   }
+
+   /* Button styling */
+   .btn {
+    border:0;
+    padding:10px 14px;
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    font-weight:600;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color:#fff;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+   }
+
+   .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   /* Mobile Styles */
+   @media (max-width: 768px) {
+    .page-container {
+        grid-template-columns: 1fr !important;
+        padding: 8px;
+        gap: 12px;
+    }
+    
+    .page-container.collapsed {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        height: auto;
+        max-height: 0;
+        overflow: hidden;
+        z-index: 1000;
+        margin: 0;
+        padding: 0;
+        border-radius: 0 0 var(--radius) var(--radius);
+        background: white;
+        box-shadow: var(--shadow);
+        transition: max-height 0.3s ease;
+    }
+    
+    .sidebar.mobile-open {
+        max-height: 300px;
+        padding: 12px;
+        overflow-y: auto;
+    }
+    
+    .sidebar-container {
+        flex-direction: column;
+    }
+    
+    .sidebar-toggle {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex !important;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: white;
+        border: none;
+        border-radius: var(--radius-sm);
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    
+    .content-area {
+        height: auto;
+        min-height: calc(100vh - 140px);
+    }
+    
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .breakdown-table-container {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .breakdown-table {
+        min-width: 800px; /* Allow horizontal scroll on mobile */
+    }
+    
+    .user-info {
+        gap: 8px;
+    }
+    
+    #userName {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    
+    #logoutBtn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+   }
+
+   /* Mobile menu toggle button */
+   .mobile-menu-toggle {
+    display: none;
+   }
+
+   /* Loading overlay */
+   #loading {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,0.85);
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    backdrop-filter: blur(2px);
+   }
+
+   .loading-content {
+    background:#fff;
+    padding:20px 24px;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+   }
+
+   .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent1);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+   }
+
+   @keyframes spin {
+    to { transform: rotate(360deg); }
+   }
+
+   /* Chart container */
+   .chart-container {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+   }
+
+   .chart-container h3 {
+    margin: 0 0 16px 0;
+    font-size: 1rem;
+    color: var(--accent1);
+    font-weight: 600;
+   }
 </style>
 </head>
 
@@ -51,35 +587,52 @@
 <div class="page-container">
 
   <header class="topbar">
-    <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
-
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
-      <div>
-        <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
+      <div class="brand-text">
+        <h1>PUROK KALIGTASAN</h1>
+        <p>Disaster Risk Reduction & Management Office - Alitagtag</p>
       </div>
     </div>
 
     <div class="user-info">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
       <span id="userName"></span>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+      <button id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
     </div>
   </header>
 
-  <aside class="sidebar">
-    <ul>
-      <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
-      <li><a href="dataForm.html">📝 Data Entry</a></li>
-      <li><a href="records.html">📁 Records</a></li>
-      <li><a href="charts.html">📈 Charts</a></li>
-      <li id="navUsers" style="display:none;"><a href="users.html">👥 User Management</a></li>
-    </ul>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-container">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <ul>
+        <li><a href="dashboard.html" class="active" title="Dashboard"><span class="menu-icon">📊</span> <span class="menu-text">Dashboard</span></a></li>
+        <li><a href="dataForm.html" title="Data Entry"><span class="menu-icon">📝</span> <span class="menu-text">Data Entry</span></a></li>
+        <li><a href="records.html" title="Records"><span class="menu-icon">📁</span> <span class="menu-text">Records</span></a></li>
+        <li><a href="charts.html" title="Charts"><span class="menu-icon">📈</span> <span class="menu-text">Charts</span></a></li>
+        <li class="admin-only"><a href="users.html" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
+      </ul>
+    </div>
   </aside>
 
-  <main class="content-area" tabindex="-1">
-    <h2>📊 Dashboard Overview</h2>
+  <main class="content-area">
+    <div class="content-header">
+      <h2><span style="color: var(--accent1);">📊</span> Dashboard Overview</h2>
+    </div>
 
+    <!-- Description -->
+    <div class="description">
+      <p>This section presents a complete summary of all data recorded in the Purok Kaligtasan database. It provides quick insights into household profiles, population details, vulnerable groups, domestic animals, resources, and other important information gathered from the community. The dashboard helps users monitor trends, review totals at a glance, and easily understand the overall status of the purok for planning, reporting, and emergency response.</p>
+    </div>
+
+    <!-- Top Cards -->
     <div class="dashboard-cards">
       <div class="card">
         <h3>Total Household Heads</h3>
@@ -106,106 +659,162 @@
       </div>
     </div>
 
+    <!-- Quick Stats -->
     <div class="card">
       <h3>Quick Totals</h3>
       <div class="stat-grid" id="quickStats"></div>
     </div>
 
-    <div class="card">
+    <!-- Chart Container -->
+    <div class="chart-container">
       <h3>Household Distribution per Barangay</h3>
       <canvas id="barangayChart" height="160"></canvas>
+      <!-- Color Legend (preserved from original) -->
+      <div class="legend-box">
+        <h4><i class="fas fa-palette"></i> Household Color Legend</h4>
+        <div class="legend-item"><div class="legend-swatch" style="background:#d4f6ff"></div>1 Member</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#d9ffd9"></div>2–4 Members</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#fff7c2"></div>5–7 Members</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#ffd6d6"></div>8+ Members</div>
+      </div>
     </div>
 
-    <!-- breakdowns grid -->
-    <div class="break-grid">
+    <!-- Barangay Breakdown Section -->
+    <div class="breakdown-section">
+      <h3><i class="fas fa-table"></i> Barangay Breakdown</h3>
 
-      <!-- Basic barangay summary (PWD + male/female/coords) -->
-      <div class="break-card">
-        <h4>Barangay Summary (PWD / Sex / With Coord)</h4>
-        <div class="center-wrap">
-          <table class="break-table" id="tblSummary">
-            <thead>
-              <tr><th>Barangay</th><th>PWD</th><th>Male</th><th>Female</th><th>With Coord</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+      <!-- 1. Barangay Summary -->
+      <div class="breakdown-table-container">
+        <h4>Barangay Summary (PWD / Sex / With Coordinates)</h4>
+        <table class="breakdown-table" id="tblSummary">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>PWD</th>
+              <th>Male</th>
+              <th>Female</th>
+              <th>With Coord</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-      <!-- Government support -->
-      <div class="break-card">
+      <!-- 2. Government Support -->
+      <div class="breakdown-table-container">
         <h4>Government Support (per Barangay)</h4>
-        <div class="center-wrap">
-          <table class="break-table" id="tblSupport">
-            <thead>
-              <tr>
-                <th>Barangay</th>
-                <th>TUPAD</th><th>Local 4Ps</th><th>National 4Ps</th>
-                <th>Local SP</th><th>National SP</th><th>Solo Parent</th><th>Relief Goods</th><th>Cash Subsidy</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <table class="breakdown-table" id="tblSupport">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>TUPAD</th>
+              <th>Local 4Ps</th>
+              <th>National 4Ps</th>
+              <th>Local SP</th>
+              <th>National SP</th>
+              <th>Solo Parent</th>
+              <th>Relief Goods</th>
+              <th>Cash Subsidy</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-      <!-- Status breakdown -->
-      <div class="break-card">
+      <!-- 3. Status Breakdown -->
+      <div class="breakdown-table-container">
         <h4>Status Breakdown (per Barangay)</h4>
-        <div class="center-wrap">
-          <table class="break-table" id="tblStatus">
-            <thead>
-              <tr>
-                <th>Barangay</th>
-                <th>With Sickness</th><th>Pregnant</th><th>Solo Parent</th><th>Lactating</th>
-                <th>Severe Illness</th><th>HIV Positive</th><th>LGBTQ+</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <table class="breakdown-table" id="tblStatus">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>With Sickness</th>
+              <th>Pregnant</th>
+              <th>Solo Parent</th>
+              <th>Lactating</th>
+              <th>Severe Illness</th>
+              <th>HIV Positive</th>
+              <th>LGBTQ+</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-      <!-- Age buckets -->
-      <div class="break-card">
+      <!-- 4. Age Buckets -->
+      <div class="breakdown-table-container">
         <h4>Age Buckets (per Barangay)</h4>
-        <div class="center-wrap">
-          <table class="break-table" id="tblAge">
-            <thead><tr><th>Barangay</th><th>0-5</th><th>6-17</th><th>18-59</th><th>60+</th><th>Unknown</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <table class="breakdown-table" id="tblAge">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>0-5</th>
+              <th>6-17</th>
+              <th>18-59</th>
+              <th>60+</th>
+              <th>Unknown</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-      <!-- Sitio/Purok -->
-      <div class="break-card">
+      <!-- 5. Sitio/Purok Distribution -->
+      <div class="breakdown-table-container">
         <h4>Sitio / Purok Distribution (per Barangay)</h4>
-        <div class="center-wrap">
-          <table class="break-table" id="tblSitio">
-            <thead><tr><th>Barangay</th><th>I</th><th>II</th><th>III</th><th>IV</th><th>V</th><th>VI</th><th>VII</th><th>Unknown</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <table class="breakdown-table" id="tblSitio">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>I</th>
+              <th>II</th>
+              <th>III</th>
+              <th>IV</th>
+              <th>V</th>
+              <th>VI</th>
+              <th>VII</th>
+              <th>Unknown</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-      <!-- Livestock -->
-      <div class="break-card">
+      <!-- 6. Household Livestock -->
+      <div class="breakdown-table-container">
         <h4>Household Livestock (per Barangay)</h4>
-        <div class="center-wrap">
-          <table class="break-table" id="tblLivestock">
-            <thead>
-              <tr><th>Barangay</th><th>Dog (qty)</th><th>Cat (qty)</th><th>Pig (qty)</th><th>Cow (qty)</th><th>Carabao (qty)</th><th>Chicken (qty)</th><th>Others (list)</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <table class="breakdown-table" id="tblLivestock">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>Dog (qty)</th>
+              <th>Cat (qty)</th>
+              <th>Pig (qty)</th>
+              <th>Cow (qty)</th>
+              <th>Carabao (qty)</th>
+              <th>Chicken (qty)</th>
+              <th>Others (list)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-    </div><!-- end break-grid -->
+    </div><!-- end breakdown-section -->
 
-    <div class="small-muted">Tip: click Refresh or reopen page to recalc. Tables are centered and responsive.</div>
+    <div class="small-muted" style="margin-top: 20px; font-size:12px; color:var(--muted);">
+      Tip: Refresh or reopen page to recalc. Tables are responsive and optimized for all devices.
+    </div>
 
   </main>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <div>Loading dashboard data…</div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -213,6 +822,7 @@
 /* CONFIG */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 let chart = null;
+let lastUpdatedTime = null;
 
 /* helpers */
 function getField(obj, name){
@@ -223,6 +833,7 @@ function getField(obj, name){
   }
   return "";
 }
+
 function formatTS(date){
   if(!date) date = new Date();
   const m = date.getMonth()+1;
@@ -235,11 +846,47 @@ function formatTS(date){
   hh = hh%12; hh = hh? hh:12;
   return `${m}/${d}/${y} ${String(hh).padStart(2,'0')}:${mm}:${ss} ${ampm}`;
 }
-async function fetchRecords(){ const res = await fetch(`${API_URL}?action=getRecords`); return res.json(); }
-function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart = null; } }
 
-/* main */
+async function fetchRecords(){ 
+  const res = await fetch(`${API_URL}?action=getRecords`); 
+  return res.json(); 
+}
+
+function destroyChart(){ 
+  if(chart){ 
+    try{ chart.destroy(); }catch(e){} 
+    chart = null; 
+  } 
+}
+
+function showLoading(yes){ 
+  document.getElementById("loading").style.display = yes ? "flex" : "none"; 
+}
+
+/* Load and store last updated time */
+async function loadLastUpdated() {
+  try {
+    // Check localStorage for stored timestamp
+    const storedTime = localStorage.getItem('lastDataUpdate');
+    if (storedTime) {
+      lastUpdatedTime = new Date(storedTime);
+      document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+    }
+  } catch(err) {
+    console.error('Error loading last updated time:', err);
+  }
+}
+
+/* Update last updated time when data changes */
+function updateLastUpdated() {
+  lastUpdatedTime = new Date();
+  localStorage.setItem('lastDataUpdate', lastUpdatedTime.toISOString());
+  document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+}
+
+/* main dashboard load */
 async function loadDashboard(){
+  showLoading(true);
   try{
     const data = await fetchRecords();
     if(!data.success) throw new Error('Failed fetch');
@@ -268,19 +915,28 @@ async function loadDashboard(){
       }
       const b = barangayMap[barangay];
 
-      if(isHead){ totalHeads++; b.heads++; if(coord){ headsWithCoords++; b.coords++; } }
-      else { totalMembers++; b.members++; }
+      if(isHead){ 
+        totalHeads++; 
+        b.heads++; 
+        if(coord){ 
+          headsWithCoords++; 
+          b.coords++; 
+        } 
+      } else { 
+        totalMembers++; 
+        b.members++; 
+      }
 
       // sex
-      if(sex === 'male') b.male++; else if(sex === 'female') b.female++;
+      if(sex === 'male') b.male++; 
+      else if(sex === 'female') b.female++;
 
       // PWD
       if(String(getField(r,'Persons with Disability (PWD)')||'').toLowerCase().trim()==='yes') b.pwds++;
 
-      // STATUS accumulation (map by known statuses)
+      // STATUS accumulation
       const statusRaw = String(getField(r,'Status')||'').trim();
       if(statusRaw){
-        // sometimes multiple statuses? we treat as single if exact
         b.status[statusRaw] = (b.status[statusRaw]||0) + 1;
       }
 
@@ -292,7 +948,6 @@ async function loadDashboard(){
       const sitioRaw = String(getField(r,'Sitio / Purok')||'').trim();
       let sitioKey = 'Unknown';
       if(sitioRaw){
-        // normalize: allow "Purok I" or "I" variants
         const m = sitioRaw.match(/I{1,3}|IV|V|VI|VII|\b1\b|\b2\b|\b3\b|\b4\b|\b5\b|\b6\b|\b7\b/i);
         if(m){
           sitioKey = m[0].toString().replace(/\b1\b/,'I').replace(/\b2\b/,'II').replace(/\b3\b/,'III').replace(/\b4\b/,'IV').replace(/\b5\b/,'V').replace(/\b6\b/,'VI').replace(/\b7\b/,'VII').toUpperCase();
@@ -302,7 +957,7 @@ async function loadDashboard(){
       }
       b.sitio[sitioKey] = (b.sitio[sitioKey]||0) + 1;
 
-      // Livestock keys present in spreadsheet header (qty fields are separate)
+      // Livestock
       const livestockKeys = ['Dog','Dog Qty.','Cat','Cat Qty.','Pig','Pig Qty.','Cow','Cow Qty.','Carabao','Carabao Qty.','Chicken','Chicken Qty.','Others'];
       livestockKeys.forEach(key=>{
         const val = String(getField(r,key) || '').trim();
@@ -316,7 +971,6 @@ async function loadDashboard(){
           if(!b.livestock['Others']) b.livestock['Others'] = [];
           if(val) b.livestock['Others'].push(val);
         } else {
-          // column like 'Dog' may be 'Yes' or blank or number -> if 'Yes' increment count else if numeric treat as qty
           if(String(val).toLowerCase() === 'yes'){
             if(!b.livestock[key]) b.livestock[key] = {qty:0, count:0};
             b.livestock[key].count += 1;
@@ -334,7 +988,7 @@ async function loadDashboard(){
         }
       });
 
-      // Age buckets from Age field (try to parse number)
+      // Age buckets
       const ageField = String(getField(r,'Age')||'').trim();
       let y = null;
       if(ageField){
@@ -349,7 +1003,6 @@ async function loadDashboard(){
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
     document.getElementById('withCoords').innerText = headsWithCoords;
-    document.getElementById('lastUpdated').innerText = formatTS(new Date());
 
     // Quick totals
     const quick = document.getElementById('quickStats');
@@ -376,18 +1029,23 @@ async function loadDashboard(){
 
     // show male/female/pwd
     [['Male', totals.male], ['Female', totals.female], ['PWD', totals.pwd]].forEach(it=>{
-      const div = document.createElement('div'); div.className = 'card'; div.style.padding = '10px';
+      const div = document.createElement('div'); 
+      div.className = 'card'; 
+      div.style.padding = '10px';
       div.innerHTML = `<div class="mini">${it[0]}</div><div class="card-value">${it[1]}</div>`;
       quick.appendChild(div);
     });
+
     // livestock (top few)
     Object.keys(livestockTotals).slice(0,6).forEach(k=>{
-      const div = document.createElement('div'); div.className='card'; div.style.padding='10px';
+      const div = document.createElement('div'); 
+      div.className='card'; 
+      div.style.padding='10px';
       div.innerHTML = `<div class="mini">${k}</div><div class="card-value">${livestockTotals[k]}</div>`;
       quick.appendChild(div);
     });
 
-    // Chart: heads vs members per barangay (same as before)
+    // Chart: heads vs members per barangay
     destroyChart();
     const labels = Object.keys(barangayMap).sort();
     const headsData = labels.map(l => barangayMap[l].heads || 0);
@@ -395,13 +1053,48 @@ async function loadDashboard(){
     const ctx = document.getElementById('barangayChart').getContext('2d');
     chart = new Chart(ctx, {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Heads', data: headsData, backgroundColor: '#2b9348' }, { label: 'Members', data: membersData, backgroundColor: '#55a630' }] },
-      options: { responsive:true, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:true } } }
+      data: { 
+        labels, 
+        datasets: [
+          { 
+            label: 'Heads', 
+            data: headsData, 
+            backgroundColor: '#2b9348' 
+          }, 
+          { 
+            label: 'Members', 
+            data: membersData, 
+            backgroundColor: '#55a630' 
+          }
+        ] 
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: true,
+        plugins:{ 
+          legend:{ 
+            position:'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true
+            }
+          } 
+        }, 
+        scales:{ 
+          y:{ 
+            beginAtZero:true,
+            ticks: {
+              precision: 0
+            }
+          } 
+        } 
+      }
     });
 
-    // Populate all breakdown tables (centered)
-    // 1) Summary table (PWD / sex / coords)
-    const tbodySummary = document.querySelector('#tblSummary tbody'); tbodySummary.innerHTML = '';
+    // Populate all breakdown tables
+    // 1) Summary table
+    const tbodySummary = document.querySelector('#tblSummary tbody'); 
+    tbodySummary.innerHTML = '';
     labels.forEach(l => {
       const s = barangayMap[l];
       const tr = document.createElement('tr');
@@ -411,7 +1104,8 @@ async function loadDashboard(){
 
     // 2) Government Support
     const supportKeys = ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'];
-    const tbodySupport = document.querySelector('#tblSupport tbody'); tbodySupport.innerHTML = '';
+    const tbodySupport = document.querySelector('#tblSupport tbody'); 
+    tbodySupport.innerHTML = '';
     labels.forEach(l=>{
       const s = barangayMap[l];
       const cells = supportKeys.map(k => s.support && s.support[k] ? s.support[k] : 0);
@@ -420,9 +1114,10 @@ async function loadDashboard(){
       tbodySupport.appendChild(tr);
     });
 
-    // 3) Status breakdown (normalized to your list)
+    // 3) Status breakdown
     const statusKeys = ['With Sickness','Pregnant','Solo Parent','Lactating','Severe Illness','HIV Positive','LGBTQ Plus'];
-    const tbodyStatus = document.querySelector('#tblStatus tbody'); tbodyStatus.innerHTML = '';
+    const tbodyStatus = document.querySelector('#tblStatus tbody'); 
+    tbodyStatus.innerHTML = '';
     labels.forEach(l=>{
       const s = barangayMap[l];
       const cells = statusKeys.map(k => s.status && s.status[k] ? s.status[k] : 0);
@@ -433,26 +1128,31 @@ async function loadDashboard(){
 
     // 4) Age buckets
     const ageKeys = ['0-5','6-17','18-59','60+','Unknown'];
-    const tbodyAge = document.querySelector('#tblAge tbody'); tbodyAge.innerHTML = '';
+    const tbodyAge = document.querySelector('#tblAge tbody'); 
+    tbodyAge.innerHTML = '';
     labels.forEach(l=>{
       const s = barangayMap[l];
       const cells = ageKeys.map(k => s.ageBuckets && s.ageBuckets[k] ? s.ageBuckets[k] : 0);
-      const tr = document.createElement('tr'); tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+      const tr = document.createElement('tr'); 
+      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
       tbodyAge.appendChild(tr);
     });
 
-    // 5) Sitio / Purok (I-VII + Unknown)
+    // 5) Sitio / Purok
     const sitios = ['I','II','III','IV','V','VI','VII','Unknown'];
-    const tbodySitio = document.querySelector('#tblSitio tbody'); tbodySitio.innerHTML = '';
+    const tbodySitio = document.querySelector('#tblSitio tbody'); 
+    tbodySitio.innerHTML = '';
     labels.forEach(l=>{
       const s = barangayMap[l];
       const cells = sitios.map(pk => s.sitio && s.sitio[pk] ? s.sitio[pk] : 0);
-      const tr = document.createElement('tr'); tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+      const tr = document.createElement('tr'); 
+      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
       tbodySitio.appendChild(tr);
     });
 
-    // 6) Livestock: show total qty (or count) and list others
-    const tbodyLiv = document.querySelector('#tblLivestock tbody'); tbodyLiv.innerHTML = '';
+    // 6) Livestock
+    const tbodyLiv = document.querySelector('#tblLivestock tbody'); 
+    tbodyLiv.innerHTML = '';
     labels.forEach(l=>{
       const s = barangayMap[l];
       const animals = ['Dog','Cat','Pig','Cow','Carabao','Chicken'];
@@ -469,8 +1169,70 @@ async function loadDashboard(){
 
   } catch(err){
     console.error('Load dashboard error', err);
+    alert('Error loading dashboard data');
   }
+  showLoading(false);
 }
+
+/* SIDEBAR FUNCTIONS */
+function toggleSidebar() {
+    const pageContainer = document.querySelector('.page-container');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const icon = sidebarToggle.querySelector('i');
+    
+    pageContainer.classList.toggle('collapsed');
+    
+    if (pageContainer.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        sidebarToggle.title = "Expand sidebar";
+    } else {
+        icon.className = 'fas fa-bars';
+        sidebarToggle.title = "Collapse sidebar";
+    }
+}
+
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const icon = mobileToggle.querySelector('i');
+    
+    sidebar.classList.toggle('mobile-open');
+    
+    if (sidebar.classList.contains('mobile-open')) {
+        icon.className = 'fas fa-times';
+        mobileToggle.title = "Close menu";
+    } else {
+        icon.className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+}
+
+/* Close mobile sidebar on click outside */
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target) && sidebar.classList.contains('mobile-open')) {
+            sidebar.classList.remove('mobile-open');
+            mobileToggle.querySelector('i').className = 'fas fa-bars';
+            mobileToggle.title = "Open menu";
+        }
+    }
+});
+
+/* WINDOW RESIZE HANDLER */
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        // On desktop, ensure sidebar is not in mobile-open state
+        const sidebar = document.getElementById('sidebar');
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        
+        sidebar.classList.remove('mobile-open');
+        mobileToggle.querySelector('i').className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+});
 
 /* session + ui */
 async function sessionCheck(){
@@ -478,18 +1240,80 @@ async function sessionCheck(){
     const r = await fetch(API_URL + '?action=sessionCheck');
     const j = await r.json();
     if(!j.success) return window.location.href = 'index.html';
-    document.getElementById('userName').innerText = j.fullName || '';
-    if(j.role === 'Admin') document.getElementById('navUsers').style.display = 'block';
-  } catch(e){ console.warn('session check failed'); }
+    
+    // Remove 👤 emoji from user display
+    const userName = j.fullName || localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    document.getElementById('userName').innerText = userName;
+    
+    // Check if user is admin
+    const isAdmin = j.role === 'Admin' || localStorage.getItem("userRole") === "admin";
+    const adminItems = document.querySelectorAll(".admin-only");
+    adminItems.forEach(item => {
+        item.style.display = isAdmin ? "block" : "none";
+    });
+    
+  } catch(e){ 
+    console.warn('session check failed', e);
+    // Fallback to localStorage check
+    const staffName = localStorage.getItem("staffName");
+    if (!staffName) {
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('userName').innerText = staffName;
+      
+      const isAdmin = localStorage.getItem("userRole") === "admin";
+      const adminItems = document.querySelectorAll(".admin-only");
+      adminItems.forEach(item => {
+          item.style.display = isAdmin ? "block" : "none";
+      });
+    }
+  }
 }
 
-document.getElementById('logoutBtn').addEventListener('click', ()=>{ fetch(API_URL+'?action=logout'); window.location.href='index.html'; });
+/* Event Listeners */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  localStorage.removeItem('lastDataUpdate');
+  fetch(API_URL+'?action=logout'); 
+  window.location.href='index.html'; 
+});
 
+// Desktop sidebar toggle
+document.getElementById('sidebarToggle').onclick = toggleSidebar;
+
+// Mobile sidebar toggle
+document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
+
+/* INITIALIZATION */
 window.addEventListener('DOMContentLoaded', async ()=>{
   await sessionCheck();
+  await loadLastUpdated(); // Load stored timestamp first
   await loadDashboard();
-  setInterval(loadDashboard, 30000);
+  
+  // Set up auto-refresh (every 5 minutes)
+  setInterval(loadDashboard, 300000);
+  
+  // Check screen width and adjust sidebar
+  if (window.innerWidth <= 768) {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.remove('mobile-open');
+  }
 });
+
+/* Listen for data changes from other pages */
+window.addEventListener('storage', function(e) {
+  if (e.key === 'lastDataUpdate') {
+    // Another tab updated data, reload dashboard
+    loadDashboard();
+  }
+});
+
+// If this is the data entry/edit page, update timestamp after successful operations
+// This would be called from dataForm.html or edit.html after successful save
+function notifyDataUpdated() {
+  updateLastUpdated();
+  // Also trigger storage event for other tabs
+  localStorage.setItem('lastDataUpdate', new Date().toISOString());
+}
 </script>
 </body>
 </html>
