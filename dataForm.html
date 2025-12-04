@@ -22,6 +22,43 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+           /* Background decorative elements */
+        .bg-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(15, 122, 74, 0.05);
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -100px;
+            background: rgba(255, 122, 0, 0.05);
+        }
+
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 10%;
+            background: rgba(52, 183, 143, 0.05);
+        }
 
    /* ============ ENHANCE: Better cross-platform compatibility ============ */
    body {
@@ -843,31 +880,51 @@
      to { opacity: 1; transform: translateY(0); }
    }
 
-   /* Head name with checkbox container */
+   /* Head name with checkbox container - FIXED */
    .head-name-container {
      display: flex;
-     align-items: center;
-     gap: 16px;
+     align-items: flex-start;
+     gap: 0;
      flex-wrap: wrap;
+     margin-bottom: 0;
    }
 
    .head-name-container input[type="text"] {
      flex: 1;
      min-width: 200px;
+     margin-bottom: 0;
    }
 
-   .head-registration {
+   /* FIXED: Remove space between Household Head Full Name and FishR/RBIS Registered button */
+   .head-registration-container {
      display: flex;
+     align-items: center;
      gap: 16px;
      margin-top: 8px;
-     padding: 12px;
-     background: var(--light-green);
-     border-radius: var(--radius-sm);
-     border-left: 3px solid var(--accent1);
+     padding: 0;
+     background: transparent;
+     border-radius: 0;
+     border-left: none;
    }
 
-   .head-registration .radio-item {
+   .head-registration-container .checkbox-item {
      margin: 0;
+   }
+
+   /* FIXED: Better alignment for conditional field in Educational & Economic Status */
+   .form-grid > div {
+     margin-bottom: 0;
+   }
+
+   .form-grid .conditional-field {
+     grid-column: 1 / -1;
+     margin-top: 8px;
+     margin-bottom: 0;
+   }
+
+   /* FIXED: Ensure proper spacing in form grids */
+   .form-grid > div:not(:last-child) {
+     margin-bottom: 0;
    }
 
    /* ============ RESPONSIVE DESIGN ============ */
@@ -1071,7 +1128,7 @@
          gap: 12px;
      }
      
-     .head-registration {
+     .head-registration-container {
          flex-direction: column;
          gap: 12px;
      }
@@ -1162,6 +1219,12 @@
 </style>
 </head>
 <body>
+       <!-- Background pattern -->
+    <div class="bg-pattern">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+    </div>
 <div class="page-container">
 
   <header class="topbar">
@@ -1246,17 +1309,19 @@
             </select>
           </div>
 
+          <!-- FIXED: Household Head Full Name with proper spacing -->
           <div style="grid-column: 1 / -1;">
             <label>Household Head Full Name<span class="required">*</span></label>
             <div class="head-name-container">
               <input type="text" id="householdHead" required />
             </div>
-          </div>
-
-          <div>
-            <div class="checkbox-item" style="margin-bottom: 8px;">
-              <input type="checkbox" id="headRegisteredCheckbox">
-              <label for="headRegisteredCheckbox">FishR/RBIS Registered</label>
+            
+            <!-- FIXED: FishR/RBIS Registered button moved inline -->
+            <div class="head-registration-container">
+              <div class="checkbox-item" style="margin-bottom: 0;">
+                <input type="checkbox" id="headRegisteredCheckbox">
+                <label for="headRegisteredCheckbox">FishR/RBIS Registered</label>
+              </div>
             </div>
             
             <div id="headRegistrationField" class="conditional-field">
@@ -1309,7 +1374,7 @@
         </div>
       </div>
 
-      <!-- NEW: EDUCATIONAL & ECONOMIC STATUS -->
+      <!-- FIXED: EDUCATIONAL & ECONOMIC STATUS -->
       <div class="card">
         <div class="section-title"><div class="chip">2</div><h3>Educational & Economic Status</h3></div>
         <div class="form-grid">
