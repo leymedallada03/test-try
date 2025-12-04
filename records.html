@@ -22,6 +22,16 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+      #disc {
+    margin-bottom: 10px;
+    background: var(--light-green);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent1);
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+   }
 
    body {
     background-color: var(--bg);
@@ -866,6 +876,9 @@
     <div class="content-header">
       <h2><span style="color: var(--accent1);">📁</span> Household Records</h2>
     </div>
+      <!-- Description -->
+<div id="disc">This section displays all collected household data in one place. Users can easily view, search, and review information gathered from each household, helping ensure accurate monitoring, validation, and decision-making for community programs and emergency operations.</div>
+
 
     <!-- Counts - Top Right -->
     <div class="stats-container">
@@ -1365,3 +1378,4 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
