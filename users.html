@@ -822,6 +822,7 @@
           <select id="user_role" class="form-control">
             <option value="Staff">Staff</option>
             <option value="Admin">Admin</option>
+            <option value="System Administrator">System Administrator</option>
           </select>
         </div>
         <div class="form-group">
@@ -897,40 +898,64 @@ let EDIT_TARGET = null;
 /* ============ SESSION CHECK FUNCTION ============ */
 async function sessionCheck(){
   try {
-    // Try to get user info from localStorage (set during login)
-    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    // DEBUG: Log what's in localStorage
+    console.log("=== DEBUG: LocalStorage contents ===");
+    console.log("userRole:", localStorage.getItem("userRole"));
+    console.log("staffName:", localStorage.getItem("staffName"));
+    console.log("username:", localStorage.getItem("username"));
+    console.log("fullUserData:", localStorage.getItem("fullUserData"));
     
-    // If we have a username, show it and allow access
-    if (userName && userName !== "User") {
-      document.getElementById('userName').innerText = userName;
-      
-      // Check admin status
-      const isAdmin = localStorage.getItem("userRole") === "admin";
-      const adminItems = document.querySelectorAll(".admin-only");
-      adminItems.forEach(item => {
-          item.style.display = isAdmin ? "block" : "none";
-      });
-      
-      // Set session flag
-      sessionStorage.setItem('authenticated', 'true');
-      return true;
-    } else {
-      // No user info found in localStorage
-      console.log('No user info found in localStorage');
-      
-      // Check if we have a session flag from before (tab restore, etc.)
-      if(sessionStorage.getItem('authenticated')) {
-        // We were authenticated before, keep going
-        console.log('Session flag found, allowing access');
-        document.getElementById('userName').innerText = "User";
-        return true;
-      } else {
-        // No session at all, redirect to login
-        console.log('No session found, redirecting to login...');
-        window.location.href = 'index.html?session=expired';
-        return false;
+    // Try to get user info from localStorage
+    const fullUserData = localStorage.getItem("fullUserData");
+    let userName = "User";
+    let userRole = "";
+    
+    if (fullUserData) {
+      try {
+        const userData = JSON.parse(fullUserData);
+        userName = userData.FullName || userData.Username || "User";
+        userRole = userData.Role || "";
+        console.log("Parsed userData:", userData);
+      } catch (e) {
+        console.log("Could not parse fullUserData:", e);
       }
     }
+    
+    // Fallback to old localStorage items
+    if (!userName || userName === "User") {
+      userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    }
+    
+    if (!userRole) {
+      userRole = localStorage.getItem("userRole") || "";
+    }
+    
+    console.log("Final values - Name:", userName, "Role:", userRole);
+    
+    // Display user name
+    document.getElementById('userName').innerText = userName;
+    
+    // Check if user is admin (more flexible check)
+    const isAdmin = userRole === "Admin" || 
+                    userRole === "admin" || 
+                    userRole === "System Administrator" ||
+                    userRole === "system administrator" ||
+                    userRole.toLowerCase().includes("admin") ||
+                    userRole.toLowerCase().includes("system");
+    
+    console.log("Is admin?", isAdmin, "Role was:", userRole);
+    
+    // Show/hide admin-only items
+    const adminItems = document.querySelectorAll(".admin-only");
+    adminItems.forEach(item => {
+      item.style.display = isAdmin ? "block" : "none";
+      console.log("Setting admin item display:", item.style.display);
+    });
+    
+    // Set session flag
+    sessionStorage.setItem('authenticated', 'true');
+    return true;
+    
   } catch(e){ 
     console.warn('session check failed', e);
     return false;
@@ -1012,7 +1037,7 @@ function renderUsers(filter = "") {
     tr.innerHTML = `
       <td>${escapeHtml(user.Username)}</td>
       <td>${escapeHtml(user.FullName)}</td>
-      <td><span style="padding: 2px 8px; border-radius: 12px; background: ${user.Role === 'Admin' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' ? '#0f7a4a' : '#666'};">${user.Role}</span></td>
+      <td><span style="padding: 2px 8px; border-radius: 12px; background: ${user.Role === 'Admin' || user.Role === 'System Administrator' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' || user.Role === 'System Administrator' ? '#0f7a4a' : '#666'};">${user.Role}</span></td>
       <td>${escapeHtml(user.AssignedBarangay)}</td>
       <td class="actions-cell">
         <button class="icon-btn" onclick="editUser('${user.Username}')" title="Edit">
@@ -1033,7 +1058,7 @@ function renderUsers(filter = "") {
 /* ============ UPDATE STATS ============ */
 function updateStats() {
   const total = ALL_USERS.length;
-  const admins = ALL_USERS.filter(u => u.Role === 'Admin').length;
+  const admins = ALL_USERS.filter(u => u.Role === 'Admin' || u.Role === 'System Administrator').length;
   const staff = ALL_USERS.filter(u => u.Role === 'Staff').length;
   
   document.getElementById('statTotal').textContent = total;
@@ -1269,17 +1294,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   const isAuthenticated = await sessionCheck();
   
   if (isAuthenticated) {
-    // Load data if authenticated
-    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
-    document.getElementById("userName").innerText = userName;
-    
-    // Check if user is admin
-    const isAdmin = localStorage.getItem("userRole") === "admin";
-    const adminItems = document.querySelectorAll(".admin-only");
-    adminItems.forEach(item => {
-        item.style.display = isAdmin ? "block" : "none";
-    });
-    
     // Load users
     loadUsers();
     
@@ -1321,6 +1335,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Auto-refresh users every 30 seconds
     setInterval(loadUsers, 30000);
+  } else {
+    // Not authenticated, redirect to login
+    window.location.href = 'index.html?session=expired';
   }
 });
 
@@ -1354,5 +1371,3 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
-
-
