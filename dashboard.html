@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<!-- CACHE PREVENTION HEADERS -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Purok Kaligtasan — Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -2278,15 +2282,29 @@ window.addEventListener('resize', function() {
     }
 });
 
-/* session + ui */
+/* ENHANCED SESSION CHECK WITH BACK BUTTON PROTECTION */
 async function sessionCheck(){
   try {
-    const r = await fetch(API_URL + '?action=sessionCheck');
+    // Clear any session flags immediately
+    sessionStorage.removeItem('authenticated');
+    
+    const r = await fetch(API_URL + '?action=sessionCheck&t=' + Date.now());
     const j = await r.json();
-    if(!j.success) return window.location.href = 'index.html';
+    
+    if(!j.success) {
+      // Clear all local storage and redirect
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = 'index.html?logout=true&t=' + Date.now();
+      return;
+    }
     
     const userName = j.fullName || localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     document.getElementById('userName').innerText = userName;
+    
+    // Set a session flag to prevent back button issues
+    sessionStorage.setItem('authenticated', 'true');
+    sessionStorage.setItem('userName', userName);
     
     const isAdmin = j.role === 'Admin' || localStorage.getItem("userRole") === "admin";
     const adminItems = document.querySelectorAll(".admin-only");
@@ -2296,11 +2314,17 @@ async function sessionCheck(){
     
   } catch(e){ 
     console.warn('session check failed', e);
-    const staffName = localStorage.getItem("staffName");
-    if (!staffName) {
-      window.location.href = 'index.html';
+    
+    // Check if we have a session flag
+    if(!sessionStorage.getItem('authenticated')) {
+      // Clear all storage and redirect
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = 'index.html?session=expired&t=' + Date.now();
     } else {
-      document.getElementById('userName').innerText = staffName;
+      // Use cached session data
+      const userName = sessionStorage.getItem('userName') || "User";
+      document.getElementById('userName').innerText = userName;
       
       const isAdmin = localStorage.getItem("userRole") === "admin";
       const adminItems = document.querySelectorAll(".admin-only");
@@ -2311,19 +2335,42 @@ async function sessionCheck(){
   }
 }
 
+/* ENHANCED LOGOUT FUNCTION */
+function handleLogout() {
+  // Clear all storage
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Add a parameter to prevent caching
+  const logoutUrl = 'index.html?logout=true&t=' + Date.now();
+  
+  // Call server-side logout with timestamp to prevent caching
+  fetch(API_URL+'?action=logout&t=' + Date.now())
+    .catch(() => { /* ignore errors on logout */ })
+    .finally(() => {
+      // Replace current history entry with login page
+      // This prevents back button from returning to dashboard
+      window.location.replace(logoutUrl);
+    });
+}
+
 /* Event Listeners */
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  localStorage.removeItem('lastDataUpdate');
-  if (refreshInterval) clearInterval(refreshInterval);
-  fetch(API_URL+'?action=logout'); 
-  window.location.href='index.html'; 
-});
+document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
 // Desktop sidebar toggle
 document.getElementById('sidebarToggle').onclick = toggleSidebar;
 
 // Mobile sidebar toggle
 document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
+
+/* PREVENT BACK BUTTON ISSUES */
+window.addEventListener('pageshow', function(event) {
+  // If page is loaded from cache (back/forward button)
+  if (event.persisted) {
+    console.log('Page loaded from cache, checking session...');
+    sessionCheck(); // Re-validate session
+  }
+});
 
 /* INITIALIZATION */
 window.addEventListener('DOMContentLoaded', async ()=>{
@@ -2367,6 +2414,3 @@ function notifyDataUpdated() {
 </script>
 </body>
 </html>
-
-
-
