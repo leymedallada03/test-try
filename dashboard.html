@@ -2282,13 +2282,13 @@ window.addEventListener('resize', function() {
     }
 });
 
-/* SIMPLE SESSION CHECK - FIXED TO ALLOW LOGIN */
+/* SIMPLE SESSION CHECK - FIXED */
 async function sessionCheck(){
   try {
     // Try to get user info from localStorage (set during login)
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     
-    // If we have a username, show it
+    // If we have a username, show it and allow access
     if (userName && userName !== "User") {
       document.getElementById('userName').innerText = userName;
       
@@ -2303,13 +2303,13 @@ async function sessionCheck(){
       sessionStorage.setItem('authenticated', 'true');
       return true;
     } else {
-      // No user info found, but don't redirect immediately
-      // Wait to see if this is a fresh login
-      console.log('No user info found, checking if this is a fresh session...');
+      // No user info found in localStorage
+      console.log('No user info found in localStorage');
       
-      // Check if we have a session flag from before
+      // Check if we have a session flag from before (tab restore, etc.)
       if(sessionStorage.getItem('authenticated')) {
         // We were authenticated before, keep going
+        console.log('Session flag found, allowing access');
         document.getElementById('userName').innerText = "User";
         return true;
       } else {
@@ -2319,7 +2319,6 @@ async function sessionCheck(){
         return false;
       }
     }
-    
   } catch(e){ 
     console.warn('session check failed', e);
     return false;
@@ -2360,19 +2359,8 @@ window.addEventListener('pageshow', function(event) {
   if (event.persisted) {
     console.log('Page loaded from cache, checking session...');
     
-    // Check if we have a session flag
-    if(!sessionStorage.getItem('authenticated')) {
-      // If we don't have a session flag but have localStorage user info
-      // it might be a fresh load after login
-      const userName = localStorage.getItem("staffName") || localStorage.getItem("username");
-      if (!userName) {
-        // No user info at all, redirect to login
-        window.location.href = 'index.html?session=expired';
-      } else {
-        // We have user info, set the session flag
-        sessionStorage.setItem('authenticated', 'true');
-      }
-    }
+    // Don't automatically redirect. Just reload the dashboard data
+    loadDashboard();
   }
 });
 
@@ -2421,3 +2409,4 @@ function notifyDataUpdated() {
 </script>
 </body>
 </html>
+
