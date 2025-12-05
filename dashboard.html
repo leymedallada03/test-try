@@ -28,6 +28,44 @@
     margin: 0;
     min-height: 100vh;
    }
+           /* Background decorative elements */
+        .bg-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(15, 122, 74, 0.05);
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -100px;
+            background: rgba(255, 122, 0, 0.05);
+        }
+
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 10%;
+            background: rgba(52, 183, 143, 0.05);
+        }
+
 
    .page-container{
     max-width:1200px;
@@ -322,6 +360,17 @@
    .section-title:first-child {
     margin-top: 0;
    }
+   .overview-title {
+    font-size: 1rem; /* SAME SIZE AS BASIC POPULATION OVERVIEW */
+    color: var(--accent1);
+    font-weight: 700;
+    margin: 25px 0 15px 0;
+    padding-bottom: 8px; /* Reduced from 10px */
+    border-bottom: 1px solid #d1d9d6; /* Changed to light grey and thinner */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+   }
    
    .category-grid {
     display: grid;
@@ -604,6 +653,12 @@
 </head>
 
 <body>
+    <!-- Background pattern -->
+    <div class="bg-pattern">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+    </div>
 <div class="page-container">
 
   <header class="topbar">
@@ -655,25 +710,25 @@
       <h3><i class="fas fa-table"></i> Alitagtag Data Overview</h3></div>
     <div class="dashboard-cards">
       <div class="card">
-        <h3>Total Household Heads</h3>
+        <h3 class="overview-title">Total Household Heads</h3>
         <div id="totalHeads" class="card-value">0</div>
         <div class="mini">(rows without member name)</div>
       </div>
 
       <div class="card">
-        <h3>Total Household Members</h3>
+        <h3 class="overview-title>Total Household Members</h3>
         <div id="totalMembers" class="card-value">0</div>
         <div class="mini">(all member rows)</div>
       </div>
 
       <div class="card">
-        <h3>Households with Coordinates</h3>
+        <h3 class="overview-title>Households with Coordinates</h3>
         <div id="withCoords" class="card-value">0</div>
         <div class="mini">Heads that provided lat,lng</div>
       </div>
 
       <div class="card">
-        <h3>Last Updated</h3>
+        <h3 class="overview-title">Last Updated</h3>
         <div id="lastUpdated" class="card-value">---</div>
         <div class="mini">(m/d/yyyy hh:mm:ss AM/PM)</div>
       </div>
@@ -681,7 +736,7 @@
 
     <!-- Basic Population Overview - Single Card with Sections -->
     <div class="card population-overview-card">
-      <h3>Basic Population Overview</h3>
+      <h3 class="overview-title">Basic Population Overview</h3>
       
       <!-- Demographics Section -->
       <div class="section-title">
@@ -799,7 +854,7 @@
 
     <!-- Chart Container -->
     <div class="chart-container">
-      <h3>Household Distribution Within Alitagtag</h3>
+      <h3 class="overview-title">Household Distribution Within Alitagtag</h3>
       <canvas id="barangayChart" height="160"></canvas>
     </div>
 
@@ -2367,6 +2422,7 @@ function notifyDataUpdated() {
 </script>
 </body>
 </html>
+
 
 
 
