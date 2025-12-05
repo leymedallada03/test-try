@@ -534,6 +534,28 @@
     margin-top: 16px;
    }
 
+   /* Password toggle in modal */
+   .modal-body .input-with-icon {
+    position: relative;
+   }
+
+   .modal-body .input-with-icon .password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+   }
+
+   .modal-body .input-with-icon input {
+    padding-right: 40px !important;
+   }
+
    /* Toast notifications */
    .toast {
     position: fixed;
@@ -833,7 +855,12 @@
         </div>
         <div class="form-group">
           <label for="user_password">Password</label>
-          <input id="user_password" type="password" class="form-control" placeholder="Enter new password" />
+          <div class="input-with-icon">
+            <input id="user_password" type="password" class="form-control" placeholder="Enter new password" />
+            <button type="button" class="password-toggle" id="toggleModalPassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
           <div class="form-hint">Leave blank when editing to keep current password</div>
         </div>
       </form>
@@ -1066,20 +1093,36 @@ function openUserModal(mode = 'add', username = null) {
       document.getElementById('user_barangay').value = user.AssignedBarangay || '';
       document.getElementById('user_username').disabled = true;
       document.getElementById('user_password').required = false;
+      document.getElementById('user_password').placeholder = "Leave blank to keep current password";
     }
   } else {
     title.textContent = 'Add New User';
     document.getElementById('user_username').disabled = false;
     document.getElementById('user_password').required = true;
+    document.getElementById('user_password').placeholder = "Enter new password";
+  }
+  
+  // Reset password toggle to eye icon
+  const toggleIcon = document.querySelector('#toggleModalPassword i');
+  if (toggleIcon) {
+    toggleIcon.className = 'fas fa-eye';
+  }
+  const passwordInput = document.getElementById('user_password');
+  if (passwordInput) {
+    passwordInput.type = 'password';
   }
   
   modal.style.display = 'flex';
+  
+  // Setup password toggle
+  setupPasswordToggle();
 }
 
 function editUser(username) {
   openUserModal('edit', username);
 }
 
+/* ============ FIXED SAVE USER FUNCTION ============ */
 async function saveUser() {
   const username = document.getElementById('user_username').value.trim();
   const fullname = document.getElementById('user_fullname').value.trim();
@@ -1098,35 +1141,30 @@ async function saveUser() {
     return;
   }
   
-  const payload = {
-    action: EDIT_TARGET ? 'updateUser' : 'createUser',
-    user: {
-      Username: username,
-      FullName: fullname,
-      Role: role,
-      AssignedBarangay: barangay
-    }
-  };
-  
-  if (password) {
-    payload.user.Password = password;
-  }
-  
-  if (EDIT_TARGET) {
-    payload.target = EDIT_TARGET;
-  }
-  
   try {
-    // Use FormData instead of JSON to match your code.gs doPost handler
+    // Use FormData with individual fields (not JSON)
     const formData = new FormData();
     formData.append('action', EDIT_TARGET ? 'updateUser' : 'createUser');
+    
+    // Add individual user fields
+    formData.append('Username', username);
+    formData.append('FullName', fullname);
+    formData.append('Role', role);
+    formData.append('AssignedBarangay', barangay);
+    
+    if (password) {
+      formData.append('Password', password);
+    }
     
     if (EDIT_TARGET) {
       formData.append('target', EDIT_TARGET);
     }
     
-    // Add user data as JSON string
-    formData.append('user', JSON.stringify(payload.user));
+    console.log('Saving user data:', {
+      username, fullname, role, barangay, 
+      hasPassword: !!password, 
+      isEdit: !!EDIT_TARGET
+    });
     
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -1134,6 +1172,8 @@ async function saveUser() {
     });
     
     const text = await res.text();
+    console.log('Response text:', text);
+    
     let data;
     try {
       data = JSON.parse(text);
@@ -1164,12 +1204,16 @@ async function resetPassword(username) {
     formData.append('action', 'resetPassword');
     formData.append('target', username);
     
+    console.log('Resetting password for:', username);
+    
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       body: formData
     });
     
     const text = await res.text();
+    console.log('Response:', text);
+    
     let data;
     try {
       data = JSON.parse(text);
@@ -1198,12 +1242,16 @@ async function deleteUser(username) {
     formData.append('action', 'deleteUser');
     formData.append('target', username);
     
+    console.log('Deleting user:', username);
+    
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       body: formData
     });
     
     const text = await res.text();
+    console.log('Response:', text);
+    
     let data;
     try {
       data = JSON.parse(text);
@@ -1264,6 +1312,27 @@ async function loadLogs() {
   } catch(err) {
     console.error(err);
     showToast('Error loading logs: ' + err.message, 'error');
+  }
+}
+
+/* ============ PASSWORD TOGGLE FOR MODAL ============ */
+function setupPasswordToggle() {
+  const toggleBtn = document.getElementById('toggleModalPassword');
+  const passwordInput = document.getElementById('user_password');
+  
+  if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener('click', function() {
+      const icon = this.querySelector('i');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
   }
 }
 
