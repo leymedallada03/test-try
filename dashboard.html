@@ -301,6 +301,19 @@
     margin-top: 12px;
    }
 
+   /* New: Extended Quick Stats Grid */
+   .extended-quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+   }
+
+   .extended-quick-stats .card {
+    padding: 12px;
+    min-height: 60px;
+   }
+
    /* Barangay Breakdown - FULL WIDTH STACK */
    .breakdown-section {
     margin-top: 24px;
@@ -500,6 +513,10 @@
         grid-template-columns: repeat(2, 1fr);
     }
     
+    .extended-quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
     .breakdown-table-container {
         padding: 12px;
         margin-bottom: 16px;
@@ -580,6 +597,88 @@
     color: var(--accent1);
     font-weight: 600;
    }
+
+   /* Toggle buttons for extended quick stats */
+   .toggle-stats-btn {
+    margin-top: 10px;
+    background: var(--light-green);
+    color: var(--accent1);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+   }
+
+   .toggle-stats-btn:hover {
+    background: var(--accent1);
+    color: white;
+   }
+   
+   /* Overall Totals Section */
+   .overall-totals-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+   }
+   
+   .overall-totals-section h3 {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    color: var(--accent1);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+   
+   .job-category-container {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+   }
+   
+   .job-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+   }
+   
+   .job-category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--light-green);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+   }
+   
+   .job-category-label {
+    color: var(--muted);
+   }
+   
+   .job-category-value {
+    font-weight: 600;
+    color: var(--accent1);
+    background: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    min-width: 40px;
+    text-align: center;
+   }
+   
+   .job-category-header {
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 15px 0 8px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+   }
 </style>
 </head>
 
@@ -659,17 +758,92 @@
       </div>
     </div>
 
-    <!-- Quick Stats -->
+    <!-- Basic Quick Stats -->
     <div class="card">
-      <h3>Quick Totals</h3>
+      <h3>Basic Population Overview</h3>
       <div class="stat-grid" id="quickStats"></div>
+    </div>
+
+    <!-- Overall (Quick Totals/OVERALL TOTAL) Section -->
+    <div class="overall-totals-section">
+      <h3><i class="fas fa-chart-bar"></i> OVERALL TOTAL - Employment & Education</h3>
+      
+      <!-- Employment Status -->
+      <div>
+        <h4 style="color: var(--accent1); margin-bottom: 10px;">Employment Status</h4>
+        <div class="stat-grid" id="employmentOverall"></div>
+      </div>
+      
+      <!-- Educational Attainment -->
+      <div style="margin-top: 20px;">
+        <h4 style="color: var(--accent1); margin-bottom: 10px;">Educational Attainment</h4>
+        <div class="extended-quick-stats" id="educationOverall"></div>
+      </div>
+      
+      <!-- Job Categories -->
+      <div class="job-category-container">
+        <h4 style="color: var(--accent1); margin-bottom: 10px;">Job Categories (Overall Total)</h4>
+        
+        <!-- Office & Administrative Jobs -->
+        <div class="job-category-header">Office & Administrative Jobs</div>
+        <div class="job-category-grid" id="officeJobs"></div>
+        
+        <!-- Business & Management -->
+        <div class="job-category-header">Business & Management</div>
+        <div class="job-category-grid" id="businessJobs"></div>
+        
+        <!-- Accounting & Finance -->
+        <div class="job-category-header">Accounting & Finance</div>
+        <div class="job-category-grid" id="accountingJobs"></div>
+        
+        <!-- IT & Tech -->
+        <div class="job-category-header">IT & Tech</div>
+        <div class="job-category-grid" id="itJobs"></div>
+        
+        <!-- Healthcare -->
+        <div class="job-category-header">Healthcare</div>
+        <div class="job-category-grid" id="healthcareJobs"></div>
+        
+        <!-- Education -->
+        <div class="job-category-header">Education</div>
+        <div class="job-category-grid" id="educationJobs"></div>
+        
+        <!-- Sales & Customer Service -->
+        <div class="job-category-header">Sales & Customer Service</div>
+        <div class="job-category-grid" id="salesJobs"></div>
+        
+        <!-- Skilled Work & Labor -->
+        <div class="job-category-header">Skilled Work & Labor</div>
+        <div class="job-category-grid" id="skilledJobs"></div>
+        
+        <!-- Delivery & Logistics -->
+        <div class="job-category-header">Delivery & Logistics</div>
+        <div class="job-category-grid" id="deliveryJobs"></div>
+        
+        <!-- Food & Hospitality -->
+        <div class="job-category-header">Food & Hospitality</div>
+        <div class="job-category-grid" id="foodJobs"></div>
+        
+        <!-- Security & Public Service -->
+        <div class="job-category-header">Security & Public Service</div>
+        <div class="job-category-grid" id="securityJobs"></div>
+        
+        <!-- Media, Design & Creative -->
+        <div class="job-category-header">Media, Design & Creative</div>
+        <div class="job-category-grid" id="mediaJobs"></div>
+        
+        <!-- Others -->
+        <div id="othersJobsContainer" style="display: none;">
+          <div class="job-category-header">Others</div>
+          <div class="job-category-grid" id="othersJobs"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Chart Container -->
     <div class="chart-container">
       <h3>Household Distribution Within Alitagtag</h3>
       <canvas id="barangayChart" height="160"></canvas>
-      <!-- Color Legend (preserved from original) -->
     </div>
 
     <!-- Barangay Breakdown Section -->
@@ -793,6 +967,43 @@
         </table>
       </div>
 
+      <!-- 7. Barangay Educational Attainment -->
+      <div class="breakdown-table-container">
+        <h4>Educational Attainment by Barangay</h4>
+        <table class="breakdown-table" id="tblBarangayEducation">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>No Formal Education</th>
+              <th>Elementary Level</th>
+              <th>Elementary Graduate</th>
+              <th>Junior High School Level</th>
+              <th>Junior High School Graduate</th>
+              <th>Senior High School Level</th>
+              <th>Senior High School Graduate</th>
+              <th>College Level</th>
+              <th>College Graduate</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- 8. Barangay Employment -->
+      <div class="breakdown-table-container">
+        <h4>Employment Status by Barangay</h4>
+        <table class="breakdown-table" id="tblBarangayEmployment">
+          <thead>
+            <tr>
+              <th>Barangay</th>
+              <th>Employed</th>
+              <th>Unemployed</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
     </div><!-- end breakdown-section -->
 
     <div class="small-muted" style="margin-top: 20px; font-size:12px; color:var(--muted);">
@@ -859,7 +1070,6 @@ function showLoading(yes){
 /* Load and store last updated time */
 async function loadLastUpdated() {
   try {
-    // Check localStorage for stored timestamp
     const storedTime = localStorage.getItem('lastDataUpdate');
     if (storedTime) {
       lastUpdatedTime = new Date(storedTime);
@@ -887,7 +1097,103 @@ async function loadDashboard(){
 
     // init containers
     let totalHeads = 0, totalMembers = 0, headsWithCoords = 0;
-    const barangayMap = {}; // bn -> stats
+    const barangayMap = {};
+    
+    // Initialize overall totals
+    const overallEmployment = {
+      employed: 0,
+      unemployed: 0
+    };
+    
+    const overallEducation = {
+      noFormalEducation: 0,
+      elementaryLevel: 0,
+      elementaryGraduate: 0,
+      juniorHighSchoolLevel: 0,
+      juniorHighSchoolGraduate: 0,
+      seniorHighSchoolLevel: 0,
+      seniorHighSchoolGraduate: 0,
+      collegeLevel: 0,
+      collegeGraduate: 0
+    };
+    
+    const overallJobCategories = {
+      // Office & Administrative Jobs
+      adminAssistant: 0,
+      officeClerk: 0,
+      secretary: 0,
+      
+      // Business & Management
+      projectManager: 0,
+      operationsManager: 0,
+      hrStaff: 0,
+      accountManager: 0,
+      
+      // Accounting & Finance
+      accountingStaff: 0,
+      bookkeeper: 0,
+      payrollOfficer: 0,
+      auditor: 0,
+      
+      // IT & Tech
+      itSupport: 0,
+      webDeveloper: 0,
+      softwareDeveloper: 0,
+      dataAnalyst: 0,
+      systemAdministrator: 0,
+      
+      // Healthcare
+      nurse: 0,
+      medicalTechnologist: 0,
+      caregiver: 0,
+      pharmacist: 0,
+      
+      // Education
+      teacher: 0,
+      tutor: 0,
+      schoolAdministrator: 0,
+      
+      // Sales & Customer Service
+      csr: 0,
+      salesAssociate: 0,
+      cashier: 0,
+      storeSupervisor: 0,
+      
+      // Skilled Work & Labor
+      electrician: 0,
+      plumber: 0,
+      welder: 0,
+      constructionWorker: 0,
+      
+      // Delivery & Logistics
+      driver: 0,
+      logisticsStaff: 0,
+      rider: 0,
+      
+      // Food & Hospitality
+      cook: 0,
+      waiter: 0,
+      barista: 0,
+      housekeepingStaff: 0,
+      
+      // Security & Public Service
+      securityGuard: 0,
+      barangayStaff: 0,
+      policeOfficer: 0,
+      fireOfficer: 0,
+      
+      // Media, Design & Creative
+      graphicDesigner: 0,
+      videoEditor: 0,
+      contentWriter: 0,
+      socialMediaManager: 0,
+      
+      // Others
+      others: 0
+    };
+    
+    // Track all unique job titles for "Others" category
+    const otherJobTitles = {};
 
     rows.forEach(r=>{
       const isHead = String(getField(r,'Name of Household Member/s')||'').trim() === '';
@@ -899,10 +1205,25 @@ async function loadDashboard(){
         barangayMap[barangay] = {
           heads:0, members:0, male:0, female:0, coords:0, pwds:0,
           status:{}, reasons:{}, livestock:{}, ageBuckets:{}, sitio:{},
-          // support counters:
           support: {
             "TUPAD":0, "Local 4Ps":0, "National 4Ps":0, "Local Social Pension":0, "National Social Pension":0,
             "Solo Parent Assistance":0, "Relief Goods":0, "Cash Subsidy":0
+          },
+          // Barangay specific education and employment
+          education: {
+            noFormalEducation: 0,
+            elementaryLevel: 0,
+            elementaryGraduate: 0,
+            juniorHighSchoolLevel: 0,
+            juniorHighSchoolGraduate: 0,
+            seniorHighSchoolLevel: 0,
+            seniorHighSchoolGraduate: 0,
+            collegeLevel: 0,
+            collegeGraduate: 0
+          },
+          employment: {
+            employed: 0,
+            unemployed: 0
           }
         };
       }
@@ -990,6 +1311,275 @@ async function loadDashboard(){
       }
       const ab = (y === null) ? 'Unknown' : (y <=5 ? '0-5' : y <=17 ? '6-17' : y <=59 ? '18-59' : '60+');
       b.ageBuckets[ab] = (b.ageBuckets[ab]||0) + 1;
+      
+      // Educational Attainment - More precise matching
+      const educationField = String(getField(r,'Educational Attainment')||'').trim();
+      if(educationField) {
+        const eduLower = educationField.toLowerCase();
+        
+        if(eduLower.includes('no formal') || eduLower === 'none' || eduLower === 'no education') {
+          b.education.noFormalEducation++;
+          overallEducation.noFormalEducation++;
+        }
+        else if(eduLower.includes('elementary level') || eduLower === 'elementary undergraduate') {
+          b.education.elementaryLevel++;
+          overallEducation.elementaryLevel++;
+        }
+        else if(eduLower.includes('elementary graduate') || eduLower === 'elementary') {
+          b.education.elementaryGraduate++;
+          overallEducation.elementaryGraduate++;
+        }
+        else if(eduLower.includes('junior high school level') || eduLower.includes('junior high level') || eduLower === 'junior high') {
+          b.education.juniorHighSchoolLevel++;
+          overallEducation.juniorHighSchoolLevel++;
+        }
+        else if(eduLower.includes('junior high school graduate') || eduLower.includes('junior high graduate') || eduLower === 'junior high grad') {
+          b.education.juniorHighSchoolGraduate++;
+          overallEducation.juniorHighSchoolGraduate++;
+        }
+        else if(eduLower.includes('senior high school level') || eduLower.includes('senior high level') || eduLower === 'senior high') {
+          b.education.seniorHighSchoolLevel++;
+          overallEducation.seniorHighSchoolLevel++;
+        }
+        else if(eduLower.includes('senior high school graduate') || eduLower.includes('senior high graduate') || eduLower === 'senior high grad') {
+          b.education.seniorHighSchoolGraduate++;
+          overallEducation.seniorHighSchoolGraduate++;
+        }
+        else if(eduLower.includes('college level') || eduLower === 'college undergraduate' || eduLower === 'college') {
+          b.education.collegeLevel++;
+          overallEducation.collegeLevel++;
+        }
+        else if(eduLower.includes('college graduate') || eduLower === 'college grad') {
+          b.education.collegeGraduate++;
+          overallEducation.collegeGraduate++;
+        }
+      }
+      
+      // Employment Status - More precise matching
+      const employmentField = String(getField(r,'Employment Status')||'').trim().toLowerCase();
+      if(employmentField) {
+        if(employmentField === 'employed' || employmentField === 'yes' || employmentField === 'working') {
+          b.employment.employed++;
+          overallEmployment.employed++;
+        } else if(employmentField === 'unemployed' || employmentField === 'no' || employmentField === 'not working') {
+          b.employment.unemployed++;
+          overallEmployment.unemployed++;
+        }
+      }
+      
+      // Job Title/Description - More precise matching
+      const jobField = String(getField(r,'Job Title/Description')||'').trim();
+      if(jobField && (employmentField === 'employed' || employmentField === 'yes' || employmentField === 'working')) {
+        const jobLower = jobField.toLowerCase();
+        let matched = false;
+        
+        // Office & Administrative Jobs
+        if(jobLower.includes('administrative assistant') || jobLower.includes('admin assistant') || jobLower.includes('admin staff')) {
+          overallJobCategories.adminAssistant++;
+          matched = true;
+        }
+        else if(jobLower.includes('office clerk') || jobLower === 'clerk') {
+          overallJobCategories.officeClerk++;
+          matched = true;
+        }
+        else if(jobLower.includes('secretary') || jobLower.includes('executive assistant')) {
+          overallJobCategories.secretary++;
+          matched = true;
+        }
+        // Business & Management
+        else if(jobLower.includes('project manager')) {
+          overallJobCategories.projectManager++;
+          matched = true;
+        }
+        else if(jobLower.includes('operations manager')) {
+          overallJobCategories.operationsManager++;
+          matched = true;
+        }
+        else if(jobLower.includes('hr staff') || jobLower.includes('hr officer') || jobLower.includes('human resources')) {
+          overallJobCategories.hrStaff++;
+          matched = true;
+        }
+        else if(jobLower.includes('account manager')) {
+          overallJobCategories.accountManager++;
+          matched = true;
+        }
+        // Accounting & Finance
+        else if(jobLower.includes('accounting staff') || jobLower.includes('accountant')) {
+          overallJobCategories.accountingStaff++;
+          matched = true;
+        }
+        else if(jobLower.includes('bookkeeper') || jobLower.includes('book keeping')) {
+          overallJobCategories.bookkeeper++;
+          matched = true;
+        }
+        else if(jobLower.includes('payroll officer') || jobLower.includes('payroll')) {
+          overallJobCategories.payrollOfficer++;
+          matched = true;
+        }
+        else if(jobLower.includes('auditor')) {
+          overallJobCategories.auditor++;
+          matched = true;
+        }
+        // IT & Tech
+        else if(jobLower.includes('it support') || jobLower.includes('it technician') || jobLower === 'it') {
+          overallJobCategories.itSupport++;
+          matched = true;
+        }
+        else if(jobLower.includes('web developer') || jobLower.includes('web dev')) {
+          overallJobCategories.webDeveloper++;
+          matched = true;
+        }
+        else if(jobLower.includes('software developer') || jobLower.includes('programmer') || jobLower.includes('coder')) {
+          overallJobCategories.softwareDeveloper++;
+          matched = true;
+        }
+        else if(jobLower.includes('data analyst')) {
+          overallJobCategories.dataAnalyst++;
+          matched = true;
+        }
+        else if(jobLower.includes('system administrator') || jobLower.includes('system admin')) {
+          overallJobCategories.systemAdministrator++;
+          matched = true;
+        }
+        // Healthcare
+        else if(jobLower.includes('nurse') || jobLower.includes('registered nurse')) {
+          overallJobCategories.nurse++;
+          matched = true;
+        }
+        else if(jobLower.includes('medical technologist') || jobLower.includes('med tech')) {
+          overallJobCategories.medicalTechnologist++;
+          matched = true;
+        }
+        else if(jobLower.includes('caregiver')) {
+          overallJobCategories.caregiver++;
+          matched = true;
+        }
+        else if(jobLower.includes('pharmacist')) {
+          overallJobCategories.pharmacist++;
+          matched = true;
+        }
+        // Education
+        else if(jobLower.includes('teacher') || jobLower.includes('instructor') || jobLower.includes('faculty')) {
+          overallJobCategories.teacher++;
+          matched = true;
+        }
+        else if(jobLower.includes('tutor')) {
+          overallJobCategories.tutor++;
+          matched = true;
+        }
+        else if(jobLower.includes('school administrator') || jobLower.includes('principal')) {
+          overallJobCategories.schoolAdministrator++;
+          matched = true;
+        }
+        // Sales & Customer Service
+        else if(jobLower.includes('customer service') || jobLower.includes('csr') || jobLower.includes('call center')) {
+          overallJobCategories.csr++;
+          matched = true;
+        }
+        else if(jobLower.includes('sales associate') || jobLower.includes('salesperson') || jobLower.includes('sales agent')) {
+          overallJobCategories.salesAssociate++;
+          matched = true;
+        }
+        else if(jobLower.includes('cashier')) {
+          overallJobCategories.cashier++;
+          matched = true;
+        }
+        else if(jobLower.includes('store supervisor') || jobLower.includes('store manager')) {
+          overallJobCategories.storeSupervisor++;
+          matched = true;
+        }
+        // Skilled Work & Labor
+        else if(jobLower.includes('electrician')) {
+          overallJobCategories.electrician++;
+          matched = true;
+        }
+        else if(jobLower.includes('plumber')) {
+          overallJobCategories.plumber++;
+          matched = true;
+        }
+        else if(jobLower.includes('welder')) {
+          overallJobCategories.welder++;
+          matched = true;
+        }
+        else if(jobLower.includes('construction worker') || jobLower.includes('skilled laborer') || jobLower.includes('laborer')) {
+          overallJobCategories.constructionWorker++;
+          matched = true;
+        }
+        // Delivery & Logistics
+        else if(jobLower.includes('driver') || jobLower.includes('delivery driver') || jobLower.includes('truck driver')) {
+          overallJobCategories.driver++;
+          matched = true;
+        }
+        else if(jobLower.includes('logistics staff') || jobLower.includes('logistics')) {
+          overallJobCategories.logisticsStaff++;
+          matched = true;
+        }
+        else if(jobLower.includes('rider') || jobLower.includes('motorcycle delivery') || jobLower.includes('foodpanda') || jobLower.includes('grab')) {
+          overallJobCategories.rider++;
+          matched = true;
+        }
+        // Food & Hospitality
+        else if(jobLower.includes('cook') || jobLower.includes('chef')) {
+          overallJobCategories.cook++;
+          matched = true;
+        }
+        else if(jobLower.includes('waiter') || jobLower.includes('service crew') || jobLower.includes('waitress')) {
+          overallJobCategories.waiter++;
+          matched = true;
+        }
+        else if(jobLower.includes('barista')) {
+          overallJobCategories.barista++;
+          matched = true;
+        }
+        else if(jobLower.includes('housekeeping') || jobLower.includes('housekeeper')) {
+          overallJobCategories.housekeepingStaff++;
+          matched = true;
+        }
+        // Security & Public Service
+        else if(jobLower.includes('security guard') || jobLower.includes('guard')) {
+          overallJobCategories.securityGuard++;
+          matched = true;
+        }
+        else if(jobLower.includes('barangay staff') || jobLower.includes('barangay council') || jobLower.includes('barangay official')) {
+          overallJobCategories.barangayStaff++;
+          matched = true;
+        }
+        else if(jobLower.includes('police officer') || jobLower.includes('policeman') || jobLower.includes('police')) {
+          overallJobCategories.policeOfficer++;
+          matched = true;
+        }
+        else if(jobLower.includes('fire officer') || jobLower.includes('fireman') || jobLower.includes('firefighter')) {
+          overallJobCategories.fireOfficer++;
+          matched = true;
+        }
+        // Media, Design & Creative
+        else if(jobLower.includes('graphic designer') || jobLower.includes('graphics designer')) {
+          overallJobCategories.graphicDesigner++;
+          matched = true;
+        }
+        else if(jobLower.includes('video editor') || jobLower.includes('video editing')) {
+          overallJobCategories.videoEditor++;
+          matched = true;
+        }
+        else if(jobLower.includes('content writer') || jobLower.includes('writer')) {
+          overallJobCategories.contentWriter++;
+          matched = true;
+        }
+        else if(jobLower.includes('social media manager') || jobLower.includes('social media')) {
+          overallJobCategories.socialMediaManager++;
+          matched = true;
+        }
+        
+        // If not matched to any specific category, add to "Others"
+        if(!matched && jobField.trim() !== '') {
+          overallJobCategories.others++;
+          // Track the actual job title for display
+          if(!otherJobTitles[jobField]) {
+            otherJobTitles[jobField] = 0;
+          }
+          otherJobTitles[jobField]++;
+        }
+      }
     });
 
     // Update top cards
@@ -1005,7 +1595,6 @@ async function loadDashboard(){
     Object.keys(barangayMap).forEach(bn=>{
       const s = barangayMap[bn];
       totals.male += s.male; totals.female += s.female; totals.pwd += s.pwds;
-      // livestock aggregation
       Object.keys(s.livestock || {}).forEach(a=>{
         if(a === 'Others'){
           livestockTotals['Others'] = (livestockTotals['Others']||0) + (s.livestock['Others'] ? s.livestock['Others'].length : 0);
@@ -1014,9 +1603,7 @@ async function loadDashboard(){
           livestockTotals[a] += (s.livestock[a] && s.livestock[a].qty) ? s.livestock[a].qty : (s.livestock[a] && s.livestock[a].count ? s.livestock[a].count : 0);
         }
       });
-      // reasons
       Object.keys(s.reasons || {}).forEach(r => reasonsTotals[r] = (reasonsTotals[r]||0) + s.reasons[r]);
-      // support totals
       Object.keys(s.support || {}).forEach(k => { supportTotals[k] = (supportTotals[k]||0) + s.support[k]; });
     });
 
@@ -1037,6 +1624,277 @@ async function loadDashboard(){
       div.innerHTML = `<div class="mini">${k}</div><div class="card-value">${livestockTotals[k]}</div>`;
       quick.appendChild(div);
     });
+    
+    // Update Overall Employment Section
+    const employmentOverall = document.getElementById('employmentOverall');
+    employmentOverall.innerHTML = '';
+    
+    // Always show Employed and Unemployed (even if 0)
+    ['Employed', 'Unemployed'].forEach(status => {
+      const count = status === 'Employed' ? overallEmployment.employed : overallEmployment.unemployed;
+      const div = document.createElement('div'); 
+      div.className = 'card'; 
+      div.style.padding = '10px';
+      div.innerHTML = `<div class="mini">${status}</div><div class="card-value">${count}</div>`;
+      employmentOverall.appendChild(div);
+    });
+    
+    // Update Overall Education Section
+    const educationOverall = document.getElementById('educationOverall');
+    educationOverall.innerHTML = '';
+    
+    // Always show all education levels
+    const educationLabels = {
+      noFormalEducation: 'No Formal Education',
+      elementaryLevel: 'Elementary Level',
+      elementaryGraduate: 'Elementary Graduate',
+      juniorHighSchoolLevel: 'Junior High School Level',
+      juniorHighSchoolGraduate: 'Junior High School Graduate',
+      seniorHighSchoolLevel: 'Senior High School Level',
+      seniorHighSchoolGraduate: 'Senior High School Graduate',
+      collegeLevel: 'College Level',
+      collegeGraduate: 'College Graduate'
+    };
+    
+    Object.entries(educationLabels).forEach(([key, label]) => {
+      const count = overallEducation[key] || 0;
+      const div = document.createElement('div'); 
+      div.className = 'card'; 
+      div.style.padding = '10px';
+      div.innerHTML = `<div class="mini">${label}</div><div class="card-value">${count}</div>`;
+      educationOverall.appendChild(div);
+    });
+    
+    // Update Job Categories Section
+    // Office & Administrative Jobs
+    const officeJobs = document.getElementById('officeJobs');
+    officeJobs.innerHTML = '';
+    ['Admin Assistant', 'Office Clerk', 'Secretary'].forEach((label, index) => {
+      const key = ['adminAssistant', 'officeClerk', 'secretary'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        officeJobs.appendChild(div);
+      }
+    });
+    
+    // Business & Management
+    const businessJobs = document.getElementById('businessJobs');
+    businessJobs.innerHTML = '';
+    ['Project Manager', 'Operations Manager', 'HR Staff', 'Account Manager'].forEach((label, index) => {
+      const key = ['projectManager', 'operationsManager', 'hrStaff', 'accountManager'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        businessJobs.appendChild(div);
+      }
+    });
+    
+    // Accounting & Finance
+    const accountingJobs = document.getElementById('accountingJobs');
+    accountingJobs.innerHTML = '';
+    ['Accounting Staff', 'Bookkeeper', 'Payroll Officer', 'Auditor'].forEach((label, index) => {
+      const key = ['accountingStaff', 'bookkeeper', 'payrollOfficer', 'auditor'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        accountingJobs.appendChild(div);
+      }
+    });
+    
+    // IT & Tech
+    const itJobs = document.getElementById('itJobs');
+    itJobs.innerHTML = '';
+    ['IT Support', 'Web Developer', 'Software Developer', 'Data Analyst', 'System Admin'].forEach((label, index) => {
+      const key = ['itSupport', 'webDeveloper', 'softwareDeveloper', 'dataAnalyst', 'systemAdministrator'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        itJobs.appendChild(div);
+      }
+    });
+    
+    // Healthcare
+    const healthcareJobs = document.getElementById('healthcareJobs');
+    healthcareJobs.innerHTML = '';
+    ['Nurse', 'Medical Technologist', 'Caregiver', 'Pharmacist'].forEach((label, index) => {
+      const key = ['nurse', 'medicalTechnologist', 'caregiver', 'pharmacist'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        healthcareJobs.appendChild(div);
+      }
+    });
+    
+    // Education
+    const educationJobs = document.getElementById('educationJobs');
+    educationJobs.innerHTML = '';
+    ['Teacher', 'Tutor', 'School Admin'].forEach((label, index) => {
+      const key = ['teacher', 'tutor', 'schoolAdministrator'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        educationJobs.appendChild(div);
+      }
+    });
+    
+    // Sales & Customer Service
+    const salesJobs = document.getElementById('salesJobs');
+    salesJobs.innerHTML = '';
+    ['CSR', 'Sales Associate', 'Cashier', 'Store Supervisor'].forEach((label, index) => {
+      const key = ['csr', 'salesAssociate', 'cashier', 'storeSupervisor'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        salesJobs.appendChild(div);
+      }
+    });
+    
+    // Skilled Work & Labor
+    const skilledJobs = document.getElementById('skilledJobs');
+    skilledJobs.innerHTML = '';
+    ['Electrician', 'Plumber', 'Welder', 'Construction Worker'].forEach((label, index) => {
+      const key = ['electrician', 'plumber', 'welder', 'constructionWorker'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        skilledJobs.appendChild(div);
+      }
+    });
+    
+    // Delivery & Logistics
+    const deliveryJobs = document.getElementById('deliveryJobs');
+    deliveryJobs.innerHTML = '';
+    ['Driver', 'Logistics Staff', 'Rider'].forEach((label, index) => {
+      const key = ['driver', 'logisticsStaff', 'rider'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        deliveryJobs.appendChild(div);
+      }
+    });
+    
+    // Food & Hospitality
+    const foodJobs = document.getElementById('foodJobs');
+    foodJobs.innerHTML = '';
+    ['Cook', 'Waiter', 'Barista', 'Housekeeping'].forEach((label, index) => {
+      const key = ['cook', 'waiter', 'barista', 'housekeepingStaff'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        foodJobs.appendChild(div);
+      }
+    });
+    
+    // Security & Public Service
+    const securityJobs = document.getElementById('securityJobs');
+    securityJobs.innerHTML = '';
+    ['Security Guard', 'Barangay Staff', 'Police Officer', 'Fire Officer'].forEach((label, index) => {
+      const key = ['securityGuard', 'barangayStaff', 'policeOfficer', 'fireOfficer'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        securityJobs.appendChild(div);
+      }
+    });
+    
+    // Media, Design & Creative
+    const mediaJobs = document.getElementById('mediaJobs');
+    mediaJobs.innerHTML = '';
+    ['Graphic Designer', 'Video Editor', 'Content Writer', 'Social Media Manager'].forEach((label, index) => {
+      const key = ['graphicDesigner', 'videoEditor', 'contentWriter', 'socialMediaManager'][index];
+      const count = overallJobCategories[key] || 0;
+      if(count > 0) {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${label}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        mediaJobs.appendChild(div);
+      }
+    });
+    
+    // Others (only show if there are data)
+    const othersJobs = document.getElementById('othersJobs');
+    othersJobs.innerHTML = '';
+    const othersContainer = document.getElementById('othersJobsContainer');
+    
+    if(overallJobCategories.others > 0) {
+      othersContainer.style.display = 'block';
+      
+      // Show top 10 unique other job titles
+      const sortedOthers = Object.entries(otherJobTitles)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+      
+      sortedOthers.forEach(([jobTitle, count]) => {
+        const div = document.createElement('div');
+        div.className = 'job-category-item';
+        div.innerHTML = `
+          <span class="job-category-label">${jobTitle}</span>
+          <span class="job-category-value">${count}</span>
+        `;
+        othersJobs.appendChild(div);
+      });
+    } else {
+      othersContainer.style.display = 'none';
+    }
 
     // Chart: heads vs members per barangay
     destroyChart();
@@ -1159,6 +2017,37 @@ async function loadDashboard(){
       tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('') + `<td>${others}</td>`;
       tbodyLiv.appendChild(tr);
     });
+    
+    // 7) Barangay Educational Attainment
+    const tbodyBarangayEducation = document.querySelector('#tblBarangayEducation tbody'); 
+    tbodyBarangayEducation.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const cells = [
+        s.education.noFormalEducation || 0,
+        s.education.elementaryLevel || 0,
+        s.education.elementaryGraduate || 0,
+        s.education.juniorHighSchoolLevel || 0,
+        s.education.juniorHighSchoolGraduate || 0,
+        s.education.seniorHighSchoolLevel || 0,
+        s.education.seniorHighSchoolGraduate || 0,
+        s.education.collegeLevel || 0,
+        s.education.collegeGraduate || 0
+      ];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+      tbodyBarangayEducation.appendChild(tr);
+    });
+    
+    // 8) Barangay Employment
+    const tbodyBarangayEmployment = document.querySelector('#tblBarangayEmployment tbody'); 
+    tbodyBarangayEmployment.innerHTML = '';
+    labels.forEach(l=>{
+      const s = barangayMap[l];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${l}</td><td>${s.employment.employed || 0}</td><td>${s.employment.unemployed || 0}</td>`;
+      tbodyBarangayEmployment.appendChild(tr);
+    });
 
   } catch(err){
     console.error('Load dashboard error', err);
@@ -1234,11 +2123,9 @@ async function sessionCheck(){
     const j = await r.json();
     if(!j.success) return window.location.href = 'index.html';
     
-    // Remove 👤 emoji from user display
     const userName = j.fullName || localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     document.getElementById('userName').innerText = userName;
     
-    // Check if user is admin
     const isAdmin = j.role === 'Admin' || localStorage.getItem("userRole") === "admin";
     const adminItems = document.querySelectorAll(".admin-only");
     adminItems.forEach(item => {
@@ -1247,7 +2134,6 @@ async function sessionCheck(){
     
   } catch(e){ 
     console.warn('session check failed', e);
-    // Fallback to localStorage check
     const staffName = localStorage.getItem("staffName");
     if (!staffName) {
       window.location.href = 'index.html';
@@ -1279,7 +2165,7 @@ document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
 /* INITIALIZATION */
 window.addEventListener('DOMContentLoaded', async ()=>{
   await sessionCheck();
-  await loadLastUpdated(); // Load stored timestamp first
+  await loadLastUpdated();
   await loadDashboard();
   
   // Set up auto-refresh (every 5 minutes)
@@ -1295,25 +2181,14 @@ window.addEventListener('DOMContentLoaded', async ()=>{
 /* Listen for data changes from other pages */
 window.addEventListener('storage', function(e) {
   if (e.key === 'lastDataUpdate') {
-    // Another tab updated data, reload dashboard
     loadDashboard();
   }
 });
 
-// If this is the data entry/edit page, update timestamp after successful operations
-// This would be called from dataForm.html or edit.html after successful save
 function notifyDataUpdated() {
   updateLastUpdated();
-  // Also trigger storage event for other tabs
   localStorage.setItem('lastDataUpdate', new Date().toISOString());
 }
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
