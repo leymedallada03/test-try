@@ -301,6 +301,61 @@
     margin-top: 12px;
    }
 
+   /* Basic Population Overview - Single Card with Sections */
+   .population-overview-card {
+    padding: 20px;
+    margin: 20px 0;
+   }
+   
+   .section-title {
+    font-size: 1rem;
+    color: var(--accent1);
+    font-weight: 600;
+    margin: 20px 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--light-green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+   
+   .section-title:first-child {
+    margin-top: 0;
+   }
+   
+   .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+   }
+   
+   .category-card {
+    padding: 12px;
+    background: var(--light-green);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+   }
+   
+   .category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(6,30,20,0.1);
+   }
+   
+   .category-label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 5px;
+    font-weight: 500;
+   }
+   
+   .category-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent1);
+   }
+
    /* Barangay Breakdown - FULL WIDTH STACK */
    .breakdown-section {
     margin-top: 24px;
@@ -371,63 +426,6 @@
 
    .breakdown-table th:first-child {
     background: rgba(15,122,74,0.1);
-   }
-
-   /* Legend Box */
-   .legend-box{
-    margin-top:16px;
-    display:inline-block;
-    background:#fff;
-    padding:12px;
-    border-radius:var(--radius-sm);
-    border:1px solid rgba(6,30,20,0.04);
-    box-shadow:0 4px 14px rgba(6,30,20,0.06);
-   }
-
-   .legend-box h4 {
-    margin: 0 0 8px 0;
-    font-size: 0.9rem;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-   }
-
-   .legend-item{
-    display:flex;
-    gap:8px;
-    align-items:center;
-    margin:6px 0;
-    font-size:0.8rem;
-   }
-
-   .legend-swatch{
-    width:14px;
-    height:14px;
-    border-radius:4px;
-    flex-shrink: 0;
-   }
-
-   /* Button styling */
-   .btn {
-    border:0;
-    padding:10px 14px;
-    border-radius:var(--radius-sm);
-    cursor:pointer;
-    font-weight:600;
-    background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    color:#fff;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-   }
-
-   .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
    }
 
    /* Mobile Styles */
@@ -584,57 +582,6 @@
     color: var(--accent1);
     font-weight: 600;
    }
-
-   /* Category Grid for Education, Employment, Job Categories, OFW */
-   .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
-   }
-   
-   .category-card {
-    padding: 12px;
-    background: var(--card-bg);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow);
-    transition: transform 0.2s ease;
-   }
-   
-   .category-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(6,30,20,0.1);
-   }
-   
-   .category-label {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 5px;
-    font-weight: 500;
-   }
-   
-   .category-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent1);
-   }
-   
-   /* Section headers */
-   .category-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-   }
-   
-   .category-section h4 {
-    margin: 0 0 12px 0;
-    font-size: 1rem;
-    color: var(--accent1);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-   }
 </style>
 </head>
 
@@ -714,33 +661,38 @@
       </div>
     </div>
 
-    <!-- Basic Population Overview -->
-    <div class="card">
+    <!-- Basic Population Overview - Single Card with Sections -->
+    <div class="card population-overview-card">
       <h3>Basic Population Overview</h3>
-      <div class="stat-grid" id="quickStats"></div>
-    </div>
-
-    <!-- Educational Attainment Section -->
-    <div class="card">
-      <h3>Educational Attainment</h3>
+      
+      <!-- Male/Female/PWD Section -->
+      <div class="section-title">
+        <i class="fas fa-users"></i> Demographics
+      </div>
+      <div class="stat-grid" id="demographicsStats"></div>
+      
+      <!-- Educational Attainment Section -->
+      <div class="section-title">
+        <i class="fas fa-graduation-cap"></i> Educational Attainment
+      </div>
       <div class="category-grid" id="educationStats"></div>
-    </div>
-
-    <!-- Employment Status Section -->
-    <div class="card">
-      <h3>Employment Status</h3>
+      
+      <!-- Employment Status Section -->
+      <div class="section-title">
+        <i class="fas fa-briefcase"></i> Employment Status
+      </div>
       <div class="category-grid" id="employmentStats"></div>
-    </div>
-
-    <!-- Job Categories Section -->
-    <div class="card">
-      <h3>Job Categories</h3>
+      
+      <!-- Job Categories Section -->
+      <div class="section-title">
+        <i class="fas fa-tasks"></i> Job Categories
+      </div>
       <div class="category-grid" id="jobCategoriesStats"></div>
-    </div>
-
-    <!-- OFW Countries Section -->
-    <div class="card">
-      <h3>OFW Countries</h3>
+      
+      <!-- OFW Countries Section -->
+      <div class="section-title">
+        <i class="fas fa-globe-asia"></i> OFW Countries
+      </div>
       <div class="category-grid" id="ofwCountriesStats"></div>
     </div>
 
@@ -823,7 +775,7 @@
               <th>6-17</th>
               <th>18-59</th>
               <th>60+</th>
-               <th>Unspecified</th>
+              <th>Unspecified</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -851,7 +803,7 @@
         </table>
       </div>
 
-      <!-- 6. Household Livestock (removed Others column) -->
+      <!-- 6. Household Livestock -->
       <div class="breakdown-table-container">
         <h4>Domestic Livestock</h4>
         <table class="breakdown-table" id="tblLivestock">
@@ -907,7 +859,7 @@
         </table>
       </div>
 
-      <!-- 9. Barangay OFW Countries -->
+      <!-- 9. Barangay OFW Countries (All countries in header) -->
       <div class="breakdown-table-container">
         <h4>OFW Countries by Barangay</h4>
         <table class="breakdown-table" id="tblBarangayOFW">
@@ -924,6 +876,17 @@
               <th>Singapore</th>
               <th>Japan</th>
               <th>Taiwan</th>
+              <th>Malaysia</th>
+              <th>Australia</th>
+              <th>New Zealand</th>
+              <th>Italy</th>
+              <th>United Kingdom</th>
+              <th>Germany</th>
+              <th>Cyprus</th>
+              <th>Canada</th>
+              <th>United States</th>
+              <th>Libya</th>
+              <th>Others</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1027,6 +990,12 @@ async function loadDashboard(){
     const barangayMap = {};
     
     // Initialize statistics
+    const demographicsStats = {
+      male: 0,
+      female: 0,
+      pwd: 0
+    };
+    
     const overallEducation = {
       noFormalEducation: 0,
       elementaryLevel: 0,
@@ -1156,7 +1125,18 @@ async function loadDashboard(){
             hongKong: 0,
             singapore: 0,
             japan: 0,
-            taiwan: 0
+            taiwan: 0,
+            malaysia: 0,
+            australia: 0,
+            newZealand: 0,
+            italy: 0,
+            uk: 0,
+            germany: 0,
+            cyprus: 0,
+            canada: 0,
+            usa: 0,
+            libya: 0,
+            others: 0
           }
         };
       }
@@ -1165,10 +1145,13 @@ async function loadDashboard(){
       if(isHead){ 
         totalHeads++; 
         b.heads++; 
-        // FIXED: Count coordinates correctly
-        if(coord && coord.trim() !== '' && coord !== 'N/A' && coord !== 'none') { 
-          headsWithCoords++; 
-          b.coords++; 
+        // FIXED: Households with Coordinates - Better coordinate detection
+        if(coord && coord.trim() !== '' && coord !== 'N/A' && coord !== 'none' && coord !== 'undefined' && !coord.toLowerCase().includes('no') && !coord.toLowerCase().includes('none')) { 
+          // Check if it looks like coordinates (contains numbers and maybe comma)
+          if (coord.match(/[-]?\d+\.?\d*[,\s]*[-]?\d+\.?\d*/)) {
+            headsWithCoords++; 
+            b.coords++; 
+          }
         } 
       } else { 
         totalMembers++; 
@@ -1176,11 +1159,21 @@ async function loadDashboard(){
       }
 
       // sex
-      if(sex === 'male') b.male++; 
-      else if(sex === 'female') b.female++;
+      if(sex === 'male') { 
+        b.male++; 
+        demographicsStats.male++;
+      }
+      else if(sex === 'female') { 
+        b.female++; 
+        demographicsStats.female++;
+      }
 
       // PWD
-      if(String(getField(r,'Persons with Disability (PWD)')||'').toLowerCase().trim()==='yes') b.pwds++;
+      const pwdField = String(getField(r,'Persons with Disability (PWD)')||'').toLowerCase().trim();
+      if(pwdField === 'yes' || pwdField === 'true' || pwdField === '1') {
+        b.pwds++;
+        demographicsStats.pwd++;
+      }
 
       // STATUS accumulation
       const statusRaw = String(getField(r,'Status')||'').trim();
@@ -1205,7 +1198,7 @@ async function loadDashboard(){
       }
       b.sitio[sitioKey] = (b.sitio[sitioKey]||0) + 1;
 
-      // Livestock - FIXED: Removed Others column
+      // Livestock
       const livestockKeys = ['Dog','Dog Qty.','Cat','Cat Qty.','Pig','Pig Qty.','Cow','Cow Qty.','Carabao','Carabao Qty.','Chicken','Chicken Qty.'];
       livestockKeys.forEach(key=>{
         const val = String(getField(r,key) || '').trim();
@@ -1286,21 +1279,21 @@ async function loadDashboard(){
         }
       }
       
-      // Employment Status - FIXED: Now counting correctly
+      // Employment Status - FIXED: Better detection
       const employmentField = String(getField(r,'Employment Status')||'').trim().toLowerCase();
       if(employmentField) {
-        if(employmentField === 'employed' || employmentField === 'yes' || employmentField === 'working' || employmentField === 'employed (please specify job)') {
+        if(employmentField.includes('employed') || employmentField === 'yes' || employmentField === 'working' || employmentField === 'work') {
           b.employment.employed++;
           overallEmployment.employed++;
-        } else if(employmentField === 'unemployed' || employmentField === 'no' || employmentField === 'not working' || employmentField === 'unemployed (please specify reason)') {
+        } else if(employmentField.includes('unemployed') || employmentField === 'no' || employmentField === 'not working' || employmentField === 'not work') {
           b.employment.unemployed++;
           overallEmployment.unemployed++;
         }
       }
       
-      // Job Title/Description
+      // Job Title/Description - FIXED: Better detection
       const jobField = String(getField(r,'Job Title/Description')||'').trim();
-      if(jobField && employmentField && (employmentField.includes('employed') || employmentField === 'yes' || employmentField === 'working')) {
+      if(jobField && overallEmployment.employed > 0) {
         const jobLower = jobField.toLowerCase();
         
         if(jobLower.includes('administrative assistant') || jobLower.includes('admin assistant') || jobLower.includes('admin staff')) {
@@ -1443,9 +1436,9 @@ async function loadDashboard(){
         }
       }
       
-      // OFW Country
+      // OFW Country - FIXED: Better detection
       const ofwField = String(getField(r,'Overseas Filipino Worker (OFW)')||'').trim().toLowerCase();
-      if(ofwField === 'yes') {
+      if(ofwField === 'yes' || ofwField === 'true' || ofwField === '1') {
         const countryField = String(getField(r,'Country')||'').trim().toLowerCase();
         
         if(countryField.includes('saudi')) {
@@ -1480,57 +1473,61 @@ async function loadDashboard(){
           b.ofw.taiwan++;
         } else if(countryField.includes('malaysia')) {
           ofwCountries.malaysia++;
+          b.ofw.malaysia++;
         } else if(countryField.includes('australia')) {
           ofwCountries.australia++;
+          b.ofw.australia++;
         } else if(countryField.includes('new zealand')) {
           ofwCountries.newZealand++;
+          b.ofw.newZealand++;
         } else if(countryField.includes('italy')) {
           ofwCountries.italy++;
+          b.ofw.italy++;
         } else if(countryField.includes('uk') || countryField.includes('united kingdom')) {
           ofwCountries.uk++;
+          b.ofw.uk++;
         } else if(countryField.includes('germany')) {
           ofwCountries.germany++;
+          b.ofw.germany++;
         } else if(countryField.includes('cyprus')) {
           ofwCountries.cyprus++;
+          b.ofw.cyprus++;
         } else if(countryField.includes('canada')) {
           ofwCountries.canada++;
+          b.ofw.canada++;
         } else if(countryField.includes('usa') || countryField.includes('united states')) {
           ofwCountries.usa++;
+          b.ofw.usa++;
         } else if(countryField.includes('libya')) {
           ofwCountries.libya++;
+          b.ofw.libya++;
         } else if(countryField.trim() !== '') {
           ofwCountries.others++;
+          b.ofw.others++;
         }
       }
     });
 
-    // Update top cards - FIXED: withCoords now shows correct count
+    // Update top cards - FIXED: Households with Coordinates
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
     document.getElementById('withCoords').innerText = headsWithCoords;
 
-    // Basic Population Overview
-    const quick = document.getElementById('quickStats');
-    quick.innerHTML = '';
-    let totals = {male:0, female:0, pwd:0};
-    Object.keys(barangayMap).forEach(bn=>{
-      const s = barangayMap[bn];
-      totals.male += s.male; 
-      totals.female += s.female; 
-      totals.pwd += s.pwds;
-    });
-
-    // show male/female/pwd
-    [['Male', totals.male], ['Female', totals.female], ['PWD', totals.pwd]].forEach(it=>{
+    // Update Basic Population Overview - Single Card
+    // Demographics Section
+    const demographicsStatsDiv = document.getElementById('demographicsStats');
+    demographicsStatsDiv.innerHTML = '';
+    
+    [['Male', demographicsStats.male], ['Female', demographicsStats.female], ['PWD', demographicsStats.pwd]].forEach(it=>{
       const div = document.createElement('div'); 
       div.className = 'category-card'; 
       div.innerHTML = `<div class="category-label">${it[0]}</div><div class="category-value">${it[1]}</div>`;
-      quick.appendChild(div);
+      demographicsStatsDiv.appendChild(div);
     });
-
+    
     // Educational Attainment Section
-    const educationStats = document.getElementById('educationStats');
-    educationStats.innerHTML = '';
+    const educationStatsDiv = document.getElementById('educationStats');
+    educationStatsDiv.innerHTML = '';
     
     const educationLabels = {
       noFormalEducation: 'No Formal Education',
@@ -1550,13 +1547,13 @@ async function loadDashboard(){
         const div = document.createElement('div'); 
         div.className = 'category-card'; 
         div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        educationStats.appendChild(div);
+        educationStatsDiv.appendChild(div);
       }
     });
     
-    // Employment Status Section - FIXED: Now showing totals correctly
-    const employmentStats = document.getElementById('employmentStats');
-    employmentStats.innerHTML = '';
+    // Employment Status Section - FIXED: Now shows data
+    const employmentStatsDiv = document.getElementById('employmentStats');
+    employmentStatsDiv.innerHTML = '';
     
     // Always show both employed and unemployed
     ['Employed', 'Unemployed'].forEach(status => {
@@ -1564,12 +1561,12 @@ async function loadDashboard(){
       const div = document.createElement('div'); 
       div.className = 'category-card'; 
       div.innerHTML = `<div class="category-label">${status}</div><div class="category-value">${count}</div>`;
-      employmentStats.appendChild(div);
+      employmentStatsDiv.appendChild(div);
     });
     
-    // Job Categories Section (Don't Show Others)
-    const jobCategoriesStats = document.getElementById('jobCategoriesStats');
-    jobCategoriesStats.innerHTML = '';
+    // Job Categories Section - FIXED: Now shows data
+    const jobCategoriesStatsDiv = document.getElementById('jobCategoriesStats');
+    jobCategoriesStatsDiv.innerHTML = '';
     
     const jobLabels = {
       adminAssistant: 'Admin Assistant',
@@ -1626,13 +1623,13 @@ async function loadDashboard(){
         const div = document.createElement('div'); 
         div.className = 'category-card'; 
         div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        jobCategoriesStats.appendChild(div);
+        jobCategoriesStatsDiv.appendChild(div);
       }
     });
     
-    // OFW Countries Section (show only when there's data)
-    const ofwCountriesStats = document.getElementById('ofwCountriesStats');
-    ofwCountriesStats.innerHTML = '';
+    // OFW Countries Section - FIXED: Now shows data
+    const ofwCountriesStatsDiv = document.getElementById('ofwCountriesStats');
+    ofwCountriesStatsDiv.innerHTML = '';
     
     const ofwLabels = {
       saudiArabia: 'Saudi Arabia',
@@ -1653,7 +1650,7 @@ async function loadDashboard(){
       germany: 'Germany',
       cyprus: 'Cyprus',
       canada: 'Canada',
-      usa: 'USA',
+      usa: 'United States',
       libya: 'Libya'
     };
     
@@ -1663,7 +1660,7 @@ async function loadDashboard(){
         const div = document.createElement('div'); 
         div.className = 'category-card'; 
         div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        ofwCountriesStats.appendChild(div);
+        ofwCountriesStatsDiv.appendChild(div);
       }
     });
 
@@ -1772,7 +1769,7 @@ async function loadDashboard(){
       tbodySitio.appendChild(tr);
     });
 
-    // 6) Livestock - FIXED: Removed Others column
+    // 6) Livestock
     const tbodyLiv = document.querySelector('#tblLivestock tbody'); 
     tbodyLiv.innerHTML = '';
     labels.forEach(l=>{
@@ -1819,7 +1816,7 @@ async function loadDashboard(){
       tbodyBarangayEmployment.appendChild(tr);
     });
     
-    // 9) Barangay OFW Countries
+    // 9) Barangay OFW Countries - FIXED: All countries in header
     const tbodyBarangayOFW = document.querySelector('#tblBarangayOFW tbody'); 
     tbodyBarangayOFW.innerHTML = '';
     labels.forEach(l=>{
@@ -1834,7 +1831,18 @@ async function loadDashboard(){
         s.ofw.hongKong || 0,
         s.ofw.singapore || 0,
         s.ofw.japan || 0,
-        s.ofw.taiwan || 0
+        s.ofw.taiwan || 0,
+        s.ofw.malaysia || 0,
+        s.ofw.australia || 0,
+        s.ofw.newZealand || 0,
+        s.ofw.italy || 0,
+        s.ofw.uk || 0,
+        s.ofw.germany || 0,
+        s.ofw.cyprus || 0,
+        s.ofw.canada || 0,
+        s.ofw.usa || 0,
+        s.ofw.libya || 0,
+        s.ofw.others || 0
       ];
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
@@ -1959,10 +1967,10 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   await sessionCheck();
   await loadLastUpdated();
   
-  // FIXED: Automatically load data when dashboard is opened
+  // Automatically load data when dashboard is opened
   await loadDashboard();
   
-  // FIXED: Auto-refresh every 30 seconds (instead of 5 minutes)
+  // Auto-refresh every 30 seconds
   if (refreshInterval) clearInterval(refreshInterval);
   refreshInterval = setInterval(loadDashboard, 30000);
   
@@ -1973,7 +1981,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   }
 });
 
-/* Listen for data changes from other pages - FIXED: Now properly loads data */
+/* Listen for data changes from other pages */
 window.addEventListener('storage', function(e) {
   if (e.key === 'lastDataUpdate') {
     console.log('Data updated from another tab, reloading dashboard...');
@@ -1981,7 +1989,7 @@ window.addEventListener('storage', function(e) {
   }
 });
 
-/* FIXED: Also listen for visibility change to refresh when tab becomes active */
+/* Also listen for visibility change to refresh when tab becomes active */
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) {
     console.log('Tab became active, refreshing dashboard...');
