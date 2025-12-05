@@ -896,8 +896,9 @@ async function sessionCheck(){
     if (userName && userName !== "User") {
       document.getElementById('userName').innerText = userName;
       
-      // Check admin status
-      const isAdmin = localStorage.getItem("userRole") === "admin";
+      // Check admin status - FIXED: Your login returns lowercase "admin"
+      const userRole = localStorage.getItem("userRole");
+      const isAdmin = userRole === "admin" || userRole === "Admin";
       const adminItems = document.querySelectorAll(".admin-only");
       adminItems.forEach(item => {
           item.style.display = isAdmin ? "block" : "none";
@@ -967,20 +968,32 @@ function showToast(message, type = 'info') {
 /* ============ LOAD USERS ============ */
 async function loadUsers() {
   try {
+    // Use GET request for fetching users (doGet handles this)
     const res = await fetch(`${SCRIPT_URL}?action=users`);
-    const data = await res.json();
+    const text = await res.text();
+    console.log("Raw response:", text);
+    
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      showToast("Invalid response from server", "error");
+      return;
+    }
     
     if (!data.success) {
-      showToast("Failed to load users", "error");
+      showToast("Failed to load users: " + (data.message || "Unknown error"), "error");
       return;
     }
     
     ALL_USERS = data.users || [];
+    console.log("Loaded users:", ALL_USERS);
     renderUsers();
     updateStats();
   } catch(err) {
-    console.error(err);
-    showToast("Error loading users", "error");
+    console.error("Error loading users:", err);
+    showToast("Error loading users: " + err.message, "error");
   }
 }
 
@@ -1005,15 +1018,15 @@ function renderUsers(filter = "") {
       <td>${escapeHtml(user.Username)}</td>
       <td>${escapeHtml(user.FullName)}</td>
       <td><span style="padding: 2px 8px; border-radius: 12px; background: ${user.Role === 'Admin' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' ? '#0f7a4a' : '#666'};">${user.Role}</span></td>
-      <td>${escapeHtml(user.AssignedBarangay)}</td>
+      <td>${escapeHtml(user.AssignedBarangay || '')}</td>
       <td class="actions-cell">
-        <button class="icon-btn" onclick="editUser('${user.Username}')" title="Edit">
+        <button class="icon-btn" onclick="editUser('${escapeHtml(user.Username)}')" title="Edit">
           <i class="fas fa-edit"></i>
         </button>
-        <button class="icon-btn" onclick="resetPassword('${user.Username}')" title="Reset Password">
+        <button class="icon-btn" onclick="resetPassword('${escapeHtml(user.Username)}')" title="Reset Password">
           <i class="fas fa-key"></i>
         </button>
-        <button class="icon-btn" onclick="deleteUser('${user.Username}')" title="Delete" style="color: #ff4444;">
+        <button class="icon-btn" onclick="deleteUser('${escapeHtml(user.Username)}')" title="Delete" style="color: #ff4444;">
           <i class="fas fa-trash"></i>
         </button>
       </td>
@@ -1025,8 +1038,8 @@ function renderUsers(filter = "") {
 /* ============ UPDATE STATS ============ */
 function updateStats() {
   const total = ALL_USERS.length;
-  const admins = ALL_USERS.filter(u => u.Role === 'Admin').length;
-  const staff = ALL_USERS.filter(u => u.Role === 'Staff').length;
+  const admins = ALL_USERS.filter(u => u.Role === 'Admin' || u.Role === 'admin').length;
+  const staff = ALL_USERS.filter(u => u.Role === 'Staff' || u.Role === 'staff').length;
   
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statAdmins').textContent = admins;
@@ -1050,8 +1063,9 @@ function openUserModal(mode = 'add', username = null) {
       document.getElementById('user_username').value = user.Username;
       document.getElementById('user_fullname').value = user.FullName;
       document.getElementById('user_role').value = user.Role;
-      document.getElementById('user_barangay').value = user.AssignedBarangay;
+      document.getElementById('user_barangay').value = user.AssignedBarangay || '';
       document.getElementById('user_username').disabled = true;
+      document.getElementById('user_password').required = false;
     }
   } else {
     title.textContent = 'Add New User';
@@ -1078,6 +1092,12 @@ async function saveUser() {
     return;
   }
   
+  // For new users, password is required
+  if (!EDIT_TARGET && !password) {
+    showToast('Password is required for new users', 'error');
+    return;
+  }
+  
   const payload = {
     action: EDIT_TARGET ? 'updateUser' : 'createUser',
     user: {
@@ -1097,13 +1117,31 @@ async function saveUser() {
   }
   
   try {
+    // Use FormData instead of JSON to match your code.gs doPost handler
+    const formData = new FormData();
+    formData.append('action', EDIT_TARGET ? 'updateUser' : 'createUser');
+    
+    if (EDIT_TARGET) {
+      formData.append('target', EDIT_TARGET);
+    }
+    
+    // Add user data as JSON string
+    formData.append('user', JSON.stringify(payload.user));
+    
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: formData
     });
     
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      showToast("Invalid response from server", "error");
+      return;
+    }
     
     if (data.success) {
       showToast(data.message || 'User saved successfully', 'success');
@@ -1114,7 +1152,7 @@ async function saveUser() {
     }
   } catch(err) {
     console.error(err);
-    showToast('Error saving user', 'error');
+    showToast('Error saving user: ' + err.message, 'error');
   }
 }
 
@@ -1122,16 +1160,24 @@ async function resetPassword(username) {
   if (!confirm(`Reset password for user "${username}" to default?`)) return;
   
   try {
+    const formData = new FormData();
+    formData.append('action', 'resetPassword');
+    formData.append('target', username);
+    
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'resetPassword',
-        target: username
-      })
+      body: formData
     });
     
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      showToast("Invalid response from server", "error");
+      return;
+    }
     
     if (data.success) {
       showToast(data.message || 'Password reset successfully', 'success');
@@ -1140,7 +1186,7 @@ async function resetPassword(username) {
     }
   } catch(err) {
     console.error(err);
-    showToast('Error resetting password', 'error');
+    showToast('Error resetting password: ' + err.message, 'error');
   }
 }
 
@@ -1148,16 +1194,24 @@ async function deleteUser(username) {
   if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) return;
   
   try {
+    const formData = new FormData();
+    formData.append('action', 'deleteUser');
+    formData.append('target', username);
+    
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'deleteUser',
-        target: username
-      })
+      body: formData
     });
     
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      showToast("Invalid response from server", "error");
+      return;
+    }
     
     if (data.success) {
       showToast(data.message || 'User deleted successfully', 'success');
@@ -1167,7 +1221,7 @@ async function deleteUser(username) {
     }
   } catch(err) {
     console.error(err);
-    showToast('Error deleting user', 'error');
+    showToast('Error deleting user: ' + err.message, 'error');
   }
 }
 
@@ -1175,24 +1229,33 @@ async function deleteUser(username) {
 async function loadLogs() {
   try {
     const res = await fetch(`${SCRIPT_URL}?action=logs`);
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      showToast("Invalid response from server", "error");
+      return;
+    }
     
     const tbody = document.getElementById('logsBody');
     tbody.innerHTML = '';
     
     if (!data.logs || data.logs.length === 0) {
       tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No logs available</td></tr>`;
+      document.getElementById('logsModal').style.display = 'flex';
       return;
     }
     
     data.logs.forEach(log => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${escapeHtml(log.Timestamp)}</td>
-        <td>${escapeHtml(log.Action)}</td>
-        <td>${escapeHtml(log.Actor)}</td>
-        <td>${escapeHtml(log.TargetSheet)}</td>
-        <td>${escapeHtml(log.Details)}</td>
+        <td>${escapeHtml(log.Timestamp || '')}</td>
+        <td>${escapeHtml(log.Action || '')}</td>
+        <td>${escapeHtml(log.Actor || '')}</td>
+        <td>${escapeHtml(log.TargetSheet || '')}</td>
+        <td>${escapeHtml(log.Details || '')}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -1200,7 +1263,7 @@ async function loadLogs() {
     document.getElementById('logsModal').style.display = 'flex';
   } catch(err) {
     console.error(err);
-    showToast('Error loading logs', 'error');
+    showToast('Error loading logs: ' + err.message, 'error');
   }
 }
 
@@ -1250,6 +1313,7 @@ function toggleMobileSidebar() {
 
 /* ============ UTILITY FUNCTIONS ============ */
 function escapeHtml(text) {
+  if (text === null || text === undefined) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
@@ -1265,12 +1329,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     document.getElementById("userName").innerText = userName;
     
-    // Check if user is admin
-    const isAdmin = localStorage.getItem("userRole") === "admin";
+    // Check if user is admin - FIXED: Your login returns lowercase "admin"
+    const userRole = localStorage.getItem("userRole");
+    const isAdmin = userRole === "admin" || userRole === "Admin";
     const adminItems = document.querySelectorAll(".admin-only");
     adminItems.forEach(item => {
         item.style.display = isAdmin ? "block" : "none";
     });
+    
+    // If not admin, redirect to dashboard
+    if (!isAdmin) {
+      showToast("Access denied. Admin privileges required.", "error");
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 2000);
+      return;
+    }
     
     // Load users
     loadUsers();
@@ -1346,4 +1420,3 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
-
