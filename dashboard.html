@@ -301,19 +301,6 @@
     margin-top: 12px;
    }
 
-   /* New: Extended Quick Stats Grid */
-   .extended-quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
-    margin-top: 20px;
-   }
-
-   .extended-quick-stats .card {
-    padding: 12px;
-    min-height: 60px;
-   }
-
    /* Barangay Breakdown - FULL WIDTH STACK */
    .breakdown-section {
     margin-top: 24px;
@@ -513,10 +500,6 @@
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .extended-quick-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
     .breakdown-table-container {
         padding: 12px;
         margin-bottom: 16px;
@@ -597,36 +580,6 @@
     color: var(--accent1);
     font-weight: 600;
    }
-
-   /* New: Job Category Table Styles */
-   .job-category-table th,
-   .job-category-table td {
-    font-size: 0.8rem;
-    padding: 8px 6px;
-   }
-
-   .category-header {
-    background: rgba(52,183,143,0.1) !important;
-    font-weight: 600;
-   }
-
-   /* Toggle buttons for extended quick stats */
-   .toggle-stats-btn {
-    margin-top: 10px;
-    background: var(--light-green);
-    color: var(--accent1);
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
-   }
-
-   .toggle-stats-btn:hover {
-    background: var(--accent1);
-    color: white;
-   }
 </style>
 </head>
 
@@ -706,25 +659,10 @@
       </div>
     </div>
 
-    <!-- Basic Quick Stats -->
+    <!-- Quick Stats -->
     <div class="card">
-      <h3>Basic Population Overview</h3>
+      <h3>Quick Totals</h3>
       <div class="stat-grid" id="quickStats"></div>
-    </div>
-
-    <!-- Extended Quick Stats (Employment, Education, Job Categories) -->
-    <div class="card">
-      <h3>Employment & Education Overview</h3>
-      <button class="toggle-stats-btn" id="toggleStatsBtn">Show Extended Statistics</button>
-      <div class="extended-quick-stats" id="extendedQuickStats" style="display: none;">
-        <!-- Employment Stats will be populated here -->
-      </div>
-      <div class="extended-quick-stats" id="educationQuickStats" style="display: none; margin-top: 10px;">
-        <!-- Education Stats will be populated here -->
-      </div>
-      <div class="extended-quick-stats" id="jobCategoriesStats" style="display: none; margin-top: 10px;">
-        <!-- Job Categories Stats will be populated here -->
-      </div>
     </div>
 
     <!-- Chart Container -->
@@ -855,141 +793,6 @@
         </table>
       </div>
 
-      <!-- NEW: 7. Educational Attainment Breakdown -->
-      <div class="breakdown-table-container">
-        <h4>Educational Attainment by Barangay</h4>
-        <table class="breakdown-table" id="tblEducation">
-          <thead>
-            <tr>
-              <th>Barangay</th>
-              <th>No Formal Education</th>
-              <th>Elementary Level</th>
-              <th>Elementary Graduate</th>
-              <th>Junior High School Level</th>
-              <th>Junior High School Graduate</th>
-              <th>Senior High School Level</th>
-              <th>Senior High School Graduate</th>
-              <th>College Level</th>
-              <th>College Graduate</th>
-              <th>College Graduate Course</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- NEW: 8. Employment Breakdown -->
-      <div class="breakdown-table-container">
-        <h4>Employment Status by Barangay</h4>
-        <table class="breakdown-table" id="tblEmployment">
-          <thead>
-            <tr>
-              <th>Barangay</th>
-              <th>Employed</th>
-              <th>Unemployed</th>
-              <th>Job Title Details</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- NEW: 9. Job Categories Breakdown -->
-      <div class="breakdown-table-container">
-        <h4>Job Categories by Barangay</h4>
-        <table class="breakdown-table job-category-table" id="tblJobCategories">
-          <thead>
-            <tr>
-              <th>Barangay</th>
-              <th colspan="4" class="category-header">Office & Administrative Jobs</th>
-              <th colspan="4" class="category-header">Business & Management</th>
-              <th colspan="4" class="category-header">Accounting & Finance</th>
-              <th colspan="5" class="category-header">IT & Tech</th>
-            </tr>
-            <tr>
-              <th></th>
-              <!-- Office & Administrative Jobs -->
-              <th>Admin Assistant</th>
-              <th>Office Clerk</th>
-              <th>Secretary</th>
-              <th>Other Admin</th>
-              
-              <!-- Business & Management -->
-              <th>Project Manager</th>
-              <th>Operations Manager</th>
-              <th>HR Staff</th>
-              <th>Account Manager</th>
-              
-              <!-- Accounting & Finance -->
-              <th>Accounting Staff</th>
-              <th>Bookkeeper</th>
-              <th>Payroll Officer</th>
-              <th>Auditor</th>
-              
-              <!-- IT & Tech -->
-              <th>IT Support</th>
-              <th>Web Developer</th>
-              <th>Software Developer</th>
-              <th>Data Analyst</th>
-              <th>System Admin</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- NEW: 10. OFW Breakdown -->
-      <div class="breakdown-table-container">
-        <h4>Overseas Filipino Workers (OFW) by Barangay</h4>
-        <table class="breakdown-table" id="tblOFW">
-          <thead>
-            <tr>
-              <th>Barangay</th>
-              <th>OFW Count</th>
-              <th>Saudi Arabia</th>
-              <th>UAE</th>
-              <th>Qatar</th>
-              <th>Kuwait</th>
-              <th>Bahrain</th>
-              <th>Oman</th>
-              <th>Hong Kong</th>
-              <th>Singapore</th>
-              <th>Japan</th>
-              <th>Taiwan</th>
-              <th>Malaysia</th>
-              <th>Australia</th>
-              <th>New Zealand</th>
-              <th>Italy</th>
-              <th>UK</th>
-              <th>Germany</th>
-              <th>Cyprus</th>
-              <th>Canada</th>
-              <th>USA</th>
-              <th>Libya</th>
-              <th>Others</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- NEW: 11. FishR/RBIS Registration -->
-      <div class="breakdown-table-container">
-        <h4>FishR/RBIS Registration by Barangay</h4>
-        <table class="breakdown-table" id="tblFishR">
-          <thead>
-            <tr>
-              <th>Barangay</th>
-              <th>FishR Registered</th>
-              <th>RBIS Registered</th>
-              <th>FishR & RBIS Registered</th>
-              <th>Not Registered</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
     </div><!-- end breakdown-section -->
 
     <div class="small-muted" style="margin-top: 20px; font-size:12px; color:var(--muted);">
@@ -1074,20 +877,6 @@ function updateLastUpdated() {
   document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
 }
 
-/* Toggle extended quick stats */
-document.getElementById('toggleStatsBtn').addEventListener('click', function() {
-  const extendedStats = document.getElementById('extendedQuickStats');
-  const educationStats = document.getElementById('educationQuickStats');
-  const jobStats = document.getElementById('jobCategoriesStats');
-  const isHidden = extendedStats.style.display === 'none';
-  
-  extendedStats.style.display = isHidden ? 'grid' : 'none';
-  educationStats.style.display = isHidden ? 'grid' : 'none';
-  jobStats.style.display = isHidden ? 'grid' : 'none';
-  
-  this.textContent = isHidden ? 'Hide Extended Statistics' : 'Show Extended Statistics';
-});
-
 /* main dashboard load */
 async function loadDashboard(){
   showLoading(true);
@@ -1099,132 +888,6 @@ async function loadDashboard(){
     // init containers
     let totalHeads = 0, totalMembers = 0, headsWithCoords = 0;
     const barangayMap = {}; // bn -> stats
-    
-    // NEW: Initialize extended statistics
-    const employmentStats = {
-      employed: 0,
-      unemployed: 0
-    };
-    
-    const educationStats = {
-      noFormalEducation: 0,
-      elementaryLevel: 0,
-      elementaryGraduate: 0,
-      juniorHighLevel: 0,
-      juniorHighGraduate: 0,
-      seniorHighLevel: 0,
-      seniorHighGraduate: 0,
-      collegeLevel: 0,
-      collegeGraduate: 0,
-      collegeGraduateCourse: 0
-    };
-    
-    const jobCategories = {
-      // Office & Administrative
-      adminAssistant: 0,
-      officeClerk: 0,
-      secretary: 0,
-      otherAdmin: 0,
-      
-      // Business & Management
-      projectManager: 0,
-      operationsManager: 0,
-      hrStaff: 0,
-      accountManager: 0,
-      
-      // Accounting & Finance
-      accountingStaff: 0,
-      bookkeeper: 0,
-      payrollOfficer: 0,
-      auditor: 0,
-      
-      // IT & Tech
-      itSupport: 0,
-      webDeveloper: 0,
-      softwareDeveloper: 0,
-      dataAnalyst: 0,
-      systemAdmin: 0,
-      
-      // Healthcare
-      nurse: 0,
-      medicalTechnologist: 0,
-      caregiver: 0,
-      pharmacist: 0,
-      
-      // Education
-      teacher: 0,
-      tutor: 0,
-      schoolAdmin: 0,
-      
-      // Sales & Customer Service
-      csr: 0,
-      salesAssociate: 0,
-      cashier: 0,
-      storeSupervisor: 0,
-      
-      // Skilled Work & Labor
-      electrician: 0,
-      plumber: 0,
-      welder: 0,
-      constructionWorker: 0,
-      
-      // Delivery & Logistics
-      driver: 0,
-      logisticsStaff: 0,
-      rider: 0,
-      
-      // Food & Hospitality
-      cook: 0,
-      waiter: 0,
-      barista: 0,
-      housekeeping: 0,
-      
-      // Security & Public Service
-      securityGuard: 0,
-      barangayStaff: 0,
-      policeOfficer: 0,
-      fireOfficer: 0,
-      
-      // Media, Design & Creative
-      graphicDesigner: 0,
-      videoEditor: 0,
-      contentWriter: 0,
-      socialMediaManager: 0,
-      
-      // Others
-      others: 0
-    };
-    
-    const ofwCountries = {
-      saudiArabia: 0,
-      uae: 0,
-      qatar: 0,
-      kuwait: 0,
-      bahrain: 0,
-      oman: 0,
-      hongKong: 0,
-      singapore: 0,
-      japan: 0,
-      taiwan: 0,
-      malaysia: 0,
-      australia: 0,
-      newZealand: 0,
-      italy: 0,
-      uk: 0,
-      germany: 0,
-      cyprus: 0,
-      canada: 0,
-      usa: 0,
-      libya: 0,
-      others: 0
-    };
-    
-    const fishrRegistration = {
-      fishrRegistered: 0,
-      rbisRegistered: 0,
-      bothRegistered: 0,
-      notRegistered: 0
-    };
 
     rows.forEach(r=>{
       const isHead = String(getField(r,'Name of Household Member/s')||'').trim() === '';
@@ -1240,18 +903,7 @@ async function loadDashboard(){
           support: {
             "TUPAD":0, "Local 4Ps":0, "National 4Ps":0, "Local Social Pension":0, "National Social Pension":0,
             "Solo Parent Assistance":0, "Relief Goods":0, "Cash Subsidy":0
-          },
-          // NEW: Extended statistics
-          employment: { employed: 0, unemployed: 0, jobDetails: {} },
-          education: {
-            noFormalEducation: 0, elementaryLevel: 0, elementaryGraduate: 0,
-            juniorHighLevel: 0, juniorHighGraduate: 0, seniorHighLevel: 0,
-            seniorHighGraduate: 0, collegeLevel: 0, collegeGraduate: 0,
-            collegeGraduateCourse: 0
-          },
-          jobCategories: { ...jobCategories },
-          ofw: { count: 0, countries: { ...ofwCountries } },
-          fishr: { ...fishrRegistration }
+          }
         };
       }
       const b = barangayMap[barangay];
@@ -1338,269 +990,6 @@ async function loadDashboard(){
       }
       const ab = (y === null) ? 'Unknown' : (y <=5 ? '0-5' : y <=17 ? '6-17' : y <=59 ? '18-59' : '60+');
       b.ageBuckets[ab] = (b.ageBuckets[ab]||0) + 1;
-      
-      // NEW: Educational Attainment
-      const educationField = String(getField(r,'Educational Attainment')||'').trim().toLowerCase();
-      if(educationField.includes('no formal')) b.education.noFormalEducation++;
-      else if(educationField.includes('elementary level')) b.education.elementaryLevel++;
-      else if(educationField.includes('elementary graduate')) b.education.elementaryGraduate++;
-      else if(educationField.includes('junior high level') || educationField.includes('junior high school level')) b.education.juniorHighLevel++;
-      else if(educationField.includes('junior high graduate') || educationField.includes('junior high school graduate')) b.education.juniorHighGraduate++;
-      else if(educationField.includes('senior high level') || educationField.includes('senior high school level')) b.education.seniorHighLevel++;
-      else if(educationField.includes('senior high graduate') || educationField.includes('senior high school graduate')) b.education.seniorHighGraduate++;
-      else if(educationField.includes('college level')) b.education.collegeLevel++;
-      else if(educationField.includes('college graduate') && !educationField.includes('course')) b.education.collegeGraduate++;
-      else if(educationField.includes('college graduate course')) b.education.collegeGraduateCourse++;
-      
-      // NEW: Employment Status
-      const employmentField = String(getField(r,'Employment Status')||'').trim().toLowerCase();
-      if(employmentField === 'employed') {
-        b.employment.employed++;
-        employmentStats.employed++;
-      } else if(employmentField === 'unemployed') {
-        b.employment.unemployed++;
-        employmentStats.unemployed++;
-      }
-      
-      // NEW: Job Title/Description
-      const jobField = String(getField(r,'Job Title/Description')||'').trim().toLowerCase();
-      if(jobField) {
-        // Track job details per barangay
-        b.employment.jobDetails[jobField] = (b.employment.jobDetails[jobField] || 0) + 1;
-        
-        // Categorize job for overall statistics
-        if(jobField.includes('admin assistant') || jobField.includes('admin staff')) {
-          b.jobCategories.adminAssistant++;
-          jobCategories.adminAssistant++;
-        } else if(jobField.includes('office clerk')) {
-          b.jobCategories.officeClerk++;
-          jobCategories.officeClerk++;
-        } else if(jobField.includes('secretary') || jobField.includes('executive assistant')) {
-          b.jobCategories.secretary++;
-          jobCategories.secretary++;
-        } else if(jobField.includes('project manager')) {
-          b.jobCategories.projectManager++;
-          jobCategories.projectManager++;
-        } else if(jobField.includes('operations manager')) {
-          b.jobCategories.operationsManager++;
-          jobCategories.operationsManager++;
-        } else if(jobField.includes('hr staff') || jobField.includes('hr officer')) {
-          b.jobCategories.hrStaff++;
-          jobCategories.hrStaff++;
-        } else if(jobField.includes('account manager')) {
-          b.jobCategories.accountManager++;
-          jobCategories.accountManager++;
-        } else if(jobField.includes('accounting staff')) {
-          b.jobCategories.accountingStaff++;
-          jobCategories.accountingStaff++;
-        } else if(jobField.includes('bookkeeper')) {
-          b.jobCategories.bookkeeper++;
-          jobCategories.bookkeeper++;
-        } else if(jobField.includes('payroll officer')) {
-          b.jobCategories.payrollOfficer++;
-          jobCategories.payrollOfficer++;
-        } else if(jobField.includes('auditor')) {
-          b.jobCategories.auditor++;
-          jobCategories.auditor++;
-        } else if(jobField.includes('it support') || jobField.includes('it technician')) {
-          b.jobCategories.itSupport++;
-          jobCategories.itSupport++;
-        } else if(jobField.includes('web developer')) {
-          b.jobCategories.webDeveloper++;
-          jobCategories.webDeveloper++;
-        } else if(jobField.includes('software developer') || jobField.includes('programmer')) {
-          b.jobCategories.softwareDeveloper++;
-          jobCategories.softwareDeveloper++;
-        } else if(jobField.includes('data analyst')) {
-          b.jobCategories.dataAnalyst++;
-          jobCategories.dataAnalyst++;
-        } else if(jobField.includes('system administrator')) {
-          b.jobCategories.systemAdmin++;
-          jobCategories.systemAdmin++;
-        } else if(jobField.includes('nurse')) {
-          b.jobCategories.nurse++;
-          jobCategories.nurse++;
-        } else if(jobField.includes('medical technologist')) {
-          b.jobCategories.medicalTechnologist++;
-          jobCategories.medicalTechnologist++;
-        } else if(jobField.includes('caregiver')) {
-          b.jobCategories.caregiver++;
-          jobCategories.caregiver++;
-        } else if(jobField.includes('pharmacist')) {
-          b.jobCategories.pharmacist++;
-          jobCategories.pharmacist++;
-        } else if(jobField.includes('teacher') || jobField.includes('instructor')) {
-          b.jobCategories.teacher++;
-          jobCategories.teacher++;
-        } else if(jobField.includes('tutor')) {
-          b.jobCategories.tutor++;
-          jobCategories.tutor++;
-        } else if(jobField.includes('school administrator')) {
-          b.jobCategories.schoolAdmin++;
-          jobCategories.schoolAdmin++;
-        } else if(jobField.includes('customer service') || jobField.includes('csr')) {
-          b.jobCategories.csr++;
-          jobCategories.csr++;
-        } else if(jobField.includes('sales associate')) {
-          b.jobCategories.salesAssociate++;
-          jobCategories.salesAssociate++;
-        } else if(jobField.includes('cashier')) {
-          b.jobCategories.cashier++;
-          jobCategories.cashier++;
-        } else if(jobField.includes('store supervisor')) {
-          b.jobCategories.storeSupervisor++;
-          jobCategories.storeSupervisor++;
-        } else if(jobField.includes('electrician')) {
-          b.jobCategories.electrician++;
-          jobCategories.electrician++;
-        } else if(jobField.includes('plumber')) {
-          b.jobCategories.plumber++;
-          jobCategories.plumber++;
-        } else if(jobField.includes('welder')) {
-          b.jobCategories.welder++;
-          jobCategories.welder++;
-        } else if(jobField.includes('construction worker') || jobField.includes('skilled laborer')) {
-          b.jobCategories.constructionWorker++;
-          jobCategories.constructionWorker++;
-        } else if(jobField.includes('driver')) {
-          b.jobCategories.driver++;
-          jobCategories.driver++;
-        } else if(jobField.includes('logistics staff')) {
-          b.jobCategories.logisticsStaff++;
-          jobCategories.logisticsStaff++;
-        } else if(jobField.includes('rider') || jobField.includes('motorcycle delivery')) {
-          b.jobCategories.rider++;
-          jobCategories.rider++;
-        } else if(jobField.includes('cook') || jobField.includes('chef')) {
-          b.jobCategories.cook++;
-          jobCategories.cook++;
-        } else if(jobField.includes('waiter') || jobField.includes('service crew')) {
-          b.jobCategories.waiter++;
-          jobCategories.waiter++;
-        } else if(jobField.includes('barista')) {
-          b.jobCategories.barista++;
-          jobCategories.barista++;
-        } else if(jobField.includes('housekeeping')) {
-          b.jobCategories.housekeeping++;
-          jobCategories.housekeeping++;
-        } else if(jobField.includes('security guard')) {
-          b.jobCategories.securityGuard++;
-          jobCategories.securityGuard++;
-        } else if(jobField.includes('barangay staff') || jobField.includes('barangay council')) {
-          b.jobCategories.barangayStaff++;
-          jobCategories.barangayStaff++;
-        } else if(jobField.includes('police officer')) {
-          b.jobCategories.policeOfficer++;
-          jobCategories.policeOfficer++;
-        } else if(jobField.includes('fire officer')) {
-          b.jobCategories.fireOfficer++;
-          jobCategories.fireOfficer++;
-        } else if(jobField.includes('graphic designer')) {
-          b.jobCategories.graphicDesigner++;
-          jobCategories.graphicDesigner++;
-        } else if(jobField.includes('video editor')) {
-          b.jobCategories.videoEditor++;
-          jobCategories.videoEditor++;
-        } else if(jobField.includes('content writer')) {
-          b.jobCategories.contentWriter++;
-          jobCategories.contentWriter++;
-        } else if(jobField.includes('social media manager')) {
-          b.jobCategories.socialMediaManager++;
-          jobCategories.socialMediaManager++;
-        } else if(jobField.trim() !== '') {
-          b.jobCategories.others++;
-          jobCategories.others++;
-        }
-      }
-      
-      // NEW: OFW Status and Country
-      const ofwField = String(getField(r,'Overseas Filipino Worker (OFW)')||'').trim().toLowerCase();
-      if(ofwField === 'yes') {
-        b.ofw.count++;
-        const countryField = String(getField(r,'Country')||'').trim().toLowerCase();
-        if(countryField.includes('saudi')) {
-          b.ofw.countries.saudiArabia++;
-          ofwCountries.saudiArabia++;
-        } else if(countryField.includes('uae') || countryField.includes('united arab emirates')) {
-          b.ofw.countries.uae++;
-          ofwCountries.uae++;
-        } else if(countryField.includes('qatar')) {
-          b.ofw.countries.qatar++;
-          ofwCountries.qatar++;
-        } else if(countryField.includes('kuwait')) {
-          b.ofw.countries.kuwait++;
-          ofwCountries.kuwait++;
-        } else if(countryField.includes('bahrain')) {
-          b.ofw.countries.bahrain++;
-          ofwCountries.bahrain++;
-        } else if(countryField.includes('oman')) {
-          b.ofw.countries.oman++;
-          ofwCountries.oman++;
-        } else if(countryField.includes('hong kong')) {
-          b.ofw.countries.hongKong++;
-          ofwCountries.hongKong++;
-        } else if(countryField.includes('singapore')) {
-          b.ofw.countries.singapore++;
-          ofwCountries.singapore++;
-        } else if(countryField.includes('japan')) {
-          b.ofw.countries.japan++;
-          ofwCountries.japan++;
-        } else if(countryField.includes('taiwan')) {
-          b.ofw.countries.taiwan++;
-          ofwCountries.taiwan++;
-        } else if(countryField.includes('malaysia')) {
-          b.ofw.countries.malaysia++;
-          ofwCountries.malaysia++;
-        } else if(countryField.includes('australia')) {
-          b.ofw.countries.australia++;
-          ofwCountries.australia++;
-        } else if(countryField.includes('new zealand')) {
-          b.ofw.countries.newZealand++;
-          ofwCountries.newZealand++;
-        } else if(countryField.includes('italy')) {
-          b.ofw.countries.italy++;
-          ofwCountries.italy++;
-        } else if(countryField.includes('uk') || countryField.includes('united kingdom')) {
-          b.ofw.countries.uk++;
-          ofwCountries.uk++;
-        } else if(countryField.includes('germany')) {
-          b.ofw.countries.germany++;
-          ofwCountries.germany++;
-        } else if(countryField.includes('cyprus')) {
-          b.ofw.countries.cyprus++;
-          ofwCountries.cyprus++;
-        } else if(countryField.includes('canada')) {
-          b.ofw.countries.canada++;
-          ofwCountries.canada++;
-        } else if(countryField.includes('usa') || countryField.includes('united states')) {
-          b.ofw.countries.usa++;
-          ofwCountries.usa++;
-        } else if(countryField.includes('libya')) {
-          b.ofw.countries.libya++;
-          ofwCountries.libya++;
-        } else if(countryField.trim() !== '') {
-          b.ofw.countries.others++;
-          ofwCountries.others++;
-        }
-      }
-      
-      // NEW: FishR/RBIS Registration
-      const fishrField = String(getField(r,'FishR Registered')||'').trim().toLowerCase();
-      const rbisField = String(getField(r,'RBIS Registered')||'').trim().toLowerCase();
-      
-      if(fishrField === 'yes' && rbisField === 'yes') {
-        b.fishr.bothRegistered++;
-        fishrRegistration.bothRegistered++;
-      } else if(fishrField === 'yes') {
-        b.fishr.fishrRegistered++;
-        fishrRegistration.fishrRegistered++;
-      } else if(rbisField === 'yes') {
-        b.fishr.rbisRegistered++;
-        fishrRegistration.rbisRegistered++;
-      } else {
-        b.fishr.notRegistered++;
-        fishrRegistration.notRegistered++;
-      }
     });
 
     // Update top cards
@@ -1647,57 +1036,6 @@ async function loadDashboard(){
       div.style.padding='10px';
       div.innerHTML = `<div class="mini">${k}</div><div class="card-value">${livestockTotals[k]}</div>`;
       quick.appendChild(div);
-    });
-    
-    // NEW: Extended Quick Stats - Employment
-    const extendedStats = document.getElementById('extendedQuickStats');
-    extendedStats.innerHTML = '';
-    
-    // Employment stats
-    if(employmentStats.employed > 0) {
-      const div = document.createElement('div'); 
-      div.className = 'card'; 
-      div.style.padding = '10px';
-      div.innerHTML = `<div class="mini">Employed</div><div class="card-value">${employmentStats.employed}</div>`;
-      extendedStats.appendChild(div);
-    }
-    
-    if(employmentStats.unemployed > 0) {
-      const div = document.createElement('div'); 
-      div.className = 'card'; 
-      div.style.padding = '10px';
-      div.innerHTML = `<div class="mini">Unemployed</div><div class="card-value">${employmentStats.unemployed}</div>`;
-      extendedStats.appendChild(div);
-    }
-    
-    // NEW: Extended Quick Stats - Education
-    const educationStatsDiv = document.getElementById('educationQuickStats');
-    educationStatsDiv.innerHTML = '';
-    
-    Object.entries(educationStats).forEach(([key, value]) => {
-      if(value > 0) {
-        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        const div = document.createElement('div'); 
-        div.className = 'card'; 
-        div.style.padding = '10px';
-        div.innerHTML = `<div class="mini">${label}</div><div class="card-value">${value}</div>`;
-        educationStatsDiv.appendChild(div);
-      }
-    });
-    
-    // NEW: Extended Quick Stats - Job Categories (only show non-zero)
-    const jobStatsDiv = document.getElementById('jobCategoriesStats');
-    jobStatsDiv.innerHTML = '';
-    
-    Object.entries(jobCategories).forEach(([key, value]) => {
-      if(value > 0) {
-        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        const div = document.createElement('div'); 
-        div.className = 'card'; 
-        div.style.padding = '10px';
-        div.innerHTML = `<div class="mini">${label}</div><div class="card-value">${value}</div>`;
-        jobStatsDiv.appendChild(div);
-      }
     });
 
     // Chart: heads vs members per barangay
@@ -1820,128 +1158,6 @@ async function loadDashboard(){
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('') + `<td>${others}</td>`;
       tbodyLiv.appendChild(tr);
-    });
-    
-    // NEW: 7) Educational Attainment
-    const tbodyEducation = document.querySelector('#tblEducation tbody'); 
-    tbodyEducation.innerHTML = '';
-    labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = [
-        s.education.noFormalEducation || 0,
-        s.education.elementaryLevel || 0,
-        s.education.elementaryGraduate || 0,
-        s.education.juniorHighLevel || 0,
-        s.education.juniorHighGraduate || 0,
-        s.education.seniorHighLevel || 0,
-        s.education.seniorHighGraduate || 0,
-        s.education.collegeLevel || 0,
-        s.education.collegeGraduate || 0,
-        s.education.collegeGraduateCourse || 0
-      ];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyEducation.appendChild(tr);
-    });
-    
-    // NEW: 8) Employment Status
-    const tbodyEmployment = document.querySelector('#tblEmployment tbody'); 
-    tbodyEmployment.innerHTML = '';
-    labels.forEach(l=>{
-      const s = barangayMap[l];
-      const jobDetails = Object.entries(s.employment.jobDetails || {})
-        .slice(0, 3)
-        .map(([job, count]) => `${job}: ${count}`)
-        .join('; ');
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td><td>${s.employment.employed || 0}</td><td>${s.employment.unemployed || 0}</td><td>${jobDetails}</td>`;
-      tbodyEmployment.appendChild(tr);
-    });
-    
-    // NEW: 9) Job Categories (first table section)
-    const tbodyJobCategories = document.querySelector('#tblJobCategories tbody'); 
-    tbodyJobCategories.innerHTML = '';
-    labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = [
-        // Office & Administrative
-        s.jobCategories.adminAssistant || 0,
-        s.jobCategories.officeClerk || 0,
-        s.jobCategories.secretary || 0,
-        (s.jobCategories.otherAdmin || 0) + (s.jobCategories.others || 0),
-        
-        // Business & Management
-        s.jobCategories.projectManager || 0,
-        s.jobCategories.operationsManager || 0,
-        s.jobCategories.hrStaff || 0,
-        s.jobCategories.accountManager || 0,
-        
-        // Accounting & Finance
-        s.jobCategories.accountingStaff || 0,
-        s.jobCategories.bookkeeper || 0,
-        s.jobCategories.payrollOfficer || 0,
-        s.jobCategories.auditor || 0,
-        
-        // IT & Tech
-        s.jobCategories.itSupport || 0,
-        s.jobCategories.webDeveloper || 0,
-        s.jobCategories.softwareDeveloper || 0,
-        s.jobCategories.dataAnalyst || 0,
-        s.jobCategories.systemAdmin || 0
-      ];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyJobCategories.appendChild(tr);
-    });
-    
-    // NEW: 10) OFW Breakdown
-    const tbodyOFW = document.querySelector('#tblOFW tbody'); 
-    tbodyOFW.innerHTML = '';
-    labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = [
-        s.ofw.count || 0,
-        s.ofw.countries.saudiArabia || 0,
-        s.ofw.countries.uae || 0,
-        s.ofw.countries.qatar || 0,
-        s.ofw.countries.kuwait || 0,
-        s.ofw.countries.bahrain || 0,
-        s.ofw.countries.oman || 0,
-        s.ofw.countries.hongKong || 0,
-        s.ofw.countries.singapore || 0,
-        s.ofw.countries.japan || 0,
-        s.ofw.countries.taiwan || 0,
-        s.ofw.countries.malaysia || 0,
-        s.ofw.countries.australia || 0,
-        s.ofw.countries.newZealand || 0,
-        s.ofw.countries.italy || 0,
-        s.ofw.countries.uk || 0,
-        s.ofw.countries.germany || 0,
-        s.ofw.countries.cyprus || 0,
-        s.ofw.countries.canada || 0,
-        s.ofw.countries.usa || 0,
-        s.ofw.countries.libya || 0,
-        s.ofw.countries.others || 0
-      ];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyOFW.appendChild(tr);
-    });
-    
-    // NEW: 11) FishR/RBIS Registration
-    const tbodyFishR = document.querySelector('#tblFishR tbody'); 
-    tbodyFishR.innerHTML = '';
-    labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = [
-        s.fishr.fishrRegistered || 0,
-        s.fishr.rbisRegistered || 0,
-        s.fishr.bothRegistered || 0,
-        s.fishr.notRegistered || 0
-      ];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyFishR.appendChild(tr);
     });
 
   } catch(err){
@@ -2094,3 +1310,10 @@ function notifyDataUpdated() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
