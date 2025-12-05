@@ -1,20 +1,13 @@
-/* index.js — FINAL WORKING VERSION FOR GITHUB PAGES + APPS SCRIPT */
-
+/* index.js — DEBUG VERSION */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Login page loaded");
+    
     const form = document.getElementById("loginForm");
     if (form) {
+        console.log("Login form found");
         form.addEventListener("submit", handleLogin);
-        
-        // Remove any inline form handler that might interfere
-        form.onsubmit = null;
-    }
-    
-    // Clear any existing form submission handlers
-    const loginBtn = document.getElementById("loginButton");
-    if (loginBtn) {
-        loginBtn.onclick = null;
     }
 });
 
@@ -30,12 +23,14 @@ async function sha256(str) {
 }
 
 // --------------------------
-// LOGIN HANDLER
+// LOGIN HANDLER - DEBUG VERSION
 // --------------------------
 async function handleLogin(event) {
     event.preventDefault();
     event.stopPropagation();
 
+    console.log("=== Login attempt started ===");
+    
     const msg = document.getElementById("statusText");
     const errorDiv = document.getElementById("loginError");
     const loginBtn = document.getElementById("loginButton");
@@ -47,7 +42,11 @@ async function handleLogin(event) {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
+    console.log("Username entered:", username);
+    console.log("Password length:", password.length);
+
     if (!username || !password) {
+        console.log("Missing username or password");
         showError("Please enter username and password.");
         return;
     }
@@ -56,34 +55,55 @@ async function handleLogin(event) {
     loginBtn.classList.add("btn-loading");
     loginBtn.disabled = true;
 
-    const pwHash = await sha256(password);
-
     try {
+        // Generate password hash
+        console.log("Generating password hash...");
+        const pwHash = await sha256(password);
+        console.log("Password hash generated (first 10 chars):", pwHash.substring(0, 10) + "...");
+        
+        // Prepare form data
         const formData = new FormData();
         formData.append("action", "login");
         formData.append("username", username);
         formData.append("pwHash", pwHash);
-
-        const response = await fetch(API_URL, {
-            method: "POST",
-            body: formData   // ✔ NO HEADERS → NO CORS ERROR
+        
+        console.log("Sending login request to:", API_URL);
+        console.log("Request data:", {
+            action: "login",
+            username: username,
+            pwHash: pwHash.substring(0, 10) + "..."
         });
 
-        // If Apps Script returns HTML instead of JSON (error case)
+        // Send request
+        const startTime = Date.now();
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: formData
+        });
+        const endTime = Date.now();
+        
+        console.log(`Request completed in ${endTime - startTime}ms`);
+        console.log("Response status:", response.status, response.statusText);
+        
+        // Get response text
         const text = await response.text();
-
+        console.log("Raw response text:", text);
+        
         let data;
         try {
             data = JSON.parse(text);
+            console.log("Parsed response data:", data);
         } catch (e) {
-            console.error("Non-JSON response:", text);
-            showError("Server error. Contact administrator.");
+            console.error("Failed to parse JSON response:", e);
+            console.error("Response was:", text);
+            showError("Server returned invalid response. Contact administrator.");
             loginBtn.classList.remove("btn-loading");
             loginBtn.disabled = false;
             return;
         }
 
         if (!data.success) {
+            console.log("Login failed:", data.message);
             showError("Login failed: " + data.message);
             loginBtn.classList.remove("btn-loading");
             loginBtn.disabled = false;
@@ -91,8 +111,9 @@ async function handleLogin(event) {
         }
 
         // -------------------------------
-        // LOGIN SUCCESS — SAVE SESSION
+        // LOGIN SUCCESS
         // -------------------------------
+        console.log("Login successful! User data:", data.user);
         msg.innerText = "Login successful! Redirecting...";
         msg.style.color = "green";
 
@@ -106,31 +127,30 @@ async function handleLogin(event) {
         localStorage.setItem("staffName", data.user.FullName);
         localStorage.setItem("userRole", data.user.Role);  // Important: dashboard.html expects "userRole"
         localStorage.setItem("role", data.user.Role);
-        localStorage.setItem("assignedBarangay", data.user.AssignedBarangay);
+        localStorage.setItem("assignedBarangay", data.user.AssignedBarangay || "");
         localStorage.setItem("pwHash", pwHash);
-        
-        // Set a timestamp to prevent cache issues
         localStorage.setItem("loginTime", Date.now().toString());
 
-        // Force a session flag
+        // Set a session flag
         sessionStorage.setItem("authenticated", "true");
 
-        console.log("Login successful! LocalStorage set:", {
+        console.log("LocalStorage set successfully. Items:", {
             username: data.user.Username,
             staffName: data.user.FullName,
-            role: data.user.Role,
+            userRole: data.user.Role,
             assignedBarangay: data.user.AssignedBarangay
         });
 
-        // Redirect to dashboard.html (NOT main.html)
+        // Redirect to dashboard.html
+        console.log("Redirecting to dashboard.html...");
         setTimeout(() => {
-            // Use replace to prevent back button issues
             window.location.replace("dashboard.html");
-        }, 800);
+        }, 1000);
 
     } catch (err) {
         console.error("FETCH ERROR:", err);
-        showError("Connection error. Please contact administrator.");
+        console.error("Error details:", err.message);
+        showError("Connection error: " + err.message);
         loginBtn.classList.remove("btn-loading");
         loginBtn.disabled = false;
     }
@@ -138,14 +158,34 @@ async function handleLogin(event) {
 
 // Helper function to show errors
 function showError(message) {
+    console.error("Showing error:", message);
     const errorDiv = document.getElementById("loginError");
     if (errorDiv) {
         errorDiv.textContent = message;
         errorDiv.style.display = "block";
         
-        // Auto-hide error after 5 seconds
+        // Auto-hide error after 8 seconds
         setTimeout(() => {
             errorDiv.style.display = "none";
-        }, 5000);
+        }, 8000);
     }
 }
+
+// Test function to check API connectivity
+async function testAPIConnection() {
+    console.log("Testing API connection...");
+    try {
+        const response = await fetch(API_URL + "?action=test&t=" + Date.now());
+        const text = await response.text();
+        console.log("API test response:", text);
+        return text;
+    } catch (error) {
+        console.error("API test failed:", error);
+        return null;
+    }
+}
+
+// Run API test on page load (optional)
+// window.addEventListener('load', () => {
+//     setTimeout(testAPIConnection, 1000);
+// });
