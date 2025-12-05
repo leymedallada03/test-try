@@ -2282,55 +2282,38 @@ window.addEventListener('resize', function() {
     }
 });
 
-/* ENHANCED SESSION CHECK WITH BACK BUTTON PROTECTION */
+/* SIMPLIFIED SESSION CHECK - FIXED VERSION */
 async function sessionCheck(){
   try {
-    // Clear any session flags immediately
-    sessionStorage.removeItem('authenticated');
+    // Try to get user info from localStorage first (set during login)
+    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     
-    const r = await fetch(API_URL + '?action=sessionCheck&t=' + Date.now());
-    const j = await r.json();
-    
-    if(!j.success) {
-      // Clear all local storage and redirect
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = 'index.html?logout=true&t=' + Date.now();
+    if (!userName || userName === "User") {
+      // No user info found, redirect to login
+      window.location.href = 'index.html?session=expired';
       return;
     }
     
-    const userName = j.fullName || localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    // Set the username in the UI
     document.getElementById('userName').innerText = userName;
     
-    // Set a session flag to prevent back button issues
-    sessionStorage.setItem('authenticated', 'true');
-    sessionStorage.setItem('userName', userName);
-    
-    const isAdmin = j.role === 'Admin' || localStorage.getItem("userRole") === "admin";
+    // Check admin status
+    const isAdmin = localStorage.getItem("userRole") === "admin";
     const adminItems = document.querySelectorAll(".admin-only");
     adminItems.forEach(item => {
         item.style.display = isAdmin ? "block" : "none";
     });
+    
+    // Set session flag
+    sessionStorage.setItem('authenticated', 'true');
     
   } catch(e){ 
     console.warn('session check failed', e);
     
     // Check if we have a session flag
     if(!sessionStorage.getItem('authenticated')) {
-      // Clear all storage and redirect
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = 'index.html?session=expired&t=' + Date.now();
-    } else {
-      // Use cached session data
-      const userName = sessionStorage.getItem('userName') || "User";
-      document.getElementById('userName').innerText = userName;
-      
-      const isAdmin = localStorage.getItem("userRole") === "admin";
-      const adminItems = document.querySelectorAll(".admin-only");
-      adminItems.forEach(item => {
-          item.style.display = isAdmin ? "block" : "none";
-      });
+      // Redirect to login
+      window.location.href = 'index.html?session=expired';
     }
   }
 }
@@ -2363,12 +2346,15 @@ document.getElementById('sidebarToggle').onclick = toggleSidebar;
 // Mobile sidebar toggle
 document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
 
-/* PREVENT BACK BUTTON ISSUES */
+/* PREVENT BACK BUTTON ISSUES - SIMPLIFIED */
 window.addEventListener('pageshow', function(event) {
   // If page is loaded from cache (back/forward button)
   if (event.persisted) {
-    console.log('Page loaded from cache, checking session...');
-    sessionCheck(); // Re-validate session
+    console.log('Page loaded from cache, revalidating session...');
+    // Just re-check session
+    if (!sessionStorage.getItem('authenticated')) {
+      window.location.href = 'index.html?session=expired';
+    }
   }
 });
 
