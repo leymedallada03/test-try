@@ -2282,39 +2282,47 @@ window.addEventListener('resize', function() {
     }
 });
 
-/* SIMPLIFIED SESSION CHECK - FIXED VERSION */
+/* SIMPLE SESSION CHECK - FIXED TO ALLOW LOGIN */
 async function sessionCheck(){
   try {
-    // Try to get user info from localStorage first (set during login)
+    // Try to get user info from localStorage (set during login)
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     
-    if (!userName || userName === "User") {
-      // No user info found, redirect to login
-      window.location.href = 'index.html?session=expired';
-      return;
+    // If we have a username, show it
+    if (userName && userName !== "User") {
+      document.getElementById('userName').innerText = userName;
+      
+      // Check admin status
+      const isAdmin = localStorage.getItem("userRole") === "admin";
+      const adminItems = document.querySelectorAll(".admin-only");
+      adminItems.forEach(item => {
+          item.style.display = isAdmin ? "block" : "none";
+      });
+      
+      // Set session flag
+      sessionStorage.setItem('authenticated', 'true');
+      return true;
+    } else {
+      // No user info found, but don't redirect immediately
+      // Wait to see if this is a fresh login
+      console.log('No user info found, checking if this is a fresh session...');
+      
+      // Check if we have a session flag from before
+      if(sessionStorage.getItem('authenticated')) {
+        // We were authenticated before, keep going
+        document.getElementById('userName').innerText = "User";
+        return true;
+      } else {
+        // No session at all, redirect to login
+        console.log('No session found, redirecting to login...');
+        window.location.href = 'index.html?session=expired';
+        return false;
+      }
     }
-    
-    // Set the username in the UI
-    document.getElementById('userName').innerText = userName;
-    
-    // Check admin status
-    const isAdmin = localStorage.getItem("userRole") === "admin";
-    const adminItems = document.querySelectorAll(".admin-only");
-    adminItems.forEach(item => {
-        item.style.display = isAdmin ? "block" : "none";
-    });
-    
-    // Set session flag
-    sessionStorage.setItem('authenticated', 'true');
     
   } catch(e){ 
     console.warn('session check failed', e);
-    
-    // Check if we have a session flag
-    if(!sessionStorage.getItem('authenticated')) {
-      // Redirect to login
-      window.location.href = 'index.html?session=expired';
-    }
+    return false;
   }
 }
 
@@ -2350,30 +2358,43 @@ document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
 window.addEventListener('pageshow', function(event) {
   // If page is loaded from cache (back/forward button)
   if (event.persisted) {
-    console.log('Page loaded from cache, revalidating session...');
-    // Just re-check session
-    if (!sessionStorage.getItem('authenticated')) {
-      window.location.href = 'index.html?session=expired';
+    console.log('Page loaded from cache, checking session...');
+    
+    // Check if we have a session flag
+    if(!sessionStorage.getItem('authenticated')) {
+      // If we don't have a session flag but have localStorage user info
+      // it might be a fresh load after login
+      const userName = localStorage.getItem("staffName") || localStorage.getItem("username");
+      if (!userName) {
+        // No user info at all, redirect to login
+        window.location.href = 'index.html?session=expired';
+      } else {
+        // We have user info, set the session flag
+        sessionStorage.setItem('authenticated', 'true');
+      }
     }
   }
 });
 
 /* INITIALIZATION */
 window.addEventListener('DOMContentLoaded', async ()=>{
-  await sessionCheck();
-  await loadLastUpdated();
+  // First check session
+  const isAuthenticated = await sessionCheck();
   
-  // Automatically load data when dashboard is opened
-  await loadDashboard();
-  
-  // Auto-refresh every 30 seconds
-  if (refreshInterval) clearInterval(refreshInterval);
-  refreshInterval = setInterval(loadDashboard, 30000);
-  
-  // Check screen width and adjust sidebar
-  if (window.innerWidth <= 768) {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.remove('mobile-open');
+  if (isAuthenticated) {
+    // Load data if authenticated
+    await loadLastUpdated();
+    await loadDashboard();
+    
+    // Auto-refresh every 30 seconds
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(loadDashboard, 30000);
+    
+    // Check screen width and adjust sidebar
+    if (window.innerWidth <= 768) {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.remove('mobile-open');
+    }
   }
 });
 
