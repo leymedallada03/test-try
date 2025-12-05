@@ -1074,6 +1074,68 @@ function highlight(text,q){
     return text.replace(re, m => `<span class="hl">${m}</span>`);
 }
 
+/* ============ SESSION CHECK FUNCTION ============ */
+async function sessionCheck(){
+  try {
+    // Try to get user info from localStorage (set during login)
+    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    
+    // If we have a username, show it and allow access
+    if (userName && userName !== "User") {
+      document.getElementById('userName').innerText = userName;
+      
+      // Check admin status
+      const isAdmin = localStorage.getItem("userRole") === "admin";
+      const adminItems = document.querySelectorAll(".admin-only");
+      adminItems.forEach(item => {
+          item.style.display = isAdmin ? "block" : "none";
+      });
+      
+      // Set session flag
+      sessionStorage.setItem('authenticated', 'true');
+      return true;
+    } else {
+      // No user info found in localStorage
+      console.log('No user info found in localStorage');
+      
+      // Check if we have a session flag from before (tab restore, etc.)
+      if(sessionStorage.getItem('authenticated')) {
+        // We were authenticated before, keep going
+        console.log('Session flag found, allowing access');
+        document.getElementById('userName').innerText = "User";
+        return true;
+      } else {
+        // No session at all, redirect to login
+        console.log('No session found, redirecting to login...');
+        window.location.href = 'index.html?session=expired';
+        return false;
+      }
+    }
+  } catch(e){ 
+    console.warn('session check failed', e);
+    return false;
+  }
+}
+
+/* ============ ENHANCED LOGOUT FUNCTION ============ */
+function handleLogout() {
+  // Clear all storage
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Add a parameter to prevent caching
+  const logoutUrl = 'index.html?logout=true&t=' + Date.now();
+  
+  // Call server-side logout with timestamp to prevent caching
+  fetch(SCRIPT_URL+'?action=logout&t=' + Date.now())
+    .catch(() => { /* ignore errors on logout */ })
+    .finally(() => {
+      // Replace current history entry with login page
+      // This prevents back button from returning to dashboard
+      window.location.replace(logoutUrl);
+    });
+}
+
 /* ============ LOAD RECORDS ============ */
 async function loadRecords(){
     showLoading(true);
@@ -1476,6 +1538,9 @@ document.getElementById('sidebarToggle').onclick = toggleSidebar;
 // Mobile sidebar toggle
 document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
 
+// Logout button event listener
+document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
 /* ============ WINDOW RESIZE HANDLER ============ */
 window.addEventListener('resize', function() {
     if (window.innerWidth > 768) {
@@ -1489,8 +1554,28 @@ window.addEventListener('resize', function() {
     }
 });
 
+/* ============ PREVENT BACK BUTTON ISSUES ============ */
+window.addEventListener('pageshow', function(event) {
+  // If page is loaded from cache (back/forward button)
+  if (event.persisted) {
+    console.log('Page loaded from cache, checking session...');
+    
+    // Don't automatically redirect. Just check session and reload data
+    sessionCheck().then(isAuthenticated => {
+      if (isAuthenticated) {
+        loadRecords();
+      }
+    });
+  }
+});
+
 /* ============ INIT ============ */
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
+  // First check session
+  const isAuthenticated = await sessionCheck();
+  
+  if (isAuthenticated) {
+    // Load data if authenticated
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     // Remove 👤 emoji from user display
     document.getElementById("userName").innerText = userName;
@@ -1510,8 +1595,8 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     
     loadRecords();
+  }
 });
 </script>
 </body>
 </html>
-
