@@ -1,8 +1,14 @@
+[file name]: dataForm.html
+[file content begin]
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<!-- CACHE PREVENTION HEADERS -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Purok Kaligtasan — Data Entry of household</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -2266,6 +2272,70 @@ function computeAgeDetailed(inputDateValue){
   return { years, months, days, display, stage };
 }
 
+/* ============ SESSION MANAGEMENT ============ */
+
+/* SIMPLE SESSION CHECK */
+async function sessionCheck(){
+  try {
+    // Try to get user info from localStorage (set during login)
+    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    
+    // If we have a username, show it and allow access
+    if (userName && userName !== "User") {
+      document.getElementById('userName').innerText = userName;
+      
+      // Check admin status
+      const isAdmin = localStorage.getItem("userRole") === "admin";
+      const adminItems = document.querySelectorAll(".admin-only");
+      adminItems.forEach(item => {
+          item.style.display = isAdmin ? "block" : "none";
+      });
+      
+      // Set session flag
+      sessionStorage.setItem('authenticated', 'true');
+      return true;
+    } else {
+      // No user info found in localStorage
+      console.log('No user info found in localStorage');
+      
+      // Check if we have a session flag from before (tab restore, etc.)
+      if(sessionStorage.getItem('authenticated')) {
+        // We were authenticated before, keep going
+        console.log('Session flag found, allowing access');
+        document.getElementById('userName').innerText = "User";
+        return true;
+      } else {
+        // No session at all, redirect to login
+        console.log('No session found, redirecting to login...');
+        window.location.href = 'index.html?session=expired';
+        return false;
+      }
+    }
+  } catch(e){ 
+    console.warn('session check failed', e);
+    return false;
+  }
+}
+
+/* ENHANCED LOGOUT FUNCTION */
+function handleLogout() {
+  // Clear all storage
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Add a parameter to prevent caching
+  const logoutUrl = 'index.html?logout=true&t=' + Date.now();
+  
+  // Call server-side logout with timestamp to prevent caching
+  fetch(API_URL+'?action=logout&t=' + Date.now())
+    .catch(() => { /* ignore errors on logout */ })
+    .finally(() => {
+      // Replace current history entry with login page
+      // This prevents back button from returning to dashboard
+      window.location.replace(logoutUrl);
+    });
+}
+
 /* ---------------- UI + state ---------------- */
 function ensureLoginOrRedirect(){
   if(!localStorage.getItem("loggedIn")){ /* keep as-is or redirect to login */ return true; }
@@ -2633,11 +2703,20 @@ document.addEventListener('input', (ev) => {
 });
 
 /* ---------------- DOM loaded bindings ---------------- */
-document.addEventListener('DOMContentLoaded', () => {
-  ensureLoginOrRedirect();
+document.addEventListener('DOMContentLoaded', async () => {
+  // First check session
+  const isAuthenticated = await sessionCheck();
+  
+  if (!isAuthenticated) {
+    return; // Stop if not authenticated
+  }
+
+  // Original DOMContentLoaded code continues here...
+  ensureLoginOrRedirect(); // You can remove this if using sessionCheck()
   document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
 
-  // Check if user is admin
+  // Check if user is admin - THIS IS NOW HANDLED IN sessionCheck()
+  // But keep for backward compatibility
   const isAdmin = localStorage.getItem("userRole") === "admin";
   const adminItems = document.querySelectorAll(".admin-only");
   adminItems.forEach(item => {
@@ -2843,7 +2922,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Add logout event listener
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
   updateMemberPreview();
+});
+
+/* ============ PREVENT BACK BUTTON ISSUES ============ */
+
+/* pageshow event listener */
+window.addEventListener('pageshow', function(event) {
+  // If page is loaded from cache (back/forward button)
+  if (event.persisted) {
+    console.log('Page loaded from cache, checking session...');
+    
+    // Check session again
+    sessionCheck();
+  }
 });
 
 /* panel helpers */
@@ -3105,6 +3200,15 @@ if (sidebarToggle) {
         }, 300); // Match the transition duration
     });
 }
+
+/* ============ VISIBILITY CHANGE HANDLER ============ */
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    // Tab became active, check session
+    sessionCheck();
+  }
+});
 </script>
 </body>
 </html>
+[file content end]
