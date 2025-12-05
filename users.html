@@ -1,563 +1,1359 @@
+[file name]: users.html
+[file content begin]
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Users — MDRRMO</title>
-  <link rel="stylesheet" href="styles.css"/>
-  <style>
-    :root{
-      --green-1:#0F7A4A;
-      --muted:#6b7a70;
-      --card-grad: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,255,250,0.98));
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Purok Kaligtasan — User Management</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+   :root{
+    --bg:#f6f8f7;
+    --card-bg:#fff;
+    --muted:#6b6f6b;
+    --accent1:#0f7a4a;
+    --accent2:#34b78f;
+    --accent3: #ff7a00;
+    --accent4: #ffa500;
+    --light-green: #e9f7f2;
+    --border: #e1e8e5;
+    --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --shadow-dark: 0 6px 20px rgba(5,40,25,0.12);
+    --radius:12px;
+    --radius-sm:8px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+   }
+   body {
+    background-color: var(--bg);
+    margin: 0;
+    min-height: 100vh;
+   }
+
+   .page-container{
+    max-width:1200px;
+    margin:20px auto;
+    padding:12px;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:18px;
+    align-items:start;
+    transition: grid-template-columns 0.3s ease;
+   }
+
+   .page-container.collapsed {
+    grid-template-columns: 60px 1fr;
+   }
+
+   /* Topbar - Enhanced */
+   .topbar{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-radius:var(--radius);
+    background:linear-gradient(90deg, var(--accent1), var(--accent2));
+    color:#fff;
+    box-shadow:var(--shadow-dark);
+   }
+
+   .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+   }
+
+   .brand .logo{
+    width:48px;
+    height:48px;
+    border-radius:var(--radius-sm);
+    object-fit:contain;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+    border: 2px solid rgba(255,255,255,0.2);
+   }
+
+   .brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+   }
+
+   .brand-text p {
+    font-size:12px;
+    opacity:0.95;
+    margin: 4px 0 0 0;
+   }
+
+   .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+   }
+
+   #userName {
+    font-weight: 600;
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   #logoutBtn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+   }
+
+   #logoutBtn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+   }
+
+   /* Sidebar - Collapsible */
+   .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
+    border-radius:var(--radius);
+    padding:12px;
+    height:calc(100vh - 120px);
+    position:sticky;
+    top:72px;
+    overflow:auto;
+    transition: width 0.3s ease;
+   }
+
+   .sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+   }
+
+   .sidebar-toggle {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+   }
+
+   .sidebar-toggle:hover {
+    transform: scale(1.1);
+   }
+
+   .sidebar ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex: 1;
+   }
+
+   .sidebar li a{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--muted);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+   }
+
+   .sidebar li a:hover{
+    background: var(--light-green);
+    color: var(--accent1);
+   }
+
+   .sidebar li a.active{
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   .sidebar li a .menu-icon {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+   }
+
+   .sidebar li a .menu-text {
+    transition: opacity 0.3s ease;
+   }
+
+   .page-container.collapsed .sidebar li a .menu-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+   }
+
+   /* Content Area - Fixed Size */
+   .content-area{
+    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 8px 22px rgba(10,20,16,0.06);
+    min-height:72vh;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+   }
+
+   /* Content Header - Fixed */
+   .content-header {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   }
+
+   .content-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--accent1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   /* Stats - Made Smaller */
+   .stats-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+   }
+
+   .stat-item {
+    text-align: center;
+    min-width: 70px;
+    padding: 6px 8px;
+    background: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+   }
+
+   .stat-item span {
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 2px;
+   }
+
+   .stat-item .value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent1);
+    display: block;
+   }
+
+   /* Toolbar - New Layout */
+   .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+   }
+
+   .toolbar-row-1 {
+    display: flex;
+    width: 100%;
+   }
+
+   .search-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+   }
+
+   .search-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.9rem;
+    z-index: 1;
+   }
+
+   .search-box{
+    padding: 10px 12px 10px 32px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    background: white;
+    width: 100%;
+    box-sizing: border-box;
+   }
+
+   .search-box:focus {
+    outline: none;
+    border-color: var(--accent1);
+    box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+   }
+
+   .toolbar-row-2 {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: center;
+   }
+
+   /* Cards Row */
+   .cards-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+   }
+
+   .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    flex: 1;
+    min-width: 200px;
+   }
+
+   .card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--accent1);
+    font-size: 1rem;
+   }
+
+   .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent1);
+    margin-top: 8px;
+   }
+
+   /* Users Table */
+   .users-table-wrap {
+    flex: 1;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: auto;
+    position: relative;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+   }
+
+   .users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+   }
+
+   .users-table th {
+    background: var(--light-green);
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    font-size: 14px;
+    color: var(--accent1);
+    border-bottom: 2px solid rgba(15,122,74,0.15);
+    white-space: nowrap;
+    vertical-align: middle;
+    height: 40px;
+    box-sizing: border-box;
+   }
+
+   .users-table td {
+    padding: 10px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(15,122,74,0.08);
+    vertical-align: middle;
+    color: var(--muted);
+    text-align: left;
+    height: 36px;
+    box-sizing: border-box;
+    line-height: 1.3;
+   }
+
+   .users-table tbody tr:hover {
+    background: rgba(52,183,143,0.05);
+   }
+
+   /* Actions column */
+   .actions-cell {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+   }
+
+   .icon-btn {
+    background: none;
+    border: 0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition: all 0.2s ease;
+   }
+
+   .icon-btn:hover {
+    background: var(--light-green);
+    color: var(--accent1);
+    transform: translateY(-1px);
+   }
+
+   /* Button styles */
+   .btn {
+    border: 0;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 36px;
+    box-sizing: border-box;
+   }
+
+   .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   .btn-secondary {
+    background: transparent;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+   }
+
+   /* Modal styles */
+   .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+   }
+
+   .modal-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: var(--radius);
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow-dark);
+   }
+
+   .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+   }
+
+   .modal-header h3 {
+    margin: 0;
+    color: var(--accent1);
+   }
+
+   .modal-body {
+    margin-bottom: 16px;
+   }
+
+   /* Form styles */
+   .form-group {
+    margin-bottom: 12px;
+   }
+
+   .form-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+   }
+
+   .form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+   }
+
+   .form-control:focus {
+    outline: none;
+    border-color: var(--accent1);
+    box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+   }
+
+   .form-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+   }
+
+   .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+   }
+
+   /* Toast notifications */
+   .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--accent1);
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    box-shadow: var(--shadow-dark);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+   }
+
+   @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+   }
+
+   /* Mobile menu toggle button */
+   .mobile-menu-toggle {
+    display: none;
+   }
+
+   /* Mobile Styles */
+   @media (max-width: 768px) {
+    .page-container {
+        grid-template-columns: 1fr !important;
+        padding: 8px;
+        gap: 12px;
     }
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:#f6f7f5}
-    .page-container{display:flex;min-height:100vh}
-    .topbar{height:68px;display:flex;align-items:center;gap:12px;padding:12px 18px;background:white;box-shadow:0 6px 18px rgba(6,30,20,0.04);width:100%;position:fixed;top:0;left:0;z-index:50}
-    .logo{height:44px;margin-right:10px}
-    .brand .title{font-weight:700}
-    aside.sidebar{width:220px;padding-top:86px;background:transparent}
-    .content-area{flex:1;padding:96px 28px 48px 28px}
-    .users-grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:980px){ .users-grid{grid-template-columns:360px 1fr} .sidebar{display:block} }
-    .card{background:var(--card-grad);padding:16px;border-radius:12px;box-shadow:0 10px 30px rgba(6,30,20,0.06);border:1px solid rgba(6,30,20,0.03)}
-    .small-input{padding:10px;border-radius:8px;border:1px solid rgba(6,30,20,0.06);width:100%}
-    .muted{color:var(--muted);font-size:13px}
-    .btn{padding:8px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--green-1),#34b78f);color:white;font-weight:700;cursor:pointer}
-    .btn.secondary{background:transparent;color:var(--green-1);border:1px solid rgba(6,30,20,0.06)}
-    .users-table-wrap{overflow:auto;margin-top:12px}
-    table.records-table{border-collapse:collapse;width:100%}
-    table.records-table th, table.records-table td{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.04);text-align:left;font-size:14px}
-    .actions-cell{display:flex;gap:6px;align-items:center}
-    .icon-btn{background:transparent;border:0;cursor:pointer;padding:6px;border-radius:8px}
-    .cards-row{display:flex;gap:12px;flex-wrap:wrap}
-    .stat-card{flex:1;min-width:160px}
-    .stat-value{font-size:20px;font-weight:800;color:var(--green-1);margin-top:6px}
-    /* drawer / modal */
-    .panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);opacity:0;visibility:hidden;transition:opacity .2s}
-    .panel-overlay.show{opacity:1;visibility:visible}
-    .drawer-panel{position:fixed;right:0;top:0;height:100vh;width:420px;max-width:96%;background:white;box-shadow:-18px 0 40px rgba(6,30,20,0.12);transform:translateX(110%);transition:transform .28s;padding:14px;z-index:1000;overflow:auto}
-    .drawer-panel.show{transform:translateX(0)}
-    .panel-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-    .panel-header h3{margin:0;flex:1;text-align:center}
-    /* logs modal */
-    #logsModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;padding:16px;z-index:2000}
-    #logsModal .modal-box{background:#fff;padding:16px;border-radius:12px;max-width:95%;max-height:86vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
-    /* toast/snackbar */
-    .toast-wrap{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:3000}
-    .toast{padding:10px 14px;border-radius:10px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,0.12);font-weight:700;transform:translateY(12px);opacity:0;animation:slideIn .28s forwards}
-    .toast.success{background:linear-gradient(90deg,#18ab6b,#34b78f)}
-    .toast.error{background:linear-gradient(90deg,#e74c3c,#ff7b6f)}
-    @keyframes slideIn{to{transform:none;opacity:1}}
-    /* small helpers */
-    .muted-note{font-size:13px;color:var(--muted)}
-  </style>
+    
+    .page-container.collapsed {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        height: auto;
+        max-height: 0;
+        overflow: hidden;
+        z-index: 1000;
+        margin: 0;
+        padding: 0;
+        border-radius: 0 0 var(--radius) var(--radius);
+        background: white;
+        box-shadow: var(--shadow);
+        transition: max-height 0.3s ease;
+    }
+    
+    .sidebar.mobile-open {
+        max-height: 300px;
+        padding: 12px;
+        overflow-y: auto;
+    }
+    
+    .sidebar-container {
+        flex-direction: column;
+    }
+    
+    .sidebar-toggle {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex !important;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: white;
+        border: none;
+        border-radius: var(--radius-sm);
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    
+    .content-area {
+        height: auto;
+        min-height: calc(100vh - 140px);
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .toolbar-row-2 {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    
+    .cards-row {
+        flex-direction: column;
+    }
+    
+    .card {
+        min-width: 100%;
+    }
+    
+    .user-info {
+        gap: 8px;
+    }
+    
+    #userName {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    
+    #logoutBtn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .users-table {
+        font-size: 12px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        font-size: 12px;
+        padding: 8px 6px;
+    }
+    
+    .modal-box {
+        max-width: 95%;
+        padding: 16px;
+    }
+   }
+
+   /* Tablet Styles */
+   @media (min-width: 769px) and (max-width: 1024px) {
+    .page-container {
+        max-width: 95%;
+        grid-template-columns: 220px 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+    
+    .content-area {
+        padding: 15px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        font-size: 13px;
+        padding: 10px 8px;
+    }
+   }
+</style>
 </head>
 <body>
-  <div class="topbar">
-    <div style="display:flex;align-items:center;gap:12px">
-      <img src="assets/MDRRMO Logo.png" class="logo" alt="logo"/>
-      <div>
-        <div class="title">PUROK KALIGTASAN</div>
-        <div class="subtitle muted-note">User Management — Admin</div>
+<div class="page-container">
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+      <div class="brand-text">
+        <h1>PUROK KALIGTASAN</h1>
+        <p>MDRRMO Alitagtag User Management</p>
       </div>
     </div>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <div id="currentUser" class="muted-note">---</div>
-      <button id="logoutBtn" class="btn secondary">Logout</button>
-    </div>
-  </div>
 
-  <aside class="sidebar" style="padding-top:86px">
-    <ul style="list-style:none;padding:18px 12px;margin:0">
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-      <li><a href="dataForm.html">📝 Data Entry</a></li>
-      <li><a href="records.html">📁 Records</a></li>
-      <li><a href="charts.html">📈 Charts</a></li>
-      <li style="margin-top:12px"><a href="users.html" class="active">👥 User Management</a></li>
-    </ul>
+    <div class="user-info">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span id="userName"></span>
+      <button id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-container">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <ul>
+        <li><a href="dashboard.html" title="Dashboard"><span class="menu-icon">📊</span> <span class="menu-text">Dashboard</span></a></li>
+        <li><a href="dataForm.html" title="Data Entry"><span class="menu-icon">📝</span> <span class="menu-text">Data Entry</span></a></li>
+        <li><a href="records.html" title="Records"><span class="menu-icon">📁</span> <span class="menu-text">Records</span></a></li>
+        <li><a href="charts.html" title="Charts"><span class="menu-icon">📈</span> <span class="menu-text">Charts</span></a></li>
+        <li class="admin-only"><a href="users.html" class="active" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
+      </ul>
+    </div>
   </aside>
 
   <main class="content-area">
-    <h2>👥 Users (Admin)</h2>
+    <div class="content-header">
+      <h2><span style="color: var(--accent1);">👥</span> User Management</h2>
+    </div>
 
-    <div style="display:flex;justify-content:space-between;gap:12px;margin:12px 0 18px 0;align-items:center">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="muted-note">Create / Manage system users</div>
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-row-1">
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input id="filterUser" class="search-box" placeholder="Search by username or full name..." />
+        </div>
       </div>
-
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="filterUser" class="small-input" placeholder="Search username / full name..." style="width:320px"/>
-        <button id="viewLogsBtn" class="btn secondary">View Logs</button>
-        <button id="openAddUser" class="btn">Add User</button>
+      
+      <div class="toolbar-row-2">
+        <button id="viewLogsBtn" class="btn btn-secondary">
+          <i class="fas fa-history"></i> View Logs
+        </button>
+        <button id="openAddUser" class="btn">
+          <i class="fas fa-user-plus"></i> Add User
+        </button>
       </div>
     </div>
 
-    <div class="users-grid">
-      <div>
-        <div class="card">
-          <h3>Quick Info</h3>
-          <div style="margin-top:10px" class="cards-row">
-            <div class="card stat-card" style="padding:12px">
-              <div class="muted">Total Users</div>
-              <div id="statTotal" class="stat-value">0</div>
-            </div>
-            <div class="card stat-card" style="padding:12px">
-              <div class="muted">Total Admins</div>
-              <div id="statAdmins" class="stat-value">0</div>
-            </div>
-            <div class="card stat-card" style="padding:12px">
-              <div class="muted">Total Staff</div>
-              <div id="statStaff" class="stat-value">0</div>
-            </div>
-          </div>
-          <div style="margin-top:12px" class="muted-note">Use <strong>Add User</strong> to create accounts. Click ✏️ to edit, 🔑 to reset password, 🗑️ to delete.</div>
-        </div>
+    <!-- Stats Cards -->
+    <div class="cards-row">
+      <div class="card">
+        <h3>Total Users</h3>
+        <div id="statTotal" class="stat-value">0</div>
       </div>
-
-      <div>
-        <div class="card">
-          <h3>Existing Users</h3>
-          <div class="users-table-wrap">
-            <table class="records-table" id="usersTable">
-              <thead>
-                <tr><th>Username</th><th>Full name</th><th>Role</th><th>Barangay</th><th>Actions</th></tr>
-              </thead>
-              <tbody id="usersBody"><tr><td colspan="5" class="muted-note">Loading…</td></tr></tbody>
-            </table>
-          </div>
-        </div>
+      <div class="card">
+        <h3>Admins</h3>
+        <div id="statAdmins" class="stat-value">0</div>
+      </div>
+      <div class="card">
+        <h3>Staff</h3>
+        <div id="statStaff" class="stat-value">0</div>
       </div>
     </div>
+
+    <!-- Users Table -->
+    <div class="users-table-wrap">
+      <table class="users-table" id="usersTable">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Role</th>
+            <th>Barangay</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersBody">
+          <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading users...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </main>
+</div>
 
-  <!-- Drawer -->
-  <div id="userPanelOverlay" class="panel-overlay"></div>
-  <aside id="userDrawer" class="drawer-panel" aria-hidden="true">
-    <div class="panel-header">
-      <button id="drawerBack" class="icon-btn">←</button>
-      <h3 id="drawerTitle">Add New User</h3>
+<!-- Add/Edit User Modal -->
+<div id="userModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add New User</h3>
+      <button id="closeModal" class="icon-btn">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-
-    <div class="panel-body">
-      <form id="userForm" onsubmit="return false;">
-        <div style="display:grid;grid-template-columns:1fr;gap:10px">
-          <div>
-            <label>Username *</label>
-            <input id="user_username" class="small-input" required />
-          </div>
-          <div>
-            <label>Full name</label>
-            <input id="user_fullname" class="small-input" />
-          </div>
-          <div>
-            <label>Role</label>
-            <select id="user_role" class="small-input">
-              <option>Staff</option>
-              <option>Admin</option>
-            </select>
-          </div>
-          <div>
-            <label>Assigned Barangay</label>
-            <select id="user_barangay" class="small-input">
-              <option value="">ALL</option>
-              <option>Balagbag</option><option>Concepcion</option><option>Concordia</option><option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option><option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option><option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option><option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option><option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
-            </select>
-          </div>
-          <div>
-            <label>Password</label>
-            <input id="user_password" type="password" class="small-input" placeholder="Enter password (plaintext)"/>
-            <div class="muted-note" style="margin-top:6px">Leave blank when editing to keep current password.</div>
-          </div>
-          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
-            <div id="userFormStatus" class="muted-note"></div>
-            <button id="cancelUserDrawer" class="btn secondary" type="button">Cancel</button>
-            <button id="saveUserBtn" class="btn" type="button">Create</button>
-          </div>
+    <div class="modal-body">
+      <form id="userForm">
+        <div class="form-group">
+          <label for="user_username">Username *</label>
+          <input id="user_username" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="user_fullname">Full Name</label>
+          <input id="user_fullname" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="user_role">Role</label>
+          <select id="user_role" class="form-control">
+            <option value="Staff">Staff</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="user_barangay">Assigned Barangay</label>
+          <select id="user_barangay" class="form-control">
+            <option value="">ALL</option>
+            <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+            <option>Dalipit East</option><option>Dalipit West</option>
+            <option>Dominador East</option><option>Dominador West</option>
+            <option>Munlawin Sur</option><option>Munlawin Norte</option>
+            <option>Muzon Primero</option><option>Muzon Segundo</option>
+            <option>Pinagkurusan</option><option>Ping-As</option>
+            <option>Poblacion East</option><option>Poblacion West</option>
+            <option>San Jose</option><option>San Juan</option>
+            <option>Santa Cruz</option><option>Tadlac</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="user_password">Password</label>
+          <input id="user_password" type="password" class="form-control" placeholder="Enter new password" />
+          <div class="form-hint">Leave blank when editing to keep current password</div>
         </div>
       </form>
     </div>
-  </aside>
-
-  <!-- Logs Modal -->
-  <div id="logsModal">
-    <div class="modal-box">
-      <h3>Audit Logs</h3>
-      <div style="margin-top:8px;max-height:60vh;overflow:auto">
-        <table class="records-table" id="logsTable">
-          <thead><tr><th>Timestamp</th><th>Action</th><th>Actor</th><th>Target</th><th>TargetID</th><th>Details</th><th>Duration</th></tr></thead>
-          <tbody id="logsBody"><tr><td colspan="7" class="muted-note">No logs yet.</td></tr></tbody>
-        </table>
-      </div>
-      <div style="text-align:right;margin-top:12px">
-        <button id="closeLogs" class="btn secondary">Close</button>
-      </div>
+    <div class="form-actions">
+      <button id="cancelModal" class="btn btn-secondary">Cancel</button>
+      <button id="saveUserBtn" class="btn">Save</button>
     </div>
   </div>
+</div>
 
-  <!-- Toast container -->
-  <div class="toast-wrap" id="toasts"></div>
+<!-- Logs Modal -->
+<div id="logsModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+    <div class="modal-header">
+      <h3>Audit Logs</h3>
+      <button id="closeLogsModal" class="icon-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="users-table-wrap">
+        <table class="users-table" id="logsTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Actor</th>
+              <th>Target</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody">
+            <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading logs...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button id="closeLogsBtn" class="btn btn-secondary">Close</button>
+    </div>
+  </div>
+</div>
 
 <script>
-/* ============================================================
-   USERS.JS — Admin User Management Logic
-   Clean, optimized, with Toast UI + API auth + auto-refresh
-   ============================================================ */
+/* ============ CONFIG ============ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
-
+/* ============ STATE ============ */
 let ALL_USERS = [];
 let EDIT_TARGET = null;
 
-/* ============================================================
-   TOAST / SNACKBAR UI
-   ============================================================ */
-function showToast(msg, type = "info") {
-  let box = document.createElement("div");
-  box.className = `toast toast-${type}`;
-  box.innerText = msg;
-
-  document.body.appendChild(box);
-
-  setTimeout(() => {
-    box.style.opacity = 0;
-    setTimeout(() => box.remove(), 400);
-  }, 2400);
-}
-
-/* Inject CSS for toast */
-const style = document.createElement("style");
-style.textContent = `
-.toast {
-  position: fixed;
-  bottom: 18px;
-  right: 18px;
-  background: #0F7A4A;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  opacity: 1;
-  transition: opacity .4s;
-  z-index: 99999;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
-}
-.toast-error { background: #cc0000; }
-.toast-info { background: #0F7A4A; }
-.toast-warning { background: #ff8800; }
-`;
-document.head.appendChild(style);
-
-/* ============================================================
-   PAGE INITIALIZATION (NO localStorage login)
-   ============================================================ */
-document.addEventListener("DOMContentLoaded", async () => {
-  // Check role using API
-  await verifyAccessRole();
-
-  document.getElementById("logoutBtn").onclick = logout;
-
-  document.getElementById("filterUser").oninput = (e) =>
-    renderUsers(e.target.value.trim().toLowerCase());
-
-  document.getElementById("openAddUser").onclick = () => openDrawer("add");
-  document.getElementById("cancelUserDrawer").onclick = closeDrawer;
-  document.getElementById("drawerBack").onclick = closeDrawer;
-  document.getElementById("userPanelOverlay").onclick = closeDrawer;
-
-  document.getElementById("saveUserBtn").onclick = saveUser;
-  document.getElementById("viewLogsBtn").onclick = loadLogs;
-  document.getElementById("closeLogs").onclick = () =>
-    (document.getElementById("logsModal").style.display = "none");
-
-  loadUsers();
-
-  // Auto-refresh users every 20s
-  setInterval(loadUsers, 20000);
-});
-
-/* ============================================================
-   ROLE VERIFICATION (No LocalStorage)
-   ============================================================ */
-async function verifyAccessRole() {
+/* ============ SESSION CHECK FUNCTION ============ */
+async function sessionCheck(){
   try {
-    const res = await fetch(`${API_URL}?action=sessionCheck`);
-    const data = await res.json();
-
-    if (!data.success || data.role !== "Admin") {
-      window.location.href = "index.html";
-      return;
+    // Try to get user info from localStorage (set during login)
+    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    
+    // If we have a username, show it and allow access
+    if (userName && userName !== "User") {
+      document.getElementById('userName').innerText = userName;
+      
+      // Check admin status
+      const isAdmin = localStorage.getItem("userRole") === "admin";
+      const adminItems = document.querySelectorAll(".admin-only");
+      adminItems.forEach(item => {
+          item.style.display = isAdmin ? "block" : "none";
+      });
+      
+      // Set session flag
+      sessionStorage.setItem('authenticated', 'true');
+      return true;
+    } else {
+      // No user info found in localStorage
+      console.log('No user info found in localStorage');
+      
+      // Check if we have a session flag from before (tab restore, etc.)
+      if(sessionStorage.getItem('authenticated')) {
+        // We were authenticated before, keep going
+        console.log('Session flag found, allowing access');
+        document.getElementById('userName').innerText = "User";
+        return true;
+      } else {
+        // No session at all, redirect to login
+        console.log('No session found, redirecting to login...');
+        window.location.href = 'index.html?session=expired';
+        return false;
+      }
     }
-
-    document.getElementById("userName").innerText = data.fullName || "";
-
-  } catch (err) {
-    showToast("Failed to verify login.", "error");
-    window.location.href = "index.html";
+  } catch(e){ 
+    console.warn('session check failed', e);
+    return false;
   }
 }
 
-/* ============================================================
-   LOGOUT
-   ============================================================ */
-async function logout() {
-  await fetch(`${API_URL}?action=logout`);
-  window.location.href = "index.html";
+/* ============ ENHANCED LOGOUT FUNCTION ============ */
+function handleLogout() {
+  // Clear all storage
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Add a parameter to prevent caching
+  const logoutUrl = 'index.html?logout=true&t=' + Date.now();
+  
+  // Call server-side logout with timestamp to prevent caching
+  fetch(SCRIPT_URL+'?action=logout&t=' + Date.now())
+    .catch(() => { /* ignore errors on logout */ })
+    .finally(() => {
+      // Replace current history entry with login page
+      // This prevents back button from returning to dashboard
+      window.location.replace(logoutUrl);
+    });
 }
 
-/* ============================================================
-   LOAD USERS
-   ============================================================ */
+/* ============ TOAST NOTIFICATION ============ */
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  toast.style.background = type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : 'var(--accent1)';
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+/* ============ LOAD USERS ============ */
 async function loadUsers() {
   try {
-    const res = await fetch(`${API_URL}?action=users`);
+    const res = await fetch(`${SCRIPT_URL}?action=users`);
     const data = await res.json();
-
+    
     if (!data.success) {
-      showToast("Permission denied.", "error");
+      showToast("Failed to load users", "error");
       return;
     }
-
+    
     ALL_USERS = data.users || [];
     renderUsers();
-
-  } catch (err) {
-    showToast("Unable to load users.", "error");
+    updateStats();
+  } catch(err) {
+    console.error(err);
+    showToast("Error loading users", "error");
   }
 }
 
-/* ============================================================
-   RENDER USERS (filters included)
-   ============================================================ */
+/* ============ RENDER USERS ============ */
 function renderUsers(filter = "") {
-  const body = document.getElementById("usersBody");
-  body.innerHTML = "";
-
-  const list = ALL_USERS.filter((u) =>
-    `${u.Username} ${u.FullName} ${u.Role} ${u.AssignedBarangay}`
-      .toLowerCase()
-      .includes(filter)
-  );
-
-  if (list.length === 0) {
-    body.innerHTML = `<tr><td colspan="5">No users found</td></tr>`;
+  const tbody = document.getElementById("usersBody");
+  tbody.innerHTML = "";
+  
+  const filtered = ALL_USERS.filter(user => {
+    const searchStr = `${user.Username} ${user.FullName} ${user.Role} ${user.AssignedBarangay}`.toLowerCase();
+    return searchStr.includes(filter.toLowerCase());
+  });
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No users found</td></tr>`;
     return;
   }
-
-  list.forEach((user) => {
+  
+  filtered.forEach(user => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${escape(user.Username)}</td>
-      <td>${escape(user.FullName)}</td>
-      <td>${escape(user.Role)}</td>
-      <td>${escape(user.AssignedBarangay)}</td>
+      <td>${escapeHtml(user.Username)}</td>
+      <td>${escapeHtml(user.FullName)}</td>
+      <td><span style="padding: 2px 8px; border-radius: 12px; background: ${user.Role === 'Admin' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' ? '#0f7a4a' : '#666'};">${user.Role}</span></td>
+      <td>${escapeHtml(user.AssignedBarangay)}</td>
       <td class="actions-cell">
-        <button class="icon-btn" data-act="edit" data-u="${user.Username}">✏️</button>
-        <button class="icon-btn" data-act="reset" data-u="${user.Username}">🔑</button>
-        <button class="icon-btn" data-act="delete" data-u="${user.Username}">🗑️</button>
+        <button class="icon-btn" onclick="editUser('${user.Username}')" title="Edit">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="icon-btn" onclick="resetPassword('${user.Username}')" title="Reset Password">
+          <i class="fas fa-key"></i>
+        </button>
+        <button class="icon-btn" onclick="deleteUser('${user.Username}')" title="Delete" style="color: #ff4444;">
+          <i class="fas fa-trash"></i>
+        </button>
       </td>
     `;
-    body.appendChild(tr);
+    tbody.appendChild(tr);
   });
-
-  body.querySelectorAll("button[data-act]").forEach((btn) =>
-    btn.addEventListener("click", handleUserAction)
-  );
 }
 
-/* ============================================================
-   USER ACTION HANDLER
-   ============================================================ */
-function handleUserAction(e) {
-  const action = e.target.dataset.act;
-  const username = e.target.dataset.u;
-
-  const user = ALL_USERS.find((x) => x.Username === username);
-
-  if (action === "edit") openDrawer("edit", user);
-  if (action === "reset") resetPassword(username);
-  if (action === "delete") deleteUser(username);
+/* ============ UPDATE STATS ============ */
+function updateStats() {
+  const total = ALL_USERS.length;
+  const admins = ALL_USERS.filter(u => u.Role === 'Admin').length;
+  const staff = ALL_USERS.filter(u => u.Role === 'Staff').length;
+  
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statAdmins').textContent = admins;
+  document.getElementById('statStaff').textContent = staff;
 }
 
-/* ============================================================
-   DRAWER (Open / Close)
-   ============================================================ */
-function openDrawer(mode, user = null) {
-  EDIT_TARGET = mode === "edit" ? user.Username : null;
-
-  document.getElementById("userForm").reset();
-  document.getElementById("drawerTitle").innerText =
-    mode === "edit" ? "Edit User" : "Add User";
-
-  document.getElementById("user_username").disabled = mode === "edit";
-  document.getElementById("saveUserBtn").innerText =
-    mode === "edit" ? "Save Changes" : "Create User";
-
-  if (mode === "edit" && user) {
-    document.getElementById("user_username").value = user.Username;
-    document.getElementById("user_fullname").value = user.FullName;
-    document.getElementById("user_role").value = user.Role;
-    document.getElementById("user_barangay").value = user.AssignedBarangay;
-  }
-
-  document.getElementById("userPanelOverlay").classList.add("show");
-  document.getElementById("userDrawer").classList.add("show");
-}
-
-function closeDrawer() {
-  EDIT_TARGET = null;
-  document.getElementById("userPanelOverlay").classList.remove("show");
-  document.getElementById("userDrawer").classList.remove("show");
-}
-
-/* ============================================================
-   CREATE or UPDATE USER
-   ============================================================ */
-async function saveUser() {
-  const username = document.getElementById("user_username").value.trim();
-  const fullname = document.getElementById("user_fullname").value.trim();
-  const role = document.getElementById("user_role").value;
-  const barangay = document.getElementById("user_barangay").value;
-  const password = document.getElementById("user_password").value.trim();
-
-  if (!username) return showToast("Username required!", "warning");
-
-  const payload = {
-    Username: username,
-    FullName: fullname,
-    Role: role,
-    AssignedBarangay: barangay,
-  };
-
-  if (password) payload.Password = password;
-
-  const body = {
-    action: EDIT_TARGET ? "updateUser" : "createUser",
-    user: payload,
-    target: EDIT_TARGET || "",
-  };
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      showToast(data.message || "Failed", "error");
-      return;
+/* ============ USER OPERATIONS ============ */
+function openUserModal(mode = 'add', username = null) {
+  EDIT_TARGET = username;
+  
+  const modal = document.getElementById('userModal');
+  const title = document.getElementById('modalTitle');
+  const form = document.getElementById('userForm');
+  
+  form.reset();
+  
+  if (mode === 'edit' && username) {
+    title.textContent = 'Edit User';
+    const user = ALL_USERS.find(u => u.Username === username);
+    if (user) {
+      document.getElementById('user_username').value = user.Username;
+      document.getElementById('user_fullname').value = user.FullName;
+      document.getElementById('user_role').value = user.Role;
+      document.getElementById('user_barangay').value = user.AssignedBarangay;
+      document.getElementById('user_username').disabled = true;
     }
-
-    showToast(data.message || "Saved!", "info");
-    closeDrawer();
-    loadUsers();
-
-  } catch (err) {
-    showToast("Request failed", "error");
+  } else {
+    title.textContent = 'Add New User';
+    document.getElementById('user_username').disabled = false;
+    document.getElementById('user_password').required = true;
   }
+  
+  modal.style.display = 'flex';
 }
 
-/* ============================================================
-   RESET PASSWORD
-   ============================================================ */
-async function resetPassword(username) {
-  if (!confirm(`Reset password for ${username}?`)) return;
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "resetPassword",
-        target: username
-      })
-    });
-
-    const data = await res.json();
-    if (data.success) showToast("Password reset!", "info");
-    else showToast("Reset failed", "error");
-
-  } catch (err) {
-    showToast("Failed", "error");
-  }
+function editUser(username) {
+  openUserModal('edit', username);
 }
 
-/* ============================================================
-   DELETE USER
-   ============================================================ */
-async function deleteUser(username) {
-  if (!confirm(`Delete user ${username}?`)) return;
-
+async function saveUser() {
+  const username = document.getElementById('user_username').value.trim();
+  const fullname = document.getElementById('user_fullname').value.trim();
+  const role = document.getElementById('user_role').value;
+  const barangay = document.getElementById('user_barangay').value;
+  const password = document.getElementById('user_password').value.trim();
+  
+  if (!username) {
+    showToast('Username is required', 'error');
+    return;
+  }
+  
+  const payload = {
+    action: EDIT_TARGET ? 'updateUser' : 'createUser',
+    user: {
+      Username: username,
+      FullName: fullname,
+      Role: role,
+      AssignedBarangay: barangay
+    }
+  };
+  
+  if (password) {
+    payload.user.Password = password;
+  }
+  
+  if (EDIT_TARGET) {
+    payload.target = EDIT_TARGET;
+  }
+  
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "deleteUser",
-        target: username
-      })
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
-
+    
     const data = await res.json();
-
+    
     if (data.success) {
-      showToast("User deleted", "info");
+      showToast(data.message || 'User saved successfully', 'success');
+      closeUserModal();
       loadUsers();
     } else {
-      showToast("Delete failed", "error");
+      showToast(data.message || 'Failed to save user', 'error');
     }
-  } catch (err) {
-    showToast("Server error", "error");
+  } catch(err) {
+    console.error(err);
+    showToast('Error saving user', 'error');
   }
 }
 
-/* ============================================================
-   LOAD LOGS
-   ============================================================ */
+async function resetPassword(username) {
+  if (!confirm(`Reset password for user "${username}" to default?`)) return;
+  
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'resetPassword',
+        target: username
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      showToast(data.message || 'Password reset successfully', 'success');
+    } else {
+      showToast(data.message || 'Failed to reset password', 'error');
+    }
+  } catch(err) {
+    console.error(err);
+    showToast('Error resetting password', 'error');
+  }
+}
+
+async function deleteUser(username) {
+  if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) return;
+  
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'deleteUser',
+        target: username
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      showToast(data.message || 'User deleted successfully', 'success');
+      loadUsers();
+    } else {
+      showToast(data.message || 'Failed to delete user', 'error');
+    }
+  } catch(err) {
+    console.error(err);
+    showToast('Error deleting user', 'error');
+  }
+}
+
+/* ============ LOAD LOGS ============ */
 async function loadLogs() {
   try {
-    const res = await fetch(`${API_URL}?action=logs`);
+    const res = await fetch(`${SCRIPT_URL}?action=logs`);
     const data = await res.json();
-
-    const body = document.getElementById("logsBody");
-    body.innerHTML = "";
-
-    (data.logs || []).forEach((log) => {
-      const tr = document.createElement("tr");
+    
+    const tbody = document.getElementById('logsBody');
+    tbody.innerHTML = '';
+    
+    if (!data.logs || data.logs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No logs available</td></tr>`;
+      return;
+    }
+    
+    data.logs.forEach(log => {
+      const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${escape(log.Timestamp)}</td>
-        <td>${escape(log.Action)}</td>
-        <td>${escape(log.Actor)}</td>
-        <td>${escape(log.TargetSheet)}</td>
-        <td>${escape(log.TargetID)}</td>
-        <td>${escape(log.Details)}</td>
+        <td>${escapeHtml(log.Timestamp)}</td>
+        <td>${escapeHtml(log.Action)}</td>
+        <td>${escapeHtml(log.Actor)}</td>
+        <td>${escapeHtml(log.TargetSheet)}</td>
+        <td>${escapeHtml(log.Details)}</td>
       `;
-      body.appendChild(tr);
+      tbody.appendChild(tr);
     });
-
-    document.getElementById("logsModal").style.display = "flex";
-
-  } catch (err) {
-    showToast("Failed to load logs", "error");
+    
+    document.getElementById('logsModal').style.display = 'flex';
+  } catch(err) {
+    console.error(err);
+    showToast('Error loading logs', 'error');
   }
 }
 
-/* ============================================================
-   UTIL
-   ============================================================ */
-function escape(str) {
-  return String(str || "")
-    .replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+/* ============ MODAL CONTROLS ============ */
+function closeUserModal() {
+  document.getElementById('userModal').style.display = 'none';
+  EDIT_TARGET = null;
 }
 
+function closeLogsModal() {
+  document.getElementById('logsModal').style.display = 'none';
+}
+
+/* ============ SIDEBAR TOGGLE ============ */
+function toggleSidebar() {
+    const pageContainer = document.querySelector('.page-container');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const icon = sidebarToggle.querySelector('i');
+    
+    pageContainer.classList.toggle('collapsed');
+    
+    if (pageContainer.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        sidebarToggle.title = "Expand sidebar";
+    } else {
+        icon.className = 'fas fa-bars';
+        sidebarToggle.title = "Collapse sidebar";
+    }
+}
+
+/* ============ MOBILE SIDEBAR TOGGLE ============ */
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const icon = mobileToggle.querySelector('i');
+    
+    sidebar.classList.toggle('mobile-open');
+    
+    if (sidebar.classList.contains('mobile-open')) {
+        icon.className = 'fas fa-times';
+        mobileToggle.title = "Close menu";
+    } else {
+        icon.className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+}
+
+/* ============ UTILITY FUNCTIONS ============ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/* ============ INITIALIZATION ============ */
+window.addEventListener('DOMContentLoaded', async () => {
+  // First check session
+  const isAuthenticated = await sessionCheck();
+  
+  if (isAuthenticated) {
+    // Load data if authenticated
+    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    document.getElementById("userName").innerText = userName;
+    
+    // Check if user is admin
+    const isAdmin = localStorage.getItem("userRole") === "admin";
+    const adminItems = document.querySelectorAll(".admin-only");
+    adminItems.forEach(item => {
+        item.style.display = isAdmin ? "block" : "none";
+    });
+    
+    // Load users
+    loadUsers();
+    
+    // Event listeners
+    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    document.getElementById('openAddUser').addEventListener('click', () => openUserModal('add'));
+    document.getElementById('viewLogsBtn').addEventListener('click', loadLogs);
+    document.getElementById('saveUserBtn').addEventListener('click', saveUser);
+    document.getElementById('cancelModal').addEventListener('click', closeUserModal);
+    document.getElementById('closeModal').addEventListener('click', closeUserModal);
+    document.getElementById('closeLogsBtn').addEventListener('click', closeLogsModal);
+    document.getElementById('closeLogsModal').addEventListener('click', closeLogsModal);
+    document.getElementById('filterUser').addEventListener('input', (e) => renderUsers(e.target.value));
+    document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+    document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileSidebar);
+    
+    // Close modals on overlay click
+    document.getElementById('userModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('userModal')) closeUserModal();
+    });
+    
+    document.getElementById('logsModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('logsModal')) closeLogsModal();
+    });
+    
+    // Close mobile sidebar on click outside
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const mobileToggle = document.getElementById('mobileMenuToggle');
+      
+      if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target) && sidebar.classList.contains('mobile-open')) {
+          sidebar.classList.remove('mobile-open');
+          mobileToggle.querySelector('i').className = 'fas fa-bars';
+          mobileToggle.title = "Open menu";
+        }
+      }
+    });
+    
+    // Auto-refresh users every 30 seconds
+    setInterval(loadUsers, 30000);
+  }
+});
+
+/* ============ PREVENT BACK BUTTON ISSUES ============ */
+window.addEventListener('pageshow', function(event) {
+  // If page is loaded from cache (back/forward button)
+  if (event.persisted) {
+    console.log('Page loaded from cache, checking session...');
+    
+    // Don't automatically redirect. Just check session and reload data
+    sessionCheck().then(isAuthenticated => {
+      if (isAuthenticated) {
+        loadUsers();
+      }
+    });
+  }
+});
+
+/* ============ WINDOW RESIZE HANDLER ============ */
+window.addEventListener('resize', function() {
+  if (window.innerWidth > 768) {
+    // On desktop, ensure sidebar is not in mobile-open state
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    
+    sidebar.classList.remove('mobile-open');
+    mobileToggle.querySelector('i').className = 'fas fa-bars';
+    mobileToggle.title = "Open menu";
+  }
+});
 </script>
 </body>
 </html>
-
-
-
-
+[file content end]
