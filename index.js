@@ -1,11 +1,10 @@
-/* index.js — UPDATED FOR BOUND SCRIPT */
-// For bound scripts (Google Apps Script attached to a Spreadsheet), the URL format is different
-// It should be: https://script.google.com/macros/s/[SCRIPT_ID]/exec
-// But since this is a bound script, you need to deploy it as a web app first
-// After deployment, use the deployment URL here
-
-// Replace this with your actual deployment URL (you'll get this after deploying the web app)
+/* index.js — UPDATED WITH SINGLE-SESSION RESTRICTION */
+// Replace this with your actual deployment URL
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+
+// Session timeout (30 minutes = 1800000 ms)
+const SESSION_TIMEOUT = 30 * 60 * 1000;
+let sessionActivityTimer = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Login page loaded");
@@ -18,7 +17,46 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Test API connection on load
     setTimeout(testAPIConnection, 1000);
+    
+    // Check if user was previously logged in
+    checkPreviousSession();
 });
+
+// --------------------------
+// Get Device Information
+// --------------------------
+function getDeviceInfo() {
+    return {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        screenResolution: `${screen.width}x${screen.height}`,
+        deviceType: /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+        timestamp: new Date().toISOString(),
+        browser: getBrowserName(),
+        os: getOSName()
+    };
+}
+
+function getBrowserName() {
+    const userAgent = navigator.userAgent;
+    if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) return "Chrome";
+    if (userAgent.includes("Firefox")) return "Firefox";
+    if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) return "Safari";
+    if (userAgent.includes("Edg")) return "Edge";
+    if (userAgent.includes("Opera") || userAgent.includes("OPR")) return "Opera";
+    return "Unknown";
+}
+
+function getOSName() {
+    const userAgent = navigator.userAgent;
+    if (userAgent.includes("Windows")) return "Windows";
+    if (userAgent.includes("Mac")) return "MacOS";
+    if (userAgent.includes("Linux")) return "Linux";
+    if (userAgent.includes("Android")) return "Android";
+    if (userAgent.includes("iOS") || userAgent.includes("iPhone") || userAgent.includes("iPad")) return "iOS";
+    return "Unknown";
+}
 
 // --------------------------
 // SHA-256 Hash Function
@@ -32,7 +70,31 @@ async function sha256(str) {
 }
 
 // --------------------------
-// LOGIN HANDLER - UPDATED
+// Check Previous Session
+// --------------------------
+function checkPreviousSession() {
+    const loggedIn = localStorage.getItem("loggedIn");
+    const loginTime = localStorage.getItem("loginTime");
+    
+    if (loggedIn === "true" && loginTime) {
+        const currentTime = Date.now();
+        const loginTimestamp = parseInt(loginTime);
+        const sessionAge = currentTime - loginTimestamp;
+        
+        if (sessionAge < SESSION_TIMEOUT) {
+            // Session is still valid, redirect to dashboard
+            console.log("Previous session found, redirecting...");
+            window.location.href = "dashboard.html";
+        } else {
+            // Session expired, clear storage
+            console.log("Previous session expired, clearing storage...");
+            clearSessionData();
+        }
+    }
+}
+
+// --------------------------
+// LOGIN HANDLER - UPDATED WITH SINGLE-SESSION CHECK
 // --------------------------
 async function handleLogin(event) {
     event.preventDefault();
@@ -70,53 +132,38 @@ async function handleLogin(event) {
         const pwHash = await sha256(password);
         console.log("Password hash generated (first 10 chars):", pwHash.substring(0, 10) + "...");
         
-        // Prepare request data - matching code.gs structure
+        // Get device information
+        const deviceInfo = getDeviceInfo();
+        console.log("Device info:", deviceInfo);
+        
+        // Prepare request data
         const requestData = {
             action: "login",
             username: username,
-            pwHash: pwHash
+            pwHash: pwHash,
+            deviceInfo: JSON.stringify(deviceInfo)
         };
         
         console.log("Sending login request to:", API_URL);
         console.log("Request data:", requestData);
 
-        // Send POST request - IMPORTANT: Use FormData or JSON based on your code.gs
+        // Send POST request
         const startTime = Date.now();
-        const formData = new FormData();
-        formData.append("action", "login");
-        formData.append("username", username);
-        formData.append("pwHash", pwHash);
-        
-        const response = await fetch(API_URL, {
-            method: "POST",
-            body: formData,
-            mode: 'no-cors' // IMPORTANT: Google Apps Script requires no-cors mode
-        });
-        
+        const response = await fetchJSON(API_URL, requestData);
         const endTime = Date.now();
         console.log(`Request completed in ${endTime - startTime}ms`);
         
-        // Note: With 'no-cors' mode, we can't read the response directly
-        // This is a limitation of Google Apps Script web apps
-        // You'll need to handle redirection or other methods
-        
-        // Alternative approach: Use JSONP or iframe for Google Apps Script
-        // For now, let's assume login is successful and redirect to dashboard
-        console.log("Assuming login successful for bound script...");
-        
-        // For bound scripts, you might need a different approach
-        // Since we can't read the response with 'no-cors', let's try a different method
-        
-        // Try with JSON request
-        const jsonResponse = await fetchJSON(API_URL, {
-            action: "login",
-            username: username,
-            pwHash: pwHash
-        });
-        
-        if (!jsonResponse.success) {
-            console.log("Login failed:", jsonResponse.message);
-            showError("Login failed: " + jsonResponse.message);
+        if (!response.success) {
+            console.log("Login failed:", response.message);
+            
+            // Handle "already logged in" error
+            if (response.code === "ALREADY_LOGGED_IN") {
+                // Show custom error with force logout option
+                showAlreadyLoggedInError(username, password, response);
+            } else {
+                showError("Login failed: " + response.message);
+            }
+            
             loginBtn.classList.remove("btn-loading");
             loginBtn.disabled = false;
             return;
@@ -125,35 +172,17 @@ async function handleLogin(event) {
         // -------------------------------
         // LOGIN SUCCESS
         // -------------------------------
-        console.log("Login successful! User data:", jsonResponse.user);
+        console.log("Login successful! User data:", response.user);
         msg.innerText = "Login successful! Redirecting...";
         msg.style.color = "green";
 
-        // Clear any existing storage
-        localStorage.clear();
-        sessionStorage.clear();
+        // Store session data
+        storeSessionData(response.user, pwHash);
         
-        // Set new session data
-        localStorage.setItem("loggedIn", "true");
-        localStorage.setItem("username", jsonResponse.user.Username);
-        localStorage.setItem("staffName", jsonResponse.user.FullName);
-        localStorage.setItem("userRole", jsonResponse.user.Role);
-        localStorage.setItem("role", jsonResponse.user.Role);
-        localStorage.setItem("assignedBarangay", jsonResponse.user.AssignedBarangay || "");
-        localStorage.setItem("pwHash", pwHash);
-        localStorage.setItem("loginTime", Date.now().toString());
-
-        // Set a session flag
-        sessionStorage.setItem("authenticated", "true");
-
-        console.log("LocalStorage set successfully. Items:", {
-            username: jsonResponse.user.Username,
-            staffName: jsonResponse.user.FullName,
-            userRole: jsonResponse.user.Role,
-            assignedBarangay: jsonResponse.user.AssignedBarangay
-        });
-
-        // Redirect to dashboard.html
+        // Start session activity tracking
+        startSessionActivityTracking(username);
+        
+        // Redirect to dashboard
         console.log("Redirecting to dashboard.html...");
         setTimeout(() => {
             window.location.replace("dashboard.html");
@@ -168,10 +197,222 @@ async function handleLogin(event) {
     }
 }
 
-// Helper function for making JSON requests to Google Apps Script
+// --------------------------
+// Handle "Already Logged In" Error
+// --------------------------
+async function showAlreadyLoggedInError(username, password, errorResponse) {
+    const errorDiv = document.getElementById("loginError");
+    const loginBtn = document.getElementById("loginButton");
+    
+    // Create custom error message
+    let errorMessage = `
+        <div class="already-logged-in-error">
+            <div style="margin-bottom: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: #ff9800; margin-right: 8px;"></i>
+                <strong>Account Already in Use</strong>
+            </div>
+            <div style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                ${errorResponse.message}
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="force-logout-btn" onclick="handleForceLogout('${username}', '${password}')" style="padding: 8px 16px; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>
+                    Force Logout
+                </button>
+                <button type="button" class="cancel-btn" onclick="closeError()" style="padding: 8px 16px; background: #f0f0f0; color: #666; border: none; border-radius: 4px; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    
+    errorDiv.innerHTML = errorMessage;
+    errorDiv.style.display = "block";
+    
+    // Re-enable login button
+    loginBtn.classList.remove("btn-loading");
+    loginBtn.disabled = false;
+}
+
+// --------------------------
+// Force Logout Handler
+// --------------------------
+async function handleForceLogout(username, password) {
+    console.log("Force logout requested for:", username);
+    
+    const errorDiv = document.getElementById("loginError");
+    const loginBtn = document.getElementById("loginButton");
+    
+    // Show loading state
+    errorDiv.innerHTML = `
+        <div style="text-align: center; padding: 10px;">
+            <div class="btn-loading" style="margin: 0 auto;"></div>
+            <div style="margin-top: 10px; color: #666;">Logging out other session...</div>
+        </div>
+    `;
+    
+    try {
+        // Call force logout API
+        const response = await fetchJSON(API_URL, {
+            action: "forceLogout",
+            username: username
+        });
+        
+        if (response.success) {
+            console.log("Force logout successful");
+            
+            // Wait a moment, then retry login
+            setTimeout(async () => {
+                // Re-enable login button
+                loginBtn.classList.remove("btn-loading");
+                loginBtn.disabled = false;
+                
+                // Close error message
+                errorDiv.style.display = "none";
+                
+                // Retry login automatically
+                const pwHash = await sha256(password);
+                const deviceInfo = getDeviceInfo();
+                
+                const loginResponse = await fetchJSON(API_URL, {
+                    action: "login",
+                    username: username,
+                    pwHash: pwHash,
+                    deviceInfo: JSON.stringify(deviceInfo)
+                });
+                
+                if (loginResponse.success) {
+                    // Login successful
+                    storeSessionData(loginResponse.user, pwHash);
+                    startSessionActivityTracking(username);
+                    window.location.replace("dashboard.html");
+                } else {
+                    showError("Login failed after force logout: " + loginResponse.message);
+                }
+            }, 1000);
+        } else {
+            showError("Force logout failed: " + response.message);
+            loginBtn.classList.remove("btn-loading");
+            loginBtn.disabled = false;
+        }
+    } catch (err) {
+        console.error("Force logout error:", err);
+        showError("Error during force logout: " + err.message);
+        loginBtn.classList.remove("btn-loading");
+        loginBtn.disabled = false;
+    }
+}
+
+// --------------------------
+// Close Error Message
+// --------------------------
+function closeError() {
+    const errorDiv = document.getElementById("loginError");
+    errorDiv.style.display = "none";
+    errorDiv.innerHTML = "";
+}
+
+// --------------------------
+// Store Session Data
+// --------------------------
+function storeSessionData(user, pwHash) {
+    // Clear any existing storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Set new session data
+    localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("username", user.Username);
+    localStorage.setItem("staffName", user.FullName);
+    localStorage.setItem("userRole", user.Role);
+    localStorage.setItem("role", user.Role);
+    localStorage.setItem("assignedBarangay", user.AssignedBarangay || "");
+    localStorage.setItem("pwHash", pwHash);
+    localStorage.setItem("loginTime", Date.now().toString());
+    localStorage.setItem("deviceInfo", JSON.stringify(getDeviceInfo()));
+
+    // Set a session flag
+    sessionStorage.setItem("authenticated", "true");
+
+    console.log("LocalStorage set successfully. Items:", {
+        username: user.Username,
+        staffName: user.FullName,
+        userRole: user.Role,
+        assignedBarangay: user.AssignedBarangay
+    });
+}
+
+// --------------------------
+// Clear Session Data
+// --------------------------
+function clearSessionData() {
+    localStorage.clear();
+    sessionStorage.clear();
+    console.log("Session data cleared");
+}
+
+// --------------------------
+// Start Session Activity Tracking
+// --------------------------
+function startSessionActivityTracking(username) {
+    // Clear any existing timer
+    if (sessionActivityTimer) {
+        clearInterval(sessionActivityTimer);
+    }
+    
+    // Update activity every 5 minutes
+    sessionActivityTimer = setInterval(async () => {
+        try {
+            await fetchJSON(API_URL, {
+                action: "logActivity",
+                username: username,
+                action: "Session Activity"
+            });
+            console.log("Session activity updated");
+        } catch (err) {
+            console.error("Failed to update session activity:", err);
+        }
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    // Also update on user interactions
+    const updateActivity = debounce(async () => {
+        try {
+            await fetchJSON(API_URL, {
+                action: "logActivity",
+                username: username,
+                action: "User Interaction"
+            });
+        } catch (err) {
+            console.error("Failed to update activity on interaction:", err);
+        }
+    }, 30000); // 30 seconds debounce
+    
+    ['click', 'keypress', 'mousemove', 'scroll'].forEach(eventType => {
+        document.addEventListener(eventType, updateActivity, { passive: true });
+    });
+}
+
+// --------------------------
+// Debounce Helper
+// --------------------------
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// --------------------------
+// Helper Functions
+// --------------------------
 async function fetchJSON(url, data) {
     try {
-        // Convert data to URL-encoded form data
+        // Convert data to FormData for Google Apps Script
         const formData = new FormData();
         for (const key in data) {
             formData.append(key, data[key]);
@@ -201,7 +442,6 @@ async function fetchJSON(url, data) {
     }
 }
 
-// Helper function to show errors
 function showError(message) {
     console.error("Showing error:", message);
     const errorDiv = document.getElementById("loginError");
@@ -216,7 +456,6 @@ function showError(message) {
     }
 }
 
-// Test function to check API connectivity
 async function testAPIConnection() {
     console.log("Testing API connection...");
     try {
@@ -248,22 +487,6 @@ async function testAPIConnection() {
     }
 }
 
-// For Google Apps Script web apps, we need to handle CORS differently
-// Add this function to handle cross-origin requests
-function setupCORSWorkaround() {
-    // Add a hidden iframe for making cross-origin requests
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.name = 'gsapi';
-    document.body.appendChild(iframe);
-    
-    // Create a form for submitting to Google Apps Script
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.target = 'gsapi';
-    form.action = API_URL;
-    form.style.display = 'none';
-    document.body.appendChild(form);
-    
-    return form;
-}
+// Make functions available globally
+window.handleForceLogout = handleForceLogout;
+window.closeError = closeError;
