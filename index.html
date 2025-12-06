@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login — Purok Kaligtasan | MDRRMO Alitagtag</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -40,6 +40,7 @@
             padding: 20px;
             position: relative;
             overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
         }
 
         /* Background decorative elements - made smaller */
@@ -190,6 +191,8 @@
 
         .input-with-icon {
             position: relative;
+            display: block;
+            width: 100%;
         }
 
         .input-icon {
@@ -199,25 +202,37 @@
             transform: translateY(-50%);
             color: var(--text-light);
             font-size: 1rem; /* Reduced from 1.1rem */
+            pointer-events: none;
+            z-index: 1;
         }
 
         .form-input {
             width: 100%;
-            padding: 14px 14px 14px 42px; /* Reduced from 16px 16px 16px 48px */
+            padding: 14px 40px 14px 42px; /* Right padding for eye button */
             border: 2px solid var(--medium-gray);
             border-radius: var(--radius-sm);
-            font-size: 0.95rem; /* Reduced from 1rem */
+            font-size: 16px; /* IMPORTANT: Set to 16px to prevent iOS zoom */
             color: var(--text-dark);
             background: var(--white);
             transition: all 0.3s ease;
             -webkit-appearance: none;
             appearance: none;
+            line-height: 1.5;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 0;
         }
 
-        /* Fix for iOS input */
+        /* Prevent iOS zoom on input focus */
         @media screen and (max-width: 768px) {
             .form-input {
-                font-size: 16px; /* Prevent iOS zoom */
+                font-size: 16px !important; /* Force 16px on mobile */
+                transform: scale(1); /* Prevent scaling */
+                transform-origin: left center;
+            }
+            
+            .form-input:focus {
+                font-size: 16px !important;
             }
         }
 
@@ -225,6 +240,7 @@
             outline: none;
             border-color: var(--primary-green);
             box-shadow: 0 0 0 3px rgba(15, 122, 74, 0.1);
+            transform: scale(1);
         }
 
         .form-input::placeholder {
@@ -266,6 +282,8 @@
             font-size: 0.85rem; /* Smaller font */
             transition: all 0.2s;
             font-weight: 500;
+            display: inline-block;
+            text-align: center;
         }
 
         .force-logout-btn {
@@ -295,6 +313,7 @@
             padding: 8px 10px; /* Reduced */
             background: var(--light-gray);
             border-radius: var(--radius-sm);
+            line-height: 1.4;
         }
 
         /* Login button - smaller */
@@ -316,6 +335,8 @@
             margin-top: 8px;
             -webkit-tap-highlight-color: rgba(15, 122, 74, 0.3);
             touch-action: manipulation;
+            position: relative;
+            box-sizing: border-box;
         }
 
         .login-btn:hover {
@@ -347,10 +368,10 @@
             opacity: 0.8;
         }
 
-        /* Password toggle */
+        /* Password toggle - FIXED to prevent resize */
         .password-toggle {
             position: absolute;
-            right: 14px; /* Reduced from 16px */
+            right: 12px; /* Reduced from 14px */
             top: 50%;
             transform: translateY(-50%);
             background: none;
@@ -360,6 +381,17 @@
             font-size: 1rem; /* Reduced from 1.1rem */
             padding: 6px; /* Reduced from 8px */
             -webkit-tap-highlight-color: transparent;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            box-sizing: border-box;
+        }
+
+        .password-toggle i {
+            pointer-events: none;
         }
 
         /* Loading state */
@@ -386,6 +418,7 @@
         @media (max-width: 480px) {
             .login-container {
                 max-width: 100%;
+                margin: 0 15px;
             }
             
             .login-header {
@@ -403,12 +436,25 @@
             .circle-1, .circle-2, .circle-3 {
                 display: none;
             }
+            
+            .form-input {
+                padding: 14px 38px 14px 40px; /* Adjust for smaller screens */
+            }
         }
 
         /* iOS Safari specific fix */
         @supports (-webkit-touch-callout: none) {
             body {
                 min-height: -webkit-fill-available;
+            }
+            
+            .form-input {
+                font-size: 16px !important; /* Force 16px on iOS */
+                line-height: 1.5;
+            }
+            
+            .login-container {
+                max-height: -webkit-fill-available;
             }
         }
 
@@ -421,6 +467,15 @@
             
             .login-container {
                 margin: 10px auto;
+                max-width: 90%;
+            }
+            
+            .login-header {
+                padding: 15px 16px;
+            }
+            
+            .login-form-container {
+                padding: 20px 16px;
             }
         }
 
@@ -428,6 +483,22 @@
         @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
             .login-container {
                 max-width: 400px; /* Slightly larger for tablets */
+            }
+        }
+
+        /* Prevent form zoom on iOS */
+        @media screen and (max-width: 767px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Disable auto-zoom on iOS */
+        @media screen and (-webkit-min-device-pixel-ratio:0) { 
+            select,
+            textarea,
+            input {
+                font-size: 16px !important;
             }
         }
     </style>
@@ -447,7 +518,7 @@
             <div class="badge">SECURE LOGIN</div>
             <div class="logo-container">
                 <div class="logo-circle">
-                    <img src="assets/logo.png" alt="MDRRMO Logo">
+                    <img src="assets/logo.png" alt="MDRRMO Logo" onerror="this.style.display='none'">
                 </div>
                 <h1 class="header-title">PUROK KALIGTASAN</h1>
                 <p class="header-subtitle">MDRRMO Alitagtag Household Records System</p>
@@ -466,7 +537,7 @@
             <p id="statusText"></p>
 
             <!-- Login form -->
-            <form id="loginForm">
+            <form id="loginForm" autocomplete="on">
                 <!-- Username field -->
                 <div class="form-group">
                     <label for="username" class="form-label">Username</label>
@@ -477,7 +548,10 @@
                                class="form-input" 
                                placeholder="Enter your username" 
                                required
-                               autocomplete="username">
+                               autocomplete="username"
+                               autocapitalize="none"
+                               autocorrect="off"
+                               spellcheck="false">
                     </div>
                 </div>
 
@@ -491,8 +565,12 @@
                                class="form-input" 
                                placeholder="Enter your password" 
                                required
-                               autocomplete="current-password">
-                        <button type="button" class="password-toggle" id="togglePassword">
+                               autocomplete="current-password"
+                               autocapitalize="none"
+                               autocorrect="off"
+                               spellcheck="false"
+                               enterkeyhint="go">
+                        <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -514,8 +592,11 @@
     </div>
 
     <script>
-        // Password visibility toggle
-        document.getElementById('togglePassword').addEventListener('click', function() {
+        // Password visibility toggle - FIXED to prevent resize
+        document.getElementById('togglePassword').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
             
@@ -523,11 +604,16 @@
                 passwordInput.type = 'text';
                 icon.classList.remove('fa-eye');
                 icon.classList.add('fa-eye-slash');
+                this.setAttribute('aria-label', 'Hide password');
             } else {
                 passwordInput.type = 'password';
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
+                this.setAttribute('aria-label', 'Show password');
             }
+            
+            // Prevent any layout shift
+            passwordInput.focus();
         });
 
         // Set status message
@@ -558,12 +644,22 @@
             }
         });
 
-        // Prevent zoom on iOS
+        // Prevent zoom on iOS - Improved
         document.addEventListener('touchstart', function(event) {
             if (event.touches.length > 1) {
                 event.preventDefault();
             }
         }, { passive: false });
+
+        // Prevent double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
 
         // Handle iOS Safari 100vh issue
         function setAppHeight() {
@@ -573,69 +669,22 @@
         
         window.addEventListener('resize', setAppHeight);
         window.addEventListener('DOMContentLoaded', setAppHeight);
-
-    <script>
-        // Password visibility toggle
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-
-        // Set status message
-        window.addEventListener('DOMContentLoaded', () => {
-            const statusText = document.getElementById('statusText');
-            const hour = new Date().getHours();
-            
-            if (hour < 12) {
-                statusText.textContent = 'Good morning! Please login to continue.';
-            } else if (hour < 18) {
-                statusText.textContent = 'Good afternoon! Please login to continue.';
-            } else {
-                statusText.textContent = 'Good evening! Please login to continue.';
-            }
-            
-            // Focus on username field
-            document.getElementById('username').focus();
-        });
-
-        // Add enter key navigation
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const focused = document.activeElement;
-                if (focused.id === 'username') {
-                    document.getElementById('password').focus();
-                    e.preventDefault();
+        window.addEventListener('orientationchange', setAppHeight);
+        
+        // Initialize
+        setAppHeight();
+        
+        // Prevent form zoom on focus for iOS
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+            document.addEventListener('focus', function(event) {
+                if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                    setTimeout(function() {
+                        event.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
                 }
-            }
-        });
-
-        // Prevent zoom on iOS
-        document.addEventListener('touchstart', function(event) {
-            if (event.touches.length > 1) {
-                event.preventDefault();
-            }
-        }, { passive: false });
-
-        // Handle iOS Safari 100vh issue
-        function setAppHeight() {
-            const doc = document.documentElement;
-            doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+            }, true);
         }
-        
-        window.addEventListener('resize', setAppHeight);
-        window.addEventListener('DOMContentLoaded', setAppHeight);
     </script>
     <script src="index.js"></script>
 </body>
 </html>
-
