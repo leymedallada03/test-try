@@ -1145,7 +1145,7 @@
       <button class="tab-btn" data-tab="audit">Audit Logs</button>
     </div>
     
-    <!-- User Activity Tab -->
+    <!-- User Activity Tab - FIXED TABLE -->
     <div class="tab-content active" id="activityTab">
       <div class="stats-container" style="justify-content: flex-start; margin-bottom: 16px;">
         <div class="stat-item">
@@ -1167,7 +1167,7 @@
         <input id="searchActivity" class="search-box" placeholder="Search users..." />
       </div>
       
-      <div class="users-table-wrap">
+      <div class="users-table-wrap" style="min-height: 300px;">
         <table class="users-table" id="activityTable">
           <thead>
             <tr>
@@ -1177,15 +1177,56 @@
               <th>Last Activity</th>
               <th>Active Time</th>
               <th>Session Duration</th>
-              <th>IP Address</th>
+              <!-- REMOVED: IP Address column -->
             </tr>
           </thead>
           <tbody id="activityBody">
-            <tr><td colspan="7" style="text-align: center; padding: 20px;">Loading activity data...</td></tr>
+            <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading activity data...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+    
+    <!-- Audit Logs Tab - WITH CATEGORIES -->
+    <div class="tab-content" id="auditTab">
+      <div class="tabs" style="margin-bottom: 16px; border-bottom: 1px solid var(--border);">
+        <button class="tab-btn-small active" data-category="all">All Logs</button>
+        <button class="tab-btn-small" data-category="today">Today</button>
+        <button class="tab-btn-small" data-category="yesterday">Yesterday</button>
+        <button class="tab-btn-small" data-category="older">Older</button>
+      </div>
+      
+      <div class="search-container" style="margin-bottom: 16px;">
+        <i class="fas fa-search"></i>
+        <input id="searchAudit" class="search-box" placeholder="Search audit logs..." />
+      </div>
+      
+      <div class="users-table-wrap" style="min-height: 300px;">
+        <table class="users-table" id="logsTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Actor</th>
+              <th>Target</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody">
+            <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading logs...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button id="refreshLogs" class="btn btn-secondary">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+      <button id="closeLogsBtn" class="btn">Close</button>
+    </div>
+  </div>
+</div>
     
     <!-- Audit Logs Tab -->
     <div class="tab-content" id="auditTab">
@@ -2025,6 +2066,7 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
+
 
 
 
