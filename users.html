@@ -1182,19 +1182,17 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuy
 /* ============ STATE ============ */
 let ALL_USERS = [];
 let EDIT_TARGET = null;
-let CURRENT_ROLE_FILTER = 'all'; // 'all', 'Admin', 'Staff'
+let CURRENT_ROLE_FILTER = 'all';
+let AUDIT_LOGS_DATA = null;
 
-/* ============ SESSION CHECK FUNCTION ============ */
+/* ============ SESSION CHECK ============ */
 async function sessionCheck(){
   try {
-    // Try to get user info from localStorage (set during login)
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     
-    // If we have a username, show it and allow access
     if (userName && userName !== "User") {
       document.getElementById('userName').innerText = userName;
       
-      // Check admin status - FIXED: Your login returns lowercase "admin"
       const userRole = localStorage.getItem("userRole");
       const isAdmin = userRole === "admin" || userRole === "Admin";
       const adminItems = document.querySelectorAll(".admin-only");
@@ -1202,22 +1200,13 @@ async function sessionCheck(){
           item.style.display = isAdmin ? "block" : "none";
       });
       
-      // Set session flag
       sessionStorage.setItem('authenticated', 'true');
       return true;
     } else {
-      // No user info found in localStorage
-      console.log('No user info found in localStorage');
-      
-      // Check if we have a session flag from before (tab restore, etc.)
       if(sessionStorage.getItem('authenticated')) {
-        // We were authenticated before, keep going
-        console.log('Session flag found, allowing access');
         document.getElementById('userName').innerText = "User";
         return true;
       } else {
-        // No session at all, redirect to login
-        console.log('No session found, redirecting to login...');
         window.location.href = 'index.html?session=expired';
         return false;
       }
@@ -1228,24 +1217,18 @@ async function sessionCheck(){
   }
 }
 
-/* ============ ENHANCED LOGOUT FUNCTION ============ */
+/* ============ LOGOUT ============ */
 function handleLogout() {
-  // Get username before clearing storage
   const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
   
-  // Clear all storage
   localStorage.clear();
   sessionStorage.clear();
   
-  // Add a parameter to prevent caching
   const logoutUrl = 'index.html?logout=true&t=' + Date.now();
   
-  // Call server-side logout with timestamp to prevent caching
   fetch(SCRIPT_URL+'?action=logout&t=' + Date.now())
-    .catch(() => { /* ignore errors on logout */ })
+    .catch(() => {})
     .finally(() => {
-      // Replace current history entry with login page
-      // This prevents back button from returning to dashboard
       window.location.replace(logoutUrl);
     });
 }
@@ -1269,16 +1252,13 @@ function showToast(message, type = 'info') {
 /* ============ LOAD USERS ============ */
 async function loadUsers() {
   try {
-    // Use GET request for fetching users (doGet handles this)
     const res = await fetch(`${SCRIPT_URL}?action=users`);
     const text = await res.text();
-    console.log("Raw response:", text);
     
     let data;
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("Failed to parse JSON:", e);
       showToast("Invalid response from server", "error");
       return;
     }
@@ -1289,11 +1269,9 @@ async function loadUsers() {
     }
     
     ALL_USERS = data.users || [];
-    console.log("Loaded users:", ALL_USERS);
     renderUsers();
     updateStats();
   } catch(err) {
-    console.error("Error loading users:", err);
     showToast("Error loading users: " + err.message, "error");
   }
 }
@@ -1303,7 +1281,6 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
   const tbody = document.getElementById("usersBody");
   tbody.innerHTML = "";
   
-  // Apply role filter
   let filtered = ALL_USERS;
   if (roleFilter !== 'all') {
     filtered = ALL_USERS.filter(user => 
@@ -1311,7 +1288,6 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
     );
   }
   
-  // Apply search filter
   if (filter) {
     filtered = filtered.filter(user => {
       const searchStr = `${user.Username} ${user.FullName} ${user.Role} ${user.AssignedBarangay}`.toLowerCase();
@@ -1320,7 +1296,6 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
   }
   
   if (filtered.length === 0) {
-    // Show empty state with centered text that matches table structure
     tbody.innerHTML = `
       <tr>
         <td colspan="5" style="text-align: center; padding: 40px 20px; color: var(--muted); font-style: italic;">
@@ -1369,17 +1344,15 @@ function updateStats() {
   document.getElementById('statStaff').textContent = staff;
 }
 
-/* ============ SIMPLE ROLE TOGGLE FUNCTION ============ */
+/* ============ ROLE TOGGLE ============ */
 function setupRoleToggle() {
   const toggleButtons = document.querySelectorAll('#roleToggle .toggle-btn');
   
-  // Load saved filter from localStorage
   const savedFilter = localStorage.getItem('roleFilter');
   if (savedFilter) {
     CURRENT_ROLE_FILTER = savedFilter;
   }
   
-  // Set initial active state
   toggleButtons.forEach(btn => {
     if (btn.getAttribute('data-role') === CURRENT_ROLE_FILTER) {
       btn.classList.add('active');
@@ -1388,26 +1361,16 @@ function setupRoleToggle() {
     }
   });
   
-  // Add click event listeners
   toggleButtons.forEach(btn => {
     btn.addEventListener('click', function() {
-      // Remove active class from all buttons
       toggleButtons.forEach(b => b.classList.remove('active'));
-      
-      // Add active class to clicked button
       this.classList.add('active');
       
-      // Get the role from data attribute
       const role = this.getAttribute('data-role');
       CURRENT_ROLE_FILTER = role;
-      
-      // Save to localStorage
       localStorage.setItem('roleFilter', role);
       
-      // Get current search filter value
       const searchFilter = document.getElementById('filterUser').value;
-      
-      // Render users with updated filters
       renderUsers(searchFilter, role);
     });
   });
@@ -1442,7 +1405,6 @@ function openUserModal(mode = 'add', username = null) {
     document.getElementById('user_password').placeholder = "Enter new password";
   }
   
-  // Reset password toggle to eye icon
   const toggleIcon = document.querySelector('#toggleModalPassword i');
   if (toggleIcon) {
     toggleIcon.className = 'fas fa-eye';
@@ -1453,8 +1415,6 @@ function openUserModal(mode = 'add', username = null) {
   }
   
   modal.style.display = 'flex';
-  
-  // Setup password toggle
   setupPasswordToggle();
 }
 
@@ -1462,7 +1422,6 @@ function editUser(username) {
   openUserModal('edit', username);
 }
 
-/* ============ FIXED SAVE USER FUNCTION ============ */
 async function saveUser() {
   const username = document.getElementById('user_username').value.trim();
   const fullname = document.getElementById('user_fullname').value.trim();
@@ -1470,23 +1429,25 @@ async function saveUser() {
   const barangay = document.getElementById('user_barangay').value;
   const password = document.getElementById('user_password').value.trim();
   
+  const currentUser = localStorage.getItem("username") || 
+                     localStorage.getItem("staffName") || 
+                     "System";
+  
   if (!username) {
     showToast('Username is required', 'error');
     return;
   }
   
-  // For new users, password is required
   if (!EDIT_TARGET && !password) {
     showToast('Password is required for new users', 'error');
     return;
   }
   
   try {
-    // Use FormData with individual fields (not JSON)
     const formData = new FormData();
     formData.append('action', EDIT_TARGET ? 'updateUser' : 'createUser');
+    formData.append('actor', currentUser);
     
-    // Add individual user fields
     formData.append('Username', username);
     formData.append('FullName', fullname);
     formData.append('Role', role);
@@ -1500,25 +1461,17 @@ async function saveUser() {
       formData.append('target', EDIT_TARGET);
     }
     
-    console.log('Saving user data:', {
-      username, fullname, role, barangay, 
-      hasPassword: !!password, 
-      isEdit: !!EDIT_TARGET
-    });
-    
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       body: formData
     });
     
     const text = await res.text();
-    console.log('Response text:', text);
     
     let data;
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("Failed to parse JSON:", e);
       showToast("Invalid response from server", "error");
       return;
     }
@@ -1531,7 +1484,6 @@ async function saveUser() {
       showToast(data.message || 'Failed to save user', 'error');
     }
   } catch(err) {
-    console.error(err);
     showToast('Error saving user: ' + err.message, 'error');
   }
 }
@@ -1539,12 +1491,15 @@ async function saveUser() {
 async function resetPassword(username) {
   if (!confirm(`Reset password for user "${username}" to default?`)) return;
   
+  const currentUser = localStorage.getItem("username") || 
+                     localStorage.getItem("staffName") || 
+                     "System";
+  
   try {
     const formData = new FormData();
     formData.append('action', 'resetPassword');
     formData.append('target', username);
-    
-    console.log('Resetting password for:', username);
+    formData.append('actor', currentUser);
     
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -1552,13 +1507,11 @@ async function resetPassword(username) {
     });
     
     const text = await res.text();
-    console.log('Response:', text);
     
     let data;
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("Failed to parse JSON:", e);
       showToast("Invalid response from server", "error");
       return;
     }
@@ -1569,7 +1522,6 @@ async function resetPassword(username) {
       showToast(data.message || 'Failed to reset password', 'error');
     }
   } catch(err) {
-    console.error(err);
     showToast('Error resetting password: ' + err.message, 'error');
   }
 }
@@ -1577,12 +1529,15 @@ async function resetPassword(username) {
 async function deleteUser(username) {
   if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) return;
   
+  const currentUser = localStorage.getItem("username") || 
+                     localStorage.getItem("staffName") || 
+                     "System";
+  
   try {
     const formData = new FormData();
     formData.append('action', 'deleteUser');
     formData.append('target', username);
-    
-    console.log('Deleting user:', username);
+    formData.append('actor', currentUser);
     
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -1590,13 +1545,11 @@ async function deleteUser(username) {
     });
     
     const text = await res.text();
-    console.log('Response:', text);
     
     let data;
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("Failed to parse JSON:", e);
       showToast("Invalid response from server", "error");
       return;
     }
@@ -1608,7 +1561,6 @@ async function deleteUser(username) {
       showToast(data.message || 'Failed to delete user', 'error');
     }
   } catch(err) {
-    console.error(err);
     showToast('Error deleting user: ' + err.message, 'error');
   }
 }
@@ -1622,7 +1574,6 @@ async function loadUserActivity() {
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("Failed to parse JSON:", e);
       showToast("Invalid response from server", "error");
       return;
     }
@@ -1631,19 +1582,16 @@ async function loadUserActivity() {
     tbody.innerHTML = '';
     
     if (!data.success || !data.activities || data.activities.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">No activity data available</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">No activity data available</td></tr>`;
       updateActivityStats([]);
       return;
     }
     
-    // Update stats
     updateActivityStats(data.activities);
     
-    // Render activity data
     data.activities.forEach(activity => {
       const tr = document.createElement('tr');
       
-      // Determine status and color
       let statusClass = 'status-offline';
       let statusText = 'Offline';
       
@@ -1664,12 +1612,11 @@ async function loadUserActivity() {
         }
       }
       
-      // Format dates
       const lastLogin = activity.LastLogin ? 
-        new Date(activity.LastLogin).toLocaleString() : 'Never';
+        new Date(activity.LastLogin).toLocaleString('en-PH') : 'Never';
       
       const lastActivityTime = activity.LastActivity ? 
-        new Date(activity.LastActivity).toLocaleString() : 'Never';
+        new Date(activity.LastActivity).toLocaleString('en-PH') : 'Never';
       
       const timeAgo = activity.TimeAgo || 'N/A';
       const sessionDuration = activity.SessionDuration || 'N/A';
@@ -1677,17 +1624,15 @@ async function loadUserActivity() {
       tr.innerHTML = `
         <td><strong>${escapeHtml(activity.Username)}</strong></td>
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-        <td>${lastLogin}</td>
-        <td>${lastActivityTime}<br><small style="color: var(--muted);">${timeAgo}</small></td>
+        <td><small>${lastLogin}</small></td>
+        <td><small>${lastActivityTime}</small><br><small style="color: var(--muted);">${timeAgo}</small></td>
         <td>${timeAgo}</td>
         <td>${sessionDuration}</td>
-        <td><small>${escapeHtml(activity.IPAddress || 'N/A')}</small></td>
       `;
       tbody.appendChild(tr);
     });
     
   } catch(err) {
-    console.error("Error loading user activity:", err);
     showToast('Error loading activity: ' + err.message, 'error');
   }
 }
@@ -1701,7 +1646,6 @@ function updateActivityStats(activities) {
   let todayActiveCount = 0;
   
   activities.forEach(activity => {
-    // Count online users (active in last 15 minutes)
     if (activity.IsOnline === 'Online' && activity.LastActivity) {
       const lastActivity = new Date(activity.LastActivity);
       const minutesSinceActivity = Math.floor((now - lastActivity) / (1000 * 60));
@@ -1710,7 +1654,6 @@ function updateActivityStats(activities) {
       }
     }
     
-    // Count users active today
     if (activity.LastActivity) {
       const lastActivity = new Date(activity.LastActivity);
       if (lastActivity >= today) {
@@ -1723,13 +1666,8 @@ function updateActivityStats(activities) {
   document.getElementById('statToday').textContent = todayActiveCount;
   document.getElementById('statTotalUsers').textContent = activities.length;
   
-  // Color code the online count
   const onlineStat = document.getElementById('statOnline');
-  if (onlineCount > 0) {
-    onlineStat.style.color = '#0f7a4a';
-  } else {
-    onlineStat.style.color = '#666';
-  }
+  onlineStat.style.color = onlineCount > 0 ? '#0f7a4a' : '#666';
 }
 
 /* ============ LOAD AUDIT LOGS ============ */
@@ -1741,66 +1679,102 @@ async function loadAuditLogs() {
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("Failed to parse JSON:", e);
       showToast("Invalid response from server", "error");
       return;
     }
     
-    const tbody = document.getElementById('logsBody');
-    tbody.innerHTML = '';
-    
-    if (!data.logs || data.logs.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No logs available</td></tr>`;
+    if (!data.success) {
+      showToast("Failed to load logs: " + (data.message || "Unknown error"), "error");
       return;
     }
     
-    data.logs.forEach(log => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${escapeHtml(log.Timestamp || '')}</td>
-        <td>${escapeHtml(log.Action || '')}</td>
-        <td>${escapeHtml(log.Actor || '')}</td>
-        <td>${escapeHtml(log.TargetSheet || '')}</td>
-        <td>${escapeHtml(log.Details || '')}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+    AUDIT_LOGS_DATA = data;
+    displayAuditLogs('all');
     
   } catch(err) {
-    console.error(err);
     showToast('Error loading logs: ' + err.message, 'error');
   }
 }
 
+function displayAuditLogs(category = 'all') {
+  const tbody = document.getElementById('logsBody');
+  tbody.innerHTML = '';
+  
+  if (!AUDIT_LOGS_DATA) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No logs data available</td></tr>`;
+    return;
+  }
+  
+  const logs = category === 'all' ? AUDIT_LOGS_DATA.logs || [] :
+              category === 'today' ? AUDIT_LOGS_DATA.today || [] :
+              category === 'yesterday' ? AUDIT_LOGS_DATA.yesterday || [] :
+              AUDIT_LOGS_DATA.older || [];
+  
+  if (logs.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 20px; color: var(--muted); font-style: italic;">
+          No ${category === 'all' ? '' : category} logs found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  logs.forEach(log => {
+    const tr = document.createElement('tr');
+    const timestamp = log.FormattedTimestamp || log.Timestamp || '';
+    const details = log.Details || '';
+    
+    tr.innerHTML = `
+      <td><small>${escapeHtml(timestamp)}</small></td>
+      <td>${escapeHtml(log.Action || '')}</td>
+      <td><strong>${escapeHtml(log.Actor || '')}</strong></td>
+      <td>${escapeHtml(log.TargetSheet || '')}</td>
+      <td><small>${escapeHtml(details)}</small></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 /* ============ TAB FUNCTIONALITY ============ */
 function setupTabs() {
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
+  // Main tabs
+  const mainTabBtns = document.querySelectorAll('.tab-btn');
+  const mainTabContents = document.querySelectorAll('.tab-content');
   
-  tabBtns.forEach(btn => {
+  mainTabBtns.forEach(btn => {
     btn.addEventListener('click', function() {
-      // Remove active class from all buttons and contents
-      tabBtns.forEach(b => b.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
+      mainTabBtns.forEach(b => b.classList.remove('active'));
+      mainTabContents.forEach(c => c.classList.remove('active'));
       
-      // Add active class to clicked button
       this.classList.add('active');
-      
-      // Show corresponding content
       const tabId = this.getAttribute('data-tab');
       document.getElementById(`${tabId}Tab`).classList.add('active');
       
-      // Load data for the selected tab
       if (tabId === 'activity') {
         loadUserActivity();
-      } else if (tabId === 'audit') {
+      } else {
         loadAuditLogs();
       }
     });
   });
+  
+  // Audit log sub-tabs
+  const subTabBtns = document.querySelectorAll('#auditTab .tab-btn-small');
+  
+  subTabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      subTabBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      const category = this.getAttribute('data-category');
+      displayAuditLogs(category);
+    });
+  });
 }
 
-/* ============ PASSWORD TOGGLE FOR MODAL ============ */
+/* ============ PASSWORD TOGGLE ============ */
 function setupPasswordToggle() {
   const toggleBtn = document.getElementById('toggleModalPassword');
   const passwordInput = document.getElementById('user_password');
@@ -1848,7 +1822,6 @@ function toggleSidebar() {
     }
 }
 
-/* ============ MOBILE SIDEBAR TOGGLE ============ */
 function toggleMobileSidebar() {
     const sidebar = document.getElementById('sidebar');
     const mobileToggle = document.getElementById('mobileMenuToggle');
@@ -1873,37 +1846,44 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-/* ============ USER ACTIVITY TRACKING ============ */
-function logUserActivityToServer(action = "Page View") {
-  const username = localStorage.getItem("username") || 
-                   localStorage.getItem("staffName") || 
-                   "Unknown";
+/* ============ SEARCH FUNCTIONALITY ============ */
+function setupSearch() {
+  // User search
+  document.getElementById('filterUser').addEventListener('input', (e) => {
+    renderUsers(e.target.value, CURRENT_ROLE_FILTER);
+  });
   
-  if (username !== "Unknown") {
-    // Send activity to server
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `action=logActivity&username=${encodeURIComponent(username)}&action=${encodeURIComponent(action)}`
-    }).catch(() => {
-      // Silently fail if server is unreachable
+  // Activity search
+  document.getElementById('searchActivity').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#activityBody tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? '' : 'none';
     });
-  }
+  });
+  
+  // Audit search
+  document.getElementById('searchAudit').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#logsBody tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+  });
 }
 
 /* ============ INITIALIZATION ============ */
 window.addEventListener('DOMContentLoaded', async () => {
-  // First check session
   const isAuthenticated = await sessionCheck();
   
   if (isAuthenticated) {
-    // Load data if authenticated
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     document.getElementById("userName").innerText = userName;
     
-    // Check if user is admin - FIXED: Your login returns lowercase "admin"
     const userRole = localStorage.getItem("userRole");
     const isAdmin = userRole === "admin" || userRole === "Admin";
     const adminItems = document.querySelectorAll(".admin-only");
@@ -1911,7 +1891,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         item.style.display = isAdmin ? "block" : "none";
     });
     
-    // If not admin, redirect to dashboard
     if (!isAdmin) {
       showToast("Access denied. Admin privileges required.", "error");
       setTimeout(() => {
@@ -1920,21 +1899,18 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     
-    // Load users
     loadUsers();
-    
-    // Setup role toggle
     setupRoleToggle();
-    
-    // Setup tabs
     setupTabs();
+    setupSearch();
     
     // Event listeners
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     document.getElementById('openAddUser').addEventListener('click', () => openUserModal('add'));
     document.getElementById('viewLogsBtn').addEventListener('click', function() {
       document.getElementById('logsModal').style.display = 'flex';
-      loadUserActivity(); // Load activity by default
+      loadUserActivity();
+      loadAuditLogs();
     });
     document.getElementById('saveUserBtn').addEventListener('click', saveUser);
     document.getElementById('cancelModal').addEventListener('click', closeUserModal);
@@ -1952,20 +1928,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
       }
     });
-    document.getElementById('filterUser').addEventListener('input', (e) => renderUsers(e.target.value, CURRENT_ROLE_FILTER));
     document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
     document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileSidebar);
-    
-    // Activity search
-    document.getElementById('searchActivity').addEventListener('input', function(e) {
-      const searchTerm = e.target.value.toLowerCase();
-      const rows = document.querySelectorAll('#activityBody tr');
-      
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-      });
-    });
     
     // Close modals on overlay click
     document.getElementById('userModal').addEventListener('click', (e) => {
@@ -1990,36 +1954,14 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
     });
     
-    // Start user activity tracking
-    logUserActivityToServer(`Viewed User Management`);
-    
-    // Log activity on user interactions
-    document.addEventListener('click', function() {
-      logUserActivityToServer("User Interaction");
-    }, { once: false, passive: true });
-    
-    // Auto-refresh users every 30 seconds
+    // Auto-refresh
     setInterval(loadUsers, 30000);
-    
-    // Auto-refresh activity every 60 seconds if modal is open
-    setInterval(() => {
-      if (document.getElementById('logsModal').style.display === 'flex') {
-        const activeTab = document.querySelector('.tab-btn.active');
-        if (activeTab && activeTab.getAttribute('data-tab') === 'activity') {
-          loadUserActivity();
-        }
-      }
-    }, 60000);
   }
 });
 
 /* ============ PREVENT BACK BUTTON ISSUES ============ */
 window.addEventListener('pageshow', function(event) {
-  // If page is loaded from cache (back/forward button)
   if (event.persisted) {
-    console.log('Page loaded from cache, checking session...');
-    
-    // Don't automatically redirect. Just check session and reload data
     sessionCheck().then(isAuthenticated => {
       if (isAuthenticated) {
         loadUsers();
@@ -2031,7 +1973,6 @@ window.addEventListener('pageshow', function(event) {
 /* ============ WINDOW RESIZE HANDLER ============ */
 window.addEventListener('resize', function() {
   if (window.innerWidth > 768) {
-    // On desktop, ensure sidebar is not in mobile-open state
     const sidebar = document.getElementById('sidebar');
     const mobileToggle = document.getElementById('mobileMenuToggle');
     
@@ -2043,3 +1984,4 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
+
