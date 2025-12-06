@@ -649,6 +649,85 @@
     to { transform: translateX(0); opacity: 1; }
    }
 
+   /* Tabs styling for logs modal */
+   .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 4px;
+   }
+
+   .tab-btn {
+    padding: 8px 16px;
+    background: var(--light-green);
+    border: none;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.2s ease;
+    position: relative;
+    bottom: -2px;
+   }
+
+   .tab-btn:hover {
+    background: rgba(15,122,74,0.1);
+   }
+
+   .tab-btn.active {
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: white;
+    box-shadow: 0 2px 4px rgba(15,122,74,0.2);
+    border-bottom: 2px solid var(--accent1);
+   }
+
+   .tab-content {
+    display: none;
+   }
+
+   .tab-content.active {
+    display: block;
+   }
+
+   /* Status badges */
+   .status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 70px;
+    text-align: center;
+   }
+
+   .status-online {
+    background: #e9f7f2;
+    color: #0f7a4a;
+    border: 1px solid #0f7a4a;
+   }
+
+   .status-offline {
+    background: #f0f0f0;
+    color: #666;
+    border: 1px solid #ddd;
+   }
+
+   .status-idle {
+    background: #fff8e1;
+    color: #ff9800;
+    border: 1px solid #ff9800;
+   }
+
+   /* Activity table styling */
+   #activityTable th:nth-child(1) { width: 15%; } /* Username */
+   #activityTable th:nth-child(2) { width: 12%; } /* Status */
+   #activityTable th:nth-child(3) { width: 18%; } /* Last Login */
+   #activityTable th:nth-child(4) { width: 18%; } /* Last Activity */
+   #activityTable th:nth-child(5) { width: 12%; } /* Active Time */
+   #activityTable th:nth-child(6) { width: 15%; } /* Session Duration */
+   #activityTable th:nth-child(7) { width: 10%; } /* IP Address */
+
    /* Mobile menu toggle button */
    .mobile-menu-toggle {
     display: none;
@@ -785,6 +864,37 @@
     
     .actions-cell {
         justify-content: flex-start; /* Left align for mobile */
+    }
+    
+    /* Tabs on mobile */
+    .tabs {
+        flex-direction: column;
+        gap: 4px;
+        border-bottom: none;
+    }
+    
+    .tab-btn {
+        border-radius: var(--radius-sm);
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+    }
+    
+    /* Activity table on mobile */
+    #activityTable th,
+    #activityTable td {
+        font-size: 11px;
+        padding: 6px 4px;
+    }
+    
+    #activityTable th:nth-child(1),
+    #activityTable th:nth-child(2),
+    #activityTable th:nth-child(3),
+    #activityTable th:nth-child(4),
+    #activityTable th:nth-child(5),
+    #activityTable th:nth-child(6),
+    #activityTable th:nth-child(7) {
+        width: auto;
     }
    }
 
@@ -979,16 +1089,65 @@
   </div>
 </div>
 
-<!-- Logs Modal -->
+<!-- Enhanced Logs Modal with User Activity -->
 <div id="logsModal" class="modal-overlay">
-  <div class="modal-box" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+  <div class="modal-box" style="max-width: 1200px; max-height: 80vh; overflow-y: auto;">
     <div class="modal-header">
-      <h3>Audit Logs</h3>
+      <h3><i class="fas fa-user-clock"></i> User Activity & Audit Logs</h3>
       <button id="closeLogsModal" class="icon-btn">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="modal-body">
+    
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="activity">User Activity</button>
+      <button class="tab-btn" data-tab="audit">Audit Logs</button>
+    </div>
+    
+    <!-- User Activity Tab -->
+    <div class="tab-content active" id="activityTab">
+      <div class="stats-container" style="justify-content: flex-start; margin-bottom: 16px;">
+        <div class="stat-item">
+          <span>Online Now</span>
+          <div id="statOnline" class="value" style="color: #0f7a4a;">0</div>
+        </div>
+        <div class="stat-item">
+          <span>Active Today</span>
+          <div id="statToday" class="value">0</div>
+        </div>
+        <div class="stat-item">
+          <span>Total Users</span>
+          <div id="statTotalUsers" class="value">0</div>
+        </div>
+      </div>
+      
+      <div class="search-container" style="margin-bottom: 16px;">
+        <i class="fas fa-search"></i>
+        <input id="searchActivity" class="search-box" placeholder="Search users..." />
+      </div>
+      
+      <div class="users-table-wrap">
+        <table class="users-table" id="activityTable">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Status</th>
+              <th>Last Login</th>
+              <th>Last Activity</th>
+              <th>Active Time</th>
+              <th>Session Duration</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody id="activityBody">
+            <tr><td colspan="7" style="text-align: center; padding: 20px;">Loading activity data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Audit Logs Tab -->
+    <div class="tab-content" id="auditTab">
       <div class="users-table-wrap">
         <table class="users-table" id="logsTable">
           <thead>
@@ -1006,8 +1165,12 @@
         </table>
       </div>
     </div>
+    
     <div class="form-actions">
-      <button id="closeLogsBtn" class="btn btn-secondary">Close</button>
+      <button id="refreshLogs" class="btn btn-secondary">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+      <button id="closeLogsBtn" class="btn">Close</button>
     </div>
   </div>
 </div>
@@ -1067,6 +1230,9 @@ async function sessionCheck(){
 
 /* ============ ENHANCED LOGOUT FUNCTION ============ */
 function handleLogout() {
+  // Get username before clearing storage
+  const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+  
   // Clear all storage
   localStorage.clear();
   sessionStorage.clear();
@@ -1447,8 +1613,127 @@ async function deleteUser(username) {
   }
 }
 
-/* ============ LOAD LOGS ============ */
-async function loadLogs() {
+/* ============ LOAD USER ACTIVITY ============ */
+async function loadUserActivity() {
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=userActivity`);
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      showToast("Invalid response from server", "error");
+      return;
+    }
+    
+    const tbody = document.getElementById('activityBody');
+    tbody.innerHTML = '';
+    
+    if (!data.success || !data.activities || data.activities.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">No activity data available</td></tr>`;
+      updateActivityStats([]);
+      return;
+    }
+    
+    // Update stats
+    updateActivityStats(data.activities);
+    
+    // Render activity data
+    data.activities.forEach(activity => {
+      const tr = document.createElement('tr');
+      
+      // Determine status and color
+      let statusClass = 'status-offline';
+      let statusText = 'Offline';
+      
+      if (activity.IsOnline === 'Online') {
+        const lastActivity = new Date(activity.LastActivity);
+        const now = new Date();
+        const minutesSinceActivity = Math.floor((now - lastActivity) / (1000 * 60));
+        
+        if (minutesSinceActivity < 5) {
+          statusClass = 'status-online';
+          statusText = 'Online';
+        } else if (minutesSinceActivity < 15) {
+          statusClass = 'status-idle';
+          statusText = 'Idle';
+        } else {
+          statusClass = 'status-offline';
+          statusText = 'Away';
+        }
+      }
+      
+      // Format dates
+      const lastLogin = activity.LastLogin ? 
+        new Date(activity.LastLogin).toLocaleString() : 'Never';
+      
+      const lastActivityTime = activity.LastActivity ? 
+        new Date(activity.LastActivity).toLocaleString() : 'Never';
+      
+      const timeAgo = activity.TimeAgo || 'N/A';
+      const sessionDuration = activity.SessionDuration || 'N/A';
+      
+      tr.innerHTML = `
+        <td><strong>${escapeHtml(activity.Username)}</strong></td>
+        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        <td>${lastLogin}</td>
+        <td>${lastActivityTime}<br><small style="color: var(--muted);">${timeAgo}</small></td>
+        <td>${timeAgo}</td>
+        <td>${sessionDuration}</td>
+        <td><small>${escapeHtml(activity.IPAddress || 'N/A')}</small></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+  } catch(err) {
+    console.error("Error loading user activity:", err);
+    showToast('Error loading activity: ' + err.message, 'error');
+  }
+}
+
+function updateActivityStats(activities) {
+  const now = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  let onlineCount = 0;
+  let todayActiveCount = 0;
+  
+  activities.forEach(activity => {
+    // Count online users (active in last 15 minutes)
+    if (activity.IsOnline === 'Online' && activity.LastActivity) {
+      const lastActivity = new Date(activity.LastActivity);
+      const minutesSinceActivity = Math.floor((now - lastActivity) / (1000 * 60));
+      if (minutesSinceActivity < 15) {
+        onlineCount++;
+      }
+    }
+    
+    // Count users active today
+    if (activity.LastActivity) {
+      const lastActivity = new Date(activity.LastActivity);
+      if (lastActivity >= today) {
+        todayActiveCount++;
+      }
+    }
+  });
+  
+  document.getElementById('statOnline').textContent = onlineCount;
+  document.getElementById('statToday').textContent = todayActiveCount;
+  document.getElementById('statTotalUsers').textContent = activities.length;
+  
+  // Color code the online count
+  const onlineStat = document.getElementById('statOnline');
+  if (onlineCount > 0) {
+    onlineStat.style.color = '#0f7a4a';
+  } else {
+    onlineStat.style.color = '#666';
+  }
+}
+
+/* ============ LOAD AUDIT LOGS ============ */
+async function loadAuditLogs() {
   try {
     const res = await fetch(`${SCRIPT_URL}?action=logs`);
     const text = await res.text();
@@ -1466,7 +1751,6 @@ async function loadLogs() {
     
     if (!data.logs || data.logs.length === 0) {
       tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No logs available</td></tr>`;
-      document.getElementById('logsModal').style.display = 'flex';
       return;
     }
     
@@ -1482,11 +1766,38 @@ async function loadLogs() {
       tbody.appendChild(tr);
     });
     
-    document.getElementById('logsModal').style.display = 'flex';
   } catch(err) {
     console.error(err);
     showToast('Error loading logs: ' + err.message, 'error');
   }
+}
+
+/* ============ TAB FUNCTIONALITY ============ */
+function setupTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove active class from all buttons and contents
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      // Show corresponding content
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(`${tabId}Tab`).classList.add('active');
+      
+      // Load data for the selected tab
+      if (tabId === 'activity') {
+        loadUserActivity();
+      } else if (tabId === 'audit') {
+        loadAuditLogs();
+      }
+    });
+  });
 }
 
 /* ============ PASSWORD TOGGLE FOR MODAL ============ */
@@ -1562,6 +1873,26 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+/* ============ USER ACTIVITY TRACKING ============ */
+function logUserActivityToServer(action = "Page View") {
+  const username = localStorage.getItem("username") || 
+                   localStorage.getItem("staffName") || 
+                   "Unknown";
+  
+  if (username !== "Unknown") {
+    // Send activity to server
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `action=logActivity&username=${encodeURIComponent(username)}&action=${encodeURIComponent(action)}`
+    }).catch(() => {
+      // Silently fail if server is unreachable
+    });
+  }
+}
+
 /* ============ INITIALIZATION ============ */
 window.addEventListener('DOMContentLoaded', async () => {
   // First check session
@@ -1595,18 +1926,46 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Setup role toggle
     setupRoleToggle();
     
+    // Setup tabs
+    setupTabs();
+    
     // Event listeners
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     document.getElementById('openAddUser').addEventListener('click', () => openUserModal('add'));
-    document.getElementById('viewLogsBtn').addEventListener('click', loadLogs);
+    document.getElementById('viewLogsBtn').addEventListener('click', function() {
+      document.getElementById('logsModal').style.display = 'flex';
+      loadUserActivity(); // Load activity by default
+    });
     document.getElementById('saveUserBtn').addEventListener('click', saveUser);
     document.getElementById('cancelModal').addEventListener('click', closeUserModal);
     document.getElementById('closeModal').addEventListener('click', closeUserModal);
     document.getElementById('closeLogsBtn').addEventListener('click', closeLogsModal);
     document.getElementById('closeLogsModal').addEventListener('click', closeLogsModal);
+    document.getElementById('refreshLogs').addEventListener('click', function() {
+      const activeTab = document.querySelector('.tab-btn.active');
+      if (activeTab) {
+        const tabId = activeTab.getAttribute('data-tab');
+        if (tabId === 'activity') {
+          loadUserActivity();
+        } else {
+          loadAuditLogs();
+        }
+      }
+    });
     document.getElementById('filterUser').addEventListener('input', (e) => renderUsers(e.target.value, CURRENT_ROLE_FILTER));
     document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
     document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileSidebar);
+    
+    // Activity search
+    document.getElementById('searchActivity').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#activityBody tr');
+      
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    });
     
     // Close modals on overlay click
     document.getElementById('userModal').addEventListener('click', (e) => {
@@ -1631,8 +1990,26 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
     });
     
+    // Start user activity tracking
+    logUserActivityToServer(`Viewed User Management`);
+    
+    // Log activity on user interactions
+    document.addEventListener('click', function() {
+      logUserActivityToServer("User Interaction");
+    }, { once: false, passive: true });
+    
     // Auto-refresh users every 30 seconds
     setInterval(loadUsers, 30000);
+    
+    // Auto-refresh activity every 60 seconds if modal is open
+    setInterval(() => {
+      if (document.getElementById('logsModal').style.display === 'flex') {
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab && activeTab.getAttribute('data-tab') === 'activity') {
+          loadUserActivity();
+        }
+      }
+    }, 60000);
   }
 });
 
@@ -1666,4 +2043,3 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
-
