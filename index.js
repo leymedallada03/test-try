@@ -1,10 +1,10 @@
-/* index.js — UPDATED WITH SINGLE-SESSION RESTRICTION */
-// Replace this with your actual deployment URL
+/* index.js — UPDATED WITH REAL SINGLE-SESSION RESTRICTION */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 // Session timeout (30 minutes = 1800000 ms)
 const SESSION_TIMEOUT = 30 * 60 * 1000;
-let sessionActivityTimer = null;
+let sessionCheckInterval = null;
+let sessionActivityInterval = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Login page loaded");
@@ -75,16 +75,16 @@ async function sha256(str) {
 function checkPreviousSession() {
     const loggedIn = localStorage.getItem("loggedIn");
     const loginTime = localStorage.getItem("loginTime");
+    const sessionId = sessionStorage.getItem("sessionId");
     
-    if (loggedIn === "true" && loginTime) {
+    if (loggedIn === "true" && loginTime && sessionId) {
         const currentTime = Date.now();
         const loginTimestamp = parseInt(loginTime);
         const sessionAge = currentTime - loginTimestamp;
         
         if (sessionAge < SESSION_TIMEOUT) {
-            // Session is still valid, redirect to dashboard
-            console.log("Previous session found, redirecting...");
-            window.location.href = "dashboard.html";
+            // Session might still be valid, check with server
+            checkSessionWithServer(localStorage.getItem("username"), sessionId);
         } else {
             // Session expired, clear storage
             console.log("Previous session expired, clearing storage...");
@@ -93,8 +93,30 @@ function checkPreviousSession() {
     }
 }
 
+async function checkSessionWithServer(username, sessionId) {
+    try {
+        const response = await fetchJSON(API_URL, {
+            action: "validateSession",
+            username: username,
+            sessionId: sessionId
+        });
+        
+        if (response.success && response.isLoggedIn) {
+            // Session is still valid, redirect to dashboard
+            console.log("Valid session found, redirecting...");
+            window.location.href = "dashboard.html";
+        } else {
+            // Session invalid, clear storage
+            clearSessionData();
+        }
+    } catch (error) {
+        console.error("Session check failed:", error);
+        clearSessionData();
+    }
+}
+
 // --------------------------
-// LOGIN HANDLER - UPDATED WITH SINGLE-SESSION CHECK
+// LOGIN HANDLER - UPDATED WITH SESSION MANAGEMENT
 // --------------------------
 async function handleLogin(event) {
     event.preventDefault();
@@ -173,14 +195,15 @@ async function handleLogin(event) {
         // LOGIN SUCCESS
         // -------------------------------
         console.log("Login successful! User data:", response.user);
+        console.log("Session ID:", response.sessionId);
         msg.innerText = "Login successful! Redirecting...";
         msg.style.color = "green";
 
         // Store session data
-        storeSessionData(response.user, pwHash);
+        storeSessionData(response.user, pwHash, response.sessionId);
         
-        // Start session activity tracking
-        startSessionActivityTracking(username);
+        // Start session management
+        startSessionManagement(response.user.Username, response.sessionId);
         
         // Redirect to dashboard
         console.log("Redirecting to dashboard.html...");
@@ -217,7 +240,7 @@ async function showAlreadyLoggedInError(username, password, errorResponse) {
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button type="button" class="force-logout-btn" onclick="handleForceLogout('${username}', '${password}')" style="padding: 8px 16px; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">
                     <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>
-                    Force Logout
+                    Force Logout from Other Device
                 </button>
                 <button type="button" class="cancel-btn" onclick="closeError()" style="padding: 8px 16px; background: #f0f0f0; color: #666; border: none; border-radius: 4px; cursor: pointer;">
                     Cancel
@@ -261,35 +284,36 @@ async function handleForceLogout(username, password) {
         if (response.success) {
             console.log("Force logout successful");
             
-            // Wait a moment, then retry login
-            setTimeout(async () => {
-                // Re-enable login button
-                loginBtn.classList.remove("btn-loading");
-                loginBtn.disabled = false;
-                
-                // Close error message
-                errorDiv.style.display = "none";
-                
-                // Retry login automatically
-                const pwHash = await sha256(password);
-                const deviceInfo = getDeviceInfo();
-                
-                const loginResponse = await fetchJSON(API_URL, {
-                    action: "login",
-                    username: username,
-                    pwHash: pwHash,
-                    deviceInfo: JSON.stringify(deviceInfo)
-                });
-                
-                if (loginResponse.success) {
-                    // Login successful
-                    storeSessionData(loginResponse.user, pwHash);
-                    startSessionActivityTracking(username);
-                    window.location.replace("dashboard.html");
-                } else {
-                    showError("Login failed after force logout: " + loginResponse.message);
-                }
-            }, 1000);
+            // Wait 2 seconds for session to be invalidated
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Close error message
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+            
+            // Re-enable login button
+            loginBtn.classList.remove("btn-loading");
+            loginBtn.disabled = false;
+            
+            // Now retry login automatically
+            const pwHash = await sha256(password);
+            const deviceInfo = getDeviceInfo();
+            
+            const loginResponse = await fetchJSON(API_URL, {
+                action: "login",
+                username: username,
+                pwHash: pwHash,
+                deviceInfo: JSON.stringify(deviceInfo)
+            });
+            
+            if (loginResponse.success) {
+                // Login successful
+                storeSessionData(loginResponse.user, pwHash, loginResponse.sessionId);
+                startSessionManagement(username, loginResponse.sessionId);
+                window.location.replace("dashboard.html");
+            } else {
+                showError("Login failed after force logout: " + loginResponse.message);
+            }
         } else {
             showError("Force logout failed: " + response.message);
             loginBtn.classList.remove("btn-loading");
@@ -304,69 +328,45 @@ async function handleForceLogout(username, password) {
 }
 
 // --------------------------
-// Close Error Message
+// Session Management
 // --------------------------
-function closeError() {
-    const errorDiv = document.getElementById("loginError");
-    errorDiv.style.display = "none";
-    errorDiv.innerHTML = "";
-}
-
-// --------------------------
-// Store Session Data
-// --------------------------
-function storeSessionData(user, pwHash) {
-    // Clear any existing storage
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Set new session data
-    localStorage.setItem("loggedIn", "true");
-    localStorage.setItem("username", user.Username);
-    localStorage.setItem("staffName", user.FullName);
-    localStorage.setItem("userRole", user.Role);
-    localStorage.setItem("role", user.Role);
-    localStorage.setItem("assignedBarangay", user.AssignedBarangay || "");
-    localStorage.setItem("pwHash", pwHash);
-    localStorage.setItem("loginTime", Date.now().toString());
-    localStorage.setItem("deviceInfo", JSON.stringify(getDeviceInfo()));
-
-    // Set a session flag
-    sessionStorage.setItem("authenticated", "true");
-
-    console.log("LocalStorage set successfully. Items:", {
-        username: user.Username,
-        staffName: user.FullName,
-        userRole: user.Role,
-        assignedBarangay: user.AssignedBarangay
-    });
-}
-
-// --------------------------
-// Clear Session Data
-// --------------------------
-function clearSessionData() {
-    localStorage.clear();
-    sessionStorage.clear();
-    console.log("Session data cleared");
-}
-
-// --------------------------
-// Start Session Activity Tracking
-// --------------------------
-function startSessionActivityTracking(username) {
-    // Clear any existing timer
-    if (sessionActivityTimer) {
-        clearInterval(sessionActivityTimer);
+function startSessionManagement(username, sessionId) {
+    // Clear any existing intervals
+    if (sessionCheckInterval) {
+        clearInterval(sessionCheckInterval);
+    }
+    if (sessionActivityInterval) {
+        clearInterval(sessionActivityInterval);
     }
     
+    // Check session validity every 30 seconds
+    sessionCheckInterval = setInterval(async () => {
+        try {
+            const response = await fetchJSON(API_URL, {
+                action: "checkSessionStatus",
+                username: username,
+                sessionId: sessionId
+            });
+            
+            if (!response.success || !response.isLoggedIn) {
+                // Session invalid - user was logged out from another device
+                console.log("Session invalidated from another device");
+                clearSessionData();
+                alert("Your session has been terminated from another device. You have been logged out.");
+                window.location.href = "index.html";
+            }
+        } catch (error) {
+            console.error("Session check failed:", error);
+        }
+    }, 30000); // Check every 30 seconds
+    
     // Update activity every 5 minutes
-    sessionActivityTimer = setInterval(async () => {
+    sessionActivityInterval = setInterval(async () => {
         try {
             await fetchJSON(API_URL, {
                 action: "logActivity",
                 username: username,
-                action: "Session Activity"
+                action: "Session Active"
             });
             console.log("Session activity updated");
         } catch (err) {
@@ -390,6 +390,58 @@ function startSessionActivityTracking(username) {
     ['click', 'keypress', 'mousemove', 'scroll'].forEach(eventType => {
         document.addEventListener(eventType, updateActivity, { passive: true });
     });
+}
+
+// --------------------------
+// Store Session Data
+// --------------------------
+function storeSessionData(user, pwHash, sessionId) {
+    // Clear any existing storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Store in sessionStorage (cleared on browser close)
+    sessionStorage.setItem('sessionId', sessionId);
+    sessionStorage.setItem('sessionExpiry', (Date.now() + SESSION_TIMEOUT).toString());
+    sessionStorage.setItem('authenticated', 'true');
+    
+    // Store in localStorage (persists)
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('username', user.Username);
+    localStorage.setItem('staffName', user.FullName);
+    localStorage.setItem('userRole', user.Role);
+    localStorage.setItem('role', user.Role);
+    localStorage.setItem('assignedBarangay', user.AssignedBarangay || '');
+    localStorage.setItem('pwHash', pwHash);
+    localStorage.setItem('loginTime', Date.now().toString());
+    localStorage.setItem('deviceInfo', JSON.stringify(getDeviceInfo()));
+
+    console.log("Session data stored successfully. Session ID:", sessionId);
+}
+
+// --------------------------
+// Clear Session Data
+// --------------------------
+function clearSessionData() {
+    if (sessionCheckInterval) {
+        clearInterval(sessionCheckInterval);
+    }
+    if (sessionActivityInterval) {
+        clearInterval(sessionActivityInterval);
+    }
+    
+    localStorage.clear();
+    sessionStorage.clear();
+    console.log("Session data cleared");
+}
+
+// --------------------------
+// Close Error Message
+// --------------------------
+function closeError() {
+    const errorDiv = document.getElementById("loginError");
+    errorDiv.style.display = "none";
+    errorDiv.innerHTML = "";
 }
 
 // --------------------------
