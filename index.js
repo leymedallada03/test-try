@@ -1,4 +1,4 @@
-/* index.js — UPDATED WITH REAL SINGLE-SESSION RESTRICTION */
+/* COMPLETE index.js with Single-Session Restriction */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 // Session timeout (30 minutes = 1800000 ms)
@@ -6,9 +6,14 @@ const SESSION_TIMEOUT = 30 * 60 * 1000;
 let sessionCheckInterval = null;
 let sessionActivityInterval = null;
 
+// Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Login page loaded");
     
+    // Setup basic UI interactions
+    setupUI();
+    
+    // Setup login form
     const form = document.getElementById("loginForm");
     if (form) {
         console.log("Login form found");
@@ -21,6 +26,110 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check if user was previously logged in
     checkPreviousSession();
 });
+
+// --------------------------
+// UI Setup Functions
+// --------------------------
+function setupUI() {
+    // Password visibility toggle
+    const togglePassword = document.getElementById('togglePassword');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                this.setAttribute('aria-label', 'Hide password');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                this.setAttribute('aria-label', 'Show password');
+            }
+            
+            // Prevent any layout shift
+            passwordInput.focus();
+        });
+    }
+    
+    // Set status message
+    const statusText = document.getElementById('statusText');
+    if (statusText) {
+        const hour = new Date().getHours();
+        
+        if (hour < 12) {
+            statusText.textContent = 'Good morning! Please login to continue.';
+        } else if (hour < 18) {
+            statusText.textContent = 'Good afternoon! Please login to continue.';
+        } else {
+            statusText.textContent = 'Good evening! Please login to continue.';
+        }
+        
+        // Focus on username field
+        const usernameInput = document.getElementById('username');
+        if (usernameInput) {
+            usernameInput.focus();
+        }
+    }
+    
+    // Add enter key navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const focused = document.activeElement;
+            if (focused.id === 'username') {
+                const passwordInput = document.getElementById('password');
+                if (passwordInput) {
+                    passwordInput.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+    });
+    
+    // Prevent zoom on iOS
+    document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+    
+    // Handle iOS Safari 100vh issue
+    function setAppHeight() {
+        const doc = document.documentElement;
+        doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+    }
+    
+    window.addEventListener('resize', setAppHeight);
+    window.addEventListener('orientationchange', setAppHeight);
+    setAppHeight();
+    
+    // Prevent form zoom on focus for iOS
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        document.addEventListener('focus', function(event) {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                setTimeout(function() {
+                    event.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }, true);
+    }
+}
 
 // --------------------------
 // Get Device Information
@@ -128,9 +237,9 @@ async function handleLogin(event) {
     const errorDiv = document.getElementById("loginError");
     const loginBtn = document.getElementById("loginButton");
     
-    msg.innerText = "Please wait… validating account…";
-    msg.style.color = "green";
-    errorDiv.style.display = "none";
+    if (msg) msg.innerText = "Please wait… validating account…";
+    if (msg) msg.style.color = "green";
+    if (errorDiv) errorDiv.style.display = "none";
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
@@ -145,8 +254,10 @@ async function handleLogin(event) {
     }
 
     // Show loading state
-    loginBtn.classList.add("btn-loading");
-    loginBtn.disabled = true;
+    if (loginBtn) {
+        loginBtn.classList.add("btn-loading");
+        loginBtn.disabled = true;
+    }
 
     try {
         // Generate password hash
@@ -186,8 +297,10 @@ async function handleLogin(event) {
                 showError("Login failed: " + response.message);
             }
             
-            loginBtn.classList.remove("btn-loading");
-            loginBtn.disabled = false;
+            if (loginBtn) {
+                loginBtn.classList.remove("btn-loading");
+                loginBtn.disabled = false;
+            }
             return;
         }
 
@@ -196,8 +309,10 @@ async function handleLogin(event) {
         // -------------------------------
         console.log("Login successful! User data:", response.user);
         console.log("Session ID:", response.sessionId);
-        msg.innerText = "Login successful! Redirecting...";
-        msg.style.color = "green";
+        if (msg) {
+            msg.innerText = "Login successful! Redirecting...";
+            msg.style.color = "green";
+        }
 
         // Store session data
         storeSessionData(response.user, pwHash, response.sessionId);
@@ -215,8 +330,10 @@ async function handleLogin(event) {
         console.error("FETCH ERROR:", err);
         console.error("Error details:", err.message);
         showError("Connection error: " + err.message);
-        loginBtn.classList.remove("btn-loading");
-        loginBtn.disabled = false;
+        if (loginBtn) {
+            loginBtn.classList.remove("btn-loading");
+            loginBtn.disabled = false;
+        }
     }
 }
 
@@ -226,6 +343,8 @@ async function handleLogin(event) {
 async function showAlreadyLoggedInError(username, password, errorResponse) {
     const errorDiv = document.getElementById("loginError");
     const loginBtn = document.getElementById("loginButton");
+    
+    if (!errorDiv) return;
     
     // Create custom error message
     let errorMessage = `
@@ -253,8 +372,10 @@ async function showAlreadyLoggedInError(username, password, errorResponse) {
     errorDiv.style.display = "block";
     
     // Re-enable login button
-    loginBtn.classList.remove("btn-loading");
-    loginBtn.disabled = false;
+    if (loginBtn) {
+        loginBtn.classList.remove("btn-loading");
+        loginBtn.disabled = false;
+    }
 }
 
 // --------------------------
@@ -266,11 +387,13 @@ async function handleForceLogout(username, password) {
     const errorDiv = document.getElementById("loginError");
     const loginBtn = document.getElementById("loginButton");
     
+    if (!errorDiv) return;
+    
     // Show loading state
     errorDiv.innerHTML = `
         <div style="text-align: center; padding: 10px;">
             <div class="btn-loading" style="margin: 0 auto;"></div>
-            <div style="margin-top: 10px; color: #666;">Logging out other session...</div>
+            <div style="margin-top: 10px; color: #666;">Terminating other session...</div>
         </div>
     `;
     
@@ -282,20 +405,27 @@ async function handleForceLogout(username, password) {
         });
         
         if (response.success) {
-            console.log("Force logout successful");
+            console.log("Force logout successful. Request ID:", response.invalidationRequestId);
             
-            // Wait 2 seconds for session to be invalidated
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Wait 3 seconds for the other device to detect logout
+            errorDiv.innerHTML = `
+                <div style="text-align: center; padding: 10px;">
+                    <div style="margin: 10px 0; color: green;">
+                        <i class="fas fa-check-circle"></i> Other session terminated
+                    </div>
+                    <div style="color: #666; font-size: 14px;">
+                        Attempting to login...
+                    </div>
+                </div>
+            `;
+            
+            await new Promise(resolve => setTimeout(resolve, 3000));
             
             // Close error message
             errorDiv.style.display = "none";
             errorDiv.innerHTML = "";
             
-            // Re-enable login button
-            loginBtn.classList.remove("btn-loading");
-            loginBtn.disabled = false;
-            
-            // Now retry login automatically
+            // Now retry login
             const pwHash = await sha256(password);
             const deviceInfo = getDeviceInfo();
             
@@ -313,17 +443,25 @@ async function handleForceLogout(username, password) {
                 window.location.replace("dashboard.html");
             } else {
                 showError("Login failed after force logout: " + loginResponse.message);
+                if (loginBtn) {
+                    loginBtn.classList.remove("btn-loading");
+                    loginBtn.disabled = false;
+                }
             }
         } else {
             showError("Force logout failed: " + response.message);
-            loginBtn.classList.remove("btn-loading");
-            loginBtn.disabled = false;
+            if (loginBtn) {
+                loginBtn.classList.remove("btn-loading");
+                loginBtn.disabled = false;
+            }
         }
     } catch (err) {
         console.error("Force logout error:", err);
         showError("Error during force logout: " + err.message);
-        loginBtn.classList.remove("btn-loading");
-        loginBtn.disabled = false;
+        if (loginBtn) {
+            loginBtn.classList.remove("btn-loading");
+            loginBtn.disabled = false;
+        }
     }
 }
 
@@ -440,8 +578,10 @@ function clearSessionData() {
 // --------------------------
 function closeError() {
     const errorDiv = document.getElementById("loginError");
-    errorDiv.style.display = "none";
-    errorDiv.innerHTML = "";
+    if (errorDiv) {
+        errorDiv.style.display = "none";
+        errorDiv.innerHTML = "";
+    }
 }
 
 // --------------------------
@@ -523,7 +663,10 @@ async function testAPIConnection() {
             const data = JSON.parse(text);
             if (data.success) {
                 console.log("✓ API connection successful");
-                document.getElementById("statusText").innerText += " (API connected)";
+                const statusText = document.getElementById("statusText");
+                if (statusText) {
+                    statusText.innerText += " (API connected)";
+                }
             } else {
                 console.log("✗ API returned error:", data.message);
             }
@@ -534,7 +677,10 @@ async function testAPIConnection() {
         return text;
     } catch (error) {
         console.error("API test failed:", error);
-        document.getElementById("statusText").innerText += " (API disconnected)";
+        const statusText = document.getElementById("statusText");
+        if (statusText) {
+            statusText.innerText += " (API disconnected)";
+        }
         return null;
     }
 }
