@@ -2,6 +2,7 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 // Log user activity to server
+// Log user activity to server
 function logUserActivityToServer(action = "Page View") {
   const username = localStorage.getItem("username") || 
                    localStorage.getItem("staffName") || 
@@ -14,7 +15,7 @@ function logUserActivityToServer(action = "Page View") {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: `action=logActivity&username=${encodeURIComponent(username)}&action=${encodeURIComponent(action)}`
+      body: `action=logActivity&username=${encodeURIComponent(username)}&actor=${encodeURIComponent(username)}&action=${encodeURIComponent(action)}`
     }).catch(() => {
       // Silently fail if server is unreachable
       console.log('Activity logging failed (server unreachable)');
@@ -76,7 +77,7 @@ function enhancedLogout() {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: `action=logActivity&username=${encodeURIComponent(userName)}&action=User Logout`
+ body: `action=logActivity&username=${encodeURIComponent(userName)}&actor=${encodeURIComponent(userName)}&action=User Logout`
   }).catch(() => {
     // Ignore errors on logout
   });
