@@ -272,71 +272,19 @@
     margin-bottom: 16px;
    }
 
-   /* Simple 3-state toggle */
-   .role-toggle-simple {
+   /* Toolbar Row with Search and Toggle */
+   .toolbar-row-1 {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    margin-bottom: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-   }
-
-   .role-toggle-label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--muted);
-    display: flex;
     align-items: center;
-    gap: 6px;
-   }
-
-   .role-toggle-label i {
-    color: var(--accent1);
-    font-size: 0.9rem;
-   }
-
-   /* 3-state toggle buttons */
-   .toggle-buttons {
-    display: flex;
-    gap: 4px;
-    background: var(--light-green);
-    border-radius: var(--radius-sm);
-    padding: 2px;
-   }
-
-   .toggle-btn {
-    padding: 6px 12px;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: var(--muted);
-    min-width: 60px;
-    text-align: center;
-    white-space: nowrap;
-   }
-
-   .toggle-btn:hover {
-    background: rgba(255,255,255,0.7);
-    color: var(--accent1);
-   }
-
-   .toggle-btn.active {
-    background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    color: white;
-    box-shadow: 0 2px 4px rgba(15,122,74,0.2);
+    gap: 12px;
+    width: 100%;
    }
 
    /* Full width search bar */
    .search-container {
     position: relative;
+    flex: 1;
     width: 100%;
    }
 
@@ -367,12 +315,48 @@
     box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
    }
 
+   /* Simple toggle buttons on the right */
+   .toggle-buttons {
+    display: flex;
+    gap: 4px;
+    background: var(--light-green);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    min-width: 180px;
+    justify-content: center;
+   }
+
+   .toggle-btn {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+    white-space: nowrap;
+   }
+
+   .toggle-btn:hover {
+    background: rgba(255,255,255,0.7);
+    color: var(--accent1);
+   }
+
+   .toggle-btn.active {
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: white;
+    box-shadow: 0 2px 4px rgba(15,122,74,0.2);
+   }
+
    .toolbar-row-2 {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
     align-items: center;
-    margin-top: 8px;
    }
 
    /* Cards Row */
@@ -407,7 +391,7 @@
     margin-top: 8px;
    }
 
-   /* Users Table */
+   /* Users Table - FIXED SIZE */
    .users-table-wrap {
     flex: 1;
     background: white;
@@ -417,18 +401,22 @@
     position: relative;
     margin-bottom: 16px;
     border: 1px solid var(--border);
+    min-height: 400px; /* Fixed minimum height */
+    display: flex;
+    flex-direction: column;
    }
 
    .users-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed; /* Fixed table layout */
    }
 
    .users-table th {
     background: var(--light-green);
     padding: 12px 10px;
-    text-align: left;
+    text-align: center; /* Center aligned headers */
     font-weight: 600;
     position: sticky;
     top: 0;
@@ -442,16 +430,31 @@
     box-sizing: border-box;
    }
 
+   /* Fixed column widths */
+   .users-table th:nth-child(1) { width: 20%; } /* Username */
+   .users-table th:nth-child(2) { width: 25%; } /* Full Name */
+   .users-table th:nth-child(3) { width: 15%; } /* Role */
+   .users-table th:nth-child(4) { width: 25%; } /* Barangay */
+   .users-table th:nth-child(5) { width: 15%; } /* Actions */
+
    .users-table td {
     padding: 10px;
     font-size: 14px;
     border-bottom: 1px solid rgba(15,122,74,0.08);
     vertical-align: middle;
     color: var(--muted);
-    text-align: left;
+    text-align: center; /* Center aligned data */
     height: 36px;
     box-sizing: border-box;
     line-height: 1.3;
+    word-wrap: break-word;
+   }
+
+   /* Center role badges */
+   .users-table td:nth-child(3) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
    }
 
    .users-table tbody tr:hover {
@@ -463,6 +466,7 @@
     display: flex;
     gap: 6px;
     align-items: center;
+    justify-content: center; /* Center action buttons */
    }
 
    .icon-btn {
@@ -707,9 +711,8 @@
         align-items: stretch;
     }
     
-    .role-toggle-simple {
+    .toolbar-row-1 {
         flex-direction: column;
-        align-items: stretch;
         gap: 8px;
     }
     
@@ -747,17 +750,31 @@
     
     .users-table {
         font-size: 12px;
+        table-layout: auto; /* Auto layout for mobile */
     }
     
     .users-table th,
     .users-table td {
         font-size: 12px;
         padding: 8px 6px;
+        text-align: left; /* Left align for mobile readability */
+    }
+    
+    .users-table th:nth-child(1),
+    .users-table th:nth-child(2),
+    .users-table th:nth-child(3),
+    .users-table th:nth-child(4),
+    .users-table th:nth-child(5) {
+        width: auto; /* Auto width for mobile */
     }
     
     .modal-box {
         max-width: 95%;
         padding: 16px;
+    }
+    
+    .actions-cell {
+        justify-content: flex-start; /* Left align for mobile */
     }
    }
 
@@ -828,23 +845,20 @@
 
     <!-- Toolbar -->
     <div class="toolbar">
-      <!-- Simple Role Toggle -->
-      <div class="role-toggle-simple">
-        <div class="role-toggle-label">
-          <i class="fas fa-filter"></i>
-          <span>Filter by Role</span>
+      <!-- Row with Search and Toggle Buttons -->
+      <div class="toolbar-row-1">
+        <!-- Full Width Search Bar -->
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input id="filterUser" class="search-box" placeholder="Search by username or full name..." />
         </div>
+        
+        <!-- Toggle Buttons Only (right side) -->
         <div class="toggle-buttons" id="roleToggle">
           <button class="toggle-btn active" data-role="all">All</button>
           <button class="toggle-btn" data-role="Admin">Admin</button>
           <button class="toggle-btn" data-role="Staff">Staff</button>
         </div>
-      </div>
-
-      <!-- Full Width Search Bar -->
-      <div class="search-container">
-        <i class="fas fa-search"></i>
-        <input id="filterUser" class="search-box" placeholder="Search by username or full name..." />
       </div>
       
       <div class="toolbar-row-2">
@@ -1129,7 +1143,14 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
   }
   
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No users found</td></tr>`;
+    // Show empty state with centered text that matches table structure
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 40px 20px; color: var(--muted); font-style: italic;">
+          No users found
+        </td>
+      </tr>
+    `;
     return;
   }
   
@@ -1138,7 +1159,11 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
     tr.innerHTML = `
       <td>${escapeHtml(user.Username)}</td>
       <td>${escapeHtml(user.FullName)}</td>
-      <td><span style="padding: 2px 8px; border-radius: 12px; background: ${user.Role === 'Admin' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' ? '#0f7a4a' : '#666'};">${user.Role}</span></td>
+      <td>
+        <span style="padding: 4px 10px; border-radius: 12px; background: ${user.Role === 'Admin' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' ? '#0f7a4a' : '#666'}; display: inline-block;">
+          ${user.Role}
+        </span>
+      </td>
       <td>${escapeHtml(user.AssignedBarangay || '')}</td>
       <td class="actions-cell">
         <button class="icon-btn" onclick="editUser('${escapeHtml(user.Username)}')" title="Edit">
