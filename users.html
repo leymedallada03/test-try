@@ -272,8 +272,8 @@
     margin-bottom: 16px;
    }
 
-   /* Role Toggle Filter - ON/OFF Switch Style */
-   .role-toggle-container {
+   /* Simple 3-state toggle */
+   .role-toggle-simple {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -299,64 +299,39 @@
     font-size: 0.9rem;
    }
 
-   /* ON/OFF Switch */
-   .toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
+   /* 3-state toggle buttons */
+   .toggle-buttons {
+    display: flex;
+    gap: 4px;
+    background: var(--light-green);
+    border-radius: var(--radius-sm);
+    padding: 2px;
    }
 
-   .toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-   }
-
-   .toggle-slider {
-    position: absolute;
+   .toggle-btn {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .3s;
-    border-radius: 24px;
-   }
-
-   .toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .3s;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-   }
-
-   input:checked + .toggle-slider {
-    background: linear-gradient(90deg, var(--accent1), var(--accent2));
-   }
-
-   input:checked + .toggle-slider:before {
-    transform: translateX(26px);
-   }
-
-   /* Toggle status text */
-   .toggle-status {
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-left: 8px;
+    transition: all 0.2s ease;
     color: var(--muted);
-    min-width: 40px;
+    min-width: 60px;
+    text-align: center;
+    white-space: nowrap;
    }
 
-   input:checked ~ .toggle-status {
+   .toggle-btn:hover {
+    background: rgba(255,255,255,0.7);
     color: var(--accent1);
+   }
+
+   .toggle-btn.active {
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: white;
+    box-shadow: 0 2px 4px rgba(15,122,74,0.2);
    }
 
    /* Full width search bar */
@@ -732,6 +707,17 @@
         align-items: stretch;
     }
     
+    .role-toggle-simple {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .toggle-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
     .toolbar-row-2 {
         justify-content: space-between;
         flex-wrap: wrap;
@@ -842,18 +828,16 @@
 
     <!-- Toolbar -->
     <div class="toolbar">
-      <!-- Role Toggle Filter - ON/OFF Switch -->
-      <div class="role-toggle-container">
+      <!-- Simple Role Toggle -->
+      <div class="role-toggle-simple">
         <div class="role-toggle-label">
-          <i class="fas fa-user-tag"></i>
-          <span id="toggleLabel">Show All Users</span>
+          <i class="fas fa-filter"></i>
+          <span>Filter by Role</span>
         </div>
-        <div class="toggle-switch-wrapper">
-          <label class="toggle-switch">
-            <input type="checkbox" id="roleToggle">
-            <span class="toggle-slider"></span>
-          </label>
-          <span class="toggle-status" id="toggleStatus">OFF</span>
+        <div class="toggle-buttons" id="roleToggle">
+          <button class="toggle-btn active" data-role="all">All</button>
+          <button class="toggle-btn" data-role="Admin">Admin</button>
+          <button class="toggle-btn" data-role="Staff">Staff</button>
         </div>
       </div>
 
@@ -1010,8 +994,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuy
 /* ============ STATE ============ */
 let ALL_USERS = [];
 let EDIT_TARGET = null;
-let CURRENT_ROLE_FILTER = 'all'; // 'all' or 'Admin' or 'Staff'
-let CURRENT_ROLE_TOGGLE = false; // false = all users, true = filtered by role
+let CURRENT_ROLE_FILTER = 'all'; // 'all', 'Admin', 'Staff'
 
 /* ============ SESSION CHECK FUNCTION ============ */
 async function sessionCheck(){
@@ -1131,7 +1114,7 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
   
   // Apply role filter
   let filtered = ALL_USERS;
-  if (CURRENT_ROLE_TOGGLE && roleFilter !== 'all') {
+  if (roleFilter !== 'all') {
     filtered = ALL_USERS.filter(user => 
       user.Role.toLowerCase() === roleFilter.toLowerCase()
     );
@@ -1184,83 +1167,47 @@ function updateStats() {
   document.getElementById('statStaff').textContent = staff;
 }
 
-/* ============ ROLE TOGGLE FUNCTION ============ */
+/* ============ SIMPLE ROLE TOGGLE FUNCTION ============ */
 function setupRoleToggle() {
-  const roleToggle = document.getElementById('roleToggle');
-  const toggleLabel = document.getElementById('toggleLabel');
-  const toggleStatus = document.getElementById('toggleStatus');
+  const toggleButtons = document.querySelectorAll('#roleToggle .toggle-btn');
   
-  // Load saved toggle state from localStorage
-  const savedToggle = localStorage.getItem('roleToggleState');
-  const savedFilter = localStorage.getItem('roleToggleFilter');
-  
-  if (savedToggle === 'true') {
-    CURRENT_ROLE_TOGGLE = true;
-    roleToggle.checked = true;
-    CURRENT_ROLE_FILTER = savedFilter || 'Admin';
-    toggleLabel.textContent = `Show Only ${CURRENT_ROLE_FILTER}s`;
-    toggleStatus.textContent = 'ON';
-    toggleStatus.style.color = 'var(--accent1)';
-  } else {
-    CURRENT_ROLE_TOGGLE = false;
-    roleToggle.checked = false;
-    CURRENT_ROLE_FILTER = 'all';
-    toggleLabel.textContent = 'Show All Users';
-    toggleStatus.textContent = 'OFF';
-    toggleStatus.style.color = 'var(--muted)';
+  // Load saved filter from localStorage
+  const savedFilter = localStorage.getItem('roleFilter');
+  if (savedFilter) {
+    CURRENT_ROLE_FILTER = savedFilter;
   }
   
-  roleToggle.addEventListener('change', function() {
-    if (this.checked) {
-      // When turned ON, filter by Admin role by default
-      CURRENT_ROLE_TOGGLE = true;
-      CURRENT_ROLE_FILTER = 'Admin';
-      toggleLabel.textContent = `Show Only Admins`;
-      toggleStatus.textContent = 'ON';
-      toggleStatus.style.color = 'var(--accent1)';
-      
-      // Save state to localStorage
-      localStorage.setItem('roleToggleState', 'true');
-      localStorage.setItem('roleToggleFilter', CURRENT_ROLE_FILTER);
+  // Set initial active state
+  toggleButtons.forEach(btn => {
+    if (btn.getAttribute('data-role') === CURRENT_ROLE_FILTER) {
+      btn.classList.add('active');
     } else {
-      // When turned OFF, show all users
-      CURRENT_ROLE_TOGGLE = false;
-      CURRENT_ROLE_FILTER = 'all';
-      toggleLabel.textContent = 'Show All Users';
-      toggleStatus.textContent = 'OFF';
-      toggleStatus.style.color = 'var(--muted)';
-      
-      // Save state to localStorage
-      localStorage.setItem('roleToggleState', 'false');
-      localStorage.removeItem('roleToggleFilter');
+      btn.classList.remove('active');
     }
-    
-    // Get current search filter value
-    const searchFilter = document.getElementById('filterUser').value;
-    
-    // Render users with updated filters
-    renderUsers(searchFilter, CURRENT_ROLE_FILTER);
   });
   
-  // Add right-click functionality to change filter type
-  roleToggle.parentElement.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    
-    if (CURRENT_ROLE_TOGGLE) {
-      // Toggle between Admin and Staff filter
-      CURRENT_ROLE_FILTER = CURRENT_ROLE_FILTER === 'Admin' ? 'Staff' : 'Admin';
-      toggleLabel.textContent = `Show Only ${CURRENT_ROLE_FILTER}s`;
+  // Add click event listeners
+  toggleButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove active class from all buttons
+      toggleButtons.forEach(b => b.classList.remove('active'));
       
-      // Save filter preference
-      localStorage.setItem('roleToggleFilter', CURRENT_ROLE_FILTER);
+      // Add active class to clicked button
+      this.classList.add('active');
       
-      // Show notification
-      showToast(`Filtering by ${CURRENT_ROLE_FILTER} role`, 'info');
+      // Get the role from data attribute
+      const role = this.getAttribute('data-role');
+      CURRENT_ROLE_FILTER = role;
       
-      // Re-render with new filter
+      // Save to localStorage
+      localStorage.setItem('roleFilter', role);
+      
+      // Get current search filter value
       const searchFilter = document.getElementById('filterUser').value;
-      renderUsers(searchFilter, CURRENT_ROLE_FILTER);
-    }
+      
+      // Render users with updated filters
+      renderUsers(searchFilter, role);
+    });
   });
 }
 
@@ -1683,4 +1630,3 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
-
