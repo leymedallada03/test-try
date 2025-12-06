@@ -1056,6 +1056,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuy
 let header = [];
 let rawRows = [];
 let groups = [];
+let filteredGroups = []; // Added: filtered groups for client-side filtering
 let selected = new Set();
 let currentPage = 1;
 const rowsPerPage = 25;
@@ -1134,26 +1135,44 @@ function handleLogout() {
     });
 }
 
-/* ============ LOAD RECORDS ============ */
+/* ============ LOAD RECORDS WITH CACHING ============ */
 async function loadRecords(){
     showLoading(true);
     try{
-        const barangay = document.getElementById("filterBarangay").value || "";
-        const q = document.getElementById("searchInput").value.trim();
-
-        // Send both filter parameters to the backend
-        const res = await fetch(`${SCRIPT_URL}?action=getRecords&barangay=${encodeURIComponent(barangay)}&q=${encodeURIComponent(q)}`);
-        const data = await res.json();
+        // Check if we already have cached data (less than 5 minutes old)
+        const cachedData = localStorage.getItem('recordsCache');
+        const cacheTime = localStorage.getItem('recordsCacheTime');
+        const now = Date.now();
         
-        if(!data.success){ 
-            alert("Load failed: " + (data.message||"")); 
-            showLoading(false); 
-            return; 
+        // Use cache if it exists and is less than 5 minutes old (300000ms = 5 minutes)
+        if(cachedData && cacheTime && (now - parseInt(cacheTime)) < 300000) {
+            const data = JSON.parse(cachedData);
+            header = data.header || [];
+            rawRows = data.rows || [];
+            console.log("Using cached data");
+        } else {
+            // Load fresh data from server (no filtering parameters)
+            const res = await fetch(`${SCRIPT_URL}?action=getRecords&barangay=&q=`);
+            const data = await res.json();
+            
+            if(!data.success){ 
+                alert("Load failed: " + (data.message||"")); 
+                showLoading(false); 
+                return; 
+            }
+            
+            header = data.header || [];
+            rawRows = data.rows || [];
+            
+            // Cache the data
+            localStorage.setItem('recordsCache', JSON.stringify(data));
+            localStorage.setItem('recordsCacheTime', now.toString());
+            console.log("Loaded fresh data from server");
         }
-
-        header = data.header || [];
-        rawRows = data.rows || [];
+        
         groupRows();
+        // Initialize filteredGroups with all groups
+        filteredGroups = [...groups];
         currentPage = 1;
         renderTable();
         renderPagination();
@@ -1163,6 +1182,51 @@ async function loadRecords(){
         alert("Error loading records");
     }
     showLoading(false);
+}
+
+/* ============ CLIENT-SIDE FILTERING ============ */
+function filterRecords() {
+    const barangay = document.getElementById("filterBarangay").value || "";
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    
+    // Reset to first page when filtering
+    currentPage = 1;
+    
+    // Filter groups based on search and barangay
+    filteredGroups = groups.filter(g => {
+        const head = g.head || {};
+        
+        // Filter by barangay
+        if (barangay && head["Barangay"] !== barangay) {
+            return false;
+        }
+        
+        // Filter by search query
+        if (q) {
+            // Search in head row fields
+            const searchableFields = [
+                head["Data ID"] || "",
+                head["Name of Head"] || "",
+                head["Barangay"] || "",
+                head["Purok/Street"] || "",
+                head["Contact"] || ""
+            ];
+            
+            // Also search in member names
+            const memberNames = g.members.map(m => m["Name of Household Member/s"] || "").join(" ");
+            
+            // Combine all searchable text
+            const searchText = [...searchableFields, memberNames].join(" ").toLowerCase();
+            
+            return searchText.includes(q);
+        }
+        
+        return true;
+    });
+    
+    renderTable();
+    renderPagination();
+    updateCounts();
 }
 
 /* ============ GROUPING ============ */
@@ -1201,18 +1265,12 @@ function renderTable(){
     thead.innerHTML = th;
 
     const start = (currentPage-1) * rowsPerPage;
-    const pageRows = groups.slice(start, start + rowsPerPage);
+    const pageRows = filteredGroups.slice(start, start + rowsPerPage);
     const keyword = document.getElementById("searchInput").value.trim();
-    const selectedBarangay = document.getElementById("filterBarangay").value;
 
     pageRows.forEach(g=>{
         const head = g.head || {};
         const mCount = g.members.length;
-
-        // Skip if barangay filter is applied and doesn't match
-        if (selectedBarangay && head["Barangay"] !== selectedBarangay) {
-            return;
-        }
 
         let cls = mCount <= 1 ? "mem-small" : mCount <= 4 ? "mem-normal" : mCount <= 7 ? "mem-large" : "mem-critical";
         const tr = document.createElement("tr"); 
@@ -1299,9 +1357,6 @@ function renderTable(){
         });
     });
 
-    // Update counts based on filtered rows
-    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
-    
     // select all logic for page
     const selectAll = document.getElementById("selectAll");
     if(selectAll){
@@ -1349,8 +1404,6 @@ function toggleMembers(id){
 /* ============ PAGINATION ============ */
 function renderPagination(){
     const div = document.getElementById("paginationArea");
-    const selectedBarangay = document.getElementById("filterBarangay").value;
-    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
     const total = Math.ceil(filteredGroups.length / rowsPerPage);
     
     if(total <= 1){ 
@@ -1374,9 +1427,6 @@ function gotoPage(p){
 
 /* ============ COUNTS ============ */
 function updateCounts(){
-    const selectedBarangay = document.getElementById("filterBarangay").value;
-    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
-    
     document.getElementById("rowCount").innerText = groups.length;
     document.getElementById("matchCount").innerText = filteredGroups.length;
     
@@ -1409,6 +1459,9 @@ async function onDelete(id){
 
         if(json.success){
             alert(`Data has been deleted. Data ID: ${id} from Master and Barangay`);
+            // Clear cache and reload fresh data after delete
+            localStorage.removeItem('recordsCache');
+            localStorage.removeItem('recordsCacheTime');
             await loadRecords();
         } else {
             alert("Delete failed: " + (json.message || JSON.stringify(json)));
@@ -1421,14 +1474,10 @@ async function onDelete(id){
 
 /* ============ EXPORT ============ */
 function exportAll(){ 
-    const selectedBarangay = document.getElementById("filterBarangay").value;
-    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
     exportCSV(filteredGroups); 
 }
 
 function exportSelected(){
-    const selectedBarangay = document.getElementById("filterBarangay").value;
-    const filteredGroups = selectedBarangay ? groups.filter(g => g.head && g.head["Barangay"] === selectedBarangay) : groups;
     const arr = filteredGroups.filter(g => selected.has(g.dataID));
     if(!arr.length) return alert("No selected rows");
     exportCSV(arr);
@@ -1504,15 +1553,18 @@ document.addEventListener('click', function(event) {
 });
 
 /* ============ UI BINDINGS ============ */
-document.getElementById("refreshBtn").onclick = loadRecords;
-document.getElementById("filterBarangay").onchange = loadRecords;
+document.getElementById("refreshBtn").onclick = function() {
+    // Clear cache and reload fresh data
+    localStorage.removeItem('recordsCache');
+    localStorage.removeItem('recordsCacheTime');
+    loadRecords();
+};
 
-// Debounced search
-let searchTimeout;
-document.getElementById("searchInput").addEventListener("input", () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(loadRecords, 260);
-});
+// Client-side filtering for search and barangay dropdown
+document.getElementById("filterBarangay").onchange = filterRecords;
+
+// Real-time search filtering (no debounce needed since it's client-side)
+document.getElementById("searchInput").addEventListener("input", filterRecords);
 
 // Export dropdown toggle
 document.getElementById("exportBtn").onclick = (e) => {
@@ -1598,5 +1650,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 </script>
 </body>
 </html>
-
-
