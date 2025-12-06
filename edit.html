@@ -719,9 +719,16 @@ function onRowSelect(e){ const id = e.target.dataset.dataId; if(e.target.checked
 /* ========================= DELETE ========================= */
 function onDeleteClick(dataID){
   if(!confirm('Delete household ' + dataID + '?')) return;
+  
+  // Get current user for audit logging
+  const currentUser = localStorage.getItem('username') || 
+                     localStorage.getItem('staffName') || 
+                     'System';
+  
   const fd = new FormData();
   fd.append('action','deleteHousehold');
   fd.append('dataID', dataID);
+  fd.append('actor', currentUser);  // ← ADD THIS LINE
   fetch(SCRIPT_URL, { method: 'POST', body: fd })
     .then(r => r.text())
     .then(txt => {
@@ -956,6 +963,7 @@ function collectHeadFromEditForm(){
 }
 
 /* ========================= SAVE EDITED HOUSEHOLD ========================= */
+/* ========================= SAVE EDITED HOUSEHOLD ========================= */
 async function saveEditedHousehold(silentReload = false){
   collectHeadFromEditForm();
 
@@ -963,12 +971,18 @@ async function saveEditedHousehold(silentReload = false){
   while(editMembers.length < expected) editMembers.push(createEmptyMember());
   if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
 
+  // Get current user for audit logging
+  const currentUser = localStorage.getItem('username') || 
+                     localStorage.getItem('staffName') || 
+                     'System';
+
   const fd = new FormData();
   fd.append('action','updateHousehold');
   fd.append('dataID', editDataID);
+  fd.append('actor', currentUser);  // ← ADD THIS LINE
   fd.append('head', JSON.stringify(editHead));
   fd.append('members', JSON.stringify(editMembers || []));
-  fd.append('submittedBy', localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown');
+  fd.append('submittedBy', currentUser);  // Updated to use currentUser variable
 
   const btn = $('saveEditBtn');
   if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
@@ -1085,6 +1099,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
 
