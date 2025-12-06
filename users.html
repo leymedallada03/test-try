@@ -275,6 +275,8 @@
    .toolbar-row-1 {
     display: flex;
     width: 100%;
+    gap: 12px;
+    align-items: center;
    }
 
    .search-container {
@@ -307,6 +309,42 @@
     outline: none;
     border-color: var(--accent1);
     box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+   }
+
+   /* Role Toggle Filter */
+   .role-filter {
+    display: flex;
+    gap: 4px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    min-width: 180px;
+   }
+
+   .role-filter-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--muted);
+    text-align: center;
+   }
+
+   .role-filter-btn:hover {
+    background: var(--light-green);
+    color: var(--accent1);
+   }
+
+   .role-filter-btn.active {
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: white;
+    box-shadow: 0 2px 4px rgba(15,122,74,0.2);
    }
 
    .toolbar-row-2 {
@@ -648,6 +686,16 @@
         align-items: stretch;
     }
     
+    .toolbar-row-1 {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .role-filter {
+        width: 100%;
+        justify-content: center;
+    }
+    
     .toolbar-row-2 {
         justify-content: space-between;
         flex-wrap: wrap;
@@ -762,6 +810,13 @@
         <div class="search-container">
           <i class="fas fa-search"></i>
           <input id="filterUser" class="search-box" placeholder="Search by username or full name..." />
+        </div>
+        
+        <!-- Role Filter Toggle -->
+        <div class="role-filter" id="roleFilter">
+          <button class="role-filter-btn active" data-role="all">All Users</button>
+          <button class="role-filter-btn" data-role="Admin">Admins</button>
+          <button class="role-filter-btn" data-role="Staff">Staff</button>
         </div>
       </div>
       
@@ -912,6 +967,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuy
 /* ============ STATE ============ */
 let ALL_USERS = [];
 let EDIT_TARGET = null;
+let CURRENT_ROLE_FILTER = 'all'; // 'all', 'Admin', 'Staff'
 
 /* ============ SESSION CHECK FUNCTION ============ */
 async function sessionCheck(){
@@ -1025,14 +1081,25 @@ async function loadUsers() {
 }
 
 /* ============ RENDER USERS ============ */
-function renderUsers(filter = "") {
+function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
   const tbody = document.getElementById("usersBody");
   tbody.innerHTML = "";
   
-  const filtered = ALL_USERS.filter(user => {
-    const searchStr = `${user.Username} ${user.FullName} ${user.Role} ${user.AssignedBarangay}`.toLowerCase();
-    return searchStr.includes(filter.toLowerCase());
-  });
+  // Apply role filter
+  let filtered = ALL_USERS;
+  if (roleFilter !== 'all') {
+    filtered = ALL_USERS.filter(user => 
+      user.Role.toLowerCase() === roleFilter.toLowerCase()
+    );
+  }
+  
+  // Apply search filter
+  if (filter) {
+    filtered = filtered.filter(user => {
+      const searchStr = `${user.Username} ${user.FullName} ${user.Role} ${user.AssignedBarangay}`.toLowerCase();
+      return searchStr.includes(filter.toLowerCase());
+    });
+  }
   
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No users found</td></tr>`;
@@ -1071,6 +1138,32 @@ function updateStats() {
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statAdmins').textContent = admins;
   document.getElementById('statStaff').textContent = staff;
+}
+
+/* ============ ROLE FILTER FUNCTION ============ */
+function setupRoleFilter() {
+  const roleFilter = document.getElementById('roleFilter');
+  const buttons = roleFilter.querySelectorAll('.role-filter-btn');
+  
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove active class from all buttons
+      buttons.forEach(b => b.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      // Get the role from data attribute
+      const role = this.getAttribute('data-role');
+      CURRENT_ROLE_FILTER = role;
+      
+      // Get current search filter value
+      const searchFilter = document.getElementById('filterUser').value;
+      
+      // Render users with both filters
+      renderUsers(searchFilter, role);
+    });
+  });
 }
 
 /* ============ USER OPERATIONS ============ */
@@ -1418,6 +1511,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Load users
     loadUsers();
     
+    // Setup role filter
+    setupRoleFilter();
+    
     // Event listeners
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     document.getElementById('openAddUser').addEventListener('click', () => openUserModal('add'));
@@ -1427,7 +1523,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('closeModal').addEventListener('click', closeUserModal);
     document.getElementById('closeLogsBtn').addEventListener('click', closeLogsModal);
     document.getElementById('closeLogsModal').addEventListener('click', closeLogsModal);
-    document.getElementById('filterUser').addEventListener('input', (e) => renderUsers(e.target.value));
+    document.getElementById('filterUser').addEventListener('input', (e) => renderUsers(e.target.value, CURRENT_ROLE_FILTER));
     document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
     document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileSidebar);
     
