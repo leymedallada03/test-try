@@ -3073,11 +3073,18 @@ async function submitHeadAndMembers(){
   }
 
   // Build request
-  const form = new FormData();
-  form.append("action","createRecord");
-  form.append("head", JSON.stringify(head));
-  form.append("members", JSON.stringify(members));
-  form.append("submittedBy", localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown");
+// Get current user
+const currentUser = localStorage.getItem("username") || 
+                   localStorage.getItem("staffName") || 
+                   "System";
+
+// Build request
+const form = new FormData();
+form.append("action", "createRecord");
+form.append("actor", currentUser);  // ← ADD THIS LINE
+form.append("head", JSON.stringify(head));
+form.append("members", JSON.stringify(members));
+form.append("submittedBy", currentUser);  // Updated to use currentUser variable
 
   // UI disable
   const submitBtn = document.getElementById("nextToMembers");
@@ -3207,6 +3214,7 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
 
 
 
