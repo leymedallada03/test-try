@@ -1047,11 +1047,14 @@ async function validateSession() {
     const sessionId = sessionStorage.getItem("sessionId");
     
     if (!username || !sessionId) {
-        console.log("No username or sessionId found for validation");
         return false;
     }
     
     try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
         const formData = new FormData();
         formData.append("action", "validateSession");
         formData.append("username", username);
@@ -1059,8 +1062,11 @@ async function validateSession() {
         
         const response = await fetch(API_URL, {
             method: "POST",
-            body: formData
+            body: formData,
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         const data = await response.json();
         
@@ -1072,7 +1078,10 @@ async function validateSession() {
         }
     } catch (error) {
         console.error("Session validation error:", error);
-        return true; // On network error, assume valid
+        if (error.name === 'AbortError') {
+            console.log("Session validation timeout");
+        }
+        return false; // On any error, consider session invalid
     }
 }
 
@@ -1157,22 +1166,30 @@ async function sessionCheck() {
     
   } catch(e){ 
     console.warn('Session check failed', e);
-    // On error, still allow access but log it
-    document.getElementById('userName').innerText = "User";
-    return true;
+    // On error, redirect to login for security
+    console.log("Session check error, redirecting to login...");
+    window.location.href = 'index.html?session=error';
+    return false;  // CHANGED THIS FROM true TO false
   }
 }
-
 /* ENHANCED LOGOUT FUNCTION */
 async function enhancedLogout() {
   try {
     const username = localStorage.getItem("username");
     const sessionId = sessionStorage.getItem("sessionId");
     
-    // Stop session monitoring
-    stopSessionMonitoring();
+    // 1. Stop all intervals
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
     
-    // Call server logout if we have session data
+    if (sessionMonitorInterval) {
+      clearInterval(sessionMonitorInterval);
+      sessionMonitorInterval = null;
+    }
+    
+    // 2. Call server logout if we have session data
     if (username && sessionId) {
       try {
         const formData = new FormData();
@@ -1183,7 +1200,9 @@ async function enhancedLogout() {
         // Fire and forget - don't wait for response
         fetch(API_URL, {
           method: "POST",
-          body: formData
+          body: formData,
+          // Add timeout to prevent hanging
+          signal: AbortSignal.timeout(5000)
         }).catch(() => { /* ignore errors */ });
       } catch (e) {
         console.error("Logout API error:", e);
@@ -1193,11 +1212,11 @@ async function enhancedLogout() {
   } catch (err) {
     console.error("Logout error:", err);
   } finally {
-    // Always clear storage and redirect
+    // 3. Always clear storage
     localStorage.clear();
     sessionStorage.clear();
     
-    // Redirect with cache-busting parameter
+    // 4. Redirect with cache-busting
     window.location.replace('index.html?logout=true&t=' + Date.now());
   }
 }
@@ -2541,7 +2560,6 @@ function notifyDataUpdated() {
 <script src="session-monitor.js"></script>
 </body>
 </html>
-
 
 
 
