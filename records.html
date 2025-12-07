@@ -1449,15 +1449,15 @@ function onEdit(id){
 async function onDelete(id){
     if(!confirm("Delete household " + id + "?")) return;
     
-    // Get current user for audit logging
-    const currentUser = localStorage.getItem("username") || 
-                       localStorage.getItem("staffName") || 
-                       "System";
+    // Get current user's full name
+    const currentUserFullName = localStorage.getItem("staffName") || 
+                               localStorage.getItem("username") || 
+                               "System";
 
     const fd = new FormData();
     fd.append("action", "deleteHousehold");
     fd.append("dataID", id);
-    fd.append("actor", currentUser);  // ← ADD THIS LINE
+    fd.append("actor", currentUserFullName);  // Send full name as actor
 
     try{
         const res = await fetch(SCRIPT_URL, { method: "POST", body: fd });
@@ -1658,6 +1658,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
 
 
 
