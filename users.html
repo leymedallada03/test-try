@@ -1803,20 +1803,23 @@ function displayAuditLogs(category = 'all') {
     return;
   }
   
-  logs.forEach(log => {
-    const tr = document.createElement('tr');
-    const timestamp = log.FormattedTimestamp || log.Timestamp || '';
-    const details = log.Details || '';
-    
-    tr.innerHTML = `
-      <td><small>${escapeHtml(timestamp)}</small></td>
-      <td>${escapeHtml(log.Action || '')}</td>
-      <td><strong>${escapeHtml(log.Actor || '')}</strong></td>
-      <td>${escapeHtml(log.TargetSheet || '')}</td>
-      <td><small>${escapeHtml(details)}</small></td>
-    `;
-    tbody.appendChild(tr);
-  });
+logs.forEach(log => {
+  const tr = document.createElement('tr');
+  const timestamp = log.FormattedTimestamp || log.Timestamp || '';
+  
+  // Use TargetSheet if available, otherwise use Target
+  const target = log.TargetSheet || log.Target || '';
+  const details = log.Details || '';
+  
+  tr.innerHTML = `
+    <td><small>${escapeHtml(timestamp)}</small></td>
+    <td>${escapeHtml(log.Action || '')}</td>
+    <td><strong>${escapeHtml(log.Actor || '')}</strong></td>
+    <td>${escapeHtml(target)}</td>
+    <td><small>${escapeHtml(details)}</small></td>
+  `;
+  tbody.appendChild(tr);
+});
 }
 
 /* ============ TAB FUNCTIONALITY ============ */
@@ -2066,7 +2069,6 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
-
 
 
 
