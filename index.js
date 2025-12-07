@@ -1,4 +1,4 @@
-/* COMPLETE index.js with Single-Session Restriction */
+/* COMPLETE index.js with Single-Session Restriction - UPDATED VERSION */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 // Session timeout (30 minutes = 1800000 ms)
@@ -9,6 +9,11 @@ let sessionActivityInterval = null;
 // Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Login page loaded");
+    
+    // Check browser compatibility first
+    if (!checkBrowserCompatibility()) {
+        return;
+    }
     
     // Setup basic UI interactions
     setupUI();
@@ -26,6 +31,42 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check if user was previously logged in
     checkPreviousSession();
 });
+
+// --------------------------
+// Browser Compatibility Check
+// --------------------------
+function checkBrowserCompatibility() {
+    const requiredFeatures = [
+        'Promise' in window,
+        'fetch' in window,
+        'crypto' in window && 'subtle' in crypto,
+        'localStorage' in window,
+        'sessionStorage' in window
+    ];
+    
+    if (requiredFeatures.some(feature => !feature)) {
+        console.error("Browser lacks required features");
+        const errorDiv = document.getElementById("loginError");
+        if (errorDiv) {
+            errorDiv.innerHTML = `
+                <div style="background: #ffebee; border-left: 4px solid #f44336; padding: 12px; border-radius: 4px; margin: 10px 0;">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Browser Compatibility Issue</strong><br>
+                    <div style="margin-top: 8px; font-size: 0.9rem;">
+                        Your browser is missing required features for this application.<br>
+                        Please use one of these modern browsers:<br>
+                        • Chrome 58+<br>
+                        • Firefox 52+<br>
+                        • Safari 10.1+<br>
+                        • Edge 16+
+                    </div>
+                </div>
+            `;
+            errorDiv.style.display = "block";
+        }
+        return false;
+    }
+    return true;
+}
 
 // --------------------------
 // UI Setup Functions
@@ -179,7 +220,7 @@ async function sha256(str) {
 }
 
 // --------------------------
-// Check Previous Session
+// Check Previous Session - UPDATED
 // --------------------------
 function checkPreviousSession() {
     const loggedIn = localStorage.getItem("loggedIn");
@@ -191,6 +232,7 @@ function checkPreviousSession() {
         const loginTimestamp = parseInt(loginTime);
         const sessionAge = currentTime - loginTimestamp;
         
+        // Check if session expired locally first
         if (sessionAge < SESSION_TIMEOUT) {
             // Session might still be valid, check with server
             checkSessionWithServer(localStorage.getItem("username"), sessionId);
@@ -204,13 +246,30 @@ function checkPreviousSession() {
 
 async function checkSessionWithServer(username, sessionId) {
     try {
+        // Add timeout for session check
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
         const response = await fetchJSON(API_URL, {
             action: "validateSession",
             username: username,
             sessionId: sessionId
-        });
+        }, controller.signal);
+        
+        clearTimeout(timeoutId);
         
         if (response.success && response.isLoggedIn) {
+            // ADD: Check session age from localStorage
+            const loginTime = localStorage.getItem("loginTime");
+            if (loginTime) {
+                const sessionAge = Date.now() - parseInt(loginTime);
+                if (sessionAge > SESSION_TIMEOUT) {
+                    console.log("Session expired locally, clearing...");
+                    clearSessionData();
+                    return;
+                }
+            }
+            
             // Session is still valid, redirect to dashboard
             console.log("Valid session found, redirecting...");
             window.location.href = "dashboard.html";
@@ -220,12 +279,15 @@ async function checkSessionWithServer(username, sessionId) {
         }
     } catch (error) {
         console.error("Session check failed:", error);
+        if (error.name === 'AbortError') {
+            console.log("Session check timeout");
+        }
         clearSessionData();
     }
 }
 
 // --------------------------
-// LOGIN HANDLER - UPDATED WITH SESSION MANAGEMENT
+// LOGIN HANDLER - UPDATED WITH TIMEOUT
 // --------------------------
 async function handleLogin(event) {
     event.preventDefault();
@@ -280,9 +342,14 @@ async function handleLogin(event) {
         console.log("Sending login request to:", API_URL);
         console.log("Request data:", requestData);
 
-        // Send POST request
+        // Send POST request with timeout
         const startTime = Date.now();
-        const response = await fetchJSON(API_URL, requestData);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        const response = await fetchJSON(API_URL, requestData, controller.signal);
+        
+        clearTimeout(timeoutId);
         const endTime = Date.now();
         console.log(`Request completed in ${endTime - startTime}ms`);
         
@@ -329,7 +396,13 @@ async function handleLogin(event) {
     } catch (err) {
         console.error("FETCH ERROR:", err);
         console.error("Error details:", err.message);
-        showError("Connection error: " + err.message);
+        
+        if (err.name === 'AbortError') {
+            showError("Connection timeout. Please check your internet and try again.");
+        } else {
+            showError("Connection error: " + err.message);
+        }
+        
         if (loginBtn) {
             loginBtn.classList.remove("btn-loading");
             loginBtn.disabled = false;
@@ -353,9 +426,24 @@ async function showAlreadyLoggedInError(username, password, errorResponse) {
                 <i class="fas fa-exclamation-triangle" style="color: #ff9800; margin-right: 8px;"></i>
                 <strong>Account Already in Use</strong>
             </div>
-            <div style="margin-bottom: 15px; color: #666; font-size: 14px;">
+            <div style="margin-bottom: 10px; color: #666; font-size: 14px;">
                 ${errorResponse.message}
             </div>
+    `;
+    
+    // Add session details if available
+    if (errorResponse.lastActivity || errorResponse.sessionStarted) {
+        errorMessage += `
+            <div style="margin-bottom: 15px; color: #666; font-size: 13px; background: #fff9e6; padding: 8px; border-radius: 4px;">
+                <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                ${errorResponse.sessionStarted ? `Session started: ${errorResponse.sessionStarted}<br>` : ''}
+                ${errorResponse.lastActivity ? `Last activity: ${errorResponse.lastActivity}<br>` : ''}
+                ${errorResponse.inactiveMinutes ? `Inactive for: ${errorResponse.inactiveMinutes} minutes` : ''}
+            </div>
+        `;
+    }
+    
+    errorMessage += `
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button type="button" class="force-logout-btn" onclick="handleForceLogout('${username}', '${password}')" style="padding: 8px 16px; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">
                     <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>
@@ -379,7 +467,7 @@ async function showAlreadyLoggedInError(username, password, errorResponse) {
 }
 
 // --------------------------
-// Force Logout Handler
+// Force Logout Handler - UPDATED WITH TIMEOUT
 // --------------------------
 async function handleForceLogout(username, password) {
     console.log("Force logout requested for:", username);
@@ -389,25 +477,31 @@ async function handleForceLogout(username, password) {
     
     if (!errorDiv) return;
     
-    // Show loading state
-    errorDiv.innerHTML = `
-        <div style="text-align: center; padding: 10px;">
-            <div class="btn-loading" style="margin: 0 auto;"></div>
-            <div style="margin-top: 10px; color: #666;">Terminating other session...</div>
-        </div>
-    `;
-    
     try {
+        // Show loading state
+        errorDiv.innerHTML = `
+            <div style="text-align: center; padding: 10px;">
+                <div class="btn-loading" style="margin: 0 auto;"></div>
+                <div style="margin-top: 10px; color: #666;">Terminating other session...</div>
+            </div>
+        `;
+        
+        // Set timeout for force logout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        
         // Call force logout API
         const response = await fetchJSON(API_URL, {
             action: "forceLogout",
             username: username
-        });
+        }, controller.signal);
+        
+        clearTimeout(timeoutId);
         
         if (response.success) {
             console.log("Force logout successful. Request ID:", response.invalidationRequestId);
             
-            // Wait 3 seconds for the other device to detect logout
+            // Wait 2 seconds for the other device to detect logout
             errorDiv.innerHTML = `
                 <div style="text-align: center; padding: 10px;">
                     <div style="margin: 10px 0; color: green;">
@@ -419,30 +513,48 @@ async function handleForceLogout(username, password) {
                 </div>
             `;
             
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
             
             // Close error message
             errorDiv.style.display = "none";
             errorDiv.innerHTML = "";
             
-            // Now retry login
-            const pwHash = await sha256(password);
-            const deviceInfo = getDeviceInfo();
+            // Now retry login with timeout
+            const loginController = new AbortController();
+            const loginTimeoutId = setTimeout(() => loginController.abort(), 15000);
             
-            const loginResponse = await fetchJSON(API_URL, {
-                action: "login",
-                username: username,
-                pwHash: pwHash,
-                deviceInfo: JSON.stringify(deviceInfo)
-            });
-            
-            if (loginResponse.success) {
-                // Login successful
-                storeSessionData(loginResponse.user, pwHash, loginResponse.sessionId);
-                startSessionManagement(username, loginResponse.sessionId);
-                window.location.replace("dashboard.html");
-            } else {
-                showError("Login failed after force logout: " + loginResponse.message);
+            try {
+                const pwHash = await sha256(password);
+                const deviceInfo = getDeviceInfo();
+                
+                const loginResponse = await fetchJSON(API_URL, {
+                    action: "login",
+                    username: username,
+                    pwHash: pwHash,
+                    deviceInfo: JSON.stringify(deviceInfo)
+                }, loginController.signal);
+                
+                clearTimeout(loginTimeoutId);
+                
+                if (loginResponse.success) {
+                    // Login successful
+                    storeSessionData(loginResponse.user, pwHash, loginResponse.sessionId);
+                    startSessionManagement(username, loginResponse.sessionId);
+                    window.location.replace("dashboard.html");
+                } else {
+                    showError("Login failed after force logout: " + loginResponse.message);
+                    if (loginBtn) {
+                        loginBtn.classList.remove("btn-loading");
+                        loginBtn.disabled = false;
+                    }
+                }
+            } catch (loginErr) {
+                clearTimeout(loginTimeoutId);
+                if (loginErr.name === 'AbortError') {
+                    showError("Login timeout after force logout. Please try again.");
+                } else {
+                    showError("Login error after force logout: " + loginErr.message);
+                }
                 if (loginBtn) {
                     loginBtn.classList.remove("btn-loading");
                     loginBtn.disabled = false;
@@ -457,7 +569,11 @@ async function handleForceLogout(username, password) {
         }
     } catch (err) {
         console.error("Force logout error:", err);
-        showError("Error during force logout: " + err.message);
+        if (err.name === 'AbortError') {
+            showError("Force logout timeout. Please try again.");
+        } else {
+            showError("Error during force logout: " + err.message);
+        }
         if (loginBtn) {
             loginBtn.classList.remove("btn-loading");
             loginBtn.disabled = false;
@@ -563,9 +679,11 @@ function storeSessionData(user, pwHash, sessionId) {
 function clearSessionData() {
     if (sessionCheckInterval) {
         clearInterval(sessionCheckInterval);
+        sessionCheckInterval = null;
     }
     if (sessionActivityInterval) {
         clearInterval(sessionActivityInterval);
+        sessionActivityInterval = null;
     }
     
     localStorage.clear();
@@ -600,9 +718,9 @@ function debounce(func, wait) {
 }
 
 // --------------------------
-// Helper Functions
+// Helper Functions - UPDATED WITH SIGNAL
 // --------------------------
-async function fetchJSON(url, data) {
+async function fetchJSON(url, data, signal) {
     try {
         // Convert data to FormData for Google Apps Script
         const formData = new FormData();
@@ -612,7 +730,8 @@ async function fetchJSON(url, data) {
         
         const response = await fetch(url, {
             method: "POST",
-            body: formData
+            body: formData,
+            signal: signal || null
         });
         
         if (!response.ok) {
@@ -630,6 +749,9 @@ async function fetchJSON(url, data) {
         }
     } catch (error) {
         console.error("fetchJSON error:", error);
+        if (error.name === 'AbortError') {
+            throw error; // Re-throw abort errors
+        }
         return { success: false, message: "Connection failed: " + error.message };
     }
 }
@@ -655,7 +777,12 @@ async function testAPIConnection() {
         const testUrl = API_URL + "?action=test&t=" + Date.now();
         console.log("Testing URL:", testUrl);
         
-        const response = await fetch(testUrl);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(testUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         const text = await response.text();
         console.log("API test response:", text);
         
