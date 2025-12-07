@@ -629,6 +629,8 @@
     justify-content: flex-end;
     gap: 8px;
     margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
    }
 
    /* Password toggle in modal */
@@ -1177,7 +1179,6 @@
               <th>Last Activity</th>
               <th>Active Time</th>
               <th>Session Duration</th>
-              <!-- REMOVED: IP Address column -->
             </tr>
           </thead>
           <tbody id="activityBody">
@@ -1202,35 +1203,6 @@
       </div>
       
       <div class="users-table-wrap" style="min-height: 300px;">
-        <table class="users-table" id="logsTable">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Action</th>
-              <th>Actor</th>
-              <th>Target</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody id="logsBody">
-            <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading logs...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-    <div class="form-actions">
-      <button id="refreshLogs" class="btn btn-secondary">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
-      <button id="closeLogsBtn" class="btn">Close</button>
-    </div>
-  </div>
-</div>
-    
-    <!-- Audit Logs Tab -->
-    <div class="tab-content" id="auditTab">
-      <div class="users-table-wrap">
         <table class="users-table" id="logsTable">
           <thead>
             <tr>
@@ -1803,23 +1775,23 @@ function displayAuditLogs(category = 'all') {
     return;
   }
   
-logs.forEach(log => {
-  const tr = document.createElement('tr');
-  const timestamp = log.FormattedTimestamp || log.Timestamp || '';
-  
-  // Use TargetSheet if available, otherwise use Target
-  const target = log.TargetSheet || log.Target || '';
-  const details = log.Details || '';
-  
-  tr.innerHTML = `
-    <td><small>${escapeHtml(timestamp)}</small></td>
-    <td>${escapeHtml(log.Action || '')}</td>
-    <td><strong>${escapeHtml(log.Actor || '')}</strong></td>
-    <td>${escapeHtml(target)}</td>
-    <td><small>${escapeHtml(details)}</small></td>
-  `;
-  tbody.appendChild(tr);
-});
+  logs.forEach(log => {
+    const tr = document.createElement('tr');
+    const timestamp = log.FormattedTimestamp || log.Timestamp || '';
+    
+    // Use TargetSheet if available, otherwise use Target
+    const target = log.TargetSheet || log.Target || '';
+    const details = log.Details || '';
+    
+    tr.innerHTML = `
+      <td><small>${escapeHtml(timestamp)}</small></td>
+      <td>${escapeHtml(log.Action || '')}</td>
+      <td><strong>${escapeHtml(log.Actor || '')}</strong></td>
+      <td>${escapeHtml(target)}</td>
+      <td><small>${escapeHtml(details)}</small></td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 /* ============ TAB FUNCTIONALITY ============ */
@@ -2069,6 +2041,3 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
-
-
-
