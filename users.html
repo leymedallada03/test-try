@@ -432,11 +432,20 @@
    #activityTable th:nth-child(6) { width: 18%; }
 
    /* Fixed column widths for logs table */
-   #logsTable th:nth-child(1) { width: 20%; }
-   #logsTable th:nth-child(2) { width: 15%; }
-   #logsTable th:nth-child(3) { width: 15%; }
-   #logsTable th:nth-child(4) { width: 15%; }
-   #logsTable th:nth-child(5) { width: 35%; }
+#logsTable th:nth-child(1) { width: 20%; min-width: 150px; }
+#logsTable th:nth-child(2) { width: 15%; min-width: 100px; }
+#logsTable th:nth-child(3) { width: 15%; min-width: 100px; }
+#logsTable th:nth-child(4) { width: 15%; min-width: 100px; }
+#logsTable th:nth-child(5) { width: 35%; min-width: 200px; text-align: left !important; }
+
+#logsTable td:nth-child(5) {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    text-align: left !important;
+    max-width: 300px;
+    min-width: 200px;
+}
 
    .users-table th {
        background: var(--light-green);
@@ -1205,21 +1214,21 @@
         <input id="searchAudit" class="search-box" placeholder="Search audit logs..." />
       </div>
       
-      <div class="users-table-wrap" style="min-height: 300px;">
-        <table class="users-table" id="logsTable">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Action</th>
-              <th>Actor</th>
-              <th>Target</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody id="logsBody">
-            <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading logs...</td></tr>
-          </tbody>
-        </table>
+<div class="users-table-wrap" style="min-height: 300px;">
+  <table class="users-table" id="logsTable">
+    <thead>
+      <tr>
+        <th style="width: 20%;">Timestamp</th>
+        <th style="width: 15%;">Action</th>
+        <th style="width: 15%;">Actor</th>
+        <th style="width: 15%;">Target</th>
+        <th style="width: 35%; text-align: left;">Details</th>
+      </tr>
+    </thead>
+    <tbody id="logsBody">
+      <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading logs...</td></tr>
+    </tbody>
+  </table>
       </div>
     </div>
     
@@ -1728,6 +1737,7 @@ function updateActivityStats(activities) {
 }
 
 /* ============ LOAD AUDIT LOGS ============ */
+/* ============ LOAD AUDIT LOGS ============ */
 async function loadAuditLogs() {
   try {
     const res = await fetch(`${SCRIPT_URL}?action=logs`);
@@ -1735,6 +1745,8 @@ async function loadAuditLogs() {
     let data;
     try {
       data = JSON.parse(text);
+      console.log("Audit logs raw data structure:", data);
+      console.log("First log entry:", data.logs ? data.logs[0] : "No logs");
     } catch (e) {
       console.error("Invalid JSON response:", text);
       showToast("Invalid response from server", "error");
@@ -1747,8 +1759,6 @@ async function loadAuditLogs() {
       return;
     }
     
-    console.log("Audit logs data received:", data);
-    
     AUDIT_LOGS_DATA = data;
     displayAuditLogs('all');
     
@@ -1756,6 +1766,139 @@ async function loadAuditLogs() {
     console.error("Error loading logs:", err);
     showToast('Error loading logs: ' + err.message, 'error');
   }
+}
+
+function displayAuditLogs(category = 'all') {
+  console.log("Displaying logs for category:", category);
+  
+  const tbody = document.getElementById('logsBody');
+  tbody.innerHTML = '';
+  
+  if (!AUDIT_LOGS_DATA) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No logs data available</td></tr>`;
+    return;
+  }
+  
+  const logs = category === 'all' ? AUDIT_LOGS_DATA.logs || [] :
+              category === 'today' ? AUDIT_LOGS_DATA.today || [] :
+              category === 'yesterday' ? AUDIT_LOGS_DATA.yesterday || [] :
+              AUDIT_LOGS_DATA.older || [];
+  
+  console.log("Total logs to display:", logs.length);
+  
+  if (logs.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 20px; color: var(--muted); font-style: italic;">
+          No ${category === 'all' ? '' : category} logs found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  logs.forEach((log, index) => {
+    console.log(`Log ${index + 1}:`, JSON.stringify(log, null, 2));
+    
+    const tr = document.createElement('tr');
+    
+    // Format timestamp - check multiple possibilities
+    let timestamp = '';
+    if (log.FormattedTimestamp) {
+      timestamp = log.FormattedTimestamp;
+    } else if (log.Timestamp) {
+      if (log.Timestamp instanceof Date || (typeof log.Timestamp === 'string' && !isNaN(Date.parse(log.Timestamp)))) {
+        const date = new Date(log.Timestamp);
+        timestamp = date.toLocaleString('en-PH');
+      } else {
+        timestamp = String(log.Timestamp);
+      }
+    }
+    
+    // Get target - check multiple possibilities
+    let target = '';
+    if (log.TargetSheet) {
+      target = log.TargetSheet;
+    } else if (log.Target) {
+      // Check if Target contains concatenated data like "StaffBalagbag"
+      const targetStr = String(log.Target);
+      // If it looks like concatenated (contains a role followed by sheet name)
+      if (targetStr.includes('Staff') || targetStr.includes('Admin')) {
+        // Extract the sheet name (after the role)
+        target = targetStr.replace(/^(Staff|Admin)/, '').trim();
+      } else {
+        target = targetStr;
+      }
+    }
+    
+    // Get actor - check multiple possibilities
+    let actor = '';
+    if (log.Actor) {
+      const actorStr = String(log.Actor);
+      // If it looks like concatenated (e.g., "Orley P Medallada JrSiaif")
+      // Remove any role suffix that might be concatenated
+      actor = actorStr.replace(/(Staff|Admin)$/i, '').trim();
+    }
+    
+    // Get role - check multiple possibilities
+    let role = '';
+    if (log.Role) {
+      role = log.Role;
+    } else if (log.Actor && String(log.Actor).match(/(Staff|Admin)$/i)) {
+      // Extract role from concatenated Actor field
+      const match = String(log.Actor).match(/(Staff|Admin)$/i);
+      if (match) role = match[0];
+    }
+    
+    // Get details - check multiple possibilities
+    let details = '';
+    if (log.Details && String(log.Details).trim() !== '') {
+      details = log.Details;
+    } else if (log.details && String(log.details).trim() !== '') {
+      details = log.details;
+    } else if (log.description && String(log.description).trim() !== '') {
+      details = log.description;
+    } else {
+      // Create meaningful details based on action and available data
+      const action = log.Action || '';
+      details = `${actor || 'Unknown'} performed ${action}${target ? ' on ' + target : ''}`;
+    }
+    
+    // Format action for better display
+    let action = log.Action || '';
+    if (action) {
+      action = action.replace(/([A-Z])/g, ' $1').trim();
+      action = action.charAt(0).toUpperCase() + action.slice(1);
+    }
+    
+    // Format the action badge color
+    let actionBadgeStyle = '';
+    if (action.includes('Login')) {
+      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
+    } else if (action.includes('Delete')) {
+      actionBadgeStyle = 'background: #ffeaea; color: #ff4444;';
+    } else if (action.includes('Create')) {
+      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
+    } else if (action.includes('Update')) {
+      actionBadgeStyle = 'background: #fff8e1; color: #ff9800;';
+    } else {
+      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
+    }
+    
+    tr.innerHTML = `
+      <td><small style="white-space: nowrap;">${escapeHtml(timestamp)}</small></td>
+      <td><span style="padding: 2px 8px; border-radius: 12px; ${actionBadgeStyle} font-weight: 600; font-size: 0.8rem;">${escapeHtml(action)}</span></td>
+      <td>
+        <strong>${escapeHtml(actor)}</strong>
+        ${role ? `<br><small style="color: var(--muted); font-size: 0.75rem;">${escapeHtml(role)}</small>` : ''}
+      </td>
+      <td>${escapeHtml(target)}</td>
+      <td style="text-align: left; white-space: normal; word-wrap: break-word;">
+        <small>${escapeHtml(details)}</small>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 function displayAuditLogs(category = 'all') {
