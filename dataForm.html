@@ -18,6 +18,8 @@
     --accent2:#34b78f;
     --accent3: #ff7a00;
     --accent4: #ffa500;
+    --hazard-red: #dc2626;
+    --hazard-orange: #ef4444;
     --light-green: #e9f7f2;
     --border: #e1e8e5;
     --shadow: 0 6px 18px rgba(6,30,20,0.06);
@@ -633,6 +635,18 @@
      border-color: var(--accent1);
    }
 
+   /* Hazard Hunter Button Styling */
+   .btn.hazard-hunter {
+     background: linear-gradient(90deg, var(--hazard-red), var(--hazard-orange)) !important;
+     color: white !important;
+     border: none !important;
+   }
+
+   .btn.hazard-hunter:hover {
+     background: linear-gradient(90deg, #b91c1c, var(--hazard-red)) !important;
+     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2) !important;
+   }
+
    /* Coordinate container button */
    .coordinate-container .btn {
      padding: 8px 12px; /* Ensure consistent padding */
@@ -927,6 +941,37 @@
      margin-bottom: 0;
    }
 
+   /* ============ MODAL STYLING ============ */
+   .modal {
+     display: none;
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0,0,0,0.7);
+     z-index: 9999;
+     align-items: center;
+     justify-content: center;
+   }
+
+   .modal-content {
+     background: white;
+     padding: 24px;
+     border-radius: var(--radius);
+     max-width: 500px;
+     width: 90%;
+     max-height: 80vh;
+     overflow-y: auto;
+   }
+
+   .modal-actions {
+     display: flex;
+     gap: 12px;
+     justify-content: flex-end;
+     margin-top: 20px;
+   }
+
    /* ============ RESPONSIVE DESIGN ============ */
    /* Tablet-specific improvements */
    @media (min-width: 769px) and (max-width: 1024px) {
@@ -1076,6 +1121,17 @@
      
      .section-title {
          flex-wrap: wrap;
+     }
+     
+     /* Coordinate container on mobile */
+     .coordinate-container {
+         flex-direction: column;
+         align-items: stretch;
+     }
+     
+     .coordinate-container .btn {
+         width: 100%;
+         justify-content: center;
      }
      
      /* Mobile: Make panel buttons full width */
@@ -1280,10 +1336,14 @@
             <div class="coordinate-container">
               <input type="text" id="coordinate" placeholder="Latitude, Longitude" />
               <button type="button" id="getLocationBtn" class="btn secondary">
-                <i class="fas fa-map-marker-alt"></i> Get Location
+                <i class="fas fa-map-marker-alt"></i> Get My Location
+              </button>
+              <!-- NEW HAZARD HUNTER BUTTON -->
+              <button type="button" id="hazardHunterBtn" class="btn hazard-hunter">
+                <i class="fas fa-map-marked-alt"></i> Pick from Hazard Hunter
               </button>
             </div>
-            <div class="small-muted">Optional — paste `lat, lng` if available.</div>
+            <div class="small-muted">Optional — paste `lat, lng` if available, or use the buttons above.</div>
           </div>
           
           <div>
@@ -1754,6 +1814,36 @@
   <div class="loading-spinner"></div>
 </div>
 
+<!-- Hazard Hunter Modal -->
+<div id="hazardHunterModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3 style="color: var(--accent1); margin-top: 0;">Pick Coordinates from Hazard Hunter</h3>
+    <div style="background: var(--light-green); padding: 16px; border-radius: var(--radius-sm); margin: 16px 0;">
+      <h4 style="color: var(--hazard-red); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-map-marked-alt"></i> Instructions:
+      </h4>
+      <ol style="margin: 12px 0 0 20px; line-height: 1.6;">
+        <li>Click the button below to open Hazard Hunter in a new tab</li>
+        <li>Navigate to the desired location on the map</li>
+        <li>Click on the map to get coordinates</li>
+        <li>Copy the coordinates (latitude, longitude)</li>
+        <li>Return to this tab and paste them in the coordinate field</li>
+      </ol>
+      <div style="margin-top: 16px; padding: 12px; background: white; border-radius: var(--radius-sm); border-left: 3px solid var(--accent1);">
+        <strong>📋 Expected format:</strong> <code>14.123456, 121.123456</code>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelHazardHunter" class="btn secondary">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmHazardHunter" class="btn hazard-hunter">
+        <i class="fas fa-external-link-alt"></i> Open Hazard Hunter
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Overlay + Member Panel -->
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
@@ -2125,6 +2215,9 @@
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
+/* ============ HAZARD HUNTER INTEGRATION ============ */
+const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
+
 /* ============ PHILIPPINE MOBILE NUMBER VALIDATION ============ */
 function validatePhilippineMobileNumber(number) {
     // Remove spaces and special characters
@@ -2264,6 +2357,229 @@ function computeAgeDetailed(inputDateValue){
   else stage = "Adult";
 
   return { years, months, days, display, stage };
+}
+
+/* ============ COORDINATE HANDLING FUNCTIONS ============ */
+
+/* Parse coordinates from Hazard Hunter format */
+function parseHazardHunterCoordinates(coordinateString) {
+    if (!coordinateString) return null;
+    
+    // Remove any extra spaces and special characters
+    let cleaned = coordinateString.trim();
+    
+    // Common formats from Hazard Hunter:
+    // 1. "14.123456, 121.123456" (lat, lng)
+    // 2. "14°07'24.4\"N 121°07'24.4\"E" (DMS format)
+    // 3. "14.123456° N, 121.123456° E" (Decimal degrees with directions)
+    
+    // Try to parse decimal format first (most common)
+    const decimalMatch = cleaned.match(/([-+]?\d+\.\d+)\s*,\s*([-+]?\d+\.\d+)/);
+    if (decimalMatch) {
+        const lat = parseFloat(decimalMatch[1]);
+        const lng = parseFloat(decimalMatch[2]);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+    }
+    
+    // Try to parse DMS format (if Hazard Hunter provides it)
+    const dmsMatch = cleaned.match(/(\d+)°\s*(\d+)'\s*([\d.]+)"\s*([NS])\s*(\d+)°\s*(\d+)'\s*([\d.]+)"\s*([EW])/i);
+    if (dmsMatch) {
+        const [_, latDeg, latMin, latSec, latDir, lngDeg, lngMin, lngSec, lngDir] = dmsMatch;
+        
+        let lat = parseInt(latDeg) + (parseInt(latMin) / 60) + (parseFloat(latSec) / 3600);
+        let lng = parseInt(lngDeg) + (parseInt(lngMin) / 60) + (parseFloat(lngSec) / 3600);
+        
+        if (latDir.toUpperCase() === 'S') lat = -lat;
+        if (lngDir.toUpperCase() === 'W') lng = -lng;
+        
+        return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    }
+    
+    return null;
+}
+
+/* Get location from Hazard Hunter (manual selection) */
+function openHazardHunterPicker() {
+    // Store current form data temporarily
+    const formData = {
+        barangay: document.getElementById("barangay").value,
+        sitio: document.getElementById("sitio").value,
+        householdHead: document.getElementById("householdHead").value,
+        contactNo: document.getElementById("contactNo").value,
+    };
+    
+    // Store in sessionStorage so we can retrieve it when we come back
+    sessionStorage.setItem('tempFormData', JSON.stringify(formData));
+    sessionStorage.setItem('awaitingCoordinates', 'true');
+    
+    // Show modal with instructions
+    const modal = document.getElementById('hazardHunterModal');
+    modal.style.display = 'flex';
+}
+
+/* Get location using browser geolocation */
+function getCurrentLocation() {
+    if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+    }
+
+    // Show loading
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    loadingOverlay.style.display = "flex";
+
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            document.getElementById("coordinate").value = `${lat}, ${lng}`;
+            loadingOverlay.style.display = "none";
+            
+            // Ask user if they want to verify on Hazard Hunter
+            if (confirm("Location captured successfully!\n\nWould you like to verify this location on Hazard Hunter to check for hazards?")) {
+                openHazardHunterVerification(lat, lng);
+            }
+        },
+        (err) => {
+            loadingOverlay.style.display = "none";
+            alert("Unable to retrieve GPS location. Please allow location access or use the Hazard Hunter option.");
+            console.error("GPS Error:", err);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 8000,
+            maximumAge: 0
+        }
+    );
+}
+
+/* Open Hazard Hunter with pre-filled coordinates for verification */
+function openHazardHunterVerification(lat, lng) {
+    // Hazard Hunter URL format for specific coordinates
+    const verificationUrl = `${HAZARD_HUNTER_URL}?lat=${lat}&lng=${lng}`;
+    
+    // Store that we're in verification mode
+    sessionStorage.setItem('verifyingCoordinates', 'true');
+    sessionStorage.setItem('originalCoordinates', `${lat}, ${lng}`);
+    
+    // Open in new tab
+    window.open(verificationUrl, '_blank');
+    
+    alert("Hazard Hunter opened with your location.\n\nYou can check for hazards and update coordinates if needed.\n\nReturn to this tab and update the coordinates field if necessary.");
+}
+
+/* Setup coordinate paste handler */
+function setupCoordinatePasteHandler() {
+    const coordInput = document.getElementById("coordinate");
+    
+    if (!coordInput) return;
+    
+    coordInput.addEventListener('paste', (e) => {
+        // Allow the paste to happen first
+        setTimeout(() => {
+            const pastedText = coordInput.value;
+            const parsed = parseHazardHunterCoordinates(pastedText);
+            
+            if (parsed) {
+                coordInput.value = parsed;
+                // Show success message
+                showToast("Coordinates parsed successfully!", "success");
+            } else {
+                // Show format hint
+                showToast("Please ensure format is: latitude, longitude (e.g., 14.123456, 121.123456)", "warning");
+            }
+        }, 100);
+    });
+}
+
+/* Show toast notification */
+function showToast(message, type = "info") {
+    // Remove existing toast
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    `;
+    
+    // Add styles
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+        color: white;
+        padding: 12px 16px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--shadow);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    // Add close button styles
+    toast.querySelector('button').style.cssText = `
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0 4px;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+/* ============ MODAL HANDLING ============ */
+function setupModalHandlers() {
+    const modal = document.getElementById('hazardHunterModal');
+    const cancelBtn = document.getElementById('cancelHazardHunter');
+    const confirmBtn = document.getElementById('confirmHazardHunter');
+    
+    if (!modal || !cancelBtn || !confirmBtn) return;
+    
+    // Cancel button
+    cancelBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    
+    // Confirm button
+    confirmBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        
+        // Open Hazard Hunter in new tab
+        window.open(HAZARD_HUNTER_URL, '_blank');
+        
+        // Show reminder message
+        showToast("Hazard Hunter opened in new tab. Copy coordinates and return to paste them.", "info");
+        
+        // Set flag that we're expecting coordinates
+        sessionStorage.setItem('awaitingCoordinates', 'true');
+    });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 }
 
 /* ============ SESSION MANAGEMENT ============ */
@@ -2720,6 +3036,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Setup conditional fields
   setupConditionalFields();
 
+  // Setup modal handlers
+  setupModalHandlers();
+
+  // Setup coordinate paste handler
+  setupCoordinatePasteHandler();
+
   // Contact number validation
   const contactInput = document.getElementById("contactNo");
   const contactError = document.getElementById("contactError");
@@ -2748,6 +3070,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       memberContactError.style.display = 'none';
     });
   }
+
+  // Coordinate buttons
+  document.getElementById("getLocationBtn").addEventListener("click", getCurrentLocation);
+  document.getElementById("hazardHunterBtn").addEventListener("click", openHazardHunterPicker);
 
   // reset
   document.getElementById("resetBtn").addEventListener('click', () => {
@@ -2861,38 +3187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("householdStage").value = info ? info.stage : "";
   });
 
-  // GPS Coordinate Button
-  document.getElementById("getLocationBtn").addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
-      return;
-    }
-
-    // Show loading
-    const loadingOverlay = document.getElementById("loadingOverlay");
-    loadingOverlay.style.display = "flex";
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude.toFixed(6);
-        const lng = pos.coords.longitude.toFixed(6);
-        document.getElementById("coordinate").value = `${lat}, ${lng}`;
-        loadingOverlay.style.display = "none";
-        alert("Location captured successfully!");
-      },
-      (err) => {
-        loadingOverlay.style.display = "none";
-        alert("Unable to retrieve GPS location. Please allow location access.");
-        console.error("GPS Error:", err);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 8000,
-        maximumAge: 0
-      }
-    );
-  });
-
   // Animal quantity input handling
   document.querySelectorAll('.animal-card input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
@@ -2919,8 +3213,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Add logout event listener
   document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
+  // Check if returning from Hazard Hunter
+  checkReturnFromHazardHunter();
+
   updateMemberPreview();
 });
+
+/* Check if user is returning from Hazard Hunter */
+function checkReturnFromHazardHunter() {
+    window.addEventListener('pageshow', (event) => {
+        if (sessionStorage.getItem('awaitingCoordinates') === 'true') {
+            // User returned from Hazard Hunter
+            setTimeout(() => {
+                const coordInput = document.getElementById("coordinate");
+                if (coordInput && !coordInput.value.trim()) {
+                    showToast("Paste your Hazard Hunter coordinates (Ctrl+V) in the coordinate field.", "info");
+                }
+            }, 1000);
+            sessionStorage.removeItem('awaitingCoordinates');
+        }
+        
+        // Restore form data if we have it
+        const tempData = sessionStorage.getItem('tempFormData');
+        if (tempData) {
+            try {
+                const data = JSON.parse(tempData);
+                if (data.barangay) document.getElementById("barangay").value = data.barangay;
+                if (data.sitio) document.getElementById("sitio").value = data.sitio;
+                if (data.householdHead) document.getElementById("householdHead").value = data.householdHead;
+                if (data.contactNo) document.getElementById("contactNo").value = data.contactNo;
+                sessionStorage.removeItem('tempFormData');
+            } catch (e) {
+                console.error("Error restoring form data:", e);
+            }
+        }
+    });
+}
 
 /* ============ PREVENT BACK BUTTON ISSUES ============ */
 
@@ -3214,7 +3542,3 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
-
-
-
