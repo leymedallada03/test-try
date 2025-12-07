@@ -3275,6 +3275,14 @@ function closePanel(){
 
 /* ---------------- Submit head + members ---------------- */
 async function submitHeadAndMembers(){
+  // Get current user - try to get full name from localStorage
+  // First, try to get the full name that was saved during login
+  const currentUserFullName = localStorage.getItem("userFullName") || 
+                             localStorage.getItem("staffFullName") || 
+                             localStorage.getItem("staffName") || 
+                             localStorage.getItem("username") || 
+                             "Unknown";
+  
   // gather head
   const headBirthInput = document.getElementById("householdBirthdate").value || "";
   const headBirthForSheet = toSheetDateFormat(headBirthInput);
@@ -3345,7 +3353,7 @@ async function submitHeadAndMembers(){
     "Chicken": document.getElementById("chicken_chk").checked ? "Yes" : "No",
     "Chicken Qty.": document.getElementById("chicken_qty").value || "",
     "Others": document.getElementById("animals_others").value || "",
-    "Submitted By": localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown",
+    "Submitted By": currentUserFullName, // Use the full name instead of username
     "Submitted On": new Date().toLocaleString()
   };
 
@@ -3407,12 +3415,12 @@ const currentUser = localStorage.getItem("username") ||
                    "System";
 
 // Build request
-const form = new FormData();
-form.append("action", "createRecord");
-form.append("actor", currentUser);  // ← ADD THIS LINE
-form.append("head", JSON.stringify(head));
-form.append("members", JSON.stringify(members));
-form.append("submittedBy", currentUser);  // Updated to use currentUser variable
+  const form = new FormData();
+  form.append("action", "createRecord");
+  form.append("actor", currentUserFullName);  // Use full name for actor
+  form.append("head", JSON.stringify(head));
+  form.append("members", JSON.stringify(members));
+  form.append("submittedBy", currentUserFullName);  // Use full name for submittedBy
 
   // UI disable
   const submitBtn = document.getElementById("nextToMembers");
