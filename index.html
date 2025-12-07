@@ -596,7 +596,28 @@
         </div>
     </div>
     <script src="index.js"></script>
+        <!-- Offline detection script -->
+    <script>
+    // Simple offline detection
+    window.addEventListener('online', () => {
+        document.getElementById('offlineAlert').style.display = 'none';
+        const liveAlert = document.getElementById('liveAlert');
+        if (liveAlert) liveAlert.textContent = 'Connection restored';
+    });
+
+    window.addEventListener('offline', () => {
+        document.getElementById('offlineAlert').style.display = 'block';
+        const liveAlert = document.getElementById('liveAlert');
+        if (liveAlert) liveAlert.textContent = 'You are now offline';
+    });
+
+    // Check initial state
+    if (!navigator.onLine) {
+        document.getElementById('offlineAlert').style.display = 'block';
+    }
+    </script>
 </body>
 </html>
+
 
 
