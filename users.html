@@ -1787,8 +1787,6 @@ function displayAuditLogs(category = 'all') {
               category === 'yesterday' ? AUDIT_LOGS_DATA.yesterday || [] :
               AUDIT_LOGS_DATA.older || [];
   
-  console.log("Logs to display:", logs.length, "items");
-  
   if (logs.length === 0) {
     tbody.innerHTML = `
       <tr>
@@ -1800,12 +1798,10 @@ function displayAuditLogs(category = 'all') {
     return;
   }
   
-  logs.forEach((log, index) => {
-    console.log(`Log ${index}:`, log);
-    
+  logs.forEach((log) => {
     const tr = document.createElement('tr');
     
-    // Format timestamp - use FormattedTimestamp if available
+    // Format timestamp
     let timestamp = '';
     if (log.FormattedTimestamp) {
       timestamp = log.FormattedTimestamp;
@@ -1814,51 +1810,19 @@ function displayAuditLogs(category = 'all') {
       timestamp = isNaN(date.getTime()) ? String(log.Timestamp) : date.toLocaleString('en-PH');
     }
     
-    // Format action for better display
-    let action = log.Action || '';
-    if (action) {
-      action = action.replace(/([A-Z])/g, ' $1').trim();
-      action = action.charAt(0).toUpperCase() + action.slice(1);
-    }
+    // Get action
+    const action = log.Action || '';
     
-    // Get actor - use Actor field and remove any appended "Staff" or "Admin"
-    let actor = '';
-    if (log.Actor) {
-      const actorStr = String(log.Actor);
-      // Remove any appended role text
-      actor = actorStr.replace(/(Staff|Admin)$/i, '').trim();
-    }
+    // Get actor (full name only)
+    const actor = log.Actor || '';
     
-    // Get role - use Role field if available, otherwise extract from Actor or default to "Staff"
-    let role = '';
-    if (log.Role && log.Role.trim() !== '') {
-      role = log.Role;
-    } else if (log.Actor && String(log.Actor).match(/(Staff|Admin)$/i)) {
-      // Extract role from concatenated Actor field
-      const match = String(log.Actor).match(/(Staff|Admin)$/i);
-      if (match) role = match[0];
-    } else {
-      role = "Staff"; // Default role
-    }
+    // Get target (TargetSheet should be like "Users", "UserActivity", etc.)
+    const target = log.TargetSheet || log.Target || 'User Activity';
     
-    // Target should always be "User Activity" for user management actions
-    const target = "User Activity";
+    // Get details
+    const details = log.Details || '';
     
-    // Get details - this should be the detailed description
-    let details = '';
-    if (log.Details && String(log.Details).trim() !== '') {
-      details = log.Details;
-    } else if (log.details && String(log.details).trim() !== '') {
-      details = log.details;
-    } else if (log.description && String(log.description).trim() !== '') {
-      details = log.description;
-    } else {
-      // Create meaningful details based on action and available data
-      const targetUser = log.Target || log.TargetSheet || '';
-      details = `${actor || 'Unknown'} performed ${action}${targetUser ? ' for ' + targetUser : ''}`;
-    }
-    
-    // Format the action badge color
+    // Format action badge color
     let actionBadgeStyle = '';
     if (action.includes('Login')) {
       actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
@@ -1877,10 +1841,7 @@ function displayAuditLogs(category = 'all') {
     tr.innerHTML = `
       <td><small style="white-space: nowrap;">${escapeHtml(timestamp)}</small></td>
       <td><span style="padding: 2px 8px; border-radius: 12px; ${actionBadgeStyle} font-weight: 600; font-size: 0.8rem;">${escapeHtml(action)}</span></td>
-      <td>
-        <strong>${escapeHtml(actor)}</strong>
-        ${role ? `<br><small style="color: var(--muted); font-size: 0.75rem;">${escapeHtml(role)}</small>` : ''}
-      </td>
+      <td>${escapeHtml(actor)}</td>
       <td>${escapeHtml(target)}</td>
       <td style="text-align: left; white-space: normal; word-wrap: break-word;">
         <small>${escapeHtml(details)}</small>
@@ -2218,4 +2179,5 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
+
 
