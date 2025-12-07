@@ -479,9 +479,12 @@
    }
 
    #logsTable td:nth-child(5) {
-       white-space: normal;
-       word-wrap: break-word;
+       white-space: normal !important;
+       word-wrap: break-word !important;
+       text-overflow: unset !important;
        text-align: left;
+       max-width: 300px;
+       min-width: 200px;
    }
 
    /* Center role badges */
@@ -1733,24 +1736,31 @@ async function loadAuditLogs() {
     try {
       data = JSON.parse(text);
     } catch (e) {
+      console.error("Invalid JSON response:", text);
       showToast("Invalid response from server", "error");
       return;
     }
     
     if (!data.success) {
+      console.error("Failed to load logs:", data.message);
       showToast("Failed to load logs: " + (data.message || "Unknown error"), "error");
       return;
     }
+    
+    console.log("Audit logs data received:", data);
     
     AUDIT_LOGS_DATA = data;
     displayAuditLogs('all');
     
   } catch(err) {
+    console.error("Error loading logs:", err);
     showToast('Error loading logs: ' + err.message, 'error');
   }
 }
 
 function displayAuditLogs(category = 'all') {
+  console.log("Displaying logs for category:", category, "Data:", AUDIT_LOGS_DATA);
+  
   const tbody = document.getElementById('logsBody');
   tbody.innerHTML = '';
   
@@ -1764,6 +1774,8 @@ function displayAuditLogs(category = 'all') {
               category === 'yesterday' ? AUDIT_LOGS_DATA.yesterday || [] :
               AUDIT_LOGS_DATA.older || [];
   
+  console.log("Logs to display:", logs.length, "items");
+  
   if (logs.length === 0) {
     tbody.innerHTML = `
       <tr>
@@ -1775,20 +1787,53 @@ function displayAuditLogs(category = 'all') {
     return;
   }
   
-  logs.forEach(log => {
-    const tr = document.createElement('tr');
-    const timestamp = log.FormattedTimestamp || log.Timestamp || '';
+  logs.forEach((log, index) => {
+    console.log(`Log ${index}:`, log);
     
-    // Use TargetSheet if available, otherwise use Target
+    const tr = document.createElement('tr');
+    
+    // Format timestamp
+    let timestamp = '';
+    if (log.FormattedTimestamp) {
+      timestamp = log.FormattedTimestamp;
+    } else if (log.Timestamp) {
+      const date = new Date(log.Timestamp);
+      timestamp = isNaN(date.getTime()) ? String(log.Timestamp) : date.toLocaleString('en-PH');
+    }
+    
+    // Get target - prefer TargetSheet, then Target
     const target = log.TargetSheet || log.Target || '';
-    const details = log.Details || '';
+    
+    // Get details - check various possible field names
+    let details = '';
+    if (log.Details) {
+      details = log.Details;
+    } else if (log.details) {
+      details = log.details;
+    } else if (log.description) {
+      details = log.description;
+    } else {
+      const action = log.Action || '';
+      const actor = log.Actor || '';
+      const targetName = target || '';
+      details = `${actor} performed ${action} on ${targetName}`;
+    }
+    
+    // Format action for better display
+    let action = log.Action || '';
+    if (action) {
+      action = action.replace(/([A-Z])/g, ' $1').trim();
+      action = action.charAt(0).toUpperCase() + action.slice(1);
+    }
     
     tr.innerHTML = `
       <td><small>${escapeHtml(timestamp)}</small></td>
-      <td>${escapeHtml(log.Action || '')}</td>
-      <td><strong>${escapeHtml(log.Actor || '')}</strong></td>
+      <td><span style="padding: 2px 6px; border-radius: 4px; background: #e9f7f2; color: #0f7a4a; font-weight: 500;">${escapeHtml(action)}</span></td>
+      <td><strong>${escapeHtml(log.Actor || '')}</strong><br><small style="color: var(--muted);">${escapeHtml(log.Role || 'Staff')}</small></td>
       <td>${escapeHtml(target)}</td>
-      <td><small>${escapeHtml(details)}</small></td>
+      <td style="text-align: left; white-space: normal; word-wrap: break-word; max-width: 300px;">
+        <small>${escapeHtml(details)}</small>
+      </td>
     `;
     tbody.appendChild(tr);
   });
