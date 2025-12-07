@@ -2404,11 +2404,69 @@ function notifyDataUpdated() {
   updateLastUpdated();
   localStorage.setItem('lastDataUpdate', new Date().toISOString());
 }
+// Add to your dashboard.js or similar file
+async function handleLogout() {
+    try {
+        const username = localStorage.getItem("username");
+        
+        if (username) {
+            // Call logout API
+            await fetch(API_URL, {
+                method: "POST",
+                body: new FormData().append("action", "logout").append("username", username)
+            });
+        }
+        
+        // Clear all session data
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Redirect to login page
+        window.location.href = "index.html";
+    } catch (err) {
+        console.error("Logout error:", err);
+        // Still redirect even if API call fails
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    }
+}
+
+// Add auto-logout for inactive sessions
+function setupAutoLogout() {
+    let inactivityTimer;
+    
+    function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            // Show warning 1 minute before logout
+            if (confirm("You've been inactive for 29 minutes. Click OK to stay logged in, or Cancel to logout.")) {
+                resetTimer();
+            } else {
+                handleLogout();
+            }
+        }, 29 * 60 * 1000); // 29 minutes
+    }
+    
+    // Reset timer on user activity
+    ['click', 'keypress', 'mousemove', 'scroll'].forEach(event => {
+        document.addEventListener(event, resetTimer);
+    });
+    
+    // Start the timer
+    resetTimer();
+}
+
+// Call on dashboard load
+document.addEventListener('DOMContentLoaded', () => {
+    setupAutoLogout();
+});
 </script>
 <!-- Activity Tracking -->
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
 
 
 
