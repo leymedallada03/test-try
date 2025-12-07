@@ -1745,8 +1745,11 @@ async function loadAuditLogs() {
     let data;
     try {
       data = JSON.parse(text);
-      console.log("Audit logs raw data structure:", data);
-      console.log("First log entry:", data.logs ? data.logs[0] : "No logs");
+      console.log("Audit logs data structure:", data);
+      console.log("Logs count:", data.logs ? data.logs.length : 0);
+      if (data.logs && data.logs.length > 0) {
+        console.log("Sample log entry:", data.logs[0]);
+      }
     } catch (e) {
       console.error("Invalid JSON response:", text);
       showToast("Invalid response from server", "error");
@@ -1769,7 +1772,7 @@ async function loadAuditLogs() {
 }
 
 function displayAuditLogs(category = 'all') {
-  console.log("Displaying logs for category:", category);
+  console.log("Displaying logs for category:", category, "Data:", AUDIT_LOGS_DATA);
   
   const tbody = document.getElementById('logsBody');
   tbody.innerHTML = '';
@@ -1784,7 +1787,7 @@ function displayAuditLogs(category = 'all') {
               category === 'yesterday' ? AUDIT_LOGS_DATA.yesterday || [] :
               AUDIT_LOGS_DATA.older || [];
   
-  console.log("Total logs to display:", logs.length);
+  console.log("Logs to display:", logs.length, "items");
   
   if (logs.length === 0) {
     tbody.innerHTML = `
@@ -1798,59 +1801,50 @@ function displayAuditLogs(category = 'all') {
   }
   
   logs.forEach((log, index) => {
-    console.log(`Log ${index + 1}:`, JSON.stringify(log, null, 2));
+    console.log(`Log ${index}:`, log);
     
     const tr = document.createElement('tr');
     
-    // Format timestamp - check multiple possibilities
+    // Format timestamp - use FormattedTimestamp if available
     let timestamp = '';
     if (log.FormattedTimestamp) {
       timestamp = log.FormattedTimestamp;
     } else if (log.Timestamp) {
-      if (log.Timestamp instanceof Date || (typeof log.Timestamp === 'string' && !isNaN(Date.parse(log.Timestamp)))) {
-        const date = new Date(log.Timestamp);
-        timestamp = date.toLocaleString('en-PH');
-      } else {
-        timestamp = String(log.Timestamp);
-      }
+      const date = new Date(log.Timestamp);
+      timestamp = isNaN(date.getTime()) ? String(log.Timestamp) : date.toLocaleString('en-PH');
     }
     
-    // Get target - check multiple possibilities
-    let target = '';
-    if (log.TargetSheet) {
-      target = log.TargetSheet;
-    } else if (log.Target) {
-      // Check if Target contains concatenated data like "StaffBalagbag"
-      const targetStr = String(log.Target);
-      // If it looks like concatenated (contains a role followed by sheet name)
-      if (targetStr.includes('Staff') || targetStr.includes('Admin')) {
-        // Extract the sheet name (after the role)
-        target = targetStr.replace(/^(Staff|Admin)/, '').trim();
-      } else {
-        target = targetStr;
-      }
+    // Format action for better display
+    let action = log.Action || '';
+    if (action) {
+      action = action.replace(/([A-Z])/g, ' $1').trim();
+      action = action.charAt(0).toUpperCase() + action.slice(1);
     }
     
-    // Get actor - check multiple possibilities
+    // Get actor - use Actor field and remove any appended "Staff" or "Admin"
     let actor = '';
     if (log.Actor) {
       const actorStr = String(log.Actor);
-      // If it looks like concatenated (e.g., "Orley P Medallada JrSiaif")
-      // Remove any role suffix that might be concatenated
+      // Remove any appended role text
       actor = actorStr.replace(/(Staff|Admin)$/i, '').trim();
     }
     
-    // Get role - check multiple possibilities
+    // Get role - use Role field if available, otherwise extract from Actor or default to "Staff"
     let role = '';
-    if (log.Role) {
+    if (log.Role && log.Role.trim() !== '') {
       role = log.Role;
     } else if (log.Actor && String(log.Actor).match(/(Staff|Admin)$/i)) {
       // Extract role from concatenated Actor field
       const match = String(log.Actor).match(/(Staff|Admin)$/i);
       if (match) role = match[0];
+    } else {
+      role = "Staff"; // Default role
     }
     
-    // Get details - check multiple possibilities
+    // Target should always be "User Activity" for user management actions
+    const target = "User Activity";
+    
+    // Get details - this should be the detailed description
     let details = '';
     if (log.Details && String(log.Details).trim() !== '') {
       details = log.Details;
@@ -1860,15 +1854,8 @@ function displayAuditLogs(category = 'all') {
       details = log.description;
     } else {
       // Create meaningful details based on action and available data
-      const action = log.Action || '';
-      details = `${actor || 'Unknown'} performed ${action}${target ? ' on ' + target : ''}`;
-    }
-    
-    // Format action for better display
-    let action = log.Action || '';
-    if (action) {
-      action = action.replace(/([A-Z])/g, ' $1').trim();
-      action = action.charAt(0).toUpperCase() + action.slice(1);
+      const targetUser = log.Target || log.TargetSheet || '';
+      details = `${actor || 'Unknown'} performed ${action}${targetUser ? ' for ' + targetUser : ''}`;
     }
     
     // Format the action badge color
@@ -1881,6 +1868,8 @@ function displayAuditLogs(category = 'all') {
       actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
     } else if (action.includes('Update')) {
       actionBadgeStyle = 'background: #fff8e1; color: #ff9800;';
+    } else if (action.includes('Reset')) {
+      actionBadgeStyle = 'background: #fff0f5; color: #ff66b2;';
     } else {
       actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
     }
@@ -2229,3 +2218,4 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
+
