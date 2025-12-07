@@ -1771,8 +1771,10 @@ async function loadAuditLogs() {
   }
 }
 
+/* ============ DISPLAY AUDIT LOGS ============ */
 function displayAuditLogs(category = 'all') {
-  console.log("Displaying logs for category:", category, "Data:", AUDIT_LOGS_DATA);
+  console.log("=== DISPLAY AUDIT LOGS ===");
+  console.log("Category:", category);
   
   const tbody = document.getElementById('logsBody');
   tbody.innerHTML = '';
@@ -1787,87 +1789,11 @@ function displayAuditLogs(category = 'all') {
               category === 'yesterday' ? AUDIT_LOGS_DATA.yesterday || [] :
               AUDIT_LOGS_DATA.older || [];
   
-  if (logs.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align: center; padding: 20px; color: var(--muted); font-style: italic;">
-          No ${category === 'all' ? '' : category} logs found
-        </td>
-      </tr>
-    `;
-    return;
+  console.log("Logs to display:", logs.length);
+  if (logs.length > 0) {
+    console.log("First log structure:", logs[0]);
+    console.log("First log keys:", Object.keys(logs[0]));
   }
-  
-  logs.forEach((log) => {
-    const tr = document.createElement('tr');
-    
-    // Format timestamp
-    let timestamp = '';
-    if (log.FormattedTimestamp) {
-      timestamp = log.FormattedTimestamp;
-    } else if (log.Timestamp) {
-      const date = new Date(log.Timestamp);
-      timestamp = isNaN(date.getTime()) ? String(log.Timestamp) : date.toLocaleString('en-PH');
-    }
-    
-    // Get action
-    const action = log.Action || '';
-    
-    // Get actor (full name only)
-    const actor = log.Actor || '';
-    
-    // Get target (TargetSheet should be like "Users", "UserActivity", etc.)
-    const target = log.TargetSheet || log.Target || 'User Activity';
-    
-    // Get details
-    const details = log.Details || '';
-    
-    // Format action badge color
-    let actionBadgeStyle = '';
-    if (action.includes('Login')) {
-      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
-    } else if (action.includes('Delete')) {
-      actionBadgeStyle = 'background: #ffeaea; color: #ff4444;';
-    } else if (action.includes('Create')) {
-      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
-    } else if (action.includes('Update')) {
-      actionBadgeStyle = 'background: #fff8e1; color: #ff9800;';
-    } else if (action.includes('Reset')) {
-      actionBadgeStyle = 'background: #fff0f5; color: #ff66b2;';
-    } else {
-      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
-    }
-    
-    tr.innerHTML = `
-      <td><small style="white-space: nowrap;">${escapeHtml(timestamp)}</small></td>
-      <td><span style="padding: 2px 8px; border-radius: 12px; ${actionBadgeStyle} font-weight: 600; font-size: 0.8rem;">${escapeHtml(action)}</span></td>
-      <td>${escapeHtml(actor)}</td>
-      <td>${escapeHtml(target)}</td>
-      <td style="text-align: left; white-space: normal; word-wrap: break-word;">
-        <small>${escapeHtml(details)}</small>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function displayAuditLogs(category = 'all') {
-  console.log("Displaying logs for category:", category, "Data:", AUDIT_LOGS_DATA);
-  
-  const tbody = document.getElementById('logsBody');
-  tbody.innerHTML = '';
-  
-  if (!AUDIT_LOGS_DATA) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No logs data available</td></tr>`;
-    return;
-  }
-  
-  const logs = category === 'all' ? AUDIT_LOGS_DATA.logs || [] :
-              category === 'today' ? AUDIT_LOGS_DATA.today || [] :
-              category === 'yesterday' ? AUDIT_LOGS_DATA.yesterday || [] :
-              AUDIT_LOGS_DATA.older || [];
-  
-  console.log("Logs to display:", logs.length, "items");
   
   if (logs.length === 0) {
     tbody.innerHTML = `
@@ -1881,55 +1807,56 @@ function displayAuditLogs(category = 'all') {
   }
   
   logs.forEach((log, index) => {
-    console.log(`Log ${index}:`, log);
-    
     const tr = document.createElement('tr');
     
-    // Format timestamp
-    let timestamp = '';
-    if (log.FormattedTimestamp) {
-      timestamp = log.FormattedTimestamp;
-    } else if (log.Timestamp) {
-      const date = new Date(log.Timestamp);
-      timestamp = isNaN(date.getTime()) ? String(log.Timestamp) : date.toLocaleString('en-PH');
-    }
+    // Get values - try both original and camelCase versions
+    const timestamp = log.FormattedTimestamp || 
+                     formatTimestamp(log["Timestamp"] || log.Timestamp || '');
+    const action = log["Action"] || log.Action || '';
+    const actor = log["Actor"] || log.Actor || '';
+    const target = log["TargetSheet"] || log.TargetSheet || log["Target"] || log.Target || '';
+    const details = log["Details"] || log.Details || '';
     
-    // Get target - prefer TargetSheet, then Target
-    const target = log.TargetSheet || log.Target || '';
-    
-    // Get details - check various possible field names
-    let details = '';
-    if (log.Details) {
-      details = log.Details;
-    } else if (log.details) {
-      details = log.details;
-    } else if (log.description) {
-      details = log.description;
+    // Format action badge color
+    let actionBadgeStyle = '';
+    if (action.includes('Login')) {
+      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
+    } else if (action.includes('Delete')) {
+      actionBadgeStyle = 'background: #ffeaea; color: #ff4444;';
+    } else if (action.includes('Create')) {
+      actionBadgeStyle = 'background: #e9f7f2; color: #0f7a4a;';
+    } else if (action.includes('Update')) {
+      actionBadgeStyle = 'background: #fff8e1; color: #ff9800;';
+    } else if (action.includes('Force')) {
+      actionBadgeStyle = 'background: #fff0f5; color: #ff66b2;';
     } else {
-      const action = log.Action || '';
-      const actor = log.Actor || '';
-      const targetName = target || '';
-      details = `${actor} performed ${action} on ${targetName}`;
-    }
-    
-    // Format action for better display
-    let action = log.Action || '';
-    if (action) {
-      action = action.replace(/([A-Z])/g, ' $1').trim();
-      action = action.charAt(0).toUpperCase() + action.slice(1);
+      actionBadgeStyle = 'background: #f0f0f0; color: #666;';
     }
     
     tr.innerHTML = `
-      <td><small>${escapeHtml(timestamp)}</small></td>
-      <td><span style="padding: 2px 6px; border-radius: 4px; background: #e9f7f2; color: #0f7a4a; font-weight: 500;">${escapeHtml(action)}</span></td>
-      <td><strong>${escapeHtml(log.Actor || '')}</strong><br><small style="color: var(--muted);">${escapeHtml(log.Role || 'Staff')}</small></td>
+      <td><small style="white-space: nowrap;">${escapeHtml(timestamp)}</small></td>
+      <td><span style="padding: 2px 8px; border-radius: 12px; ${actionBadgeStyle} font-weight: 600; font-size: 0.8rem;">${escapeHtml(action)}</span></td>
+      <td>${escapeHtml(actor)}</td>
       <td>${escapeHtml(target)}</td>
-      <td style="text-align: left; white-space: normal; word-wrap: break-word; max-width: 300px;">
+      <td style="text-align: left; white-space: normal; word-wrap: break-word;">
         <small>${escapeHtml(details)}</small>
       </td>
     `;
     tbody.appendChild(tr);
   });
+  
+  console.log("=== END DISPLAY AUDIT LOGS ===");
+}
+
+// Helper function to format timestamp
+function formatTimestamp(timestamp) {
+  if (!timestamp) return '';
+  try {
+    const date = new Date(timestamp);
+    return isNaN(date.getTime()) ? String(timestamp) : date.toLocaleString('en-PH');
+  } catch (e) {
+    return String(timestamp);
+  }
 }
 
 /* ============ TAB FUNCTIONALITY ============ */
@@ -2179,5 +2106,6 @@ window.addEventListener('resize', function() {
 </script>
 </body>
 </html>
+
 
 
