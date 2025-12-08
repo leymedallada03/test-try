@@ -1,216 +1,951 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Purok Kaligtasan — Charts</title>
-  <link rel="stylesheet" href="styles.css"/>
-  <style>
-    aside.sidebar a.active{background:linear-gradient(90deg,#eaf7ef,#f3fff6);border-left:3px solid var(--green-1);font-weight:700}
-    h2{margin:0 0 6px 0}
-    .charts-container{
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap:20px;
-      margin-top:15px;
-    }
-    .chart-card{
-      background:var(--card-grad);
-      border-radius:14px;
-      padding:16px;
-      box-shadow: 0 10px 30px rgba(6,30,20,0.06);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(6,30,20,0.03);
-      min-height:170px;
-      position:relative;
-    }
-    .chart-card h4{
-      margin:4px 0 12px 0;
-      font-size:15px;
-      font-weight:700;
-      color:var(--green-1);
-    }
-    canvas{filter: drop-shadow(0 8px 16px rgba(6,30,20,0.06)); display:block; width:100% !important; height:auto !important; background:white}
-    .floating-menu{
-      position: fixed;
-      right: 18px;
-      top: 130px;
-      width: 220px;
-      background: white;
-      border-radius: 14px;
-      padding:12px;
-      box-shadow:0 10px 35px rgba(6,30,20,0.14);
-      z-index:9999;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .floating-menu h5{margin:0 0 6px 0;font-size:15px;font-weight:700;color:var(--green-1)}
-    .btn{padding:8px;border-radius:8px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#0f7a4a,#34b78f);color:#fff;border:0}
-    .small-desc{font-size:12px;color:var(--muted)}
-    /* PWD gauge overlay counts */
-    .pwd-info{position:absolute;right:18px;top:54px;text-align:right;font-size:13px;color:#22332b}
-    .pwd-info b{display:block;font-size:14px}
-    /* comparison chart full width row */
-    .full-row{grid-column:1/-1}
-    @media(max-width:980px){
-      .charts-container{grid-template-columns:1fr}
-      aside.sidebar{display:none}
-      main.content-area{padding:110px 18px 40px}
-      .floating-menu{left:8px;right:8px;bottom:18px;top:auto;width:auto;flex-direction:row;justify-content:space-between}
-    }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Purok Kaligtasan — Charts & Analytics</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+   :root{
+    --bg:#f6f8f7;
+    --card-bg:#fff;
+    --muted:#6b6f6b;
+    --accent1:#0f7a4a;
+    --accent2:#34b78f;
+    --accent3: #ff7a00;
+    --accent4: #ffa500;
+    --light-green: #e9f7f2;
+    --border: #e1e8e5;
+    --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --shadow-dark: 0 6px 20px rgba(5,40,25,0.12);
+    --radius:12px;
+    --radius-sm:8px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+   }
+   
+   /* Description Styling */
+   #disc {
+    margin-bottom: 10px;
+    background: var(--light-green);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent1);
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+   }
+   
+   body {
+    background-color: var(--bg);
+    margin: 0;
+    min-height: 100vh;
+   }
 
-    /* Print tweaks: remove shadows/gradients for crisp export */
-    @media print {
-      body * { visibility: hidden; }
-      .chart-card, .chart-card * { visibility: visible; }
-      .chart-card { page-break-inside: avoid; box-shadow:none; background:white !important; border: none; }
-      canvas { filter:none !important; box-shadow:none !important; background:white !important; }
+   .page-container{
+    max-width:1200px;
+    margin:20px auto;
+    padding:12px;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:18px;
+    align-items:start;
+    transition: grid-template-columns 0.3s ease;
+   }
+
+   .page-container.collapsed {
+    grid-template-columns: 60px 1fr;
+   }
+
+   /* Topbar - Enhanced */
+   .topbar{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-radius:var(--radius);
+    background:linear-gradient(90deg, var(--accent1), var(--accent2));
+    color:#fff;
+    box-shadow:var(--shadow-dark);
+   }
+
+   .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+   }
+
+   .brand .logo{
+    width:48px;
+    height:48px;
+    border-radius:var(--radius-sm);
+    object-fit:contain;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+    border: 2px solid rgba(255,255,255,0.2);
+   }
+
+   .brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+   }
+
+   .brand-text p {
+    font-size:12px;
+    opacity:0.95;
+    margin: 4px 0 0 0;
+   }
+
+   .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+   }
+
+   #userName {
+    font-weight: 600;
+    border-radius: 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   #logoutBtn {
+    background: rgba(255,255,255,0.25);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+   }
+
+   #logoutBtn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+   }
+
+   /* Sidebar - Collapsible */
+   .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
+    border-radius:var(--radius);
+    padding:12px;
+    height:calc(100vh - 120px);
+    position:sticky;
+    top:72px;
+    overflow:auto;
+    transition: width 0.3s ease;
+   }
+
+   .sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+   }
+
+   .sidebar-toggle {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+   }
+
+   .sidebar-toggle:hover {
+    transform: scale(1.1);
+   }
+
+   .sidebar ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex: 1;
+   }
+
+   .sidebar li a{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--muted);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+   }
+
+   .sidebar li a:hover{
+    background: var(--light-green);
+    color: var(--accent1);
+   }
+
+   .sidebar li a.active{
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   .sidebar li a .menu-icon {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+   }
+
+   .sidebar li a .menu-text {
+    transition: opacity 0.3s ease;
+   }
+
+   .page-container.collapsed .sidebar li a .menu-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+   }
+
+   /* Content Area */
+   .content-area{
+    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 8px 22px rgba(10,20,16,0.06);
+    min-height:72vh;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+   }
+
+   /* Content Header */
+   .content-header {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   }
+
+   .content-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--accent1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   /* Toolbar */
+   .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+    background: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(6,30,20,0.04);
+   }
+
+   .toolbar-left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+   }
+
+   .btn {
+    border:0;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor:pointer;
+    font-weight:600;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color:#fff;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 36px;
+    box-sizing: border-box;
+   }
+
+   .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+   }
+
+   .btn-print {
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+   }
+
+   .btn-pdf {
+    background: linear-gradient(90deg, #1a73e8, #4285f4);
+   }
+
+   .btn-png {
+    background: linear-gradient(90deg, #ea4335, #fbbc05);
+   }
+
+   .btn-csv {
+    background: linear-gradient(90deg, #34a853, #0f9d58);
+   }
+
+   .btn-refresh {
+    background: linear-gradient(90deg, #6c757d, #adb5bd);
+   }
+
+   /* Charts Grid - Redesigned */
+   .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 10px;
+   }
+
+   .chart-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+   }
+
+   .chart-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(6,30,20,0.12);
+   }
+
+   .chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    border-radius: var(--radius) var(--radius) 0 0;
+   }
+
+   .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+   }
+
+   .chart-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent1);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+
+   .chart-title i {
+    color: var(--accent2);
+   }
+
+   .chart-stats {
+    display: flex;
+    gap: 8px;
+   }
+
+   .stat-badge {
+    background: var(--light-green);
+    color: var(--accent1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+   }
+
+   .chart-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    margin: 10px 0;
+   }
+
+   canvas {
+    width: 100% !important;
+    height: 100% !important;
+   }
+
+   /* Special styling for PWD gauge */
+   .pwd-gauge-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    height: 100%;
+   }
+
+   .pwd-canvas-wrapper {
+    flex: 1;
+    position: relative;
+    height: 200px;
+   }
+
+   .pwd-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 120px;
+   }
+
+   .pwd-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    background: var(--light-green);
+   }
+
+   .pwd-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent1);
+   }
+
+   .pwd-stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+   }
+
+   /* Comparison Chart - Full Width */
+   .comparison-chart {
+    grid-column: 1 / -1;
+    min-height: 400px;
+   }
+
+   .comparison-chart .chart-container {
+    height: 320px;
+   }
+
+   /* Loading overlay */
+   #loading {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,0.85);
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    backdrop-filter: blur(2px);
+   }
+
+   .loading-content {
+    background:#fff;
+    padding:20px 24px;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+   }
+
+   .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent1);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+   }
+
+   @keyframes spin {
+    to { transform: rotate(360deg); }
+   }
+
+   /* Auto-refresh indicator */
+   .auto-refresh {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 8px 12px;
+    background: rgba(15,122,74,0.05);
+    border-radius: var(--radius-sm);
+   }
+
+   .auto-refresh .indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #34a853;
+    animation: pulse 2s infinite;
+   }
+
+   @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+   }
+
+   /* Mobile Styles */
+   @media (max-width: 768px) {
+    .page-container {
+        grid-template-columns: 1fr !important;
+        padding: 8px;
+        gap: 12px;
     }
-  </style>
+    
+    .page-container.collapsed {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        height: auto;
+        max-height: 0;
+        overflow: hidden;
+        z-index: 1000;
+        margin: 0;
+        padding: 0;
+        border-radius: 0 0 var(--radius) var(--radius);
+        background: white;
+        box-shadow: var(--shadow);
+        transition: max-height 0.3s ease;
+    }
+    
+    .sidebar.mobile-open {
+        max-height: 300px;
+        padding: 12px;
+        overflow-y: auto;
+    }
+    
+    .sidebar-container {
+        flex-direction: column;
+    }
+    
+    .sidebar-toggle {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex !important;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: white;
+        border: none;
+        border-radius: var(--radius-sm);
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    
+    .content-area {
+        height: auto;
+        min-height: calc(100vh - 140px);
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px;
+    }
+    
+    .toolbar-left {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .chart-card {
+        padding: 15px;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+    
+    .comparison-chart .chart-container {
+        height: 250px;
+    }
+    
+    .pwd-gauge-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .pwd-stats {
+        flex-direction: row;
+        justify-content: space-around;
+        width: 100%;
+    }
+    
+    .user-info {
+        gap: 8px;
+    }
+    
+    #userName {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    
+    #logoutBtn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+   }
+
+   /* Tablet Styles */
+   @media (min-width: 769px) and (max-width: 1024px) {
+    .page-container {
+        max-width: 95%;
+        grid-template-columns: 220px 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+    
+    .content-area {
+        padding: 15px;
+    }
+    
+    .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .comparison-chart {
+        grid-column: 1 / -1;
+    }
+   }
+
+   /* Mobile menu toggle button */
+   .mobile-menu-toggle {
+    display: none;
+   }
+
+   /* Print styles */
+   @media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .content-area,
+    .content-area * {
+        visibility: visible;
+    }
+    
+    .content-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        box-shadow: none;
+        padding: 0;
+    }
+    
+    .topbar,
+    .sidebar,
+    .toolbar {
+        display: none !important;
+    }
+    
+    .chart-card {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .charts-grid {
+        display: block;
+    }
+   }
+</style>
 </head>
 <body>
 <div class="page-container">
 
-  <header class="topbar" role="banner">
-    <div style="display:flex;gap:12px;align-items:center">
-      <button id="menuToggle" class="menu-btn" aria-label="Toggle menu">☰</button>
-      <div class="brand">
-        <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
-        <div>
-          <div class="title">PUROK KALIGTASAN</div>
-          <div class="subtitle">Disaster Risk Reduction & Management Office - Alitagtag</div>
-        </div>
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
+      <div class="brand-text">
+        <h1>PUROK KALIGTASAN</h1>
+        <p>MDRRMO Alitagtag Charts & Analytics</p>
       </div>
     </div>
 
     <div class="user-info">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
       <span id="userName"></span>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+      <button id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
     </div>
   </header>
 
-  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
-    <ul>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-      <li><a href="dataForm.html">📝 Data Entry</a></li>
-      <li><a href="records.html">📁 Records</a></li>
-      <li><a href="charts.html" class="active">📈 Charts</a></li>
-      <li id="navUsers" style="display:none;">
-    <a href="users.html">👥 User Management</a>
-</li>
-
-    </ul>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-container">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <ul>
+        <li><a href="dashboard.html" title="Dashboard"><span class="menu-icon">📊</span> <span class="menu-text">Dashboard</span></a></li>
+        <li><a href="dataForm.html" title="Data Entry"><span class="menu-icon">📝</span> <span class="menu-text">Data Entry</span></a></li>
+        <li><a href="records.html" title="Records"><span class="menu-icon">📁</span> <span class="menu-text">Records</span></a></li>
+        <li><a href="charts.html" class="active" title="Charts"><span class="menu-icon">📈</span> <span class="menu-text">Charts</span></a></li>
+        <li class="admin-only"><a href="users.html" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
+      </ul>
+    </div>
   </aside>
 
-  <main class="content-area" role="main">
-    <h2>📈 Household Statistics & Trends</h2>
-     <div id="disc">This section captures all key information about the household head, including personal data, contact details, demographic profile, and any government support or programs currently availed. The information will help establish the primary point of contact and provide a clear understanding of the household's overall status.</div>
+  <main class="content-area">
+    <div class="content-header">
+      <h2><span style="color: var(--accent1);">📈</span> Household Statistics & Trends</h2>
+      <div class="auto-refresh">
+        <span class="indicator"></span>
+        <span>Auto-refresh: 30s</span>
+      </div>
+    </div>
+    
+    <div id="disc">This section provides visual analytics and insights from household data. Interactive charts help identify patterns, distributions, and trends across barangays, age groups, disabilities, and government support programs for better decision-making.</div>
 
-    <div class="charts-container" id="chartsContainer">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button id="btnRefresh" class="btn btn-refresh">
+          <i class="fas fa-redo"></i> Refresh Charts
+        </button>
+      </div>
+      
+      <div class="toolbar-right" style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button id="btnPrint" class="btn btn-print">
+          <i class="fas fa-print"></i> Print
+        </button>
+        <button id="btnExportPDF" class="btn btn-pdf">
+          <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+        <button id="btnExportPNGs" class="btn btn-png">
+          <i class="fas fa-file-image"></i> Export PNGs
+        </button>
+        <button id="btnExportCSV" class="btn btn-csv">
+          <i class="fas fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="charts-grid" id="chartsContainer">
+      <!-- Chart 1: Entries per Barangay -->
       <div class="chart-card">
-        <h4>1. Entry per Barangay</h4>
-        <canvas id="chartBarangay" height="220"></canvas>
+        <div class="chart-header">
+          <h3 class="chart-title"><i class="fas fa-map-marker-alt"></i> Entries per Barangay</h3>
+          <div class="chart-stats">
+            <span class="stat-badge" id="totalBarangays">Total: 0</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartBarangay"></canvas>
+        </div>
       </div>
 
+      <!-- Chart 2: Age Groups -->
       <div class="chart-card">
-        <h4>2. Age Groups</h4>
-        <canvas id="chartAgeGroup" height="220"></canvas>
+        <div class="chart-header">
+          <h3 class="chart-title"><i class="fas fa-users"></i> Age Distribution</h3>
+          <div class="chart-stats">
+            <span class="stat-badge" id="totalAgeGroups">Total: 0</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartAgeGroup"></canvas>
+        </div>
       </div>
 
+      <!-- Chart 3: Stage Distribution -->
       <div class="chart-card">
-        <h4>3. Stage  (Double-ring)</h4>
-        <canvas id="chartStage" height="220"></canvas>
+        <div class="chart-header">
+          <h3 class="chart-title"><i class="fas fa-layer-group"></i> Stage Distribution</h3>
+          <div class="chart-stats">
+            <span class="stat-badge" id="totalStages">Stages: 0</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartStage"></canvas>
+        </div>
       </div>
 
+      <!-- Chart 4: PWD Gauge -->
       <div class="chart-card">
-        <h4>4. Persons With Disability (PWD)</h4>
-        <canvas id="chartPWD" height="160"></canvas>
-        <div class="pwd-info" id="pwdInfo"><span id="pwdYes">Yes: 0</span><span id="pwdNo">No: 0</span></div>
+        <div class="chart-header">
+          <h3 class="chart-title"><i class="fas fa-wheelchair"></i> PWD Distribution</h3>
+          <div class="chart-stats">
+            <span class="stat-badge">Gauge View</span>
+          </div>
+        </div>
+        <div class="pwd-gauge-container">
+          <div class="pwd-canvas-wrapper">
+            <canvas id="chartPWD"></canvas>
+          </div>
+          <div class="pwd-stats">
+            <div class="pwd-stat-item" id="pwdYesStat">
+              <div class="pwd-stat-value" id="pwdYesCount">0</div>
+              <div class="pwd-stat-label">PWD (Yes)</div>
+            </div>
+            <div class="pwd-stat-item" id="pwdNoStat">
+              <div class="pwd-stat-value" id="pwdNoCount">0</div>
+              <div class="pwd-stat-label">Non-PWD (No)</div>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- Chart 5: Status Distribution -->
       <div class="chart-card">
-        <h4>5. Status </h4>
-        <canvas id="chartStatus" height="220"></canvas>
+        <div class="chart-header">
+          <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Status Distribution</h3>
+          <div class="chart-stats">
+            <span class="stat-badge" id="totalStatuses">Statuses: 0</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartStatus"></canvas>
+        </div>
       </div>
 
+      <!-- Chart 6: Government Support -->
       <div class="chart-card">
-        <h4>6. Government Support</h4>
-        <canvas id="chartSupport" height="260"></canvas>
+        <div class="chart-header">
+          <h3 class="chart-title"><i class="fas fa-hand-holding-heart"></i> Government Support</h3>
+          <div class="chart-stats">
+            <span class="stat-badge" id="totalSupport">Programs: 9</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartSupport"></canvas>
+        </div>
       </div>
 
-      <div class="chart-card full-row">
-        <h4>Comparison — Barangay & Status</h4>
-        <canvas id="chartComparison" height="300"></canvas>
+      <!-- Chart 7: Comparison Chart -->
+      <div class="chart-card comparison-chart">
+        <div class="chart-header">
+          <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Barangay vs Status Comparison</h3>
+          <div class="chart-stats">
+            <span class="stat-badge">Comparative Analysis</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartComparison"></canvas>
+        </div>
       </div>
     </div>
   </main>
 </div>
 
-<div class="floating-menu" role="toolbar" aria-label="Export tools">
-  <h5>Export & Print</h5>
-  <button id="btnPrint" class="btn">Print</button>
-  <button id="btnExportPDF" class="btn">Export PDF</button>
-  <button id="btnExportPNGs" class="btn">Export PNG ZIP</button>
-  <button id="btnExportCSV" class="btn" style="background:linear-gradient(90deg,#2476ff,#4aa0ff)">Export CSV</button>
-  <div class="small-desc">Green = Barangay | Blue = Age groups. Auto-refresh: 30s</div>
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <div>Loading charts data...</div>
+  </div>
 </div>
 
-<!-- libs -->
+<!-- JavaScript Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <script>
-(function(){
-  // === CONFIG - set your Apps Script web app URL here ===
-  const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+/* ============ CONFIG ============ */
+const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
-  // chart instances
-  const CH = {};
+/* ============ CHART INSTANCES ============ */
+const CH = {};
 
-  // Auto-refresh interval (ms)
-  const AUTO_REFRESH_MS = 30000; // 30 seconds
+/* ============ AUTO-REFRESH CONFIG ============ */
+const AUTO_REFRESH_MS = 30000; // 30 seconds
+let refreshInterval = null;
 
-  // Utility: find value case-insensitively in object
-  function getField(r, key) {
+/* ============ UTILITY FUNCTIONS ============ */
+function showLoading(yes){ 
+    document.getElementById("loading").style.display = yes ? "flex" : "none"; 
+}
+
+function getField(r, key) {
     if (!r) return "";
     if (r.hasOwnProperty(key)) return r[key];
     const kl = key.toLowerCase().trim();
     for (const k of Object.keys(r)) {
-      if (String(k).toLowerCase().trim() === kl) return r[k];
+        if (String(k).toLowerCase().trim() === kl) return r[k];
     }
     return "";
-  }
+}
 
-  // Parse dates, support dd/mm/yyyy and ISO
-  function parseAnyDate(v){
+function parseAnyDate(v){
     if(!v && v !== 0) return null;
     if (v instanceof Date) return v;
     v = String(v).trim();
     if (!v) return null;
     if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v)){
-      const p = v.split('/');
-      return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+        const p = v.split('/');
+        return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
     }
     if(/^\d{4}-\d{2}-\d{2}/.test(v)){
-      return new Date(v);
+        return new Date(v);
     }
     const d = new Date(v);
     return isNaN(d) ? null : d;
-  }
+}
 
-  function monthsBetween(d1, d2){
+function monthsBetween(d1, d2){
     if(!d1 || !d2) return null;
     let years = d2.getFullYear() - d1.getFullYear();
     let months = d2.getMonth() - d1.getMonth();
     let m = years*12 + months;
     if(d2.getDate() < d1.getDate()) m--;
     return m;
-  }
+}
 
-  function ageInYearsFromBirth(bd){
+function ageInYearsFromBirth(bd){
     const d = parseAnyDate(bd);
     if(!d) return null;
     const now = new Date();
@@ -218,10 +953,9 @@
     const m = now.getMonth() - d.getMonth();
     if(m < 0 || (m === 0 && now.getDate() < d.getDate())) years--;
     return years;
-  }
+}
 
-  // normalize row values we need
-  function normalizeRow(r){
+function normalizeRow(r){
     const barangay = String(getField(r,"Barangay") || "").trim() || "Unknown";
     const stage = String(getField(r,"Stage") || "").trim() || "Unspecified";
     const pwdRaw = String(getField(r,"Persons with Disability (PWD)") || getField(r,"PWD") || "").trim().toLowerCase();
@@ -232,429 +966,733 @@
     let ageVal = getField(r,"Age");
     let ageYears = null;
     if (ageVal !== "" && ageVal !== null && ageVal !== undefined && !isNaN(Number(ageVal))) {
-      ageYears = Number(ageVal);
+        ageYears = Number(ageVal);
     } else {
-      if (birth) {
-        const y = ageInYearsFromBirth(birth);
-        if (y !== null) ageYears = y;
-      }
+        if (birth) {
+            const y = ageInYearsFromBirth(birth);
+            if (y !== null) ageYears = y;
+        }
     }
     let infantMonths = null;
     if ((ageYears === 0 || ageYears === 0) && birth) {
-      const bd = parseAnyDate(birth);
-      if (bd) infantMonths = monthsBetween(bd, new Date());
+        const bd = parseAnyDate(birth);
+        if (bd) infantMonths = monthsBetween(bd, new Date());
     }
 
-    // assistance fields — we treat 'yes' only except AICS counts non-empty
+    // assistance fields
     const assistKeys = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
     const assist = {};
     assistKeys.forEach(k => {
-      assist[k] = String(getField(r,k) || "").trim();
+        assist[k] = String(getField(r,k) || "").trim();
     });
 
     return { barangay, stage, pwd, status, birth, ageYears, infantMonths, assist };
-  }
+}
 
-  // Age bucketing per your rule:
-  // 0-11 months => Infant
-  // <=17 => School Children
-  // 18-59 => Adult
-  // 60+ => Elderly
-  function bucketAge(norm){
+function bucketAge(norm){
     if (typeof norm.infantMonths === "number" && norm.infantMonths >= 0 && norm.infantMonths <= 11) return "Infant (0-11 mos)";
     const y = norm.ageYears;
     if (y === null || y === undefined || y === "") return "Unknown";
     if (y <= 17) return "School Children (≤17)";
     if (y >= 60) return "Elderly (60+)";
     return "Adult (18-59)";
-  }
+}
 
-  // FETCH rows from Apps Script
-  async function fetchRecords(){
+/* ============ SESSION MANAGEMENT ============ */
+async function sessionCheck(){
+    try {
+        const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+        
+        if (userName && userName !== "User") {
+            document.getElementById('userName').innerText = userName;
+            
+            const isAdmin = localStorage.getItem("userRole") === "admin";
+            const adminItems = document.querySelectorAll(".admin-only");
+            adminItems.forEach(item => {
+                item.style.display = isAdmin ? "block" : "none";
+            });
+            
+            sessionStorage.setItem('authenticated', 'true');
+            return true;
+        } else {
+            if(sessionStorage.getItem('authenticated')) {
+                document.getElementById('userName').innerText = "User";
+                return true;
+            } else {
+                window.location.href = 'index.html?session=expired';
+                return false;
+            }
+        }
+    } catch(e){ 
+        console.warn('session check failed', e);
+        return false;
+    }
+}
+
+function handleLogout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    const logoutUrl = 'index.html?logout=true&t=' + Date.now();
+    fetch(API_URL+'?action=logout&t=' + Date.now())
+        .catch(() => {})
+        .finally(() => {
+            window.location.replace(logoutUrl);
+        });
+}
+
+/* ============ DATA FETCHING ============ */
+async function fetchRecords(){
     const url = API_URL + "?action=getRecords";
     const res = await fetch(url, {cache: "no-store"});
     if(!res.ok) throw new Error("Network error " + res.status);
     const j = await res.json();
     if(!j || !j.success) throw new Error("Bad response from API");
     return j.rows || [];
-  }
+}
 
-  // color utilities
-  function pastelGreen(i){ return `rgba(52,183,143,${0.85 - (i*0.02)})`; }
-  function pastelBlue(i){ return `rgba(70,140,240,${0.85 - (i*0.02)})`; }
-  function palette(i){ const colors = ['#0f7a4a','#3fbf8b','#f6b042','#f26c4f','#7b61ff','#0096c7','#ff7ab6','#6c757d','#2d9cdb']; return colors[i % colors.length]; }
-
-  // ensure canvas white background before exporting
-  function ensureCanvasWhite(c){
-    if (!c) return;
-    // draw white rect underneath if empty background
-    const ctx = c.getContext('2d');
-    ctx.save();
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,c.width,c.height);
-    ctx.restore();
-  }
-
-  // DRAWS
-  function drawBarChart(id, labels, values, colorFunc){
+/* ============ CHART FUNCTIONS ============ */
+function createBarChart(id, labels, values, title, color) {
     const ctx = document.getElementById(id).getContext('2d');
     if (CH[id]) CH[id].destroy();
 
-    const bg = labels.map((_,i) => colorFunc ? colorFunc(i) : pastelGreen(i));
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, color);
+    gradient.addColorStop(1, color.replace('0.8', '0.4'));
 
     CH[id] = new Chart(ctx, {
-      type: 'bar',
-      data: { labels, datasets: [{ label: 'Count', data: values, backgroundColor: bg, borderColor: bg.map(c => c), borderWidth: 0, borderRadius:6 }] },
-      options: {
-        responsive:true,
-        plugins: { legend:{ display:false }, tooltip:{ mode:'index' } },
-        scales: { x:{ ticks:{ autoSkip:true } }, y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
-      }
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: title,
+                data: values,
+                backgroundColor: gradient,
+                borderColor: color,
+                borderWidth: 1,
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 12 },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 6
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: { 
+                        font: { size: 10 },
+                        precision: 0
+                    }
+                }
+            }
+        }
     });
-  }
+}
 
-  function drawHorizontalBars(id, labels, values){
+function createDoughnutChart(id, labels, values, title) {
     const ctx = document.getElementById(id).getContext('2d');
     if (CH[id]) CH[id].destroy();
-    CH[id] = new Chart(ctx, {
-      type:'bar',
-      data:{ labels, datasets:[{ label:'Recipients', data:values, backgroundColor: labels.map((_,i)=> palette(i)) }]},
-      options:{ indexAxis:'y', responsive:true, plugins:{ legend:{ display:false }}, scales:{ x:{ beginAtZero:true, ticks:{ stepSize:1 } } } }
-    });
-  }
 
-  function drawDoughnutDouble(id, innerLabels, innerValues, outerLabels, outerValues){
-    // Create composite by drawing outer ring first then smaller inner ring
+    const backgroundColors = [
+        'rgba(52, 183, 143, 0.8)',
+        'rgba(70, 140, 240, 0.8)',
+        'rgba(246, 176, 66, 0.8)',
+        'rgba(242, 108, 79, 0.8)',
+        'rgba(123, 97, 255, 0.8)',
+        'rgba(0, 150, 199, 0.8)',
+        'rgba(255, 122, 182, 0.8)',
+        'rgba(108, 117, 125, 0.8)'
+    ];
+
+    CH[id] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: backgroundColors,
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 10 },
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 12 },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 6
+                }
+            },
+            cutout: '65%'
+        }
+    });
+}
+
+function createPWDGauge(id, yesCount, noCount) {
     const ctx = document.getElementById(id).getContext('2d');
     if (CH[id]) CH[id].destroy();
 
-    CH[id] = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: outerLabels.concat(innerLabels),
-        datasets: [
-          {
-            label: 'Outer',
-            data: outerValues,
-            backgroundColor: outerLabels.map((_,i)=> `hsl(${(i*40)%360} 65% 65%)`),
-            cutout: '50%',
-            circumference: 360,
-            weight: 1
-          },
-          {
-            label: 'Inner',
-            data: innerValues,
-            backgroundColor: innerLabels.map((_,i)=> `hsl(${(i*40+20)%360} 70% 50%)`),
-            cutout: '70%',
-            circumference: 360,
-            weight: 0.5
-          }
-        ]
-      },
-      options: {
-        responsive:true,
-        plugins:{ legend:{ position:'bottom' } }
-      }
-    });
-  }
-
-  function drawDoughnutSingle(id, labels, values){
-    const ctx = document.getElementById(id).getContext('2d');
-    if (CH[id]) CH[id].destroy();
-    CH[id] = new Chart(ctx, {
-      type:'doughnut',
-      data:{ labels, datasets:[{ data:values, backgroundColor: labels.map((_,i)=> `hsl(${(i*55)%360} 65% 55%)`) }]},
-      options:{ responsive:true, plugins:{ legend:{ position:'bottom' } } }
-    });
-  }
-
-  // PWD gauge: show YES % in ring and update counts in DOM
-  function drawPWDGauge(id, yesCount, noCount){
     const total = yesCount + noCount;
     const percent = total === 0 ? 0 : Math.round((yesCount/total) * 100);
+    
+    // Update stat displays
+    document.getElementById('pwdYesCount').textContent = yesCount;
+    document.getElementById('pwdNoCount').textContent = noCount;
+
+    CH[id] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [percent, 100 - percent],
+                backgroundColor: ['rgba(52, 183, 143, 0.9)', 'rgba(220, 220, 220, 0.3)'],
+                borderWidth: 0,
+                circumference: 270,
+                rotation: 225
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            },
+            cutout: '75%'
+        }
+    });
+
+    // Draw center text
+    setTimeout(() => {
+        try {
+            const c = document.getElementById(id);
+            const ctx2 = c.getContext('2d');
+            const centerX = c.width / 2;
+            const centerY = c.height / 2;
+            
+            ctx2.save();
+            ctx2.textAlign = 'center';
+            ctx2.textBaseline = 'middle';
+            
+            // Draw percentage
+            ctx2.font = 'bold 28px Inter, system-ui';
+            ctx2.fillStyle = '#0f7a4a';
+            ctx2.fillText(`${percent}%`, centerX, centerY - 10);
+            
+            // Draw label
+            ctx2.font = '12px Inter, system-ui';
+            ctx2.fillStyle = '#6b6f6b';
+            ctx2.fillText('PWD', centerX, centerY + 15);
+            
+            ctx2.restore();
+        } catch(e) {}
+    }, 100);
+}
+
+function createHorizontalBarChart(id, labels, values, title) {
     const ctx = document.getElementById(id).getContext('2d');
     if (CH[id]) CH[id].destroy();
 
+    const gradient = ctx.createLinearGradient(0, 0, 400, 0);
+    gradient.addColorStop(0, 'rgba(52, 183, 143, 0.8)');
+    gradient.addColorStop(1, 'rgba(70, 140, 240, 0.8)');
+
     CH[id] = new Chart(ctx, {
-      type:'doughnut',
-      data:{
-        labels:['Yes','No'],
-        datasets:[{
-          data:[percent, 100-percent],
-          backgroundColor: [`rgba(52,183,143,0.95)`, `rgba(220,220,220,0.6)`],
-          hoverOffset:6
-        }]
-      },
-      options:{
-        rotation: -120 * Math.PI/180,
-        circumference: 240 * Math.PI/180,
-        cutout: '70%',
-        responsive:true,
-        plugins:{
-          legend:{ display:false },
-          tooltip:{ enabled:true, callbacks:{ label: (ctx)=> `${ctx.label}: ${ctx.parsed}` } }
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: title,
+                data: values,
+                backgroundColor: gradient,
+                borderColor: 'rgba(52, 183, 143, 1)',
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 12 },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 6
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: { 
+                        font: { size: 10 },
+                        precision: 0
+                    }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 } }
+                }
+            }
         }
-      }
     });
+}
 
-    // overlay text in center (we'll draw using Chart plugin? simpler: create two DOM labels)
-    document.getElementById('pwdYes').innerText = `Yes: ${yesCount}`;
-    document.getElementById('pwdNo').innerText = `No: ${noCount}`;
-
-    // draw percent label in center using plugin? We'll render as HTML overlay by writing into center of canvas
-    // Simpler approach: draw over canvas with text using ctx after short delay
-    setTimeout(()=> {
-      try {
-        const c = document.getElementById(id);
-        const ctx2 = c.getContext('2d');
-        // re-render current chart then draw label
-        // determine center and draw
-        const cx = c.width / 2;
-        const cy = c.height / 2;
-        ctx2.save();
-        ctx2.fillStyle = '#0b3b2a';
-        ctx2.font = '600 20px system-ui,Segoe UI';
-        ctx2.textAlign = 'center';
-        ctx2.textBaseline = 'middle';
-        ctx2.fillText(percent + '%', cx, cy - 6);
-        ctx2.font = '400 12px system-ui,Segoe UI';
-        ctx2.fillText('YES', cx, cy + 14);
-        ctx2.restore();
-      } catch(e){}
-    }, 120);
-  }
-
-  // Comparison: grouped bar (barangay categories as x, statuses as datasets)
-  function drawComparison(barangayLabels, statusKeys, matrix){
+function createComparisonChart(labels, datasets) {
     const ctx = document.getElementById('chartComparison').getContext('2d');
     if (CH['chartComparison']) CH['chartComparison'].destroy();
 
-    const datasets = statusKeys.map((s,i)=> ({
-      label: s,
-      data: barangayLabels.map(b => matrix[b] ? (matrix[b][s]||0) : 0),
-      backgroundColor: palette(i),
-      borderColor: palette(i),
-      borderWidth: 1
-    }));
+    const backgroundColors = [
+        'rgba(52, 183, 143, 0.7)',
+        'rgba(70, 140, 240, 0.7)',
+        'rgba(246, 176, 66, 0.7)',
+        'rgba(242, 108, 79, 0.7)',
+        'rgba(123, 97, 255, 0.7)',
+        'rgba(0, 150, 199, 0.7)'
+    ];
 
     CH['chartComparison'] = new Chart(ctx, {
-      type:'bar',
-      data:{ labels: barangayLabels, datasets },
-      options:{
-        responsive:true,
-        plugins:{ legend:{ position:'bottom' }, tooltip:{ mode:'index' } },
-        scales:{ x:{ stacked:false }, y:{ beginAtZero:true, ticks:{ stepSize:1 } } }
-      }
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: datasets.map((dataset, index) => ({
+                ...dataset,
+                backgroundColor: backgroundColors[index % backgroundColors.length],
+                borderColor: backgroundColors[index % backgroundColors.length].replace('0.7', '1'),
+                borderWidth: 1,
+                borderRadius: 4
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 10 },
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 12 },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 6
+                }
+            },
+            scales: {
+                x: {
+                    stacked: false,
+                    grid: { display: false },
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    stacked: false,
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: { 
+                        font: { size: 10 },
+                        precision: 0
+                    }
+                }
+            }
+        }
     });
-  }
+}
 
-  // Build charts from raw rows
-  async function buildCharts(){
+/* ============ BUILD CHARTS ============ */
+async function buildCharts() {
+    showLoading(true);
+    
     try {
-      const rawRows = await fetchRecords(); // array of objects (sheet rows)
-      const norm = rawRows.map(normalizeRow);
+        const rawRows = await fetchRecords();
+        const norm = rawRows.map(normalizeRow);
+        
+        // Update total count
+        document.getElementById('totalBarangays').textContent = `Total: ${norm.length}`;
 
-      // 1) Entry per Barangay
-      const barangayCounts = {};
-      norm.forEach(n => barangayCounts[n.barangay] = (barangayCounts[n.barangay]||0) + 1);
-      // sort descending
-      const brgEntries = Object.entries(barangayCounts).sort((a,b)=> b[1] - a[1]);
-      const brgLabels = brgEntries.map(e=>e[0]);
-      const brgValues = brgEntries.map(e=>e[1]);
-      drawBarChart('chartBarangay', brgLabels, brgValues, (i)=> pastelGreen(i));
+        // 1. Entries per Barangay
+        const barangayCounts = {};
+        norm.forEach(n => barangayCounts[n.barangay] = (barangayCounts[n.barangay] || 0) + 1);
+        const brgEntries = Object.entries(barangayCounts).sort((a, b) => b[1] - a[1]);
+        const brgLabels = brgEntries.map(e => e[0]);
+        const brgValues = brgEntries.map(e => e[1]);
+        createBarChart('chartBarangay', brgLabels, brgValues, 'Households', 'rgba(52, 183, 143, 0.8)');
 
-      // 2) Age groups (pastel blue)
-      const ageBuckets = {"Infant (0-11 mos)":0,"School Children (≤17)":0,"Adult (18-59)":0,"Elderly (60+)":0,"Unknown":0};
-      norm.forEach(n => { ageBuckets[bucketAge(n)] = (ageBuckets[bucketAge(n)] || 0) + 1; });
-      drawBarChart('chartAgeGroup', Object.keys(ageBuckets), Object.values(ageBuckets), (i)=> pastelBlue(i));
-
-      // 3) Stage distribution — make double-ring:
-      // Outer: top 6 stages; Inner: rest or same distribution split
-      const stageCounts = {};
-      norm.forEach(n => stageCounts[n.stage] = (stageCounts[n.stage]||0) + 1);
-      const stageEntries = Object.entries(stageCounts).sort((a,b)=> b[1]-a[1]);
-      const outer = stageEntries.slice(0, Math.min(stageEntries.length,6));
-      const inner = stageEntries.slice(6);
-      const outerLabels = outer.map(e=>e[0]), outerVals = outer.map(e=>e[1]);
-      const innerLabels = inner.length ? inner.map(e=>e[0]) : outerLabels.slice(0, Math.min(3, outerLabels.length));
-      const innerVals = inner.length ? inner.map(e=>e[1]) : outerVals.slice(0, Math.min(3, outerVals.length));
-      drawDoughnutDouble('chartStage', innerLabels, innerVals, outerLabels, outerVals);
-
-      // 4) PWD gauge (Yes/No only)
-      let yes = 0, no = 0;
-      norm.forEach(n => { if (String(n.pwd).toLowerCase() === 'yes') yes++; else no++; });
-      drawPWDGauge('chartPWD', yes, no);
-
-      // 5) Status donut
-      const statusCounts = {};
-      norm.forEach(n => statusCounts[n.status] = (statusCounts[n.status]||0) + 1);
-      drawDoughnutSingle('chartStatus', Object.keys(statusCounts), Object.values(statusCounts));
-
-      // 6) Government support horizontal bars (count yes, AICS non-empty)
-      const supportKeys = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
-      const supportCounts = {};
-      supportKeys.forEach(k=> supportCounts[k]=0);
-      norm.forEach(n=>{
-        supportKeys.forEach(k=>{
-          const v = (n.assist && n.assist[k]) ? String(n.assist[k]).trim().toLowerCase() : "";
-          if (k === 'AICS') {
-            if (v) supportCounts[k]++; // any non-empty AICS
-          } else {
-            if (v === 'yes' || v === 'y' || v === 'true') supportCounts[k]++;
-          }
+        // 2. Age Groups
+        const ageBuckets = {
+            "Infant (0-11 mos)": 0,
+            "School Children (≤17)": 0,
+            "Adult (18-59)": 0,
+            "Elderly (60+)": 0,
+            "Unknown": 0
+        };
+        norm.forEach(n => {
+            ageBuckets[bucketAge(n)] = (ageBuckets[bucketAge(n)] || 0) + 1;
         });
-      });
-      drawHorizontalBars('chartSupport', Object.keys(supportCounts), Object.values(supportCounts));
+        const ageLabels = Object.keys(ageBuckets);
+        const ageValues = Object.values(ageBuckets);
+        document.getElementById('totalAgeGroups').textContent = `Total: ${norm.length}`;
+        createBarChart('chartAgeGroup', ageLabels, ageValues, 'Persons', 'rgba(70, 140, 240, 0.8)');
 
-      // Comparison — Barangay vs Status
-      // build matrix: { barangay: { status: count, ... }, ... }
-      const comparisonMatrix = {};
-      const statusSet = new Set();
-      norm.forEach(n=>{
-        const b = n.barangay || 'Unknown';
-        const s = n.status || 'Unspecified';
-        statusSet.add(s);
-        if(!comparisonMatrix[b]) comparisonMatrix[b] = {};
-        comparisonMatrix[b][s] = (comparisonMatrix[b][s]||0) + 1;
-      });
-      const statusKeys = Array.from(statusSet).sort();
-      const barangayLabels = Object.keys(comparisonMatrix).sort((a,b)=> (comparisonMatrix[b] && Object.values(comparisonMatrix[b]).reduce((x,y)=>x+y,0)) - (comparisonMatrix[a] && Object.values(comparisonMatrix[a]).reduce((x,y)=>x+y,0)));
-      drawComparison(barangayLabels, statusKeys, comparisonMatrix);
+        // 3. Stage Distribution
+        const stageCounts = {};
+        norm.forEach(n => stageCounts[n.stage] = (stageCounts[n.stage] || 0) + 1);
+        const stageEntries = Object.entries(stageCounts).sort((a, b) => b[1] - a[1]);
+        const stageLabels = stageEntries.map(e => e[0]);
+        const stageValues = stageEntries.map(e => e[1]);
+        document.getElementById('totalStages').textContent = `Stages: ${stageLabels.length}`;
+        createDoughnutChart('chartStage', stageLabels, stageValues, 'Stage Distribution');
 
-    } catch(err){
-      console.error("buildCharts error:", err);
-      alert("Unable to load charts: " + err.message);
+        // 4. PWD Distribution
+        let yesPWD = 0, noPWD = 0;
+        norm.forEach(n => {
+            if (String(n.pwd).toLowerCase() === 'yes') yesPWD++;
+            else noPWD++;
+        });
+        createPWDGauge('chartPWD', yesPWD, noPWD);
+
+        // 5. Status Distribution
+        const statusCounts = {};
+        norm.forEach(n => statusCounts[n.status] = (statusCounts[n.status] || 0) + 1);
+        const statusEntries = Object.entries(statusCounts).sort((a, b) => b[1] - a[1]);
+        const statusLabels = statusEntries.map(e => e[0]);
+        const statusValues = statusEntries.map(e => e[1]);
+        document.getElementById('totalStatuses').textContent = `Statuses: ${statusLabels.length}`;
+        createDoughnutChart('chartStatus', statusLabels, statusValues, 'Status Distribution');
+
+        // 6. Government Support
+        const supportKeys = [
+            "TUPAD", "Local 4Ps", "National 4Ps", "Local Social Pension",
+            "National Social Pension", "Solo Parent Assistance", "Cash Subsidy",
+            "Relief Goods", "AICS"
+        ];
+        const supportCounts = {};
+        supportKeys.forEach(k => supportCounts[k] = 0);
+        norm.forEach(n => {
+            supportKeys.forEach(k => {
+                const v = (n.assist && n.assist[k]) ? String(n.assist[k]).trim().toLowerCase() : "";
+                if (k === 'AICS') {
+                    if (v) supportCounts[k]++;
+                } else {
+                    if (v === 'yes' || v === 'y' || v === 'true') supportCounts[k]++;
+                }
+            });
+        });
+        const supportLabels = Object.keys(supportCounts);
+        const supportValues = Object.values(supportCounts);
+        createHorizontalBarChart('chartSupport', supportLabels, supportValues, 'Recipients');
+
+        // 7. Comparison Chart
+        const comparisonMatrix = {};
+        const statusSet = new Set();
+        norm.forEach(n => {
+            const b = n.barangay || 'Unknown';
+            const s = n.status || 'Unspecified';
+            statusSet.add(s);
+            if (!comparisonMatrix[b]) comparisonMatrix[b] = {};
+            comparisonMatrix[b][s] = (comparisonMatrix[b][s] || 0) + 1;
+        });
+        
+        const statusKeys = Array.from(statusSet).sort();
+        const barangayLabels = Object.keys(comparisonMatrix).sort((a, b) => {
+            const totalA = Object.values(comparisonMatrix[a] || {}).reduce((x, y) => x + y, 0);
+            const totalB = Object.values(comparisonMatrix[b] || {}).reduce((x, y) => x + y, 0);
+            return totalB - totalA;
+        });
+        
+        const comparisonDatasets = statusKeys.map(status => ({
+            label: status,
+            data: barangayLabels.map(barangay => comparisonMatrix[barangay]?.[status] || 0)
+        }));
+        
+        createComparisonChart(barangayLabels, comparisonDatasets);
+
+    } catch (err) {
+        console.error("Error building charts:", err);
+        alert("Unable to load charts: " + err.message);
+    } finally {
+        showLoading(false);
     }
-  }
+}
 
-  // EXPORT: PDF (ensures white backgrounds)
-  async function exportToPDF(){
+/* ============ EXPORT FUNCTIONS ============ */
+async function exportToPDF() {
     try {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation:'landscape' });
-      const ids = ['chartBarangay','chartAgeGroup','chartStage','chartPWD','chartStatus','chartSupport','chartComparison'];
-      let page = 0;
-      for (const id of ids){
-        const c = document.getElementById(id);
-        if(!c) continue;
-        // ensure white background
-        ensureCanvasWhite(c);
-        const img = c.toDataURL('image/jpeg', 0.96);
-        if (page > 0) pdf.addPage();
-        // adapt size to page - keep margins
-        const w = pdf.internal.pageSize.getWidth() - 20;
-        const h = pdf.internal.pageSize.getHeight() - 20;
-        pdf.addImage(img, 'JPEG', 10, 10, w, h);
-        page++;
-      }
-      pdf.save(`Charts_Report_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`);
-    } catch(err){
-      console.error("PDF export failed:", err);
-      alert("PDF export failed: " + err.message);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('landscape', 'mm', 'a4');
+        
+        const chartIds = [
+            'chartBarangay', 'chartAgeGroup', 'chartStage',
+            'chartPWD', 'chartStatus', 'chartSupport',
+            'chartComparison'
+        ];
+        
+        let page = 0;
+        for (const id of chartIds) {
+            const canvas = document.getElementById(id);
+            if (!canvas) continue;
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const imgWidth = 280;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            if (page > 0) pdf.addPage();
+            
+            // Add title
+            pdf.setFontSize(16);
+            pdf.setTextColor(15, 122, 74);
+            pdf.text('Purok Kaligtasan - Charts Report', 10, 15);
+            
+            pdf.setFontSize(10);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(new Date().toLocaleDateString(), 270, 15);
+            
+            // Add chart
+            pdf.addImage(imgData, 'JPEG', 10, 25, imgWidth, imgHeight);
+            
+            page++;
+        }
+        
+        pdf.save(`Charts_Report_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`);
+    } catch(err) {
+        console.error("PDF export failed:", err);
+        alert("PDF export failed: " + err.message);
     }
-  }
+}
 
-  // EXPORT PNG ZIP
-  async function exportPNGsZip(){
+async function exportPNGsZip() {
     try {
-      const zip = new JSZip();
-      const ids = ['chartBarangay','chartAgeGroup','chartStage','chartPWD','chartStatus','chartSupport','chartComparison'];
-      for(const id of ids){
-        const c = document.getElementById(id);
-        if(!c) continue;
-        ensureCanvasWhite(c);
-        const blob = await new Promise(res => c.toBlob(res, 'image/png', 1.0));
-        if(blob) zip.file(`${id}.png`, blob);
-      }
-      const content = await zip.generateAsync({type:'blob'});
-      saveAs(content, `Charts_PNGs_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.zip`);
-    } catch(err){
-      console.error("PNG ZIP failed:", err);
-      alert("PNG ZIP failed: " + err.message);
+        const zip = new JSZip();
+        const chartIds = [
+            'chartBarangay', 'chartAgeGroup', 'chartStage',
+            'chartPWD', 'chartStatus', 'chartSupport',
+            'chartComparison'
+        ];
+        
+        for(const id of chartIds) {
+            const canvas = document.getElementById(id);
+            if(!canvas) continue;
+            
+            const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
+            if(blob) zip.file(`${id}.png`, blob);
+        }
+        
+        const content = await zip.generateAsync({type:'blob'});
+        saveAs(content, `Charts_PNGs_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.zip`);
+    } catch(err) {
+        console.error("PNG ZIP failed:", err);
+        alert("PNG ZIP failed: " + err.message);
     }
-  }
+}
 
-  // CSV Export: create CSV from normalized rows or by chart data. Offer "all rows" CSV.
-  async function exportCSV_AllRows(){
+async function exportCSV_AllRows() {
     try {
-      const raw = await fetchRecords();
-      if(!Array.isArray(raw) || raw.length === 0){
-        alert("No data to export");
-        return;
-      }
-      // build header union
-      const keys = new Set();
-      raw.forEach(r => Object.keys(r).forEach(k => keys.add(k)));
-      const header = Array.from(keys);
-      const rows = raw.map(r => header.map(h => {
-        const v = r[h];
-        if (v === null || v === undefined) return '';
-        return typeof v === 'string' ? v.replace(/"/g,'""') : String(v);
-      }));
-      let csv = '"' + header.join('","') + '"\n';
-      rows.forEach(r => csv += '"' + r.join('","') + '"\n');
+        const raw = await fetchRecords();
+        if(!Array.isArray(raw) || raw.length === 0){
+            alert("No data to export");
+            return;
+        }
+        
+        const keys = new Set();
+        raw.forEach(r => Object.keys(r).forEach(k => keys.add(k)));
+        const header = Array.from(keys);
+        const rows = raw.map(r => header.map(h => {
+            const v = r[h];
+            if (v === null || v === undefined) return '';
+            return typeof v === 'string' ? v.replace(/"/g,'""') : String(v);
+        }));
+        
+        let csv = '"' + header.join('","') + '"\n';
+        rows.forEach(r => csv += '"' + r.join('","') + '"\n');
 
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      saveAs(blob, `All_Rows_${(new Date()).toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`);
-    } catch(err){
-      console.error("CSV export failed", err);
-      alert("CSV export failed: " + err.message);
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        saveAs(blob, `All_Rows_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`);
+    } catch(err) {
+        console.error("CSV export failed", err);
+        alert("CSV export failed: " + err.message);
     }
-  }
+}
 
-  // small helper: export single chart dataset as CSV (labels + values)
-  function exportChartCSV(labels, values, filename){
-    const header = ['Label','Value'];
-    let csv = header.join(',') + '\n';
-    for(let i=0;i<labels.length;i++){
-      csv += `"${String(labels[i]).replace(/"/g,'""')}",${String(values[i]||0)}\n`;
-    }
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    saveAs(blob, filename);
-  }
-
-  // wire buttons
-  document.getElementById('btnExportPDF').addEventListener('click', exportToPDF);
-  document.getElementById('btnExportPNGs').addEventListener('click', exportPNGsZip);
-  document.getElementById('btnExportCSV').addEventListener('click', exportCSV_AllRows);
-  document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
-
-  // Auto-refresh loop
-  let intervalHandle = null;
-  function startAutoRefresh(){
-    if(intervalHandle) clearInterval(intervalHandle);
-    intervalHandle = setInterval(() => {
-      buildCharts();
+/* ============ AUTO REFRESH ============ */
+function startAutoRefresh() {
+    if(refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(() => {
+        buildCharts();
     }, AUTO_REFRESH_MS);
-  }
+}
 
-  // init
-  (function init(){
-    document.getElementById('userName').innerText = localStorage.getItem('staffName') || localStorage.getItem('username') || '';
-    document.getElementById('logoutBtn').addEventListener('click', ()=> { localStorage.clear(); location.href='login.html'; });
+function stopAutoRefresh() {
+    if(refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+}
 
-    // initial build
-    buildCharts();
-    startAutoRefresh();
-    // also rebuild when tab becomes visible again (freshness)
-    document.addEventListener('visibilitychange', ()=> {
-      if(document.visibilityState === 'visible') buildCharts();
-    });
-  })();
-})();
+/* ============ SIDEBAR TOGGLE ============ */
+function toggleSidebar() {
+    const pageContainer = document.querySelector('.page-container');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const icon = sidebarToggle.querySelector('i');
+    
+    pageContainer.classList.toggle('collapsed');
+    
+    if (pageContainer.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        sidebarToggle.title = "Expand sidebar";
+    } else {
+        icon.className = 'fas fa-bars';
+        sidebarToggle.title = "Collapse sidebar";
+    }
+}
+
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const icon = mobileToggle.querySelector('i');
+    
+    sidebar.classList.toggle('mobile-open');
+    
+    if (sidebar.classList.contains('mobile-open')) {
+        icon.className = 'fas fa-times';
+        mobileToggle.title = "Close menu";
+    } else {
+        icon.className = 'fas fa-bars';
+        mobileToggle.title = "Open menu";
+    }
+}
+
+/* ============ EVENT LISTENERS ============ */
+document.addEventListener('DOMContentLoaded', async function() {
+    // Session check
+    const isAuthenticated = await sessionCheck();
+    
+    if (isAuthenticated) {
+        // Set user info
+        const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+        document.getElementById("userName").innerText = userName;
+        
+        // Check admin status
+        const isAdmin = localStorage.getItem("userRole") === "admin";
+        const adminItems = document.querySelectorAll(".admin-only");
+        adminItems.forEach(item => {
+            item.style.display = isAdmin ? "block" : "none";
+        });
+        
+        // Initialize charts
+        await buildCharts();
+        startAutoRefresh();
+        
+        // Bind event listeners
+        document.getElementById('btnRefresh').addEventListener('click', () => {
+            buildCharts();
+        });
+        
+        document.getElementById('btnPrint').addEventListener('click', () => {
+            window.print();
+        });
+        
+        document.getElementById('btnExportPDF').addEventListener('click', exportToPDF);
+        document.getElementById('btnExportPNGs').addEventListener('click', exportPNGsZip);
+        document.getElementById('btnExportCSV').addEventListener('click', exportCSV_AllRows);
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+        document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileSidebar);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const sidebar = document.getElementById('sidebar');
+                const mobileToggle = document.getElementById('mobileMenuToggle');
+                
+                sidebar.classList.remove('mobile-open');
+                mobileToggle.querySelector('i').className = 'fas fa-bars';
+                mobileToggle.title = "Open menu";
+                
+                // Rebuild charts on resize for better fit
+                setTimeout(() => {
+                    Object.keys(CH).forEach(key => {
+                        if (CH[key] && CH[key].resize) CH[key].resize();
+                    });
+                }, 100);
+            }
+        });
+        
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                buildCharts();
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        });
+        
+        // Close mobile sidebar on click outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target) && sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                    mobileToggle.querySelector('i').className = 'fas fa-bars';
+                    mobileToggle.title = "Open menu";
+                }
+            }
+        });
+    }
+});
+
+// Handle page show event
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        sessionCheck().then(isAuthenticated => {
+            if (isAuthenticated) {
+                buildCharts();
+                startAutoRefresh();
+            }
+        });
+    }
+});
 </script>
 <!-- Activity Tracking -->
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
