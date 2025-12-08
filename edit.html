@@ -1132,6 +1132,15 @@ function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&am
 function computeKeywordRegex(q){ if(!q) return null; const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g,"\\$&"); return new RegExp(esc,"gi"); }
 function highlight(text,q){ if(!q) return escapeHtml(text); const re=computeKeywordRegex(q); return escapeHtml(text).replace(re,m=>`<span class="hl">${m}</span>`); }
 
+/* Get user's full name from localStorage */
+function getUserFullName() {
+  return localStorage.getItem('staffName') || 
+         localStorage.getItem('userFullName') || 
+         localStorage.getItem('fullName') || 
+         localStorage.getItem('username') || 
+         'System';
+}
+
 /* ========================= DATE PARSING & FORMATTING ========================= */
 function toInputDate(val){
   if(!val && val !== 0) return '';
@@ -1543,15 +1552,12 @@ function onRowSelect(e){ const id = e.target.dataset.dataId; if(e.target.checked
 function onDeleteClick(dataID){
   if(!confirm('Delete household ' + dataID + '?')) return;
   
-  // Get current user for audit logging
-  const currentUser = localStorage.getItem('username') || 
-                     localStorage.getItem('staffName') || 
-                     'System';
+  const userFullName = getUserFullName();
   
   const fd = new FormData();
   fd.append('action','deleteHousehold');
   fd.append('dataID', dataID);
-  fd.append('actor', currentUser);
+  fd.append('actor', userFullName);
   fetch(SCRIPT_URL, { method: 'POST', body: fd })
     .then(r => r.text())
     .then(txt => {
@@ -1576,6 +1582,14 @@ function onEditClick(dataID){
     $('editDataIdDisplay').textContent = editDataID;
   }
 
+  // Store original submittedBy value from head
+  const originalSubmittedBy = editHead['Submitted By'] || editHead['submittedBy'] || '';
+  
+  // If no submittedBy in head, add current user's name
+  if (!originalSubmittedBy) {
+    editHead['Submitted By'] = getUserFullName();
+  }
+  
   // Prefill head inputs
   $('edit_coordinate').value = editHead['Coordinate'] || editHead['Coordinates'] || '';
   $('edit_barangay').value = editHead['Barangay'] || '';
@@ -1662,6 +1676,7 @@ function onEditClick(dataID){
 
   updateEditMembersPreview();
   openEditPanel();
+  
   setTimeout(()=> $('edit_householdHead')?.focus(), 120);
 }
 
@@ -1726,17 +1741,10 @@ function removeMember(index) {
   }
 }
 
-/* Add/Edit Members button handler */
-function ensureMembersArraySize(){
-  const expected = Number($('edit_memberCount')?.value || 0);
-  while(editMembers.length < expected) editMembers.push(createEmptyMember());
-  if(editMembers.length === 0) editMembers.push(createEmptyMember());
-}
-
 /* create empty member object */
 function createEmptyMember(){
   return {
-    'Data ID': editDataID, // Include Data ID for members
+    'Data ID': editDataID,
     'Name of Household Member/s':'',
     'FishR Registered/RBIS Registered':'',
     'Contact no.':'',
@@ -1767,8 +1775,16 @@ function createEmptyMember(){
     'Reasons for Displacement':'',
     'TUPAD':'No','Local 4Ps':'No','National 4Ps':'No',
     'Local Social Pension':'No','National Social Pension':'No','Solo Parent Assistance':'No',
-    'Cash Subsidy':'No','Relief Goods':'No','AICS':''
+    'Cash Subsidy':'No','Relief Goods':'No','AICS':'',
+    'Submitted By': getUserFullName()
   };
+}
+
+/* Add/Edit Members button handler */
+function ensureMembersArraySize(){
+  const expected = Number($('edit_memberCount')?.value || 0);
+  while(editMembers.length < expected) editMembers.push(createEmptyMember());
+  if(editMembers.length === 0) editMembers.push(createEmptyMember());
 }
 
 /* MEMBER PANEL: open -> fill -> collect -> navigate */
@@ -1858,8 +1874,12 @@ function collectMemberPanelToEdit(){
     registrationValue = $('memberRegistration').value || "";
   }
 
+  // Get the current member to preserve existing submittedBy
+  const currentMember = editMembers[memberEditIndex] || {};
+  const existingSubmittedBy = currentMember['Submitted By'] || '';
+
   const obj = {
-    'Data ID': editDataID, // Include Data ID for members
+    'Data ID': editDataID,
     'Name of Household Member/s': name,
     'FishR Registered/RBIS Registered': registrationValue,
     'Contact no.': $('memberContact').value || '',
@@ -1896,7 +1916,9 @@ function collectMemberPanelToEdit(){
     'Solo Parent Assistance': $('member_solo').checked ? 'Yes' : 'No',
     'Relief Goods': $('member_relief').checked ? 'Yes' : 'No',
     'Cash Subsidy': $('member_cash').checked ? 'Yes' : 'No',
-    'AICS': $('memberAics').value || ''
+    'AICS': $('memberAics').value || '',
+    // Preserve existing submittedBy or use current user's full name
+    'Submitted By': existingSubmittedBy || getUserFullName()
   };
   editMembers[memberEditIndex] = obj;
 }
@@ -1975,8 +1997,11 @@ function collectHeadFromEditForm(){
     headRegistrationValue = $('edit_headRegistration').value || "";
   }
 
+  // Preserve the original submittedBy value
+  const originalSubmittedBy = editHead['Submitted By'] || editHead['submittedBy'] || '';
+  
   editHead = {
-    'Data ID': editDataID, // Include Data ID for head
+    'Data ID': editDataID,
     'Coordinate': $('edit_coordinate').value || '',
     'Coordinates': $('edit_coordinate').value || '',
     'Barangay': $('edit_barangay').value || '',
@@ -2031,7 +2056,9 @@ function collectHeadFromEditForm(){
     'Solo Parent Assistance': $('edit_ass_solo').checked ? 'Yes' : 'No',
     'Relief Goods': $('edit_ass_relief').checked ? 'Yes' : 'No',
     'Cash Subsidy': $('edit_ass_cash').checked ? 'Yes' : 'No',
-    'AICS': $('edit_ass_aics').value || ''
+    'AICS': $('edit_ass_aics').value || '',
+    // Preserve the Submitted By field
+    'Submitted By': originalSubmittedBy || getUserFullName()
   };
 }
 
@@ -2051,18 +2078,19 @@ async function saveEditedHousehold(silentReload = false){
   while(editMembers.length < expected) editMembers.push(createEmptyMember());
   if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
 
-  // Get current user for audit logging
-  const currentUser = localStorage.getItem('username') || 
-                     localStorage.getItem('staffName') || 
-                     'System';
+  const userFullName = getUserFullName();
+
+  // Add "Last Edited By" field
+  editHead['Last Edited By'] = userFullName;
+  editHead['Last Edit Date'] = new Date().toLocaleDateString();
 
   const fd = new FormData();
   fd.append('action','updateHousehold');
   fd.append('dataID', editDataID);
-  fd.append('actor', currentUser);
+  fd.append('actor', userFullName);
   fd.append('head', JSON.stringify(editHead));
   fd.append('members', JSON.stringify(editMembers || []));
-  fd.append('submittedBy', currentUser);
+  fd.append('submittedBy', editHead['Submitted By'] || userFullName);
 
   const btn = $('saveEditBtn');
   if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
@@ -2289,7 +2317,7 @@ function wireUI(){
 /* ========================= INIT ========================= */
 window.addEventListener('DOMContentLoaded', ()=>{
   // Set username
-  const userName = localStorage.getItem('staffName') || localStorage.getItem('username') || '';
+  const userName = getUserFullName();
   if($('userName')) $('userName').innerText = userName;
   
   // Check if user is admin
@@ -2320,6 +2348,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
   }
 });
 </script>
-
 </body>
 </html>
+
