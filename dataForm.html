@@ -2215,6 +2215,217 @@
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
+   /* SESSION MANAGEMENT FUNCTIONS */
+// Validate session with server
+async function validateSession() {
+    const username = localStorage.getItem("username");
+    const sessionId = sessionStorage.getItem("sessionId");
+    
+    if (!username || !sessionId) {
+        console.log("No username or sessionId found for validation");
+        return false;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append("action", "validateSession");
+        formData.append("username", username);
+        formData.append("sessionId", sessionId);
+        
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.isLoggedIn) {
+            return true;
+        } else {
+            console.log("Session invalid:", data.message);
+            return false;
+        }
+    } catch (error) {
+        console.error("Session validation error:", error);
+        return true; // On network error, assume valid
+    }
+}
+
+// Start session monitoring
+function startSessionMonitoring() {
+    // Check session every 10 seconds
+    sessionMonitorInterval = setInterval(async () => {
+        const isValid = await validateSession();
+        if (!isValid) {
+            // Session invalidated
+            stopSessionMonitoring();
+            alert("Your session has been terminated from another device. You have been logged out.");
+            handleLogout();
+        }
+    }, 10000); // Check every 10 seconds
+    
+    // Also check when page becomes visible
+    document.addEventListener("visibilitychange", async () => {
+        if (!document.hidden) {
+            await validateSession();
+        }
+    });
+    
+    console.log("Session monitoring started");
+}
+
+// Stop session monitoring
+function stopSessionMonitoring() {
+    if (sessionMonitorInterval) {
+        clearInterval(sessionMonitorInterval);
+        sessionMonitorInterval = null;
+    }
+}
+
+/* ENHANCED SESSION CHECK FUNCTION */
+async function sessionCheck() {
+  try {
+    // Check if we have required session data
+    const loggedIn = localStorage.getItem("loggedIn");
+    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    const sessionId = sessionStorage.getItem("sessionId");
+    
+    // Basic validation
+    if (loggedIn !== "true" || !userName || userName === "User" || !sessionId) {
+      console.log("Missing session data, redirecting...");
+      window.location.href = 'index.html?session=expired';
+      return false;
+    }
+    
+    // Validate with server
+    const isValid = await validateSession();
+    if (!isValid) {
+      console.log("Session invalidated by server");
+      sessionStorage.removeItem('authenticated');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html?session=invalid';
+      return false;
+    }
+    
+    // Session is valid, set up UI
+    document.getElementById('userName').innerText = userName;
+    
+    // Check admin status
+    const isAdmin = localStorage.getItem("userRole") === "admin";
+    const adminItems = document.querySelectorAll(".admin-only");
+    adminItems.forEach(item => {
+        item.style.display = isAdmin ? "block" : "none";
+    });
+    
+    // Set session flag
+    sessionStorage.setItem('authenticated', 'true');
+    
+    // Start session monitoring
+    startSessionMonitoring();
+    
+    return true;
+    
+  } catch(e){ 
+    console.warn('Session check failed', e);
+    // On error, still allow access but log it
+    document.getElementById('userName').innerText = "User";
+    return true;
+  }
+}
+
+/* ENHANCED LOGOUT FUNCTION */
+async function handleLogout() {
+  try {
+    const username = localStorage.getItem("username");
+    const sessionId = sessionStorage.getItem("sessionId");
+    
+    // Stop session monitoring
+    stopSessionMonitoring();
+    
+    // Call server logout if we have session data
+    if (username && sessionId) {
+      try {
+        const formData = new FormData();
+        formData.append("action", "logout");
+        formData.append("username", username);
+        formData.append("sessionId", sessionId);
+        
+        // Fire and forget - don't wait for response
+        fetch(API_URL, {
+          method: "POST",
+          body: formData
+        }).catch(() => { /* ignore errors */ });
+      } catch (e) {
+        console.error("Logout API error:", e);
+      }
+    }
+    
+  } catch (err) {
+    console.error("Logout error:", err);
+  } finally {
+    // Always clear storage and redirect
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Redirect with cache-busting parameter
+    window.location.replace('index.html?logout=true&t=' + Date.now());
+  }
+}
+
+/* SETUP AUTO LOGOUT FOR INACTIVITY */
+function setupAutoLogout() {
+    let inactivityTimer;
+    
+    function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            // Show warning 1 minute before logout (29 minutes of inactivity)
+            if (confirm("You've been inactive for 29 minutes. Click OK to stay logged in, or Cancel to logout.")) {
+                resetTimer();
+            } else {
+                handleLogout();
+            }
+        }, 29 * 60 * 1000); // 29 minutes
+    }
+    
+    // Reset timer on user activity
+    ['click', 'keypress', 'mousemove', 'scroll'].forEach(event => {
+        document.addEventListener(event, resetTimer);
+    });
+    
+    // Start the timer
+    resetTimer();
+}
+
+/* INITIALIZATION - UPDATED */
+window.addEventListener('DOMContentLoaded', async () => {
+  // First check session with server validation
+  const isAuthenticated = await sessionCheck();
+  
+  if (!isAuthenticated) {
+    return; // Already redirected
+  }
+  
+  // Setup auto-logout for inactivity
+  setupAutoLogout();
+  
+  // Load dashboard data
+  await loadLastUpdated();
+  await loadDashboard();
+  
+  // Auto-refresh dashboard data every 30 seconds
+  if (refreshInterval) clearInterval(refreshInterval);
+  refreshInterval = setInterval(loadDashboard, 30000);
+  
+  // Check screen width and adjust sidebar
+  if (window.innerWidth <= 768) {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.remove('mobile-open');
+  }
+});
+
+   
+
 /* ============ HAZARD HUNTER INTEGRATION ============ */
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
 
@@ -2579,70 +2790,6 @@ function setupModalHandlers() {
         if (e.target === modal) {
             modal.style.display = 'none';
         }
-    });
-}
-
-/* ============ SESSION MANAGEMENT ============ */
-
-/* SIMPLE SESSION CHECK */
-async function sessionCheck(){
-  try {
-    // Try to get user info from localStorage (set during login)
-    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
-    
-    // If we have a username, show it and allow access
-    if (userName && userName !== "User") {
-      document.getElementById('userName').innerText = userName;
-      
-      // Check admin status
-      const isAdmin = localStorage.getItem("userRole") === "admin";
-      const adminItems = document.querySelectorAll(".admin-only");
-      adminItems.forEach(item => {
-          item.style.display = isAdmin ? "block" : "none";
-      });
-      
-      // Set session flag
-      sessionStorage.setItem('authenticated', 'true');
-      return true;
-    } else {
-      // No user info found in localStorage
-      console.log('No user info found in localStorage');
-      
-      // Check if we have a session flag from before (tab restore, etc.)
-      if(sessionStorage.getItem('authenticated')) {
-        // We were authenticated before, keep going
-        console.log('Session flag found, allowing access');
-        document.getElementById('userName').innerText = "User";
-        return true;
-      } else {
-        // No session at all, redirect to login
-        console.log('No session found, redirecting to login...');
-        window.location.href = 'index.html?session=expired';
-        return false;
-      }
-    }
-  } catch(e){ 
-    console.warn('session check failed', e);
-    return false;
-  }
-}
-
-/* ENHANCED LOGOUT FUNCTION */
-function handleLogout() {
-  // Clear all storage
-  localStorage.clear();
-  sessionStorage.clear();
-  
-  // Add a parameter to prevent caching
-  const logoutUrl = 'index.html?logout=true&t=' + Date.now();
-  
-  // Call server-side logout with timestamp to prevent caching
-  fetch(API_URL+'?action=logout&t=' + Date.now())
-    .catch(() => { /* ignore errors on logout */ })
-    .finally(() => {
-      // Replace current history entry with login page
-      // This prevents back button from returning to dashboard
-      window.location.replace(logoutUrl);
     });
 }
 
@@ -3550,3 +3697,4 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
