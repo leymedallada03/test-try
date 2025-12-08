@@ -116,6 +116,73 @@
 .panel-body { padding-right: 8px; }
 .panel-body h4 { margin: 16px 0 12px 0; color: var(--accent1); font-size: 16px; border-bottom: 2px solid var(--light-green); padding-bottom: 8px; }
 
+/* Data ID display */
+.data-id-display { 
+    background: #f0f9ff; 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    border: 1px solid #d1e9ff;
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: #0f7a4a;
+}
+
+.data-id-display span {
+    background: #e3f2fd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+/* Member preview improvements */
+.member-preview { 
+    list-style: none; 
+    padding: 0; 
+    margin: 12px 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.member-preview li { 
+    padding: 8px 12px; 
+    border-bottom: 1px solid #eee; 
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.member-preview li:hover { 
+    background: #f0f9ff; 
+}
+
+.member-preview li:last-child { 
+    border-bottom: none; 
+}
+
+.member-preview li .member-actions {
+    float: right;
+    display: flex;
+    gap: 6px;
+}
+
+.member-preview li .member-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+.member-preview li .member-actions .edit-btn {
+    color: #0f7a4a;
+}
+
+.member-preview li .member-actions .remove-btn {
+    color: #dc2626;
+}
+
 @media(max-width:900px){ 
     .form-grid { grid-template-columns:1fr; } 
     .member-panel{ width:100%; }
@@ -217,6 +284,10 @@
   </div>
 
   <div class="panel-body">
+    <div class="data-id-display">
+      Data ID: <span id="editDataIdDisplay">Loading...</span>
+    </div>
+    
     <form id="editForm" onsubmit="return false;">
       <!-- Head editing -->
       <div class="card">
@@ -672,6 +743,9 @@
         <div style="display:flex;gap:8px; margin-top:10px; justify-content:flex-end;">
           <button id="edit_addMember" class="btn secondary" type="button">
             <i class="fas fa-user-plus"></i> Add / Edit Members
+          </button>
+          <button id="edit_removeMember" class="btn secondary" type="button" style="background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
+            <i class="fas fa-user-minus"></i> Remove Member
           </button>
         </div>
       </div>
@@ -1497,6 +1571,11 @@ function onEditClick(dataID){
   editHead = Object.assign({}, group.head || {});
   editMembers = (group.members || []).map(m => Object.assign({}, m));
 
+  // Show Data ID at the top of edit panel
+  if ($('editDataIdDisplay')) {
+    $('editDataIdDisplay').textContent = editDataID;
+  }
+
   // Prefill head inputs
   $('edit_coordinate').value = editHead['Coordinate'] || editHead['Coordinates'] || '';
   $('edit_barangay').value = editHead['Barangay'] || '';
@@ -1557,6 +1636,7 @@ function onEditClick(dataID){
   document.querySelectorAll('#editPanel .animal-card input[type="checkbox"]').forEach(checkbox => {
     const qtyInput = checkbox.closest('.animal-card').querySelector('.qty');
     qtyInput.disabled = !checkbox.checked;
+    if (!checkbox.checked) qtyInput.value = '';
   });
   
   // Transportation & Evacuation
@@ -1617,10 +1697,32 @@ function updateEditMembersPreview(){
   for(let i=0;i<n;i++){
     const li = document.createElement('li');
     const m = editMembers[i] || {};
-    li.textContent = `#${i+1} — ${m['Name of Household Member/s'] || '(empty)'} (${m['Contact no.']||''})`;
+    li.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span>#${i+1} — ${escapeHtml(m['Name of Household Member/s'] || '(empty)')} (${m['Contact no.']||''})</span>
+        <div class="member-actions">
+          <button class="edit-btn" title="Edit this member" onclick="event.stopPropagation(); openMemberPanelForEdit(${i})">✏️</button>
+          <button class="remove-btn" title="Remove this member" onclick="event.stopPropagation(); removeMember(${i})">🗑️</button>
+        </div>
+      </div>
+    `;
     li.style.cursor = 'pointer';
     li.onclick = () => { memberEditIndex = i; openMemberPanelForEdit(i); };
     ul.appendChild(li);
+  }
+}
+
+/* Remove member function */
+function removeMember(index) {
+  if (confirm('Are you sure you want to remove this member?')) {
+    editMembers.splice(index, 1);
+    updateEditMembersPreview();
+    
+    // Update member count
+    const currentCount = parseInt($('edit_memberCount').value) || 0;
+    if (currentCount > 0) {
+      $('edit_memberCount').value = currentCount - 1;
+    }
   }
 }
 
@@ -1634,6 +1736,7 @@ function ensureMembersArraySize(){
 /* create empty member object */
 function createEmptyMember(){
   return {
+    'Data ID': editDataID, // Include Data ID for members
     'Name of Household Member/s':'',
     'FishR Registered/RBIS Registered':'',
     'Contact no.':'',
@@ -1756,6 +1859,7 @@ function collectMemberPanelToEdit(){
   }
 
   const obj = {
+    'Data ID': editDataID, // Include Data ID for members
     'Name of Household Member/s': name,
     'FishR Registered/RBIS Registered': registrationValue,
     'Contact no.': $('memberContact').value || '',
@@ -1872,6 +1976,7 @@ function collectHeadFromEditForm(){
   }
 
   editHead = {
+    'Data ID': editDataID, // Include Data ID for head
     'Coordinate': $('edit_coordinate').value || '',
     'Coordinates': $('edit_coordinate').value || '',
     'Barangay': $('edit_barangay').value || '',
@@ -2069,6 +2174,20 @@ function wireUI(){
     openMemberPanelForEdit(memberEditIndex);
   });
 
+  // Remove Member button
+  if($('edit_removeMember')) $('edit_removeMember').addEventListener('click', ()=>{
+    const expected = Number($('edit_memberCount')?.value || 0);
+    if (expected > 0 && editMembers.length > 0) {
+      if (confirm('Remove the last member?')) {
+        editMembers.pop();
+        $('edit_memberCount').value = expected - 1;
+        updateEditMembersPreview();
+      }
+    } else {
+      alert('No members to remove.');
+    }
+  });
+
   // Member panel navigation
   if($('memberNext')) $('memberNext').addEventListener('click', memberPanelNext);
   if($('memberBack')) $('memberBack').addEventListener('click', memberPanelBack);
@@ -2092,6 +2211,31 @@ function wireUI(){
       if (!this.checked) qtyInput.value = '';
     });
   });
+
+  // Member count change handler
+  if ($('edit_memberCount')) {
+    $('edit_memberCount').addEventListener('change', function() {
+      const newCount = parseInt(this.value) || 0;
+      const currentCount = editMembers.length;
+      
+      if (newCount < currentCount) {
+        // Remove extra members
+        if (confirm(`Reduce members from ${currentCount} to ${newCount}? This will remove the last ${currentCount - newCount} member(s).`)) {
+          editMembers = editMembers.slice(0, newCount);
+          updateEditMembersPreview();
+        } else {
+          this.value = currentCount;
+        }
+      } else if (newCount > currentCount) {
+        // Add empty members
+        const toAdd = newCount - currentCount;
+        for (let i = 0; i < toAdd; i++) {
+          editMembers.push(createEmptyMember());
+        }
+        updateEditMembersPreview();
+      }
+    });
+  }
 
   // Cancel buttons
   if($('cancelEditBtn')) $('cancelEditBtn').addEventListener('click', ()=> { 
