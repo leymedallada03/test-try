@@ -906,160 +906,6 @@
    .records-wrapper::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
    }
-
-   /* ============ NEW CSS FOR ADDED FEATURES ============ */
-   
-   /* Bulk action bar */
-   .bulk-action-bar {
-       position: fixed;
-       bottom: 20px;
-       left: 50%;
-       transform: translateX(-50%);
-       background: linear-gradient(90deg, var(--accent1), var(--accent2));
-       color: white;
-       padding: 12px 20px;
-       border-radius: var(--radius);
-       box-shadow: var(--shadow-dark);
-       z-index: 1000;
-       display: flex;
-       align-items: center;
-       gap: 15px;
-       animation: slideUp 0.3s ease;
-   }
-   
-   @keyframes slideUp {
-       from { transform: translateX(-50%) translateY(100%); opacity: 0; }
-       to { transform: translateX(-50%) translateY(0); opacity: 1; }
-   }
-   
-   .bulk-action-info {
-       display: flex;
-       align-items: center;
-       gap: 10px;
-       font-weight: 600;
-   }
-   
-   .bulk-action-count {
-       background: rgba(255,255,255,0.2);
-       padding: 4px 10px;
-       border-radius: 12px;
-       font-size: 0.9rem;
-   }
-   
-   .bulk-action-buttons {
-       display: flex;
-       gap: 8px;
-   }
-   
-   .bulk-action-btn {
-       background: rgba(255,255,255,0.15);
-       border: 1px solid rgba(255,255,255,0.3);
-       color: white;
-       padding: 6px 12px;
-       border-radius: var(--radius-sm);
-       cursor: pointer;
-       font-size: 0.85rem;
-       display: flex;
-       align-items: center;
-       gap: 6px;
-       transition: all 0.2s ease;
-   }
-   
-   .bulk-action-btn:hover {
-       background: rgba(255,255,255,0.25);
-       transform: translateY(-1px);
-   }
-   
-   .bulk-action-btn.delete {
-       background: rgba(220, 53, 69, 0.8);
-       border-color: rgba(220, 53, 69, 0.9);
-   }
-   
-   .bulk-action-btn.delete:hover {
-       background: rgba(220, 53, 69, 0.9);
-   }
-   
-   .bulk-action-btn.close {
-       background: rgba(255,255,255,0.1);
-       padding: 6px;
-       border-radius: 50%;
-       width: 30px;
-       height: 30px;
-       justify-content: center;
-   }
-   
-   /* Update the toolbar for bulk selection */
-   .toolbar-row-2 {
-       display: flex;
-       justify-content: flex-end;
-       gap: 8px;
-       align-items: center;
-       position: relative;
-   }
-   
-   /* Add this to existing CSS for better selected count visibility */
-   .stats-container .stat-item:nth-child(3) {
-       border: 2px solid rgba(15,122,74,0.3);
-       background: var(--light-green);
-   }
-   
-   /* Add tooltip style */
-   .tooltip {
-       position: relative;
-       display: inline-block;
-   }
-   
-   .tooltip .tooltiptext {
-       visibility: hidden;
-       width: 200px;
-       background-color: var(--accent1);
-       color: #fff;
-       text-align: center;
-       border-radius: var(--radius-sm);
-       padding: 8px;
-       position: absolute;
-       z-index: 1001;
-       bottom: 125%;
-       left: 50%;
-       margin-left: -100px;
-       opacity: 0;
-       transition: opacity 0.3s;
-       font-size: 0.75rem;
-       line-height: 1.4;
-       box-shadow: var(--shadow);
-   }
-   
-   .tooltip .tooltiptext::after {
-       content: "";
-       position: absolute;
-       top: 100%;
-       left: 50%;
-       margin-left: -5px;
-       border-width: 5px;
-       border-style: solid;
-       border-color: var(--accent1) transparent transparent transparent;
-   }
-   
-   .tooltip:hover .tooltiptext {
-       visibility: visible;
-       opacity: 1;
-   }
-   
-   /* Loading overlay update */
-   .loading-content {
-       max-width: 300px;
-   }
-
-   /* Search status indicator */
-   #searchStatus {
-       position: absolute;
-       right: 10px;
-       top: 50%;
-       transform: translateY(-50%);
-       color: var(--muted);
-       font-size: 0.75rem;
-       display: none;
-   }
 </style>
 </head>
 <body>
@@ -1118,10 +964,9 @@
         <span>Matches</span>
         <div class="value" id="matchCount">0</div>
       </div>
-      <div class="stat-item tooltip">
+      <div class="stat-item">
         <span>Selected</span>
         <div class="value" id="selectedCount">0</div>
-        <span class="tooltiptext">Counts selected households from current filter view only. Use "Select All" checkbox to select all visible households.</span>
       </div>
     </div>
 
@@ -1131,9 +976,6 @@
         <div class="search-container">
           <i class="fas fa-search"></i>
           <input id="searchInput" class="search-box" placeholder="Search by Name / Barangay / ID..." />
-          <div id="searchStatus" style="display: none;">
-            <i class="fas fa-circle-notch fa-spin"></i>
-          </div>
         </div>
       </div>
       
@@ -1166,16 +1008,8 @@
             <div onclick="exportSelected()">
               <i class="fas fa-check-circle"></i> Export Selected
             </div>
-            <div onclick="exportFiltered()">
-              <i class="fas fa-filter"></i> Export Filtered
-            </div>
           </div>
         </div>
-        
-        <!-- Bulk selection button -->
-        <button id="bulkSelectBtn" class="btn" style="background: linear-gradient(90deg, #4a6fa5, #6b93d6);">
-          <i class="fas fa-list-check"></i> Bulk Actions
-        </button>
       </div>
     </div>
 
@@ -1214,40 +1048,18 @@
   </div>
 </div>
 
-<!-- Bulk Action Bar -->
-<div id="bulkActionBar" class="bulk-action-bar hidden">
-  <div class="bulk-action-info">
-    <span>Bulk Actions</span>
-    <span class="bulk-action-count" id="bulkSelectedCount">0 selected</span>
-  </div>
-  <div class="bulk-action-buttons">
-    <button class="bulk-action-btn" onclick="exportSelected()">
-      <i class="fas fa-download"></i> Export
-    </button>
-    <button class="bulk-action-btn delete" onclick="confirmBulkDelete()">
-      <i class="fas fa-trash"></i> Delete
-    </button>
-    <button class="bulk-action-btn close" onclick="closeBulkActions()">
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
-</div>
-
-<script>
 <script>
 /* ============ CONFIG ============ */
-// SCRIPT_URL is now ONLY defined here, not in activity-tracking.js
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 /* ============ STATE ============ */
 let header = [];
 let rawRows = [];
 let groups = [];
-let filteredGroups = [];
+let filteredGroups = []; // Added: filtered groups for client-side filtering
 let selected = new Set();
 let currentPage = 1;
 const rowsPerPage = 25;
-let searchDebounceTimer = null;
 
 /* ============ UTIL ============ */
 function showLoading(yes){ 
@@ -1261,44 +1073,39 @@ function highlight(text,q){
     return text.replace(re, m => `<span class="hl">${m}</span>`);
 }
 
-/* ============ SEARCH DEBOUNCING ============ */
-function debounceSearch() {
-    const searchInput = document.getElementById("searchInput");
-    const searchStatus = document.getElementById("searchStatus");
-    
-    if (searchDebounceTimer) {
-        clearTimeout(searchDebounceTimer);
-    }
-    
-    searchStatus.style.display = 'block';
-    
-    searchDebounceTimer = setTimeout(() => {
-        filterRecords();
-        searchStatus.style.display = 'none';
-    }, 300);
-}
-
 /* ============ SESSION CHECK FUNCTION ============ */
 async function sessionCheck(){
   try {
+    // Try to get user info from localStorage (set during login)
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     
+    // If we have a username, show it and allow access
     if (userName && userName !== "User") {
       document.getElementById('userName').innerText = userName;
       
+      // Check admin status
       const isAdmin = localStorage.getItem("userRole") === "admin";
       const adminItems = document.querySelectorAll(".admin-only");
       adminItems.forEach(item => {
           item.style.display = isAdmin ? "block" : "none";
       });
       
+      // Set session flag
       sessionStorage.setItem('authenticated', 'true');
       return true;
     } else {
+      // No user info found in localStorage
+      console.log('No user info found in localStorage');
+      
+      // Check if we have a session flag from before (tab restore, etc.)
       if(sessionStorage.getItem('authenticated')) {
+        // We were authenticated before, keep going
+        console.log('Session flag found, allowing access');
         document.getElementById('userName').innerText = "User";
         return true;
       } else {
+        // No session at all, redirect to login
+        console.log('No session found, redirecting to login...');
         window.location.href = 'index.html?session=expired';
         return false;
       }
@@ -1311,40 +1118,40 @@ async function sessionCheck(){
 
 /* ============ ENHANCED LOGOUT FUNCTION ============ */
 function handleLogout() {
+  // Clear all storage
   localStorage.clear();
   sessionStorage.clear();
   
+  // Add a parameter to prevent caching
   const logoutUrl = 'index.html?logout=true&t=' + Date.now();
   
+  // Call server-side logout with timestamp to prevent caching
   fetch(SCRIPT_URL+'?action=logout&t=' + Date.now())
-    .catch(() => { })
+    .catch(() => { /* ignore errors on logout */ })
     .finally(() => {
+      // Replace current history entry with login page
+      // This prevents back button from returning to dashboard
       window.location.replace(logoutUrl);
     });
-}
-
-/* ============ CLEAR CACHE FUNCTION ============ */
-function clearCache() {
-    localStorage.removeItem('recordsCache');
-    localStorage.removeItem('recordsCacheTime');
-    console.log("Cache cleared");
 }
 
 /* ============ LOAD RECORDS WITH CACHING ============ */
 async function loadRecords(){
     showLoading(true);
     try{
+        // Check if we already have cached data (less than 5 minutes old)
         const cachedData = localStorage.getItem('recordsCache');
         const cacheTime = localStorage.getItem('recordsCacheTime');
         const now = Date.now();
         
+        // Use cache if it exists and is less than 5 minutes old (300000ms = 5 minutes)
         if(cachedData && cacheTime && (now - parseInt(cacheTime)) < 300000) {
             const data = JSON.parse(cachedData);
             header = data.header || [];
             rawRows = data.rows || [];
             console.log("Using cached data");
         } else {
-            // Use the new CORS-friendly approach
+            // Load fresh data from server (no filtering parameters)
             const res = await fetch(`${SCRIPT_URL}?action=getRecords&barangay=&q=`);
             const data = await res.json();
             
@@ -1357,18 +1164,19 @@ async function loadRecords(){
             header = data.header || [];
             rawRows = data.rows || [];
             
+            // Cache the data
             localStorage.setItem('recordsCache', JSON.stringify(data));
             localStorage.setItem('recordsCacheTime', now.toString());
             console.log("Loaded fresh data from server");
         }
         
         groupRows();
+        // Initialize filteredGroups with all groups
         filteredGroups = [...groups];
         currentPage = 1;
         renderTable();
         renderPagination();
         updateCounts();
-        updateBulkActionBar();
     } catch(err){
         console.error(err);
         alert("Error loading records");
@@ -1381,16 +1189,21 @@ function filterRecords() {
     const barangay = document.getElementById("filterBarangay").value || "";
     const q = document.getElementById("searchInput").value.trim().toLowerCase();
     
+    // Reset to first page when filtering
     currentPage = 1;
     
+    // Filter groups based on search and barangay
     filteredGroups = groups.filter(g => {
         const head = g.head || {};
         
+        // Filter by barangay
         if (barangay && head["Barangay"] !== barangay) {
             return false;
         }
         
+        // Filter by search query
         if (q) {
+            // Search in head row fields
             const searchableFields = [
                 head["Data ID"] || "",
                 head["Name of Head"] || "",
@@ -1399,7 +1212,10 @@ function filterRecords() {
                 head["Contact"] || ""
             ];
             
+            // Also search in member names
             const memberNames = g.members.map(m => m["Name of Household Member/s"] || "").join(" ");
+            
+            // Combine all searchable text
             const searchText = [...searchableFields, memberNames].join(" ").toLowerCase();
             
             return searchText.includes(q);
@@ -1411,7 +1227,6 @@ function filterRecords() {
     renderTable();
     renderPagination();
     updateCounts();
-    updateBulkActionBar();
 }
 
 /* ============ GROUPING ============ */
@@ -1427,6 +1242,7 @@ function groupRows(){
         else map[id].members.push(r);
     });
 
+    // ensure head exists
     Object.keys(map).forEach(k=>{
         if(!map[k].head && map[k].members.length>0){
             map[k].head = map[k].members.shift();
@@ -1442,6 +1258,7 @@ function renderTable(){
     const tbody = document.getElementById("tableBody");
     thead.innerHTML = ""; tbody.innerHTML = "";
 
+    // header row
     let th = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
     header.forEach(c => th += `<th>${c}</th>`);
     th += `<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>`;
@@ -1459,15 +1276,19 @@ function renderTable(){
         const tr = document.createElement("tr"); 
         tr.className = cls;
 
+        // checkbox
         const tdSel = document.createElement("td"); 
         tdSel.className = "select-col";
         tdSel.innerHTML = `<input type="checkbox" class="row-select" data-id="${g.dataID}" ${selected.has(g.dataID) ? "checked" : ""}>`;
         tr.appendChild(tdSel);
 
+        // header columns
         header.forEach(col=>{
             const td = document.createElement("td");
             const cellValue = head[col] || "";
+            // Fix for Submitted On column if it shows "aN/aN/NaN NaN:aN:aN AM"
             if (col === "Submitted On" && String(cellValue).includes("NaN")) {
+                // Try to get the actual date from the raw data
                 const rawData = rawRows.find(r => 
                     String(r["Data ID"]) === String(g.dataID) && 
                     (!r["Name of Household Member/s"] || String(r["Name of Household Member/s"]).trim() === "")
@@ -1483,11 +1304,13 @@ function renderTable(){
             tr.appendChild(td);
         });
 
+        // show toggle
         const tdShow = document.createElement("td"); 
         tdShow.className = "actions-col";
         tdShow.innerHTML = `<button class="show-toggle" onclick="toggleMembers('${g.dataID}')"><i class="fas fa-eye"></i> Show (${mCount})</button>`;
         tr.appendChild(tdShow);
 
+        // action buttons
         const tdAct = document.createElement("td"); 
         tdAct.className = "actions-col";
         tdAct.innerHTML = `
@@ -1502,15 +1325,18 @@ function renderTable(){
 
         tbody.appendChild(tr);
 
+        // member rows
         g.members.forEach(m=>{
             const mr = document.createElement("tr");
             mr.className = "member-row hidden";
             mr.dataset.parent = g.dataID;
-            mr.appendChild(document.createElement("td"));
+            mr.appendChild(document.createElement("td")); // empty select col
             header.forEach(col=>{
                 const td = document.createElement("td");
                 const cellValue = m[col] || "";
+                // Fix for Submitted On column in member rows
                 if (col === "Submitted On" && String(cellValue).includes("NaN")) {
+                    // Try to get the actual date from the raw data
                     const rawData = rawRows.find(r => 
                         String(r["Data ID"]) === String(g.dataID) && 
                         String(r["Name of Household Member/s"] || "").trim() === String(m["Name of Household Member/s"] || "").trim()
@@ -1525,12 +1351,13 @@ function renderTable(){
                 }
                 mr.appendChild(td);
             });
-            mr.appendChild(document.createElement("td"));
-            mr.appendChild(document.createElement("td"));
+            mr.appendChild(document.createElement("td")); // empty members column
+            mr.appendChild(document.createElement("td")); // empty actions column
             tbody.appendChild(mr);
         });
     });
 
+    // select all logic for page
     const selectAll = document.getElementById("selectAll");
     if(selectAll){
         selectAll.checked = pageRows.every(g => selected.has(g.dataID));
@@ -1541,193 +1368,20 @@ function renderTable(){
             });
             renderTable();
             updateCounts();
-            updateBulkActionBar();
         };
     }
 
+    // row selects
     document.querySelectorAll(".row-select").forEach(cb=>{
         cb.onchange = function(){
             const id = this.dataset.id;
             if(this.checked) selected.add(id); 
             else selected.delete(id);
             updateCounts();
-            updateBulkActionBar();
         };
     });
 
     updateCounts();
-    updateBulkActionBar();
-}
-
-/* ============ BULK ACTION BAR FUNCTIONS ============ */
-function updateBulkActionBar() {
-    const bulkActionBar = document.getElementById("bulkActionBar");
-    
-    if (selected.size > 0) {
-        bulkActionBar.classList.remove("hidden");
-        document.getElementById("bulkSelectedCount").innerText = `${selected.size} selected`;
-        document.querySelector('.content-area').style.paddingBottom = '80px';
-    } else {
-        bulkActionBar.classList.add("hidden");
-        document.querySelector('.content-area').style.paddingBottom = '18px';
-    }
-}
-
-function closeBulkActions() {
-    selected.clear();
-    renderTable();
-    updateCounts();
-    updateBulkActionBar();
-}
-
-function showBulkActions() {
-    updateBulkActionBar();
-}
-
-/* ============ ENHANCED FETCH FOR GOOGLE APPS SCRIPT ============ */
-async function safeFetch(url, options = {}) {
-    try {
-        // Add CORS mode and credentials settings
-        const fetchOptions = {
-            ...options,
-            mode: 'cors',
-            credentials: 'omit'
-        };
-        
-        const response = await fetch(url, fetchOptions);
-        return response;
-    } catch (error) {
-        console.error('Fetch error:', error);
-        throw error;
-    }
-}
-
-/* ============ BULK DELETE ============ */
-async function confirmBulkDelete() {
-    if (selected.size === 0) {
-        alert("No households selected for deletion.");
-        return;
-    }
-    
-    const selectedArray = Array.from(selected);
-    const confirmMessage = `Are you sure you want to delete ${selected.size} household(s)?\n\nThis action cannot be undone.`;
-    
-    if (!confirm(confirmMessage)) return;
-    
-    showLoading(true);
-    
-    const currentUserFullName = localStorage.getItem("staffName") || 
-                               localStorage.getItem("username") || 
-                               "System";
-
-    try {
-        // Use FormData for POST requests
-        const fd = new FormData();
-        fd.append("action", "deleteMultipleHouseholds");
-        fd.append("dataIDs", JSON.stringify(selectedArray));
-        fd.append("actor", currentUserFullName);
-
-        // Use the safeFetch function for CORS handling
-        const res = await safeFetch(SCRIPT_URL, { 
-            method: "POST", 
-            body: fd,
-            mode: 'no-cors' // Try no-cors for Google Apps Script
-        });
-        
-        // For no-cors mode, we can't read the response
-        // Google Apps Script will still process the request
-        alert(`Bulk delete request sent for ${selected.size} household(s). The data will be removed from the server.`);
-        
-        // Clear cache and reload data
-        clearCache();
-        await loadRecords();
-        selected.clear();
-        updateBulkActionBar();
-        
-    } catch(err) {
-        console.error("Bulk delete error", err);
-        // Even if fetch fails, the request might have been processed
-        alert("Delete request sent. Refreshing data...");
-        clearCache();
-        await loadRecords();
-        selected.clear();
-        updateBulkActionBar();
-    } finally {
-        showLoading(false);
-    }
-}
-
-/* ============ EDIT & DELETE ============ */
-function onEdit(id){
-    clearCache();
-    localStorage.setItem("edit_dataID", id);
-    location.href = "edit.html";
-}
-
-async function onDelete(id){
-    if(!confirm("Delete household " + id + "?")) return;
-    
-    const currentUserFullName = localStorage.getItem("staffName") || 
-                               localStorage.getItem("username") || 
-                               "System";
-
-    try {
-        // Use URL parameters instead of FormData for GET requests
-        const url = `${SCRIPT_URL}?action=deleteHousehold&dataID=${encodeURIComponent(id)}&actor=${encodeURIComponent(currentUserFullName)}`;
-        
-        const res = await fetch(url, { mode: 'no-cors' });
-        
-        alert(`Delete request sent for household ${id}. Refreshing data...`);
-        clearCache();
-        await loadRecords();
-        selected.delete(id);
-        updateBulkActionBar();
-        
-    } catch(err) {
-        console.error("Delete error", err);
-        alert("Delete request sent. Refreshing data...");
-        clearCache();
-        await loadRecords();
-        selected.delete(id);
-        updateBulkActionBar();
-    }
-}
-
-/* ============ EXPORT FUNCTIONS ============ */
-function exportAll(){ 
-    exportCSV(groups, "all_households.csv"); 
-}
-
-function exportSelected(){
-    const arr = groups.filter(g => selected.has(g.dataID));
-    if(!arr.length) return alert("No selected rows");
-    exportCSV(arr, "selected_households.csv");
-}
-
-function exportFiltered(){
-    if(!filteredGroups.length) return alert("No filtered rows");
-    exportCSV(filteredGroups, "filtered_households.csv");
-}
-
-function exportCSV(list, filename = "records.csv"){
-    const cols = header.slice();
-    const lines = [];
-    lines.push(cols.map(c => `"${c.replace(/"/g,'""')}"`).join(","));
-    
-    list.forEach(g=>{
-        lines.push(cols.map(c => `"${(g.head[c]||"").toString().replace(/"/g,'""')}"`).join(","));
-        (g.members || []).forEach(m => {
-            lines.push(cols.map(c => `"${(m[c]||"").toString().replace(/"/g,'""')}"`).join(","));
-        });
-    });
-    
-    const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); 
-    a.href = url; 
-    a.download = filename; 
-    a.click();
-    setTimeout(()=> URL.revokeObjectURL(url), 500);
 }
 
 /* ============ TOGGLE MEMBERS ============ */
@@ -1776,15 +1430,84 @@ function updateCounts(){
     document.getElementById("rowCount").innerText = groups.length;
     document.getElementById("matchCount").innerText = filteredGroups.length;
     
-    let selectedInViewCount = 0;
+    // Count selected items from filtered groups only
+    let selectedCount = 0;
     filteredGroups.forEach(g => {
         if (selected.has(g.dataID)) {
-            selectedInViewCount++;
+            selectedCount++;
         }
     });
+    document.getElementById("selectedCount").innerText = selectedCount;
+}
+
+/* ============ EDIT & DELETE ============ */
+function onEdit(id){
+    localStorage.setItem("edit_dataID", id);
+    location.href = "edit.html";
+}
+
+async function onDelete(id){
+    if(!confirm("Delete household " + id + "?")) return;
     
-    document.getElementById("selectedCount").innerText = selectedInViewCount;
-    document.getElementById("bulkSelectedCount").innerText = `${selected.size} selected`;
+    // Get current user's full name
+    const currentUserFullName = localStorage.getItem("staffName") || 
+                               localStorage.getItem("username") || 
+                               "System";
+
+    const fd = new FormData();
+    fd.append("action", "deleteHousehold");
+    fd.append("dataID", id);
+    fd.append("actor", currentUserFullName);  // Send full name as actor
+
+    try{
+        const res = await fetch(SCRIPT_URL, { method: "POST", body: fd });
+        const json = await res.json();
+
+        if(json.success){
+            alert(`Data has been deleted. Data ID: ${id} from Master and Barangay`);
+            // Clear cache and reload fresh data after delete
+            localStorage.removeItem('recordsCache');
+            localStorage.removeItem('recordsCacheTime');
+            await loadRecords();
+        } else {
+            alert("Delete failed: " + (json.message || JSON.stringify(json)));
+        }
+    }catch(err){
+        console.error("Delete error", err);
+        alert("Delete failed — see console");
+    }
+}
+
+/* ============ EXPORT ============ */
+function exportAll(){ 
+    exportCSV(filteredGroups); 
+}
+
+function exportSelected(){
+    const arr = filteredGroups.filter(g => selected.has(g.dataID));
+    if(!arr.length) return alert("No selected rows");
+    exportCSV(arr);
+}
+
+function exportCSV(list){
+    const cols = header.slice();
+    const lines = [];
+    lines.push(cols.map(c => `"${c.replace(/"/g,'""')}"`).join(","));
+    
+    list.forEach(g=>{
+        lines.push(cols.map(c => `"${(g.head[c]||"").toString().replace(/"/g,'""')}"`).join(","));
+        (g.members || []).forEach(m => {
+            lines.push(cols.map(c => `"${(m[c]||"").toString().replace(/"/g,'""')}"`).join(","));
+        });
+    });
+    
+    const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); 
+    a.href = url; 
+    a.download = "records.csv"; 
+    a.click();
+    setTimeout(()=> URL.revokeObjectURL(url), 500);
 }
 
 /* ============ SIDEBAR COLLAPSE ============ */
@@ -1837,20 +1560,25 @@ document.addEventListener('click', function(event) {
 
 /* ============ UI BINDINGS ============ */
 document.getElementById("refreshBtn").onclick = function() {
-    clearCache();
+    // Clear cache and reload fresh data
+    localStorage.removeItem('recordsCache');
+    localStorage.removeItem('recordsCacheTime');
     loadRecords();
 };
 
-document.getElementById("searchInput").addEventListener("input", debounceSearch);
+// Client-side filtering for search and barangay dropdown
 document.getElementById("filterBarangay").onchange = filterRecords;
 
+// Real-time search filtering (no debounce needed since it's client-side)
+document.getElementById("searchInput").addEventListener("input", filterRecords);
+
+// Export dropdown toggle
 document.getElementById("exportBtn").onclick = (e) => {
     e.stopPropagation();
     document.getElementById("exportDropdown").classList.toggle("hidden");
 };
 
-document.getElementById("bulkSelectBtn").onclick = showBulkActions;
-
+// Close dropdown when clicking outside
 document.addEventListener("click", (e) => {
     const dropdown = document.getElementById("exportDropdown");
     const btn = document.getElementById("exportBtn");
@@ -1860,13 +1588,19 @@ document.addEventListener("click", (e) => {
     }
 });
 
+// Desktop sidebar toggle
 document.getElementById('sidebarToggle').onclick = toggleSidebar;
+
+// Mobile sidebar toggle
 document.getElementById('mobileMenuToggle').onclick = toggleMobileSidebar;
+
+// Logout button event listener
 document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
 /* ============ WINDOW RESIZE HANDLER ============ */
 window.addEventListener('resize', function() {
     if (window.innerWidth > 768) {
+        // On desktop, ensure sidebar is not in mobile-open state
         const sidebar = document.getElementById('sidebar');
         const mobileToggle = document.getElementById('mobileMenuToggle');
         
@@ -1878,12 +1612,13 @@ window.addEventListener('resize', function() {
 
 /* ============ PREVENT BACK BUTTON ISSUES ============ */
 window.addEventListener('pageshow', function(event) {
+  // If page is loaded from cache (back/forward button)
   if (event.persisted) {
     console.log('Page loaded from cache, checking session...');
     
+    // Don't automatically redirect. Just check session and reload data
     sessionCheck().then(isAuthenticated => {
       if (isAuthenticated) {
-        clearCache();
         loadRecords();
       }
     });
@@ -1892,19 +1627,25 @@ window.addEventListener('pageshow', function(event) {
 
 /* ============ INIT ============ */
 window.addEventListener("DOMContentLoaded", async () => {
+  // First check session
   const isAuthenticated = await sessionCheck();
   
   if (isAuthenticated) {
+    // Load data if authenticated
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    // Remove 👤 emoji from user display
     document.getElementById("userName").innerText = userName;
     
+    // Check if user is admin
     const isAdmin = localStorage.getItem("userRole") === "admin";
     const adminItems = document.querySelectorAll(".admin-only");
     adminItems.forEach(item => {
         item.style.display = isAdmin ? "block" : "none";
     });
     
+    // Check screen width and adjust sidebar
     if (window.innerWidth <= 768) {
+        // On mobile, collapse sidebar by default
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.remove('mobile-open');
     }
@@ -1917,4 +1658,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
+
+
 
