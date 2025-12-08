@@ -2227,6 +2227,10 @@ async function validateSession() {
     }
     
     try {
+        // ADD TIMEOUT LIKE DASHBOARD
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
         const formData = new FormData();
         formData.append("action", "validateSession");
         formData.append("username", username);
@@ -2234,11 +2238,15 @@ async function validateSession() {
         
         const response = await fetch(API_URL, {
             method: "POST",
-            body: formData
+            body: formData,
+            signal: controller.signal  // ADD SIGNAL FOR TIMEOUT
         });
+        
+        clearTimeout(timeoutId);
         
         const data = await response.json();
         
+        // MATCH DASHBOARD LOGIC EXACTLY
         if (data.success && data.isLoggedIn) {
             return true;
         } else {
@@ -2247,7 +2255,10 @@ async function validateSession() {
         }
     } catch (error) {
         console.error("Session validation error:", error);
-        return true; // On network error, assume valid
+        if (error.name === 'AbortError') {
+            console.log("Session validation timeout");
+        }
+        return false; // CHANGE FROM true TO false (to match dashboard)
     }
 }
 
@@ -2260,7 +2271,7 @@ function startSessionMonitoring() {
             // Session invalidated
             stopSessionMonitoring();
             alert("Your session has been terminated from another device. You have been logged out.");
-            handleLogout();
+            handleLogout();  // This should be the same as dashboard's enhancedLogout()
         }
     }, 10000); // Check every 10 seconds
     
@@ -3697,4 +3708,3 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
