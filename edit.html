@@ -1144,34 +1144,36 @@ function getUserFullName() {
 /* ========================= DATE PARSING & FORMATTING ========================= */
 function toInputDate(val){
   if(!val && val !== 0) return '';
+  
+  // Already in yyyy-mm-dd format
   if(typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
-
-  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(val)){
-    const parts = val.split('/');
-    let d = parts[0].padStart(2,'0'), m = parts[1].padStart(2,'0'), y = parts[2];
-    if(y.length === 2) y = '20' + y;
-    return `${y}-${m}-${d}`;
-  }
-
+  
+  // Handle dd/mm/yyyy format
   if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
-    const [a,b,c] = val.split('/');
-    const d = a.padStart(2,'0'), m = b.padStart(2,'0'), y = c;
+    const parts = val.split('/');
+    const d = parts[0].padStart(2,'0');
+    const m = parts[1].padStart(2,'0');
+    const y = parts[2];
     return `${y}-${m}-${d}`;
   }
-
-  if(val instanceof Date && !isNaN(val)){
-    const mm = String(val.getMonth()+1).padStart(2,'0');
-    const dd = String(val.getDate()).padStart(2,'0');
-    return `${val.getFullYear()}-${mm}-${dd}`;
+  
+  // Handle mm/dd/yyyy format
+  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
+    const [m, d, y] = val.split('/');
+    const month = m.padStart(2,'0');
+    const day = d.padStart(2,'0');
+    return `${y}-${month}-${day}`;
   }
-
-  const dt = new Date(String(val));
+  
+  // Try parsing as Date
+  const dt = new Date(val);
   if(!isNaN(dt)){
-    const mm = String(dt.getMonth()+1).padStart(2,'0');
-    const dd = String(dt.getDate()).padStart(2,'0');
-    return `${dt.getFullYear()}-${mm}-${dd}`;
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, '0');
+    const d = String(dt.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
-
+  
   return '';
 }
 
@@ -1568,8 +1570,20 @@ function onDeleteClick(dataID){
     }).catch(err => { console.error('Delete error', err); alert('Delete failed — see console'); });
 }
 
+/* ========================= RESET EDIT STATE ========================= */
+function resetEditState() {
+  editDataID = null;
+  editHead = {};
+  editMembers = [];
+  memberEditIndex = 0;
+  sequenceMode = false;
+}
+
 /* ========================= EDIT FLOW ========================= */
 function onEditClick(dataID){
+  // Reset edit state first
+  resetEditState();
+  
   const group = grouped[dataID] || groupsArr.find(g => g.dataID === dataID);
   if(!group){ alert('Record not found'); return; }
 
@@ -1646,12 +1660,8 @@ function onEditClick(dataID){
   $('edit_chicken_qty').value = editHead['Chicken Qty.'] || '';
   $('edit_animals_others').value = editHead['Others'] || '';
   
-  // Enable/disable quantity inputs based on checkbox
-  document.querySelectorAll('#editPanel .animal-card input[type="checkbox"]').forEach(checkbox => {
-    const qtyInput = checkbox.closest('.animal-card').querySelector('.qty');
-    qtyInput.disabled = !checkbox.checked;
-    if (!checkbox.checked) qtyInput.value = '';
-  });
+  // Sync animal checkboxes with quantity inputs
+  syncAnimalCheckboxes();
   
   // Transportation & Evacuation
   $('edit_head_transport').value = editHead['Transportation'] || '';
@@ -1744,7 +1754,7 @@ function removeMember(index) {
 /* create empty member object */
 function createEmptyMember(){
   return {
-    'Data ID': editDataID,
+    'Data ID': editDataID || '',
     'Name of Household Member/s':'',
     'FishR Registered/RBIS Registered':'',
     'Contact no.':'',
@@ -1780,6 +1790,72 @@ function createEmptyMember(){
   };
 }
 
+/* Validate head for save */
+function validateHeadForSave() {
+  // Check required fields
+  const requiredFields = [
+    { id: 'edit_barangay', name: 'Barangay' },
+    { id: 'edit_sitio', name: 'Sitio/Purok' },
+    { id: 'edit_householdHead', name: 'Household Head Name' },
+    { id: 'edit_contactNo', name: 'Contact Number' },
+    { id: 'edit_householdBirthdate', name: 'Birthdate' }
+  ];
+  
+  for (const field of requiredFields) {
+    const element = $(field.id);
+    if (!element || !element.value.trim()) {
+      alert(`Please fill in ${field.name}`);
+      element?.focus();
+      return false;
+    }
+  }
+  
+  // Validate contact number
+  if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
+    alert('Please enter a valid Philippine mobile number for the household head');
+    $('edit_contactNo').focus();
+    return false;
+  }
+  
+  // Check if sex is selected
+  const headSex = document.querySelector("input[name='edit_head_sex']:checked")?.value;
+  if (!headSex) {
+    alert('Please select head sex');
+    qAll("input[name='edit_head_sex']")[0]?.focus();
+    return false;
+  }
+  
+  return true;
+}
+
+/* Validate edit panel for member editing */
+function validateEditPanelForMemberEditing() {
+  // Check if household head has valid contact number
+  if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
+    alert('Please enter a valid Philippine mobile number for the household head first.');
+    $('edit_contactNo').focus();
+    return false;
+  }
+  
+  // Check if household head name is filled
+  const headName = $('edit_householdHead').value.trim();
+  if (!headName) {
+    alert('Please enter household head name first.');
+    $('edit_householdHead').focus();
+    return false;
+  }
+  
+  // Check if barangay is selected
+  const barangay = $('edit_barangay').value;
+  if (!barangay) {
+    alert('Please select barangay first.');
+    $('edit_barangay').focus();
+    return false;
+  }
+  
+  return true;
+}
+
 /* Add/Edit Members button handler */
 function ensureMembersArraySize(){
   const expected = Number($('edit_memberCount')?.value || 0);
@@ -1789,13 +1865,33 @@ function ensureMembersArraySize(){
 
 /* MEMBER PANEL: open -> fill -> collect -> navigate */
 function openMemberPanelForEdit(index){
-  ensureMembersArraySize();
+  // Ensure we have valid head data first
+  if (!validateEditPanelForMemberEditing()) {
+    return;
+  }
+  
+  // Collect head data
+  collectHeadFromEditForm();
+  
+  // Ensure the members array exists
+  if (!editMembers || !Array.isArray(editMembers)) {
+    editMembers = [];
+  }
+  
+  // Ensure we have enough members
+  while (editMembers.length <= index) {
+    editMembers.push(createEmptyMember());
+  }
+  
   memberEditIndex = index;
-  const total = editMembers.length;
+  const total = Math.max(1, editMembers.length);
   $('memberPanelTitle').innerText = `Member ${index+1} of ${total}`;
   fillMemberPanelFromEdit(index);
   $('memberPanel')?.classList.add('open');
   $('panelOverlay')?.classList.add('show');
+  
+  // Focus on the first field
+  setTimeout(() => $('memberName')?.focus(), 100);
 }
 
 function fillMemberPanelFromEdit(idx){
@@ -1927,15 +2023,30 @@ function collectMemberPanelToEdit(){
 function memberPanelNext() {
     const name = $('memberName').value.trim();
     const contact = $('memberContact').value.trim();
+    const birthdate = $('memberBirthdate').value;
+    const sex = document.querySelector("input[name='member_sex']:checked")?.value;
     
+    // Validate all required fields
     if(!name){ 
         alert('Please enter member name'); 
         $('memberName').focus();
         return; 
     }
     
-    // Validate contact number
-    if (!validateContactInput($('memberContact'), $('memberContactError'))) {
+    if(!sex){
+        alert('Please select member sex');
+        qAll("input[name='member_sex']")[0]?.focus();
+        return;
+    }
+    
+    if(!birthdate){
+        alert('Please enter member birthdate');
+        $('memberBirthdate').focus();
+        return;
+    }
+    
+    // Validate contact number (if provided)
+    if (contact && !validateContactInput($('memberContact'), $('memberContactError'))) {
         alert('Please enter a valid Philippine mobile number');
         $('memberContact').focus();
         return;
@@ -2064,42 +2175,61 @@ function collectHeadFromEditForm(){
 
 /* ========================= SAVE EDITED HOUSEHOLD ========================= */
 async function saveEditedHousehold(silentReload = false){
-  // Validate required fields
-  const contactNo = $('edit_contactNo').value.trim();
-  if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
-      alert('Please enter a valid Philippine mobile number for the household head');
-      $('edit_contactNo').focus();
-      return;
-  }
-  
-  collectHeadFromEditForm();
-
-  const expected = Number($('edit_memberCount')?.value || 0);
-  while(editMembers.length < expected) editMembers.push(createEmptyMember());
-  if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
-
-  const userFullName = getUserFullName();
-
-  // Add "Last Edited By" field
-  editHead['Last Edited By'] = userFullName;
-  editHead['Last Edit Date'] = new Date().toLocaleDateString();
-
-  const fd = new FormData();
-  fd.append('action','updateHousehold');
-  fd.append('dataID', editDataID);
-  fd.append('actor', userFullName);
-  fd.append('head', JSON.stringify(editHead));
-  fd.append('members', JSON.stringify(editMembers || []));
-  fd.append('submittedBy', editHead['Submitted By'] || userFullName);
-
-  const btn = $('saveEditBtn');
-  if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
-
   try {
-    const res = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
+    // Validate required fields
+    const contactNo = $('edit_contactNo').value.trim();
+    if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
+        alert('Please enter a valid Philippine mobile number for the household head');
+        $('edit_contactNo').focus();
+        return;
+    }
+    
+    collectHeadFromEditForm();
+
+    const expected = Number($('edit_memberCount')?.value || 0);
+    while(editMembers.length < expected) editMembers.push(createEmptyMember());
+    if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
+
+    const userFullName = getUserFullName();
+
+    // Add "Last Edited By" field
+    editHead['Last Edited By'] = userFullName;
+    editHead['Last Edit Date'] = new Date().toLocaleDateString();
+
+    const fd = new FormData();
+    fd.append('action','updateHousehold');
+    fd.append('dataID', editDataID);
+    fd.append('actor', userFullName);
+    fd.append('head', JSON.stringify(editHead));
+    fd.append('members', JSON.stringify(editMembers || []));
+    fd.append('submittedBy', editHead['Submitted By'] || userFullName);
+
+    const btn = $('saveEditBtn');
+    const originalText = btn ? btn.innerText : 'Save changes';
+    if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
+
+    const res = await fetch(SCRIPT_URL, { 
+      method: 'POST', 
+      body: fd,
+      timeout: 30000 // 30 second timeout
+    });
+    
+    if (!res.ok) {
+      throw new Error(`Server responded with status: ${res.status}`);
+    }
+    
     const text = await res.text();
-    let json; try { json = JSON.parse(text); } catch(e){ throw new Error('Invalid server response'); }
-    if(!json.success){ alert('Save failed: ' + (json.message || JSON.stringify(json))); console.error(json); }
+    let json;
+    try { 
+      json = JSON.parse(text); 
+    } catch(e){ 
+      throw new Error('Invalid server response format'); 
+    }
+    
+    if(!json.success){ 
+      alert('Save failed: ' + (json.message || JSON.stringify(json))); 
+      console.error(json); 
+    }
     else {
       if(!silentReload) alert('Household updated (Data ID: ' + (editDataID||'') + ')');
       closeEditPanel();
@@ -2107,9 +2237,13 @@ async function saveEditedHousehold(silentReload = false){
     }
   } catch(err){
     console.error('Save error', err);
-    alert('Network or server error. See console.');
+    alert('Error saving data: ' + err.message + '\nPlease check your connection and try again.');
   } finally {
-    if(btn){ btn.disabled = false; btn.innerText = 'Save changes'; }
+    const btn = $('saveEditBtn');
+    if(btn){ 
+      btn.disabled = false; 
+      btn.innerText = originalText || 'Save changes'; 
+    }
   }
 }
 
@@ -2133,6 +2267,23 @@ function downloadCSV(name, content){
 }
 function exportAll(){ if(!groupsArr.length) return alert('Nothing to export.'); downloadCSV('mdrrmo_records_all.csv', groupsToCSV(groupsArr)); }
 function exportSelected(){ const sel = groupsArr.filter(g => selectedIds.has(g.dataID)); if(!sel.length) return alert('No selected households.'); downloadCSV('mdrrmo_records_selected.csv', groupsToCSV(sel)); }
+
+/* ========================= SYNC ANIMAL CHECKBOXES ========================= */
+function syncAnimalCheckboxes() {
+  document.querySelectorAll('#editPanel .animal-card input[type="checkbox"]').forEach(checkbox => {
+    const qtyInput = checkbox.closest('.animal-card').querySelector('.qty');
+    
+    // Set initial state
+    qtyInput.disabled = !checkbox.checked;
+    if (!checkbox.checked) qtyInput.value = '';
+    
+    // Add change listener
+    checkbox.addEventListener('change', function() {
+      qtyInput.disabled = !this.checked;
+      if (!this.checked) qtyInput.value = '';
+    });
+  });
+}
 
 /* ========================= UI BINDINGS ========================= */
 function wireUI(){
@@ -2195,24 +2346,65 @@ function wireUI(){
     });
   }
 
-  // Add/Edit Members button
+  // Add/Edit Members button - UPDATED
   if($('edit_addMember')) $('edit_addMember').addEventListener('click', ()=>{
-    ensureMembersArraySize(); 
-    memberEditIndex = editMembers.length > 0 ? 0 : 0; 
+    // Validate the head information first
+    if (!validateEditPanelForMemberEditing()) {
+      return;
+    }
+    
+    // Collect head data to ensure it's saved
+    collectHeadFromEditForm();
+    
+    // First, update the member count to reflect the new addition
+    const currentCount = editMembers.length || 0;
+    const newCount = currentCount + 1;
+    
+    // Update the member count input
+    $('edit_memberCount').value = newCount;
+    
+    // Create a new empty member and add it to the array
+    const newMember = createEmptyMember();
+    editMembers.push(newMember);
+    
+    // Update the preview to show the new member
+    updateEditMembersPreview();
+    
+    // Open the member panel for editing the new member
+    memberEditIndex = editMembers.length - 1; // Last index
     openMemberPanelForEdit(memberEditIndex);
   });
 
-  // Remove Member button
+  // Remove Member button - UPDATED
   if($('edit_removeMember')) $('edit_removeMember').addEventListener('click', ()=>{
-    const expected = Number($('edit_memberCount')?.value || 0);
-    if (expected > 0 && editMembers.length > 0) {
-      if (confirm('Remove the last member?')) {
-        editMembers.pop();
-        $('edit_memberCount').value = expected - 1;
-        updateEditMembersPreview();
-      }
-    } else {
+    if (editMembers.length === 0) {
       alert('No members to remove.');
+      return;
+    }
+    
+    // Show a list of members to remove
+    const memberList = editMembers.map((m, i) => 
+      `${i+1}. ${m['Name of Household Member/s'] || 'Unnamed Member'}`
+    ).join('\n');
+    
+    const memberIndex = prompt(
+      `Enter the number of the member to remove (1-${editMembers.length}):\n\n${memberList}`
+    );
+    
+    const index = parseInt(memberIndex) - 1;
+    
+    if (index >= 0 && index < editMembers.length) {
+      if (confirm(`Remove member "${editMembers[index]['Name of Household Member/s'] || 'Unnamed Member'}"?`)) {
+        editMembers.splice(index, 1);
+        
+        // Update member count
+        $('edit_memberCount').value = editMembers.length;
+        
+        updateEditMembersPreview();
+        alert('Member removed.');
+      }
+    } else if (memberIndex !== null) {
+      alert('Invalid member number.');
     }
   });
 
@@ -2231,16 +2423,7 @@ function wireUI(){
   if($('memberBirthdate')) $('memberBirthdate').addEventListener('change', updateMemberAgeStage);
   if($('edit_householdBirthdate')) $('edit_householdBirthdate').addEventListener('change', updateEditHeadAgeStage);
   
-  // Animal checkbox handlers
-  document.querySelectorAll('#editPanel .animal-card input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      const qtyInput = this.closest('.animal-card').querySelector('.qty');
-      qtyInput.disabled = !this.checked;
-      if (!this.checked) qtyInput.value = '';
-    });
-  });
-
-  // Member count change handler
+  // Member count change handler - UPDATED
   if ($('edit_memberCount')) {
     $('edit_memberCount').addEventListener('change', function() {
       const newCount = parseInt(this.value) || 0;
@@ -2252,7 +2435,7 @@ function wireUI(){
           editMembers = editMembers.slice(0, newCount);
           updateEditMembersPreview();
         } else {
-          this.value = currentCount;
+          this.value = currentCount; // Revert to current count
         }
       } else if (newCount > currentCount) {
         // Add empty members
@@ -2262,32 +2445,42 @@ function wireUI(){
         }
         updateEditMembersPreview();
       }
+      // If equal, do nothing
     });
   }
 
-  // Cancel buttons
+  // Cancel buttons - UPDATED
   if($('cancelEditBtn')) $('cancelEditBtn').addEventListener('click', ()=> { 
-    if(confirm('Discard changes and close?')) closeEditPanel(); 
-  });
-  
-  if($('panelClose')) $('panelClose').addEventListener('click', ()=> { 
-    if(confirm('Discard changes and close?')) closeEditPanel(); 
-  });
-  
-  if($('panelOverlay')) $('panelOverlay').addEventListener('click', ()=> {
-    if($('memberPanel')?.classList.contains('open')) return;
-    if(confirm('Close edit panel? Unsaved changes will be lost.')) closeEditPanel();
+    if(confirm('Discard ALL changes and close? This includes both head and member changes.')) {
+      closeEditPanel();
+    }
   });
 
-  // Start sequence button
+  if($('panelClose')) $('panelClose').addEventListener('click', ()=> { 
+    if(confirm('Discard ALL changes and close? This includes both head and member changes.')) {
+      closeEditPanel();
+    }
+  });
+
+  if($('panelOverlay')) $('panelOverlay').addEventListener('click', ()=>{
+    if($('memberPanel')?.classList.contains('open')) {
+      if(confirm('Close member panel? Unsaved member changes will be lost.')) {
+        $('memberPanel')?.classList.remove('open');
+      }
+      return;
+    }
+    if(confirm('Close edit panel? ALL unsaved changes will be lost.')) {
+      closeEditPanel();
+    }
+  });
+
+  // Start sequence button - UPDATED
   if($('startSequenceBtn')) $('startSequenceBtn').addEventListener('click', (ev)=> {
     ev.preventDefault();
     
-    // Validate head contact first
-    if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
-        alert('Please enter a valid Philippine mobile number for the household head');
-        $('edit_contactNo').focus();
-        return;
+    // Validate ALL head required fields first
+    if (!validateHeadForSave()) {
+      return;
     }
     
     collectHeadFromEditForm();
@@ -2307,9 +2500,32 @@ function wireUI(){
     openMemberPanelForEdit(memberEditIndex);
   });
 
-  // Save edit button
+  // Save edit button - UPDATED
   if($('saveEditBtn')) $('saveEditBtn').addEventListener('click', (ev)=> { 
     ev.preventDefault(); 
+    
+    // Validate head data
+    if (!validateHeadForSave()) {
+      return;
+    }
+    
+    // Validate all members if there are any
+    if (editMembers.length > 0) {
+      const invalidMembers = [];
+      editMembers.forEach((member, index) => {
+        if (!member['Name of Household Member/s'] || !member['Name of Household Member/s'].trim()) {
+          invalidMembers.push(index + 1);
+        }
+      });
+      
+      if (invalidMembers.length > 0) {
+        if (confirm(`Members #${invalidMembers.join(', ')} are missing names. Save anyway?`)) {
+          saveEditedHousehold(false);
+        }
+        return;
+      }
+    }
+    
     saveEditedHousehold(false); 
   });
 }
@@ -2352,5 +2568,3 @@ window.addEventListener('DOMContentLoaded', ()=>{
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
-
