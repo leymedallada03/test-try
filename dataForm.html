@@ -2566,8 +2566,8 @@ function computeAgeDetailed(inputDateValue){
   if(years >= 1){
     display = String(years);
   } else {
-    if(months >= 1) display = `${months} month/s`;
-    else display = `${days} day/s`;
+    if(months >= 1) display = `${months} month(s)`;
+    else display = `${days} day(s)`;
   }
 
   let stage = "";
@@ -3708,3 +3708,4 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
