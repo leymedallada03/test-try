@@ -84,20 +84,33 @@
      pointer-events: auto;
    }
    
-   /* Form styling from edit.html */
-   .radio-line {
-     display: flex;
-     gap: 18px;
-     align-items: center;
-     padding: 6px 0;
+   /* FIX 1: Improved radio button alignment */
+   .form-row {
+     margin-bottom: 12px;
    }
    
-   .radio-item {
+   .radio-group {
+     margin-top: 8px;
+     padding: 8px 0;
+     display: flex;
+     gap: 20px;
+     align-items: center;
+   }
+   
+   .radio-label {
      display: flex;
      align-items: center;
      gap: 6px;
-     font-weight: 700;
-     font-size: 14px;
+     font-weight: 600;
+     color: var(--muted);
+     cursor: pointer;
+   }
+   
+   .radio-label input[type="radio"] {
+     accent-color: var(--accent1);
+     width: 18px;
+     height: 18px;
+     margin: 0;
    }
    
    .btn.secondary {
@@ -108,17 +121,34 @@
    
    /* Card styling for edit form */
    .edit-card {
-     padding: 14px;
-     border-radius: 10px;
-     background: #fff;
-     margin-bottom: 12px;
-     box-shadow: 0 6px 18px rgba(6,30,20,0.04);
+     padding: 16px;
+     border-radius: var(--radius);
+     background: white;
+     margin-bottom: 16px;
+     box-shadow: 0 4px 12px rgba(6,30,20,0.08);
+     border: 1px solid var(--border);
+   }
+   
+   /* FIX 4: Consistent form section headers */
+   .form-section {
+     background: var(--light-green);
+     padding: 10px 14px;
+     border-radius: var(--radius-sm);
+     margin: 20px 0 16px 0;
+     border-left: 4px solid var(--accent1);
+   }
+   
+   .form-section h5 {
+     margin: 0;
+     color: var(--accent1);
+     font-size: 15px;
+     font-weight: 700;
    }
    
    .form-grid {
      display: grid;
      grid-template-columns: repeat(2,1fr);
-     gap: 12px;
+     gap: 16px;
    }
    
    .small-muted {
@@ -155,13 +185,13 @@
    .member-panel select,
    .member-panel textarea {
      width: 100%;
-     padding: 8px 10px;
-     border: 1px solid var(--border);
+     padding: 10px 12px;
+     border: 2px solid var(--border);
      border-radius: var(--radius-sm);
      font-size: 14px;
      font-family: inherit;
      box-sizing: border-box;
-     margin-top: 4px;
+     margin-top: 6px;
    }
    
    .member-panel input:focus,
@@ -177,7 +207,7 @@
      font-size: 14px;
      color: var(--muted);
      display: block;
-     margin-bottom: 4px;
+     margin-bottom: 6px;
    }
    
    /* Hazard hunter button */
@@ -187,7 +217,7 @@
      border: none !important;
    }
    
-   /* Checkbox styling */
+   /* FIX 2: Larger checkboxes like dataForm.html */
    .checkbox-item {
      display: flex;
      align-items: center;
@@ -195,14 +225,15 @@
      font-weight: 600;
      color: var(--accent1);
      cursor: pointer;
-     margin: 4px 0;
+     margin: 6px 0;
    }
    
    .checkbox-item input[type="checkbox"] {
      accent-color: var(--accent1);
-     transform: scale(1.1);
-     width: auto;
+     width: 20px;
+     height: 20px;
      margin: 0;
+     cursor: pointer;
    }
    
    /* Conditional fields */
@@ -252,7 +283,7 @@
    
    .qty {
      width: 70px;
-     padding: 6px;
+     padding: 8px;
      border-radius: var(--radius-sm);
      border: 2px solid var(--border);
      text-align: center;
@@ -308,7 +339,7 @@
    }
    
    .panel-body h4 {
-     margin: 16px 0 12px 0;
+     margin: 20px 0 16px 0;
      color: var(--accent1);
      font-size: 16px;
      border-bottom: 2px solid var(--light-green);
@@ -318,10 +349,10 @@
    /* Data ID display */
    .data-id-display {
      background: #f0f9ff;
-     padding: 8px 12px;
+     padding: 10px 14px;
      border-radius: 8px;
      border: 1px solid #d1e9ff;
-     margin-bottom: 12px;
+     margin-bottom: 16px;
      font-weight: bold;
      color: #0f7a4a;
    }
@@ -346,7 +377,7 @@
    }
    
    .member-preview li {
-     padding: 8px 12px;
+     padding: 10px 12px;
      border-bottom: 1px solid #eee;
      cursor: pointer;
      transition: background 0.2s;
@@ -384,12 +415,69 @@
    
    /* Form section spacing */
    .member-panel .edit-card + .edit-card {
-     margin-top: 16px;
+     margin-top: 20px;
    }
    
    /* Specific grid column spans */
    .member-panel .form-grid > div[style*="grid-column"] {
      grid-column: 1 / -1;
+   }
+   
+   /* FIX 3: Coordinate modal styles */
+   .coordinate-modal {
+     display: none;
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0,0,0,0.5);
+     z-index: 7000;
+     align-items: center;
+     justify-content: center;
+   }
+   
+   .coordinate-modal.active {
+     display: flex;
+   }
+   
+   .coordinate-modal-content {
+     background: white;
+     padding: 24px;
+     border-radius: var(--radius);
+     width: 90%;
+     max-width: 500px;
+     box-shadow: var(--shadow-dark);
+   }
+   
+   .coordinate-modal-content h4 {
+     margin-top: 0;
+     color: var(--accent1);
+     border-bottom: 2px solid var(--light-green);
+     padding-bottom: 12px;
+     margin-bottom: 20px;
+   }
+   
+   .modal-coordinate-input {
+     width: 100%;
+     padding: 12px;
+     border: 2px solid var(--border);
+     border-radius: var(--radius-sm);
+     margin: 12px 0;
+     font-size: 14px;
+   }
+   
+   .modal-coordinate-input:focus {
+     outline: none;
+     border-color: var(--accent1);
+     box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+   }
+   
+   .modal-coordinate-actions {
+     display: flex;
+     gap: 12px;
+     justify-content: flex-end;
+     margin-top: 20px;
    }
    
    /* Responsive for edit panel */
@@ -408,6 +496,11 @@
      
      .gov-support-grid {
        grid-template-columns: repeat(2, 1fr);
+     }
+     
+     .radio-group {
+       gap: 16px;
+       flex-wrap: wrap;
      }
    }
 
@@ -1446,22 +1539,26 @@
     <form id="editForm" onsubmit="return false;">
       <!-- Head editing -->
       <div class="edit-card">
-        <h4>Household Head — Edit</h4>
-        <div class="form-grid">
-          <!-- Coordinate Field -->
-          <div style="grid-column: 1 / -1;">
-            <label>Coordinates (optional)</label>
-            <div class="coordinate-container">
-              <input type="text" id="edit_coordinate" placeholder="Latitude, Longitude" />
-              <button type="button" id="edit_getLocationBtn" class="btn secondary">
-                <i class="fas fa-map-marker-alt"></i> Get Location
-              </button>
-              <button type="button" id="edit_hazardHunterBtn" class="btn hazard-hunter">
-                <i class="fas fa-map-marked-alt"></i> Hazard Hunter
-              </button>
-            </div>
+        <div class="form-section">
+          <h5>Household Head Information</h5>
+        </div>
+        
+        <!-- Coordinate Field with Modal -->
+        <div style="grid-column: 1 / -1;">
+          <label>Coordinates (optional)</label>
+          <div class="coordinate-container">
+            <input type="text" id="edit_coordinate" placeholder="Latitude, Longitude" readonly />
+            <button type="button" id="edit_openCoordinateModal" class="btn secondary">
+              <i class="fas fa-map-marker-alt"></i> Set Coordinates
+            </button>
+            <button type="button" id="edit_hazardHunterBtn" class="btn hazard-hunter">
+              <i class="fas fa-map-marked-alt"></i> Hazard Hunter
+            </button>
           </div>
+          <div class="small-muted">Click "Set Coordinates" to enter or update location</div>
+        </div>
 
+        <div class="form-grid">
           <div>
             <label>Barangay <span class="required">*</span></label>
             <select id="edit_barangay" required>
@@ -1516,9 +1613,9 @@
 
           <div>
             <label>Sex <span class="required">*</span></label>
-            <div class="radio-line">
-              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Male" required> Male</label>
-              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="edit_head_sex" value="Male" required> Male</label>
+              <label class="radio-label"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
             </div>
           </div>
 
@@ -1544,7 +1641,9 @@
           </div>
         </div>
 
-        <h4>Educational & Economic Status</h4>
+        <div class="form-section">
+          <h5>Educational & Economic Status</h5>
+        </div>
         <div class="form-grid">
           <div>
             <label>Educational Attainment</label>
@@ -1656,9 +1755,9 @@
 
           <div>
             <label>Overseas Filipino Worker (OFW)</label>
-            <div class="radio-line">
-              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="Yes"> Yes</label>
-              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="No" checked> No</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="edit_ofw_status" value="Yes"> Yes</label>
+              <label class="radio-label"><input type="radio" name="edit_ofw_status" value="No" checked> No</label>
             </div>
           </div>
 
@@ -1691,13 +1790,15 @@
           </div>
         </div>
 
-        <h4>Health & Status</h4>
+        <div class="form-section">
+          <h5>Health & Status</h5>
+        </div>
         <div class="form-grid">
           <div>
             <label>Persons with Disability (PWD)</label>
-            <div class="radio-line">
-              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="Yes"> Yes</label>
-              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="No" checked> No</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="edit_head_pwd" value="Yes"> Yes</label>
+              <label class="radio-label"><input type="radio" name="edit_head_pwd" value="No" checked> No</label>
             </div>
           </div>
           <div>
@@ -1715,7 +1816,9 @@
           </div>
         </div>
 
-        <h4>Domestic Livestock</h4>
+        <div class="form-section">
+          <h5>Domestic Livestock</h5>
+        </div>
         <div class="domestic-grid">
           <div class="animal-card">
             <div class="animal-header">
@@ -1783,7 +1886,9 @@
           <textarea id="edit_animals_others" class="others-box" placeholder="Use this field to describe other animals owned in a brief sentence (e.g., '5 goats and 2 ducks')."></textarea>
         </div>
 
-        <h4>Transportation & Evacuation Details</h4>
+        <div class="form-section">
+          <h5>Transportation & Evacuation Details</h5>
+        </div>
         <div class="form-grid">
           <div>
             <label>Transportation</label>
@@ -1838,7 +1943,9 @@
           </div>
         </div>
 
-        <h4>Government Assistance Programs</h4>
+        <div class="form-section">
+          <h5>Government Assistance Programs</h5>
+        </div>
         <div class="gov-support-grid">
           <div class="checkbox-item">
             <input type="checkbox" id="edit_ass_tupad">
@@ -1884,7 +1991,7 @@
           </select>
         </div>
 
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
           <button id="startSequenceBtn" class="btn">Next → Members (Start sequence)</button>
           <button id="saveEditBtn" class="btn">Save changes</button>
           <button id="cancelEditBtn" class="btn secondary" type="button">Cancel</button>
@@ -1918,332 +2025,352 @@
 
   <div class="panel-body">
     <form id="memberForm" onsubmit="return false;">
-      <h4>Basic Information</h4>
-      <div class="form-grid">
-        <div style="grid-column: 1 / -1;">
-          <label>Household Member Full Name<span class="required">*</span></label>
-          <input type="text" id="memberName" class="member-name" required />
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Basic Information</h5>
         </div>
-
-        <div style="grid-column: 1 / -1;">
-          <div class="checkbox-item">
-            <input type="checkbox" id="memberRegisteredCheckbox">
-            <label for="memberRegisteredCheckbox">FishR/RBIS Registered</label>
+        <div class="form-grid">
+          <div style="grid-column: 1 / -1;">
+            <label>Household Member Full Name<span class="required">*</span></label>
+            <input type="text" id="memberName" class="member-name" required />
           </div>
-          
-          <div id="memberRegistrationField" class="conditional-field">
-            <label>FishR Registered/RBIS Registered</label>
-            <select id="memberRegistration">
+
+          <div style="grid-column: 1 / -1;">
+            <div class="checkbox-item">
+              <input type="checkbox" id="memberRegisteredCheckbox">
+              <label for="memberRegisteredCheckbox">FishR/RBIS Registered</label>
+            </div>
+            
+            <div id="memberRegistrationField" class="conditional-field">
+              <label>FishR Registered/RBIS Registered</label>
+              <select id="memberRegistration">
+                <option value="">Select...</option>
+                <option value="FishR Registered">FishR Registered</option>
+                <option value="RBIS Registered">RBIS Registered</option>
+                <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label>Contact no. <span class="required">*</span></label>
+            <input type="text" id="memberContact" placeholder="09XXXXXXXXX" required
+                   pattern="^(09|\+639)\d{9}$" />
+            <div class="error-message" id="memberContactError"></div>
+          </div>
+
+          <div>
+            <label>Sex <span class="required">*</span></label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="member_sex" value="Male" required> Male</label>
+              <label class="radio-label"><input type="radio" name="member_sex" value="Female"> Female</label>
+            </div>
+          </div>
+
+          <div>
+            <label>Birthdate <span class="required">*</span></label>
+            <input type="date" id="memberBirthdate" class="member-birthdate" required/>
+          </div>
+
+          <div>
+            <label>Age</label>
+            <input type="text" id="memberAge" class="member-age" readonly/>
+          </div>
+
+          <div>
+            <label>Age Category</label>
+            <input type="text" id="memberStage" class="member-stage" readonly/>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Educational & Economic Status</h5>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label>Educational Attainment</label>
+            <select id="memberEducationalAttainment" class="member-educational">
               <option value="">Select...</option>
-              <option value="FishR Registered">FishR Registered</option>
-              <option value="RBIS Registered">RBIS Registered</option>
-              <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
+              <option value="No Formal Education">No Formal Education</option>
+              <option value="Elementary Level">Elementary Level</option>
+              <option value="Elementary Graduate">Elementary Graduate</option>
+              <option value="High School Level">High School Level</option>
+              <option value="High School Graduate">High School Graduate</option>
+              <option value="Senior High School Level">Senior High School Level</option>
+              <option value="Senior High School Graduate">Senior High School Graduate</option>
+              <option value="College Level">College Level</option>
+              <option value="College Graduate">College Graduate</option>
+            </select>
+          </div>
+
+          <div id="memberCollegeCourseField" class="conditional-field">
+            <label>College Graduate Course</label>
+            <input type="text" id="memberCollegeCourse" placeholder="Enter course name" />
+          </div>
+
+          <div>
+            <label>Employment</label>
+            <select id="memberEmployment" class="member-employment">
+              <option value="">Select...</option>
+              <option value="Employed">Employed</option>
+              <option value="Unemployed">Unemployed</option>
+            </select>
+          </div>
+
+          <div id="memberJobTitleField" class="conditional-field">
+            <label>Job Title</label>
+            <select id="memberJobTitle" class="member-jobtitle">
+              <option value="">Select...</option>
+              <optgroup label="Office & Administrative Jobs">
+                <option>Administrative Assistant / Admin Staff</option>
+                <option>Office Clerk</option>
+                <option>Secretary / Executive Assistant</option>
+              </optgroup>
+              <optgroup label="Business & Management">
+                <option>Project Manager</option>
+                <option>Operations Manager</option>
+                <option>HR Staff / HR Officer</option>
+                <option>Account Manager</option>
+              </optgroup>
+              <optgroup label="Accounting & Finance">
+                <option>Accounting Staff</option>
+                <option>Bookkeeper</option>
+                <option>Payroll Officer</option>
+                <option>Auditor</option>
+              </optgroup>
+              <optgroup label="IT & Tech">
+                <option>IT Support / IT Technician</option>
+                <option>Web Developer</option>
+                <option>Software Developer / Programmer</option>
+                <option>Data Analyst</option>
+                <option>System Administrator</option>
+              </optgroup>
+              <optgroup label="Healthcare">
+                <option>Nurse (Staff Nurse / Company Nurse)</option>
+                <option>Medical Technologist</option>
+                <option>Caregiver</option>
+                <option>Pharmacist</option>
+              </optgroup>
+              <optgroup label="Education">
+                <option>Teacher / Instructor</option>
+                <option>Tutor</option>
+                <option>School Administrator</option>
+              </optgroup>
+              <optgroup label="Sales & Customer Service">
+                <option>Customer Service Representative (CSR)</option>
+                <option>Sales Associate</option>
+                <option>Cashier</option>
+                <option>Store Supervisor</option>
+              </optgroup>
+              <optgroup label="Skilled Work & Labor">
+                <option>Electrician</option>
+                <option>Plumber</option>
+                <option>Welder</option>
+                <option>Construction Worker / Skilled Laborer</option>
+              </optgroup>
+              <optgroup label="Delivery & Logistics">
+                <option>Driver (Company Driver / Delivery Driver)</option>
+                <option>Logistics Staff</option>
+                <option>Rider / Motorcycle Delivery</option>
+              </optgroup>
+              <optgroup label="Food & Hospitality">
+                <option>Cook / Chef</option>
+                <option>Waiter / Service Crew</option>
+                <option>Barista</option>
+                <option>Housekeeping Staff</option>
+              </optgroup>
+              <optgroup label="Security & Public Service">
+                <option>Security Guard</option>
+                <option>Barangay Staff / Barangay Council Employee</option>
+                <option>Police Officer</option>
+                <option>Fire Officer</option>
+              </optgroup>
+              <optgroup label="Media, Design & Creative">
+                <option>Graphic Designer</option>
+                <option>Video Editor</option>
+                <option>Content Writer</option>
+                <option>Social Media Manager</option>
+              </optgroup>
+              <option>Others</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Overseas Filipino Worker (OFW)</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="member_ofw_status" value="Yes"> Yes</label>
+              <label class="radio-label"><input type="radio" name="member_ofw_status" value="No" checked> No</label>
+            </div>
+          </div>
+
+          <div id="memberCountryField" class="conditional-field">
+            <label>Country</label>
+            <select id="memberCountry" class="member-country">
+              <option value="">Select...</option>
+              <option>Saudi Arabia</option>
+              <option>United Arab Emirates (UAE)</option>
+              <option>Qatar</option>
+              <option>Kuwait</option>
+              <option>Bahrain</option>
+              <option>Oman</option>
+              <option>Hong Kong</option>
+              <option>Singapore</option>
+              <option>Japan</option>
+              <option>Taiwan</option>
+              <option>Malaysia</option>
+              <option>Australia</option>
+              <option>New Zealand</option>
+              <option>Italy</option>
+              <option>United Kingdom (UK)</option>
+              <option>Germany</option>
+              <option>Cyprus</option>
+              <option>Canada</option>
+              <option>United States (USA)</option>
+              <option>Libya</option>
+              <option>Others</option>
             </select>
           </div>
         </div>
+      </div>
 
-        <div>
-          <label>Contact no. <span class="required">*</span></label>
-          <input type="text" id="memberContact" placeholder="09XXXXXXXXX" required
-                 pattern="^(09|\+639)\d{9}$" />
-          <div class="error-message" id="memberContactError"></div>
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Health and Status</h5>
         </div>
+        <div class="form-grid">
+          <div>
+            <label>Persons with Disability (PWD)</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
+              <label class="radio-label"><input type="radio" name="member_pwd" value="No" checked> No</label>
+            </div>
+          </div>
 
-        <div>
-          <label>Sex <span class="required">*</span></label>
-          <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_sex" value="Male" required> Male</label>
-            <label class="radio-item"><input type="radio" name="member_sex" value="Female"> Female</label>
+          <div>
+            <label>Status</label>
+            <select id="memberStatus" class="member-status">
+              <option value="">Select...</option>
+              <option>With Sickness</option>
+              <option>Pregnant</option>
+              <option>Solo Parent</option>
+              <option>Lactating</option>
+              <option>Severe Illness</option>
+              <option>HIV Positive</option>
+              <option>LGBTQ Plus</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Transportation & Evacuation Details</h5>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label>Transportation</label>
+            <select id="memberTransport" class="member-transport">
+              <option value="">Select...</option>
+              <option>Has Transportation</option>
+              <option>Needs Transportation</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Pick-Up Location</label>
+            <input id="memberPickup" class="member-pickup"/>
+          </div>
+          
+          <div>
+            <label>Drop-Off Location</label>
+            <input id="memberDropoff" class="member-dropoff"/>
+          </div>
+          
+          <div>
+            <label>Evacuation Camp Name</label>
+            <input id="memberCamp" class="member-camp"/>
+          </div>
+          
+          <div>
+            <label>Camp Capacity</label>
+            <input type="number" id="memberCampCap" class="member-cap" min="0"/>
+          </div>
+          
+          <div>
+            <label>Individuals Currently in Camp</label>
+            <input type="number" id="memberInside" class="member-inside" min="0"/>
+          </div>
+          
+          <div>
+            <label>Individuals Outside Camp</label>
+            <input type="number" id="memberOutside" class="member-outside" min="0"/>
+          </div>
+
+          <div style="grid-column:1/-1;">
+            <label>Reason for Displacement</label>
+            <select id="memberReason" class="member-reason">
+              <option value="">Select...</option>
+              <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
+              <option>Typhoon</option>
+              <option>Flood</option>
+              <option>Landslide</option>
+              <option>Earthquake</option>
+              <option>Others</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Government Assistance Programs</h5>
+        </div>
+        <div class="gov-support-grid">
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_tupad" class="member_tupad">
+            <label for="member_tupad">TUPAD</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_local4ps" class="member_local4ps">
+            <label for="member_local4ps">Local 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
+            <label for="member_intl4ps">National 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_locsp" class="member_locsp">
+            <label for="member_locsp">Local Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_intlsp" class="member_intlsp">
+            <label for="member_intlsp">National Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_solo" class="member_solo">
+            <label for="member_solo">Solo Parent Assistance</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_relief" class="member_relief">
+            <label for="member_relief">Relief Goods</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="member_cash" class="member_cash">
+            <label for="member_cash">Cash Subsidy</label>
           </div>
         </div>
 
-        <div>
-          <label>Birthdate <span class="required">*</span></label>
-          <input type="date" id="memberBirthdate" class="member-birthdate" required/>
-        </div>
-
-        <div>
-          <label>Age</label>
-          <input type="text" id="memberAge" class="member-age" readonly/>
-        </div>
-
-        <div>
-          <label>Age Category</label>
-          <input type="text" id="memberStage" class="member-stage" readonly/>
-        </div>
-      </div>
-
-      <h4>Educational & Economic Status</h4>
-      <div class="form-grid">
-        <div>
-          <label>Educational Attainment</label>
-          <select id="memberEducationalAttainment" class="member-educational">
-            <option value="">Select...</option>
-            <option value="No Formal Education">No Formal Education</option>
-            <option value="Elementary Level">Elementary Level</option>
-            <option value="Elementary Graduate">Elementary Graduate</option>
-            <option value="High School Level">High School Level</option>
-            <option value="High School Graduate">High School Graduate</option>
-            <option value="Senior High School Level">Senior High School Level</option>
-            <option value="Senior High School Graduate">Senior High School Graduate</option>
-            <option value="College Level">College Level</option>
-            <option value="College Graduate">College Graduate</option>
+        <div style="margin-top:16px">
+          <label>AICS (if any)</label>
+          <select id="memberAics" class="member_aics">
+            <option value="">None</option>
+            <option>Shelter Assistance</option>
+            <option>Burial</option>
+            <option>Scholarship</option>
           </select>
         </div>
-
-        <div id="memberCollegeCourseField" class="conditional-field">
-          <label>College Graduate Course</label>
-          <input type="text" id="memberCollegeCourse" placeholder="Enter course name" />
-        </div>
-
-        <div>
-          <label>Employment</label>
-          <select id="memberEmployment" class="member-employment">
-            <option value="">Select...</option>
-            <option value="Employed">Employed</option>
-            <option value="Unemployed">Unemployed</option>
-          </select>
-        </div>
-
-        <div id="memberJobTitleField" class="conditional-field">
-          <label>Job Title</label>
-          <select id="memberJobTitle" class="member-jobtitle">
-            <option value="">Select...</option>
-            <optgroup label="Office & Administrative Jobs">
-              <option>Administrative Assistant / Admin Staff</option>
-              <option>Office Clerk</option>
-              <option>Secretary / Executive Assistant</option>
-            </optgroup>
-            <optgroup label="Business & Management">
-              <option>Project Manager</option>
-              <option>Operations Manager</option>
-              <option>HR Staff / HR Officer</option>
-              <option>Account Manager</option>
-            </optgroup>
-            <optgroup label="Accounting & Finance">
-              <option>Accounting Staff</option>
-              <option>Bookkeeper</option>
-              <option>Payroll Officer</option>
-              <option>Auditor</option>
-            </optgroup>
-            <optgroup label="IT & Tech">
-              <option>IT Support / IT Technician</option>
-              <option>Web Developer</option>
-              <option>Software Developer / Programmer</option>
-              <option>Data Analyst</option>
-              <option>System Administrator</option>
-            </optgroup>
-            <optgroup label="Healthcare">
-              <option>Nurse (Staff Nurse / Company Nurse)</option>
-              <option>Medical Technologist</option>
-              <option>Caregiver</option>
-              <option>Pharmacist</option>
-            </optgroup>
-            <optgroup label="Education">
-              <option>Teacher / Instructor</option>
-              <option>Tutor</option>
-              <option>School Administrator</option>
-            </optgroup>
-            <optgroup label="Sales & Customer Service">
-              <option>Customer Service Representative (CSR)</option>
-              <option>Sales Associate</option>
-              <option>Cashier</option>
-              <option>Store Supervisor</option>
-            </optgroup>
-            <optgroup label="Skilled Work & Labor">
-              <option>Electrician</option>
-              <option>Plumber</option>
-              <option>Welder</option>
-              <option>Construction Worker / Skilled Laborer</option>
-            </optgroup>
-            <optgroup label="Delivery & Logistics">
-              <option>Driver (Company Driver / Delivery Driver)</option>
-              <option>Logistics Staff</option>
-              <option>Rider / Motorcycle Delivery</option>
-            </optgroup>
-            <optgroup label="Food & Hospitality">
-              <option>Cook / Chef</option>
-              <option>Waiter / Service Crew</option>
-              <option>Barista</option>
-              <option>Housekeeping Staff</option>
-            </optgroup>
-            <optgroup label="Security & Public Service">
-              <option>Security Guard</option>
-              <option>Barangay Staff / Barangay Council Employee</option>
-              <option>Police Officer</option>
-              <option>Fire Officer</option>
-            </optgroup>
-            <optgroup label="Media, Design & Creative">
-              <option>Graphic Designer</option>
-              <option>Video Editor</option>
-              <option>Content Writer</option>
-              <option>Social Media Manager</option>
-            </optgroup>
-            <option>Others</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Overseas Filipino Worker (OFW)</label>
-          <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_ofw_status" value="Yes"> Yes</label>
-            <label class="radio-item"><input type="radio" name="member_ofw_status" value="No" checked> No</label>
-          </div>
-        </div>
-
-        <div id="memberCountryField" class="conditional-field">
-          <label>Country</label>
-          <select id="memberCountry" class="member-country">
-            <option value="">Select...</option>
-            <option>Saudi Arabia</option>
-            <option>United Arab Emirates (UAE)</option>
-            <option>Qatar</option>
-            <option>Kuwait</option>
-            <option>Bahrain</option>
-            <option>Oman</option>
-            <option>Hong Kong</option>
-            <option>Singapore</option>
-            <option>Japan</option>
-            <option>Taiwan</option>
-            <option>Malaysia</option>
-            <option>Australia</option>
-            <option>New Zealand</option>
-            <option>Italy</option>
-            <option>United Kingdom (UK)</option>
-            <option>Germany</option>
-            <option>Cyprus</option>
-            <option>Canada</option>
-            <option>United States (USA)</option>
-            <option>Libya</option>
-            <option>Others</option>
-          </select>
-        </div>
-      </div>
-
-      <h4>Health and Status</h4>
-      <div class="form-grid">
-        <div>
-          <label>Persons with Disability (PWD)</label>
-          <div class="radio-line">
-            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
-            <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked> No</label>
-          </div>
-        </div>
-
-        <div>
-          <label>Status</label>
-          <select id="memberStatus" class="member-status">
-            <option value="">Select...</option>
-            <option>With Sickness</option>
-            <option>Pregnant</option>
-            <option>Solo Parent</option>
-            <option>Lactating</option>
-            <option>Severe Illness</option>
-            <option>HIV Positive</option>
-            <option>LGBTQ Plus</option>
-          </select>
-        </div>
-      </div>
-
-      <h4>Transportation & Evacuation Details</h4>
-      <div class="form-grid">
-        <div>
-          <label>Transportation</label>
-          <select id="memberTransport" class="member-transport">
-            <option value="">Select...</option>
-            <option>Has Transportation</option>
-            <option>Needs Transportation</option>
-          </select>
-        </div>
-        
-        <div>
-          <label>Pick-Up Location</label>
-          <input id="memberPickup" class="member-pickup"/>
-        </div>
-        
-        <div>
-          <label>Drop-Off Location</label>
-          <input id="memberDropoff" class="member-dropoff"/>
-        </div>
-        
-        <div>
-          <label>Evacuation Camp Name</label>
-          <input id="memberCamp" class="member-camp"/>
-        </div>
-        
-        <div>
-          <label>Camp Capacity</label>
-          <input type="number" id="memberCampCap" class="member-cap" min="0"/>
-        </div>
-        
-        <div>
-          <label>Individuals Currently in Camp</label>
-          <input type="number" id="memberInside" class="member-inside" min="0"/>
-        </div>
-        
-        <div>
-          <label>Individuals Outside Camp</label>
-          <input type="number" id="memberOutside" class="member-outside" min="0"/>
-        </div>
-
-        <div style="grid-column:1/-1;">
-          <label>Reason for Displacement</label>
-          <select id="memberReason" class="member-reason">
-            <option value="">Select...</option>
-            <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
-            <option>Typhoon</option>
-            <option>Flood</option>
-            <option>Landslide</option>
-            <option>Earthquake</option>
-            <option>Others</option>
-          </select>
-        </div>
-      </div>
-
-      <h4>Government Assistance Programs</h4>
-      <div class="gov-support-grid">
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_tupad" class="member_tupad">
-          <label for="member_tupad">TUPAD</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_local4ps" class="member_local4ps">
-          <label for="member_local4ps">Local 4Ps</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
-          <label for="member_intl4ps">National 4Ps</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_locsp" class="member_locsp">
-          <label for="member_locsp">Local Social Pension</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_intlsp" class="member_intlsp">
-          <label for="member_intlsp">National Social Pension</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_solo" class="member_solo">
-          <label for="member_solo">Solo Parent Assistance</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_relief" class="member_relief">
-          <label for="member_relief">Relief Goods</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="member_cash" class="member_cash">
-          <label for="member_cash">Cash Subsidy</label>
-        </div>
-      </div>
-
-      <div style="margin-top:16px">
-        <label>AICS (if any)</label>
-        <select id="memberAics" class="member_aics">
-          <option value="">None</option>
-          <option>Shelter Assistance</option>
-          <option>Burial</option>
-          <option>Scholarship</option>
-        </select>
       </div>
 
       <div class="panel-actions" style="margin-top:20px;">
@@ -2251,6 +2378,39 @@
         <button id="memberNext" class="btn" type="button">Save & Next</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- COORDINATE MODAL -->
+<div id="coordinateModal" class="coordinate-modal">
+  <div class="coordinate-modal-content">
+    <h4>Set Household Coordinates</h4>
+    
+    <div style="margin-bottom: 16px;">
+      <label>Coordinates <span class="required">*</span></label>
+      <input type="text" id="modal_coordinate" class="modal-coordinate-input" 
+             placeholder="e.g., 13.8651, 120.9278" />
+      <div class="small-muted">Enter latitude and longitude separated by comma</div>
+    </div>
+    
+    <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+      <div style="font-weight: 600; color: var(--accent1); margin-bottom: 8px;">
+        <i class="fas fa-lightbulb"></i> How to get coordinates:
+      </div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <button type="button" id="modal_getLocationBtn" class="btn secondary" style="flex: 1;">
+          <i class="fas fa-map-marker-alt"></i> Get Current Location
+        </button>
+        <button type="button" id="modal_hazardHunterBtn" class="btn hazard-hunter" style="flex: 1;">
+          <i class="fas fa-map-marked-alt"></i> Open Hazard Hunter
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-coordinate-actions">
+      <button id="modal_cancelBtn" class="btn secondary" type="button">Cancel</button>
+      <button id="modal_saveBtn" class="btn" type="button">Save Coordinates</button>
+    </div>
   </div>
 </div>
 
@@ -2315,6 +2475,58 @@ function resetEditState() {
   editMembers = [];
   memberEditIndex = 0;
   sequenceMode = false;
+}
+
+/* ============ COORDINATE MODAL FUNCTIONS ============ */
+function openCoordinateModal() {
+  const modal = $('coordinateModal');
+  const currentCoord = $('edit_coordinate').value || '';
+  $('modal_coordinate').value = currentCoord;
+  modal.classList.add('active');
+}
+
+function closeCoordinateModal() {
+  $('coordinateModal').classList.remove('active');
+}
+
+function saveCoordinateFromModal() {
+  const coord = $('modal_coordinate').value.trim();
+  if (!coord) {
+    alert('Please enter coordinates');
+    return;
+  }
+  
+  // Basic validation for coordinate format
+  const coordRegex = /^-?\d+\.?\d*,\s*-?\d+\.?\d*$/;
+  if (!coordRegex.test(coord)) {
+    alert('Please enter valid coordinates in format: latitude, longitude\ne.g., 13.8651, 120.9278');
+    return;
+  }
+  
+  $('edit_coordinate').value = coord;
+  closeCoordinateModal();
+}
+
+function getCurrentLocationForModal() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lng = pos.coords.longitude.toFixed(6);
+        $('modal_coordinate').value = `${lat}, ${lng}`;
+      },
+      (err) => {
+        alert('Unable to retrieve location. Please enable location services or enter coordinates manually.');
+      }
+    );
+  } else {
+    alert('Geolocation is not supported by your browser.');
+  }
+}
+
+function openHazardHunterForModal() {
+  alert('Open Hazard Hunter in another tab to get coordinates, then paste them in the coordinate field.');
+  window.open('https://hazardhunter.georisk.gov.ph/map#', '_blank');
 }
 
 /* ============ DATE FORMATTING FUNCTIONS ============ */
@@ -3579,24 +3791,9 @@ function syncAnimalCheckboxes() {
 
 /* ============ WIRE EDIT PANEL UI ============ */
 function wireEditPanelUI() {
-  // Coordinate buttons
-  if ($('edit_getLocationBtn')) {
-    $('edit_getLocationBtn').addEventListener('click', () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude.toFixed(6);
-            const lng = pos.coords.longitude.toFixed(6);
-            $('edit_coordinate').value = `${lat}, ${lng}`;
-          },
-          (err) => {
-            alert('Unable to retrieve location. Please enable location services or enter coordinates manually.');
-          }
-        );
-      } else {
-        alert('Geolocation is not supported by your browser.');
-      }
-    });
+  // Coordinate modal
+  if ($('edit_openCoordinateModal')) {
+    $('edit_openCoordinateModal').addEventListener('click', openCoordinateModal);
   }
   
   if ($('edit_hazardHunterBtn')) {
@@ -3604,6 +3801,23 @@ function wireEditPanelUI() {
       alert('Open Hazard Hunter in another tab to get coordinates, then paste them in the coordinate field.');
       window.open('https://hazardhunter.georisk.gov.ph/map#', '_blank');
     });
+  }
+
+  // Coordinate modal buttons
+  if ($('modal_getLocationBtn')) {
+    $('modal_getLocationBtn').addEventListener('click', getCurrentLocationForModal);
+  }
+  
+  if ($('modal_hazardHunterBtn')) {
+    $('modal_hazardHunterBtn').addEventListener('click', openHazardHunterForModal);
+  }
+  
+  if ($('modal_saveBtn')) {
+    $('modal_saveBtn').addEventListener('click', saveCoordinateFromModal);
+  }
+  
+  if ($('modal_cancelBtn')) {
+    $('modal_cancelBtn').addEventListener('click', closeCoordinateModal);
   }
 
   // Contact number validation
@@ -4041,6 +4255,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     // Wire edit panel UI
     wireEditPanelUI();
     
+    // Setup coordinate modal close on overlay click
+    $('coordinateModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeCoordinateModal();
+      }
+    });
+    
     loadRecords();
   }
 });
@@ -4049,4 +4270,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
