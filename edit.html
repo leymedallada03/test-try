@@ -2195,6 +2195,18 @@ async function saveEditedHousehold(silentReload = false){
     // Add "Last Edited By" field
     editHead['Last Edited By'] = userFullName;
     editHead['Last Edit Date'] = new Date().toLocaleDateString();
+    
+    // Ensure all members have the correct Data ID
+    editMembers.forEach(member => {
+      member['Data ID'] = editDataID;
+      // Ensure members have the same barangay and purok as the head
+      member['Barangay'] = editHead['Barangay'];
+      member['Sitio / Purok'] = editHead['Sitio / Purok'];
+      member['Coordinate'] = editHead['Coordinate'];
+      member['Coordinates'] = editHead['Coordinates'];
+      member['Last Edited By'] = userFullName;
+      member['Last Edit Date'] = new Date().toLocaleDateString();
+    });
 
     const fd = new FormData();
     fd.append('action','updateHousehold');
@@ -2203,6 +2215,7 @@ async function saveEditedHousehold(silentReload = false){
     fd.append('head', JSON.stringify(editHead));
     fd.append('members', JSON.stringify(editMembers || []));
     fd.append('submittedBy', editHead['Submitted By'] || userFullName);
+    fd.append('barangay', editHead['Barangay']); // Important: Include barangay for proper sheet targeting
 
     const btn = $('saveEditBtn');
     const originalText = btn ? btn.innerText : 'Save changes';
@@ -2568,3 +2581,4 @@ window.addEventListener('DOMContentLoaded', ()=>{
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
