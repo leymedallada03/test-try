@@ -14,6 +14,8 @@
     --accent2:#34b78f;
     --accent3: #ff7a00;
     --accent4: #ffa500;
+    --hazard-red: #dc2626;
+    --hazard-orange: #ef4444;
     --light-green: #e9f7f2;
     --border: #e1e8e5;
     --shadow: 0 6px 18px rgba(6,30,20,0.06);
@@ -718,6 +720,341 @@
     to { transform: rotate(360deg); }
    }
 
+   /* EDIT PANEL STYLES - Extracted from edit.html */
+   .member-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 520px;
+    max-width: 96%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98));
+    box-shadow: -18px 0 40px rgba(6,30,20,0.12);
+    transform: translateX(110%);
+    transition: transform 280ms cubic-bezier(.2,.9,.3,1);
+    z-index: 6000;
+    padding: 18px;
+    overflow-y: auto;
+   }
+   
+   .member-panel.open {
+    transform: translateX(0%);
+   }
+   
+   .member-panel .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+   }
+   
+   .member-panel h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--accent1);
+   }
+   
+   .member-panel .panel-body {
+    margin-top: 8px;
+   }
+   
+   .member-panel .panel-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 12px;
+   }
+   
+   .panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.32);
+    opacity: 0;
+    transition: opacity 200ms;
+    pointer-events: none;
+    z-index: 5900;
+   }
+   
+   .panel-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+   }
+   
+   .radio-line {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    padding: 6px 0;
+   }
+   
+   .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 14px;
+   }
+   
+   .btn.secondary {
+    background: transparent;
+    color: #0f7a4a;
+    border: 1px solid rgba(6,30,20,0.06);
+   }
+   
+   .card {
+    padding: 14px;
+    border-radius: 10px;
+    background: #fff;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 18px rgba(6,30,20,0.04);
+   }
+   
+   .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 12px;
+   }
+   
+   .small-muted {
+    font-size: 13px;
+    color: #666;
+   }
+   
+   .green {
+    color: #0f7a4a;
+    font-weight: 700;
+   }
+   
+   .coordinate-container {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+   }
+   
+   .coordinate-container input {
+    flex: 1;
+    min-width: 200px;
+   }
+   
+   .coordinate-container .btn {
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 14px;
+   }
+   
+   .btn.hazard-hunter {
+    background: linear-gradient(90deg, var(--hazard-red), var(--hazard-orange)) !important;
+    color: white !important;
+    border: none !important;
+   }
+   
+   .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--accent1);
+    cursor: pointer;
+    margin: 4px 0;
+   }
+   
+   .checkbox-item input[type="checkbox"] {
+    accent-color: var(--accent1);
+    transform: scale(1.1);
+   }
+   
+   .conditional-field {
+    display: none;
+    margin-top: 8px;
+   }
+   
+   .conditional-field.show {
+    display: block;
+   }
+   
+   .domestic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+   }
+   
+   .animal-card {
+    background: var(--light-green);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+   }
+   
+   .animal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+   }
+   
+   .animal-qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
+   
+   .animal-qty label {
+    margin: 0;
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 14px;
+   }
+   
+   .qty {
+    width: 70px;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    text-align: center;
+    font-size: 14px;
+   }
+   
+   .others-box {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    font-family: inherit;
+    font-size: 14px;
+    margin-top: 8px;
+    resize: vertical;
+   }
+   
+   .gov-support-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px 20px;
+    margin-top: 12px;
+   }
+   
+   .gov-support-grid .checkbox-item {
+    min-height: 40px;
+    padding: 10px 0;
+   }
+   
+   .error-message {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+   }
+   
+   .input-error {
+    border-color: #dc2626 !important;
+   }
+   
+   /* Required field indicator */
+   .required {
+    color: #dc2626;
+    margin-left: 2px;
+   }
+   
+   /* Panel improvements */
+   .panel-body {
+    padding-right: 8px;
+   }
+   
+   .panel-body h4 {
+    margin: 16px 0 12px 0;
+    color: var(--accent1);
+    font-size: 16px;
+    border-bottom: 2px solid var(--light-green);
+    padding-bottom: 8px;
+   }
+   
+   /* Data ID display */
+   .data-id-display {
+    background: #f0f9ff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1e9ff;
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: #0f7a4a;
+   }
+   
+   .data-id-display span {
+    background: #e3f2fd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+   }
+   
+   /* Member preview improvements */
+   .member-preview {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+   }
+   
+   .member-preview li {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+   }
+   
+   .member-preview li:hover {
+    background: #f0f9ff;
+   }
+   
+   .member-preview li:last-child {
+    border-bottom: none;
+   }
+   
+   .member-preview li .member-actions {
+    float: right;
+    display: flex;
+    gap: 6px;
+   }
+   
+   .member-preview li .member-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 12px;
+   }
+   
+   .member-preview li .member-actions .edit-btn {
+    color: #0f7a4a;
+   }
+   
+   .member-preview li .member-actions .remove-btn {
+    color: #dc2626;
+   }
+   
+   @media(max-width:900px){
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .member-panel {
+      width: 100%;
+    }
+    
+    .domestic-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .gov-support-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+   }
+
    /* Mobile Styles */
    @media (max-width: 768px) {
     .page-container {
@@ -951,8 +1288,9 @@
     <div class="content-header">
       <h2><span style="color: var(--accent1);">📁</span> Household Records</h2>
     </div>
- <!-- Description -->
-<div id="disc">This section displays all collected household data in one place. Users can easily view, search, and review information gathered from each household, helping ensure accurate monitoring, validation, and decision-making for community programs and emergency operations.</div>
+    
+    <!-- Description -->
+    <div id="disc">This section displays all collected household data in one place. Users can easily view, search, and review information gathered from each household, helping ensure accurate monitoring, validation, and decision-making for community programs and emergency operations.</div>
 
     <!-- Counts - Top Right -->
     <div class="stats-container">
@@ -1040,6 +1378,831 @@
   </main>
 </div>
 
+<!-- EDIT PANEL OVERLAY -->
+<div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
+
+<!-- EDIT SLIDE-IN PANEL -->
+<div id="editPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Edit household panel">
+  <div class="panel-header">
+    <button id="panelClose" class="btn secondary" title="Close panel">←</button>
+    <h3 id="panelTitle">Edit Household</h3>
+  </div>
+
+  <div class="panel-body">
+    <div class="data-id-display">
+      Data ID: <span id="editDataIdDisplay">Loading...</span>
+    </div>
+    
+    <form id="editForm" onsubmit="return false;">
+      <!-- Head editing -->
+      <div class="card">
+        <h4>Household Head — Edit</h4>
+        <div class="form-grid">
+          <!-- Coordinate Field -->
+          <div style="grid-column: 1 / -1;">
+            <label>Coordinates (optional)</label>
+            <div class="coordinate-container">
+              <input type="text" id="edit_coordinate" placeholder="Latitude, Longitude" />
+              <button type="button" id="edit_getLocationBtn" class="btn secondary">
+                <i class="fas fa-map-marker-alt"></i> Get Location
+              </button>
+              <button type="button" id="edit_hazardHunterBtn" class="btn hazard-hunter">
+                <i class="fas fa-map-marked-alt"></i> Hazard Hunter
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label>Barangay <span class="required">*</span></label>
+            <select id="edit_barangay" required>
+              <option value="">Select Barangay...</option>
+              <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+              <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+              <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+              <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+              <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+              <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+            </select>
+          </div>
+          <div>
+            <label>Sitio / Purok <span class="required">*</span></label>
+            <select id="edit_sitio" required>
+              <option value="">Select...</option>
+              <option>Purok I</option><option>Purok II</option><option>Purok III</option>
+              <option>Purok IV</option><option>Purok V</option><option>Purok VI</option>
+              <option>Purok VII</option>
+            </select>
+          </div>
+
+          <div style="grid-column: 1 / -1;">
+            <label>Household Head Full Name<span class="required">*</span></label>
+            <input type="text" id="edit_householdHead" required/>
+            
+            <div style="margin-top: 8px;">
+              <div class="checkbox-item">
+                <input type="checkbox" id="edit_headRegisteredCheckbox">
+                <label for="edit_headRegisteredCheckbox">FishR/RBIS Registered</label>
+              </div>
+            </div>
+            
+            <div id="edit_headRegistrationField" class="conditional-field">
+              <label>FishR Registered/RBIS Registered</label>
+              <select id="edit_headRegistration">
+                <option value="">Select...</option>
+                <option value="FishR Registered">FishR Registered</option>
+                <option value="RBIS Registered">RBIS Registered</option>
+                <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label>Contact no. <span class="required">*</span></label>
+            <input type="text" id="edit_contactNo" placeholder="09XXXXXXXXX" required 
+                   pattern="^(09|\+639)\d{9}$" />
+            <div class="error-message" id="edit_contactError"></div>
+          </div>
+
+          <div>
+            <label>Sex <span class="required">*</span></label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Male" required> Male</label>
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
+            </div>
+          </div>
+
+          <div>
+            <label>Birthdate <span class="required">*</span></label>
+            <input type="date" id="edit_householdBirthdate" required/>
+          </div>
+
+          <div>
+            <label>Age</label>
+            <input type="text" id="edit_householdAge" readonly/>
+          </div>
+
+          <div>
+            <label>Age Category</label>
+            <input type="text" id="edit_householdStage" readonly/>
+          </div>
+
+          <div>
+            <label>No. of Household Member/s <span class="required">*</span></label>
+            <input type="number" id="edit_memberCount" min="0" value="0" required/>
+            <div class="small-muted">Set to 0 if no other members.</div>
+          </div>
+        </div>
+
+        <h4>Educational & Economic Status</h4>
+        <div class="form-grid">
+          <div>
+            <label>Educational Attainment</label>
+            <select id="edit_educationalAttainment">
+              <option value="">Select...</option>
+              <option value="No Formal Education">No Formal Education</option>
+              <option value="Elementary Level">Elementary Level</option>
+              <option value="Elementary Graduate">Elementary Graduate</option>
+              <option value="High School Level">High School Level</option>
+              <option value="High School Graduate">High School Graduate</option>
+              <option value="Senior High School Level">Senior High School Level</option>
+              <option value="Senior High School Graduate">Senior High School Graduate</option>
+              <option value="College Level">College Level</option>
+              <option value="College Graduate">College Graduate</option>
+            </select>
+          </div>
+
+          <div id="edit_collegeCourseField" class="conditional-field">
+            <label>College Graduate Course</label>
+            <input type="text" id="edit_collegeCourse" placeholder="Enter course name" />
+          </div>
+
+          <div>
+            <label>Employment</label>
+            <select id="edit_employment">
+              <option value="">Select...</option>
+              <option value="Employed">Employed</option>
+              <option value="Unemployed">Unemployed</option>
+            </select>
+          </div>
+
+          <div id="edit_jobTitleField" class="conditional-field">
+            <label>Job Title</label>
+            <select id="edit_jobTitle">
+              <option value="">Select...</option>
+              <optgroup label="Office & Administrative Jobs">
+                <option>Administrative Assistant / Admin Staff</option>
+                <option>Office Clerk</option>
+                <option>Secretary / Executive Assistant</option>
+              </optgroup>
+              <optgroup label="Business & Management">
+                <option>Project Manager</option>
+                <option>Operations Manager</option>
+                <option>HR Staff / HR Officer</option>
+                <option>Account Manager</option>
+              </optgroup>
+              <optgroup label="Accounting & Finance">
+                <option>Accounting Staff</option>
+                <option>Bookkeeper</option>
+                <option>Payroll Officer</option>
+                <option>Auditor</option>
+              </optgroup>
+              <optgroup label="IT & Tech">
+                <option>IT Support / IT Technician</option>
+                <option>Web Developer</option>
+                <option>Software Developer / Programmer</option>
+                <option>Data Analyst</option>
+                <option>System Administrator</option>
+              </optgroup>
+              <optgroup label="Healthcare">
+                <option>Nurse (Staff Nurse / Company Nurse)</option>
+                <option>Medical Technologist</option>
+                <option>Caregiver</option>
+                <option>Pharmacist</option>
+              </optgroup>
+              <optgroup label="Education">
+                <option>Teacher / Instructor</option>
+                <option>Tutor</option>
+                <option>School Administrator</option>
+              </optgroup>
+              <optgroup label="Sales & Customer Service">
+                <option>Customer Service Representative (CSR)</option>
+                <option>Sales Associate</option>
+                <option>Cashier</option>
+                <option>Store Supervisor</option>
+              </optgroup>
+              <optgroup label="Skilled Work & Labor">
+                <option>Electrician</option>
+                <option>Plumber</option>
+                <option>Welder</option>
+                <option>Construction Worker / Skilled Laborer</option>
+              </optgroup>
+              <optgroup label="Delivery & Logistics">
+                <option>Driver (Company Driver / Delivery Driver)</option>
+                <option>Logistics Staff</option>
+                <option>Rider / Motorcycle Delivery</option>
+              </optgroup>
+              <optgroup label="Food & Hospitality">
+                <option>Cook / Chef</option>
+                <option>Waiter / Service Crew</option>
+                <option>Barista</option>
+                <option>Housekeeping Staff</option>
+              </optgroup>
+              <optgroup label="Security & Public Service">
+                <option>Security Guard</option>
+                <option>Barangay Staff / Barangay Council Employee</option>
+                <option>Police Officer</option>
+                <option>Fire Officer</option>
+              </optgroup>
+              <optgroup label="Media, Design & Creative">
+                <option>Graphic Designer</option>
+                <option>Video Editor</option>
+                <option>Content Writer</option>
+                <option>Social Media Manager</option>
+              </optgroup>
+              <option>Others</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Overseas Filipino Worker (OFW)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="No" checked> No</label>
+            </div>
+          </div>
+
+          <div id="edit_countryField" class="conditional-field">
+            <label>Country</label>
+            <select id="edit_country">
+              <option value="">Select...</option>
+              <option>Saudi Arabia</option>
+              <option>United Arab Emirates (UAE)</option>
+              <option>Qatar</option>
+              <option>Kuwait</option>
+              <option>Bahrain</option>
+              <option>Oman</option>
+              <option>Hong Kong</option>
+              <option>Singapore</option>
+              <option>Japan</option>
+              <option>Taiwan</option>
+              <option>Malaysia</option>
+              <option>Australia</option>
+              <option>New Zealand</option>
+              <option>Italy</option>
+              <option>United Kingdom (UK)</option>
+              <option>Germany</option>
+              <option>Cyprus</option>
+              <option>Canada</option>
+              <option>United States (USA)</option>
+              <option>Libya</option>
+              <option>Others</option>
+            </select>
+          </div>
+        </div>
+
+        <h4>Health & Status</h4>
+        <div class="form-grid">
+          <div>
+            <label>Persons with Disability (PWD)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="No" checked> No</label>
+            </div>
+          </div>
+          <div>
+            <label>Status</label>
+            <select id="edit_head_status">
+                <option value="">Select...</option>
+                <option>With Sickness</option>
+                <option>Pregnant</option>
+                <option>Solo Parent</option>
+                <option>Lactating</option>
+                <option>Severe Illness</option>
+                <option>HIV Positive</option>
+                <option>LGBTQ Plus</option>
+            </select>
+          </div>
+        </div>
+
+        <h4>Domestic Livestock</h4>
+        <div class="domestic-grid">
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item"><input type="checkbox" id="edit_dog_chk"> <span style="font-size: 1.2rem;">🐕</span> Dog</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_dog_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item"><input type="checkbox" id="edit_cat_chk"> <span style="font-size: 1.2rem;">🐈</span> Cat</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_cat_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item"><input type="checkbox" id="edit_pig_chk"> <span style="font-size: 1.2rem;">🐖</span> Pig</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_pig_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item"><input type="checkbox" id="edit_cow_chk"> <span style="font-size: 1.2rem;">🐄</span> Cow</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_cow_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item"><input type="checkbox" id="edit_carabao_chk"> <span style="font-size: 1.2rem;">🐃</span> Carabao</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_carabao_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item"><input type="checkbox" id="edit_chicken_chk"> <span style="font-size: 1.2rem;">🐔</span> Chicken</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_chicken_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 12px;">
+          <label>Others</label>
+          <textarea id="edit_animals_others" class="others-box" placeholder="Use this field to describe other animals owned in a brief sentence (e.g., '5 goats and 2 ducks')."></textarea>
+        </div>
+
+        <h4>Transportation & Evacuation Details</h4>
+        <div class="form-grid">
+          <div>
+            <label>Transportation</label>
+            <select id="edit_head_transport">
+              <option value="">Select...</option>
+              <option>Has Transportation</option>
+              <option>Needs Transportation</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Pick-Up Location</label>
+            <input type="text" id="edit_pickup"/>
+          </div>
+          
+          <div>
+            <label>Drop-Off Location</label>
+            <input type="text" id="edit_dropoff"/>
+          </div>
+          
+          <div>
+            <label>Evacuation Camp Name</label>
+            <input type="text" id="edit_campName"/>
+          </div>
+          
+          <div>
+            <label>Camp Capacity</label>
+            <input type="number" id="edit_capacity" min="0"/>
+          </div>
+          
+          <div>
+            <label>Individuals Currently in Camp</label>
+            <input type="number" id="edit_insideCamp" min="0"/>
+          </div>
+          
+          <div>
+            <label>Individuals Outside Camp</label>
+            <input type="number" id="edit_outsideCamp" min="0"/>
+          </div>
+
+          <div style="grid-column:1/-1;">
+            <label>Reason for Displacement</label>
+            <select id="edit_reasons">
+              <option value="">Select...</option>
+              <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
+              <option>Typhoon</option>
+              <option>Flood</option>
+              <option>Landslide</option>
+              <option>Earthquake</option>
+              <option>Others</option>
+            </select>
+          </div>
+        </div>
+
+        <h4>Government Assistance Programs</h4>
+        <div class="gov-support-grid">
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_tupad">
+            <label for="edit_ass_tupad">TUPAD</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_local4ps">
+            <label for="edit_ass_local4ps">Local 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_intl4ps">
+            <label for="edit_ass_intl4ps">National 4Ps</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_locsp">
+            <label for="edit_ass_locsp">Local Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_intlsp">
+            <label for="edit_ass_intlsp">National Social Pension</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_solo">
+            <label for="edit_ass_solo">Solo Parent Assistance</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_relief">
+            <label for="edit_ass_relief">Relief Goods</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="edit_ass_cash">
+            <label for="edit_ass_cash">Cash Subsidy</label>
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <label>AICS (if any)</label>
+          <select id="edit_ass_aics">
+            <option value="">None</option>
+            <option>Shelter Assistance</option>
+            <option>Burial</option>
+            <option>Scholarship</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+          <button id="startSequenceBtn" class="btn">Next → Members (Start sequence)</button>
+          <button id="saveEditBtn" class="btn">Save changes</button>
+          <button id="cancelEditBtn" class="btn secondary" type="button">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Members preview + edit controls -->
+      <div class="card">
+        <h4>Members</h4>
+        <div class="small-muted">Count: <strong id="edit_previewCount">0</strong></div>
+        <ul id="edit_membersPreview" class="member-preview"></ul>
+        <div style="display:flex;gap:8px; margin-top:10px; justify-content:flex-end;">
+          <button id="edit_addMember" class="btn secondary" type="button">
+            <i class="fas fa-user-plus"></i> Add / Edit Members
+          </button>
+          <button id="edit_removeMember" class="btn secondary" type="button" style="background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
+            <i class="fas fa-user-minus"></i> Remove Member
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MEMBER SEQUENTIAL PANEL -->
+<div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
+  <div class="panel-header">
+    <button id="memberPanelClose" class="btn secondary" title="Close panel">←</button>
+    <h3 id="memberPanelTitle">Member 1 of N</h3>
+  </div>
+
+  <div class="panel-body">
+    <form id="memberForm" onsubmit="return false;">
+      <h4>Basic Information</h4>
+      <div class="form-grid">
+        <div style="grid-column: 1 / -1;">
+          <label>Household Member Full Name<span class="required">*</span></label>
+          <input type="text" id="memberName" class="member-name" required />
+        </div>
+
+        <div style="grid-column: 1 / -1;">
+          <div class="checkbox-item">
+            <input type="checkbox" id="memberRegisteredCheckbox">
+            <label for="memberRegisteredCheckbox">FishR/RBIS Registered</label>
+          </div>
+          
+          <div id="memberRegistrationField" class="conditional-field">
+            <label>FishR Registered/RBIS Registered</label>
+            <select id="memberRegistration">
+              <option value="">Select...</option>
+              <option value="FishR Registered">FishR Registered</option>
+              <option value="RBIS Registered">RBIS Registered</option>
+              <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label>Contact no. <span class="required">*</span></label>
+          <input type="text" id="memberContact" placeholder="09XXXXXXXXX" required
+                 pattern="^(09|\+639)\d{9}$" />
+          <div class="error-message" id="memberContactError"></div>
+        </div>
+
+        <div>
+          <label>Sex <span class="required">*</span></label>
+          <div class="radio-line">
+            <label class="radio-item"><input type="radio" name="member_sex" value="Male" required> Male</label>
+            <label class="radio-item"><input type="radio" name="member_sex" value="Female"> Female</label>
+          </div>
+        </div>
+
+        <div>
+          <label>Birthdate <span class="required">*</span></label>
+          <input type="date" id="memberBirthdate" class="member-birthdate" required/>
+        </div>
+
+        <div>
+          <label>Age</label>
+          <input type="text" id="memberAge" class="member-age" readonly/>
+        </div>
+
+        <div>
+          <label>Age Category</label>
+          <input type="text" id="memberStage" class="member-stage" readonly/>
+        </div>
+      </div>
+
+      <h4>Educational & Economic Status</h4>
+      <div class="form-grid">
+        <div>
+          <label>Educational Attainment</label>
+          <select id="memberEducationalAttainment" class="member-educational">
+            <option value="">Select...</option>
+            <option value="No Formal Education">No Formal Education</option>
+            <option value="Elementary Level">Elementary Level</option>
+            <option value="Elementary Graduate">Elementary Graduate</option>
+            <option value="High School Level">High School Level</option>
+            <option value="High School Graduate">High School Graduate</option>
+            <option value="Senior High School Level">Senior High School Level</option>
+            <option value="Senior High School Graduate">Senior High School Graduate</option>
+            <option value="College Level">College Level</option>
+            <option value="College Graduate">College Graduate</option>
+          </select>
+        </div>
+
+        <div id="memberCollegeCourseField" class="conditional-field">
+          <label>College Graduate Course</label>
+          <input type="text" id="memberCollegeCourse" placeholder="Enter course name" />
+        </div>
+
+        <div>
+          <label>Employment</label>
+          <select id="memberEmployment" class="member-employment">
+            <option value="">Select...</option>
+            <option value="Employed">Employed</option>
+            <option value="Unemployed">Unemployed</option>
+          </select>
+        </div>
+
+        <div id="memberJobTitleField" class="conditional-field">
+          <label>Job Title</label>
+          <select id="memberJobTitle" class="member-jobtitle">
+            <option value="">Select...</option>
+            <optgroup label="Office & Administrative Jobs">
+              <option>Administrative Assistant / Admin Staff</option>
+              <option>Office Clerk</option>
+              <option>Secretary / Executive Assistant</option>
+            </optgroup>
+            <optgroup label="Business & Management">
+              <option>Project Manager</option>
+              <option>Operations Manager</option>
+              <option>HR Staff / HR Officer</option>
+              <option>Account Manager</option>
+            </optgroup>
+            <optgroup label="Accounting & Finance">
+              <option>Accounting Staff</option>
+              <option>Bookkeeper</option>
+              <option>Payroll Officer</option>
+              <option>Auditor</option>
+            </optgroup>
+            <optgroup label="IT & Tech">
+              <option>IT Support / IT Technician</option>
+              <option>Web Developer</option>
+              <option>Software Developer / Programmer</option>
+              <option>Data Analyst</option>
+              <option>System Administrator</option>
+            </optgroup>
+            <optgroup label="Healthcare">
+              <option>Nurse (Staff Nurse / Company Nurse)</option>
+              <option>Medical Technologist</option>
+              <option>Caregiver</option>
+              <option>Pharmacist</option>
+            </optgroup>
+            <optgroup label="Education">
+              <option>Teacher / Instructor</option>
+              <option>Tutor</option>
+              <option>School Administrator</option>
+            </optgroup>
+            <optgroup label="Sales & Customer Service">
+              <option>Customer Service Representative (CSR)</option>
+              <option>Sales Associate</option>
+              <option>Cashier</option>
+              <option>Store Supervisor</option>
+            </optgroup>
+            <optgroup label="Skilled Work & Labor">
+              <option>Electrician</option>
+              <option>Plumber</option>
+              <option>Welder</option>
+              <option>Construction Worker / Skilled Laborer</option>
+            </optgroup>
+            <optgroup label="Delivery & Logistics">
+              <option>Driver (Company Driver / Delivery Driver)</option>
+              <option>Logistics Staff</option>
+              <option>Rider / Motorcycle Delivery</option>
+            </optgroup>
+            <optgroup label="Food & Hospitality">
+              <option>Cook / Chef</option>
+              <option>Waiter / Service Crew</option>
+              <option>Barista</option>
+              <option>Housekeeping Staff</option>
+            </optgroup>
+            <optgroup label="Security & Public Service">
+              <option>Security Guard</option>
+              <option>Barangay Staff / Barangay Council Employee</option>
+              <option>Police Officer</option>
+              <option>Fire Officer</option>
+            </optgroup>
+            <optgroup label="Media, Design & Creative">
+              <option>Graphic Designer</option>
+              <option>Video Editor</option>
+              <option>Content Writer</option>
+              <option>Social Media Manager</option>
+            </optgroup>
+            <option>Others</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Overseas Filipino Worker (OFW)</label>
+          <div class="radio-line">
+            <label class="radio-item"><input type="radio" name="member_ofw_status" value="Yes"> Yes</label>
+            <label class="radio-item"><input type="radio" name="member_ofw_status" value="No" checked> No</label>
+          </div>
+        </div>
+
+        <div id="memberCountryField" class="conditional-field">
+          <label>Country</label>
+          <select id="memberCountry" class="member-country">
+            <option value="">Select...</option>
+            <option>Saudi Arabia</option>
+            <option>United Arab Emirates (UAE)</option>
+            <option>Qatar</option>
+            <option>Kuwait</option>
+            <option>Bahrain</option>
+            <option>Oman</option>
+            <option>Hong Kong</option>
+            <option>Singapore</option>
+            <option>Japan</option>
+            <option>Taiwan</option>
+            <option>Malaysia</option>
+            <option>Australia</option>
+            <option>New Zealand</option>
+            <option>Italy</option>
+            <option>United Kingdom (UK)</option>
+            <option>Germany</option>
+            <option>Cyprus</option>
+            <option>Canada</option>
+            <option>United States (USA)</option>
+            <option>Libya</option>
+            <option>Others</option>
+          </select>
+        </div>
+      </div>
+
+      <h4>Health and Status</h4>
+      <div class="form-grid">
+        <div>
+          <label>Persons with Disability (PWD)</label>
+          <div class="radio-line">
+            <label class="radio-item"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
+            <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked> No</label>
+          </div>
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select id="memberStatus" class="member-status">
+            <option value="">Select...</option>
+            <option>With Sickness</option>
+            <option>Pregnant</option>
+            <option>Solo Parent</option>
+            <option>Lactating</option>
+            <option>Severe Illness</option>
+            <option>HIV Positive</option>
+            <option>LGBTQ Plus</option>
+          </select>
+        </div>
+      </div>
+
+      <h4>Transportation & Evacuation Details</h4>
+      <div class="form-grid">
+        <div>
+          <label>Transportation</label>
+          <select id="memberTransport" class="member-transport">
+            <option value="">Select...</option>
+            <option>Has Transportation</option>
+            <option>Needs Transportation</option>
+          </select>
+        </div>
+        
+        <div>
+          <label>Pick-Up Location</label>
+          <input id="memberPickup" class="member-pickup"/>
+        </div>
+        
+        <div>
+          <label>Drop-Off Location</label>
+          <input id="memberDropoff" class="member-dropoff"/>
+        </div>
+        
+        <div>
+          <label>Evacuation Camp Name</label>
+          <input id="memberCamp" class="member-camp"/>
+        </div>
+        
+        <div>
+          <label>Camp Capacity</label>
+          <input type="number" id="memberCampCap" class="member-cap" min="0"/>
+        </div>
+        
+        <div>
+          <label>Individuals Currently in Camp</label>
+          <input type="number" id="memberInside" class="member-inside" min="0"/>
+        </div>
+        
+        <div>
+          <label>Individuals Outside Camp</label>
+          <input type="number" id="memberOutside" class="member-outside" min="0"/>
+        </div>
+
+        <div style="grid-column:1/-1;">
+          <label>Reason for Displacement</label>
+          <select id="memberReason" class="member-reason">
+            <option value="">Select...</option>
+            <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
+            <option>Typhoon</option>
+            <option>Flood</option>
+            <option>Landslide</option>
+            <option>Earthquake</option>
+            <option>Others</option>
+          </select>
+        </div>
+      </div>
+
+      <h4>Government Assistance Programs</h4>
+      <div class="gov-support-grid">
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_tupad" class="member_tupad">
+          <label for="member_tupad">TUPAD</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_local4ps" class="member_local4ps">
+          <label for="member_local4ps">Local 4Ps</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
+          <label for="member_intl4ps">National 4Ps</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_locsp" class="member_locsp">
+          <label for="member_locsp">Local Social Pension</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_intlsp" class="member_intlsp">
+          <label for="member_intlsp">National Social Pension</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_solo" class="member_solo">
+          <label for="member_solo">Solo Parent Assistance</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_relief" class="member_relief">
+          <label for="member_relief">Relief Goods</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="member_cash" class="member_cash">
+          <label for="member_cash">Cash Subsidy</label>
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <label>AICS (if any)</label>
+        <select id="memberAics" class="member_aics">
+          <option value="">None</option>
+          <option>Shelter Assistance</option>
+          <option>Burial</option>
+          <option>Scholarship</option>
+        </select>
+      </div>
+
+      <div class="panel-actions" style="margin-top:20px;">
+        <button id="memberBack" class="btn secondary" type="button">Back</button>
+        <button id="memberNext" class="btn" type="button">Save & Next</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Loading overlay -->
 <div id="loading">
   <div class="loading-content">
@@ -1056,12 +2219,23 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuy
 let header = [];
 let rawRows = [];
 let groups = [];
-let filteredGroups = []; // Added: filtered groups for client-side filtering
+let filteredGroups = [];
 let selected = new Set();
 let currentPage = 1;
 const rowsPerPage = 25;
 
+/* ============ EDIT STATE ============ */
+let editDataID = null;
+let editHead = {};
+let editMembers = [];
+let memberEditIndex = 0;
+let sequenceMode = false;
+
 /* ============ UTIL ============ */
+const $ = id => document.getElementById(id);
+const q = sel => document.querySelector(sel);
+const qAll = sel => Array.from(document.querySelectorAll(sel));
+
 function showLoading(yes){ 
     document.getElementById("loading").style.display = yes ? "flex" : "none"; 
 }
@@ -1073,39 +2247,174 @@ function highlight(text,q){
     return text.replace(re, m => `<span class="hl">${m}</span>`);
 }
 
+/* ============ EDIT PANEL FUNCTIONS ============ */
+function openEditPanel(){ 
+    $('editPanel')?.classList.add('open'); 
+    $('panelOverlay')?.classList.add('show'); 
+}
+
+function closeEditPanel(){ 
+    $('editPanel')?.classList.remove('open'); 
+    $('panelOverlay')?.classList.remove('show'); 
+}
+
+function resetEditState() {
+  editDataID = null;
+  editHead = {};
+  editMembers = [];
+  memberEditIndex = 0;
+  sequenceMode = false;
+}
+
+/* ============ DATE FORMATTING FUNCTIONS ============ */
+function toInputDate(val){
+  if(!val && val !== 0) return '';
+  
+  // Already in yyyy-mm-dd format
+  if(typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  
+  // Handle dd/mm/yyyy format
+  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
+    const parts = val.split('/');
+    const d = parts[0].padStart(2,'0');
+    const m = parts[1].padStart(2,'0');
+    const y = parts[2];
+    return `${y}-${m}-${d}`;
+  }
+  
+  // Handle mm/dd/yyyy format
+  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
+    const [m, d, y] = val.split('/');
+    const month = m.padStart(2,'0');
+    const day = d.padStart(2,'0');
+    return `${y}-${month}-${day}`;
+  }
+  
+  // Try parsing as Date
+  const dt = new Date(val);
+  if(!isNaN(dt)){
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, '0');
+    const d = String(dt.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  
+  return '';
+}
+
+function toSheetDate(inputVal){
+  if(!inputVal) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
+    const [y,m,d] = inputVal.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  const dt = new Date(inputVal);
+  if(!isNaN(dt)){
+    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${dd}/${mm}/${dt.getFullYear()}`;
+  }
+  return '';
+}
+
+function computeAgeDetailed(inputDateValue){
+  if(!inputDateValue) return null;
+  let d;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputDateValue)){
+    const parts = inputDateValue.split('-');
+    d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  } else {
+    d = new Date(inputDateValue);
+  }
+  if(isNaN(d)) return null;
+
+  const now = new Date();
+  const birth = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  let years = today.getFullYear() - birth.getFullYear();
+  let months = today.getMonth() - birth.getMonth();
+  let days = today.getDate() - birth.getDate();
+
+  if(days < 0){
+    months -= 1;
+    const prev = new Date(today.getFullYear(), today.getMonth(), 0);
+    days += prev.getDate();
+  }
+  if(months < 0){
+    years -= 1;
+    months += 12;
+  }
+
+  let display = "";
+  if(years >= 1){
+    display = String(years);
+  } else {
+    if(months >= 1) display = `${months} month/s`;
+    else display = `${days} day/s`;
+  }
+
+  let stage = "";
+  if(years === 0){
+    if(months <= 10) stage = "Infant";
+    else stage = "Children";
+  } else if(years <= 17) stage = "School Children";
+  else if(years >= 60) stage = "Elderly";
+  else stage = "Adult";
+
+  return { years, months, days, display, stage };
+}
+
+/* ============ CONTACT VALIDATION ============ */
+function validatePhilippineMobileNumber(number) {
+    const cleaned = number.replace(/\s+/g, '').replace(/[^\d+]/g, '');
+    const pattern = /^(09|\+639)\d{9}$/;
+    
+    if (!pattern.test(cleaned)) return false;
+    
+    if (cleaned.startsWith('09') && cleaned.length !== 11) return false;
+    if (cleaned.startsWith('+639') && cleaned.length !== 13) return false;
+    
+    return true;
+}
+
+function validateContactInput(input, errorElement) {
+    const value = input.value.trim();
+    const isValid = validatePhilippineMobileNumber(value);
+    
+    if (value && !isValid) {
+        input.classList.add('input-error');
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)';
+        return false;
+    } else {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+    }
+}
+
 /* ============ SESSION CHECK FUNCTION ============ */
 async function sessionCheck(){
   try {
-    // Try to get user info from localStorage (set during login)
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     
-    // If we have a username, show it and allow access
     if (userName && userName !== "User") {
       document.getElementById('userName').innerText = userName;
       
-      // Check admin status
       const isAdmin = localStorage.getItem("userRole") === "admin";
       const adminItems = document.querySelectorAll(".admin-only");
       adminItems.forEach(item => {
           item.style.display = isAdmin ? "block" : "none";
       });
       
-      // Set session flag
       sessionStorage.setItem('authenticated', 'true');
       return true;
     } else {
-      // No user info found in localStorage
-      console.log('No user info found in localStorage');
-      
-      // Check if we have a session flag from before (tab restore, etc.)
       if(sessionStorage.getItem('authenticated')) {
-        // We were authenticated before, keep going
-        console.log('Session flag found, allowing access');
         document.getElementById('userName').innerText = "User";
         return true;
       } else {
-        // No session at all, redirect to login
-        console.log('No session found, redirecting to login...');
         window.location.href = 'index.html?session=expired';
         return false;
       }
@@ -1118,19 +2427,14 @@ async function sessionCheck(){
 
 /* ============ ENHANCED LOGOUT FUNCTION ============ */
 function handleLogout() {
-  // Clear all storage
   localStorage.clear();
   sessionStorage.clear();
   
-  // Add a parameter to prevent caching
   const logoutUrl = 'index.html?logout=true&t=' + Date.now();
   
-  // Call server-side logout with timestamp to prevent caching
   fetch(SCRIPT_URL+'?action=logout&t=' + Date.now())
-    .catch(() => { /* ignore errors on logout */ })
+    .catch(() => { })
     .finally(() => {
-      // Replace current history entry with login page
-      // This prevents back button from returning to dashboard
       window.location.replace(logoutUrl);
     });
 }
@@ -1139,19 +2443,16 @@ function handleLogout() {
 async function loadRecords(){
     showLoading(true);
     try{
-        // Check if we already have cached data (less than 5 minutes old)
         const cachedData = localStorage.getItem('recordsCache');
         const cacheTime = localStorage.getItem('recordsCacheTime');
         const now = Date.now();
         
-        // Use cache if it exists and is less than 5 minutes old (300000ms = 5 minutes)
         if(cachedData && cacheTime && (now - parseInt(cacheTime)) < 300000) {
             const data = JSON.parse(cachedData);
             header = data.header || [];
             rawRows = data.rows || [];
             console.log("Using cached data");
         } else {
-            // Load fresh data from server (no filtering parameters)
             const res = await fetch(`${SCRIPT_URL}?action=getRecords&barangay=&q=`);
             const data = await res.json();
             
@@ -1164,14 +2465,12 @@ async function loadRecords(){
             header = data.header || [];
             rawRows = data.rows || [];
             
-            // Cache the data
             localStorage.setItem('recordsCache', JSON.stringify(data));
             localStorage.setItem('recordsCacheTime', now.toString());
             console.log("Loaded fresh data from server");
         }
         
         groupRows();
-        // Initialize filteredGroups with all groups
         filteredGroups = [...groups];
         currentPage = 1;
         renderTable();
@@ -1189,21 +2488,16 @@ function filterRecords() {
     const barangay = document.getElementById("filterBarangay").value || "";
     const q = document.getElementById("searchInput").value.trim().toLowerCase();
     
-    // Reset to first page when filtering
     currentPage = 1;
     
-    // Filter groups based on search and barangay
     filteredGroups = groups.filter(g => {
         const head = g.head || {};
         
-        // Filter by barangay
         if (barangay && head["Barangay"] !== barangay) {
             return false;
         }
         
-        // Filter by search query
         if (q) {
-            // Search in head row fields
             const searchableFields = [
                 head["Data ID"] || "",
                 head["Name of Head"] || "",
@@ -1212,10 +2506,7 @@ function filterRecords() {
                 head["Contact"] || ""
             ];
             
-            // Also search in member names
             const memberNames = g.members.map(m => m["Name of Household Member/s"] || "").join(" ");
-            
-            // Combine all searchable text
             const searchText = [...searchableFields, memberNames].join(" ").toLowerCase();
             
             return searchText.includes(q);
@@ -1242,7 +2533,6 @@ function groupRows(){
         else map[id].members.push(r);
     });
 
-    // ensure head exists
     Object.keys(map).forEach(k=>{
         if(!map[k].head && map[k].members.length>0){
             map[k].head = map[k].members.shift();
@@ -1286,9 +2576,7 @@ function renderTable(){
         header.forEach(col=>{
             const td = document.createElement("td");
             const cellValue = head[col] || "";
-            // Fix for Submitted On column if it shows "aN/aN/NaN NaN:aN:aN AM"
             if (col === "Submitted On" && String(cellValue).includes("NaN")) {
-                // Try to get the actual date from the raw data
                 const rawData = rawRows.find(r => 
                     String(r["Data ID"]) === String(g.dataID) && 
                     (!r["Name of Household Member/s"] || String(r["Name of Household Member/s"]).trim() === "")
@@ -1310,7 +2598,7 @@ function renderTable(){
         tdShow.innerHTML = `<button class="show-toggle" onclick="toggleMembers('${g.dataID}')"><i class="fas fa-eye"></i> Show (${mCount})</button>`;
         tr.appendChild(tdShow);
 
-        // action buttons
+        // action buttons - MODIFIED FOR IN-PLACE EDITING
         const tdAct = document.createElement("td"); 
         tdAct.className = "actions-col";
         tdAct.innerHTML = `
@@ -1334,9 +2622,7 @@ function renderTable(){
             header.forEach(col=>{
                 const td = document.createElement("td");
                 const cellValue = m[col] || "";
-                // Fix for Submitted On column in member rows
                 if (col === "Submitted On" && String(cellValue).includes("NaN")) {
-                    // Try to get the actual date from the raw data
                     const rawData = rawRows.find(r => 
                         String(r["Data ID"]) === String(g.dataID) && 
                         String(r["Name of Household Member/s"] || "").trim() === String(m["Name of Household Member/s"] || "").trim()
@@ -1430,7 +2716,6 @@ function updateCounts(){
     document.getElementById("rowCount").innerText = groups.length;
     document.getElementById("matchCount").innerText = filteredGroups.length;
     
-    // Count selected items from filtered groups only
     let selectedCount = 0;
     filteredGroups.forEach(g => {
         if (selected.has(g.dataID)) {
@@ -1440,24 +2725,771 @@ function updateCounts(){
     document.getElementById("selectedCount").innerText = selectedCount;
 }
 
-/* ============ EDIT & DELETE ============ */
+/* ============ EDIT FUNCTION - MODIFIED FOR IN-PLACE EDITING ============ */
 function onEdit(id){
-    localStorage.setItem("edit_dataID", id);
-    location.href = "edit.html";
+    resetEditState();
+    
+    const group = groups.find(g => g.dataID === id) || filteredGroups.find(g => g.dataID === id);
+    if(!group){ alert('Record not found'); return; }
+
+    editDataID = id;
+    editHead = Object.assign({}, group.head || {});
+    editMembers = (group.members || []).map(m => Object.assign({}, m));
+
+    // Show Data ID at the top of edit panel
+    if ($('editDataIdDisplay')) {
+        $('editDataIdDisplay').textContent = editDataID;
+    }
+
+    // Store original submittedBy value from head
+    const originalSubmittedBy = editHead['Submitted By'] || editHead['submittedBy'] || '';
+    
+    // If no submittedBy in head, add current user's name
+    if (!originalSubmittedBy) {
+        editHead['Submitted By'] = getUserFullName();
+    }
+    
+    // Prefill head inputs
+    $('edit_coordinate').value = editHead['Coordinate'] || editHead['Coordinates'] || '';
+    $('edit_barangay').value = editHead['Barangay'] || '';
+    $('edit_sitio').value = editHead['Sitio / Purok'] || '';
+    $('edit_householdHead').value = editHead['Name of Household Head'] || '';
+    
+    // FishR/RBIS Registered
+    const hasRegistration = editHead['FishR Registered/RBIS Registered'] && editHead['FishR Registered/RBIS Registered'] !== '';
+    $('edit_headRegisteredCheckbox').checked = hasRegistration;
+    if (hasRegistration) {
+        $('edit_headRegistrationField').classList.add('show');
+        $('edit_headRegistration').value = editHead['FishR Registered/RBIS Registered'] || '';
+    }
+    
+    $('edit_contactNo').value = editHead['Contact no.'] || '';
+    qAll("input[name='edit_head_sex']").forEach(r => r.checked = (r.value === (editHead['Sex'] || '')));
+    $('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
+    updateEditHeadAgeStage();
+    $('edit_memberCount').value = editHead['No. of Household Member/s'] || (editMembers.length || 0);
+    
+    // Educational & Economic Status
+    $('edit_educationalAttainment').value = editHead['Educational Attainment'] || '';
+    if (editHead['Educational Attainment'] === 'College Graduate') {
+        $('edit_collegeCourseField').classList.add('show');
+        $('edit_collegeCourse').value = editHead['College Graduate Course'] || '';
+    }
+    $('edit_employment').value = editHead['Employment'] || '';
+    if (editHead['Employment'] === 'Employed') {
+        $('edit_jobTitleField').classList.add('show');
+        $('edit_jobTitle').value = editHead['Job Title'] || '';
+    }
+    qAll("input[name='edit_ofw_status']").forEach(r => r.checked = (r.value === (editHead['Overseas Filipino Worker(OFW)'] || 'No')));
+    if (editHead['Overseas Filipino Worker(OFW)'] === 'Yes') {
+        $('edit_countryField').classList.add('show');
+        $('edit_country').value = editHead['Country'] || '';
+    }
+    
+    // Health & Status
+    qAll("input[name='edit_head_pwd']").forEach(r => r.checked = (r.value === (editHead['PWD'] || 'No')));
+    $('edit_head_status').value = editHead['Status'] || '';
+    
+    // Domestic Animals
+    $('edit_dog_chk').checked = (editHead['Dog'] === 'Yes');
+    $('edit_dog_qty').value = editHead['Dog Qty.'] || '';
+    $('edit_cat_chk').checked = (editHead['Cat'] === 'Yes');
+    $('edit_cat_qty').value = editHead['Cat Qty.'] || '';
+    $('edit_pig_chk').checked = (editHead['Pig'] === 'Yes');
+    $('edit_pig_qty').value = editHead['Pig Qty.'] || '';
+    $('edit_cow_chk').checked = (editHead['Cow'] === 'Yes');
+    $('edit_cow_qty').value = editHead['Cow Qty.'] || '';
+    $('edit_carabao_chk').checked = (editHead['Carabao'] === 'Yes');
+    $('edit_carabao_qty').value = editHead['Carabao Qty.'] || '';
+    $('edit_chicken_chk').checked = (editHead['Chicken'] === 'Yes');
+    $('edit_chicken_qty').value = editHead['Chicken Qty.'] || '';
+    $('edit_animals_others').value = editHead['Others'] || '';
+    
+    // Sync animal checkboxes
+    syncAnimalCheckboxes();
+    
+    // Transportation & Evacuation
+    $('edit_head_transport').value = editHead['Transportation'] || '';
+    $('edit_pickup').value = editHead['Designated Pick-Up Point'] || editHead['Pick-Up Location'] || '';
+    $('edit_dropoff').value = editHead['Drop-Off Point'] || editHead['Drop-Off Location'] || '';
+    $('edit_campName').value = editHead['Name of Camp'] || editHead['Evacuation Camp Name'] || '';
+    $('edit_capacity').value = editHead['Capacity'] || '';
+    $('edit_insideCamp').value = editHead['No. of Individuals Inside Camp'] || editHead['Individuals Currently in Camp'] || '';
+    $('edit_outsideCamp').value = editHead['No. of Individuals Outside Camp'] || editHead['Individuals Outside Camp'] || '';
+    $('edit_reasons').value = editHead['Reasons for Displacement'] || '';
+    
+    // Government Assistance
+    $('edit_ass_tupad').checked = (editHead['TUPAD'] === 'Yes');
+    $('edit_ass_local4ps').checked = (editHead['Local 4Ps'] === 'Yes');
+    $('edit_ass_intl4ps').checked = (editHead['National 4Ps'] === 'Yes');
+    $('edit_ass_locsp').checked = (editHead['Local Social Pension'] === 'Yes');
+    $('edit_ass_intlsp').checked = (editHead['National Social Pension'] === 'Yes');
+    $('edit_ass_solo').checked = (editHead['Solo Parent Assistance'] === 'Yes');
+    $('edit_ass_relief').checked = (editHead['Relief Goods'] === 'Yes');
+    $('edit_ass_cash').checked = (editHead['Cash Subsidy'] === 'Yes');
+    $('edit_ass_aics').value = editHead['AICS'] || '';
+
+    updateEditMembersPreview();
+    openEditPanel();
+    
+    setTimeout(()=> $('edit_householdHead')?.focus(), 120);
 }
 
+function getUserFullName() {
+  return localStorage.getItem('staffName') || 
+         localStorage.getItem('userFullName') || 
+         localStorage.getItem('fullName') || 
+         localStorage.getItem('username') || 
+         'System';
+}
+
+function updateEditHeadAgeStage(){
+  const d = $('edit_householdBirthdate')?.value || '';
+  const ageObj = computeAgeDetailed(d);
+  if(!ageObj){ 
+      if($('edit_householdAge')) $('edit_householdAge').value=''; 
+      if($('edit_householdStage')) $('edit_householdStage').value=''; 
+      return; 
+  }
+  $('edit_householdAge').value = ageObj.display;
+  $('edit_householdStage').value = ageObj.stage;
+}
+
+function createEmptyMember(){
+  return {
+    'Data ID': editDataID || '',
+    'Name of Household Member/s':'',
+    'FishR Registered/RBIS Registered':'',
+    'Contact no.':'',
+    'Sex':'',
+    'Birthdate':'',
+    'Age':'',
+    'Stage':'',
+    'Persons with Disability (PWD)':'No',
+    'Status':'',
+    'Educational Attainment':'',
+    'College Graduate Course':'',
+    'Employment':'',
+    'Job Title':'',
+    'Overseas Filipino Worker(OFW)':'No',
+    'Country':'',
+    'Transportation':'',
+    'Designated Pick-Up Point':'',
+    'Pick-Up Location':'',
+    'Drop-Off Point':'',
+    'Drop-Off Location':'',
+    'Name of Camp':'',
+    'Evacuation Camp Name':'',
+    'Capacity':'',
+    'No. of Individuals Inside Camp':'',
+    'Individuals Currently in Camp':'',
+    'No. of Individuals Outside Camp':'',
+    'Individuals Outside Camp':'',
+    'Reasons for Displacement':'',
+    'TUPAD':'No','Local 4Ps':'No','National 4Ps':'No',
+    'Local Social Pension':'No','National Social Pension':'No','Solo Parent Assistance':'No',
+    'Cash Subsidy':'No','Relief Goods':'No','AICS':'',
+    'Submitted By': getUserFullName()
+  };
+}
+
+function updateEditMembersPreview(){
+  const ul = $('edit_membersPreview');
+  if(!ul) return;
+  ul.innerHTML = '';
+  const n = editMembers.length || 0;
+  if($('edit_previewCount')) $('edit_previewCount').innerText = n;
+  for(let i=0;i<n;i++){
+    const li = document.createElement('li');
+    const m = editMembers[i] || {};
+    li.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span>#${i+1} — ${escapeHtml(m['Name of Household Member/s'] || '(empty)')} (${m['Contact no.']||''})</span>
+        <div class="member-actions">
+          <button class="edit-btn" title="Edit this member" onclick="event.stopPropagation(); openMemberPanelForEdit(${i})">✏️</button>
+          <button class="remove-btn" title="Remove this member" onclick="event.stopPropagation(); removeMember(${i})">🗑️</button>
+        </div>
+      </div>
+    `;
+    li.style.cursor = 'pointer';
+    li.onclick = () => { memberEditIndex = i; openMemberPanelForEdit(i); };
+    ul.appendChild(li);
+  }
+}
+
+function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+
+function removeMember(index) {
+  if (confirm('Are you sure you want to remove this member?')) {
+    editMembers.splice(index, 1);
+    updateEditMembersPreview();
+    
+    // Update member count
+    const currentCount = parseInt($('edit_memberCount').value) || 0;
+    if (currentCount > 0) {
+      $('edit_memberCount').value = currentCount - 1;
+    }
+  }
+}
+
+/* ============ SETUP CONDITIONAL FIELDS ============ */
+function setupEditConditionalFields() {
+    // Head Registered Checkbox
+    const headRegisteredCheckbox = $('edit_headRegisteredCheckbox');
+    const headRegistrationField = $('edit_headRegistrationField');
+    
+    if (headRegisteredCheckbox) {
+        headRegisteredCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                headRegistrationField.classList.add('show');
+            } else {
+                headRegistrationField.classList.remove('show');
+                $('edit_headRegistration').value = '';
+            }
+        });
+    }
+    
+    // Educational Attainment -> College Course
+    const educationSelect = $('edit_educationalAttainment');
+    const collegeCourseField = $('edit_collegeCourseField');
+    
+    if (educationSelect) {
+        educationSelect.addEventListener('change', function() {
+            if (this.value === 'College Graduate') {
+                collegeCourseField.classList.add('show');
+            } else {
+                collegeCourseField.classList.remove('show');
+                $('edit_collegeCourse').value = '';
+            }
+        });
+    }
+    
+    // Employment -> Job Title
+    const employmentSelect = $('edit_employment');
+    const jobTitleField = $('edit_jobTitleField');
+    
+    if (employmentSelect) {
+        employmentSelect.addEventListener('change', function() {
+            if (this.value === 'Employed') {
+                jobTitleField.classList.add('show');
+            } else {
+                jobTitleField.classList.remove('show');
+                $('edit_jobTitle').value = '';
+            }
+        });
+    }
+    
+    // OFW Status -> Country
+    const ofwRadios = document.querySelectorAll('input[name="edit_ofw_status"]');
+    const countryField = $('edit_countryField');
+    
+    if (ofwRadios.length > 0) {
+        ofwRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'Yes') {
+                    countryField.classList.add('show');
+                } else {
+                    countryField.classList.remove('show');
+                    $('edit_country').value = '';
+                }
+            });
+        });
+    }
+    
+    // Member Registered Checkbox
+    const memberRegisteredCheckbox = $('memberRegisteredCheckbox');
+    const memberRegistrationField = $('memberRegistrationField');
+    
+    if (memberRegisteredCheckbox) {
+        memberRegisteredCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                memberRegistrationField.classList.add('show');
+            } else {
+                memberRegistrationField.classList.remove('show');
+                $('memberRegistration').value = '';
+            }
+        });
+    }
+    
+    // Member Educational Attainment -> College Course
+    const memberEducationSelect = $('memberEducationalAttainment');
+    const memberCollegeCourseField = $('memberCollegeCourseField');
+    
+    if (memberEducationSelect) {
+        memberEducationSelect.addEventListener('change', function() {
+            if (this.value === 'College Graduate') {
+                memberCollegeCourseField.classList.add('show');
+            } else {
+                memberCollegeCourseField.classList.remove('show');
+                $('memberCollegeCourse').value = '';
+            }
+        });
+    }
+    
+    // Member Employment -> Job Title
+    const memberEmploymentSelect = $('memberEmployment');
+    const memberJobTitleField = $('memberJobTitleField');
+    
+    if (memberEmploymentSelect) {
+        memberEmploymentSelect.addEventListener('change', function() {
+            if (this.value === 'Employed') {
+                memberJobTitleField.classList.add('show');
+            } else {
+                memberJobTitleField.classList.remove('show');
+                $('memberJobTitle').value = '';
+            }
+        });
+    }
+    
+    // Member OFW Status -> Country
+    const memberOfwRadios = document.querySelectorAll('input[name="member_ofw_status"]');
+    const memberCountryField = $('memberCountryField');
+    
+    if (memberOfwRadios.length > 0) {
+        memberOfwRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'Yes') {
+                    memberCountryField.classList.add('show');
+                } else {
+                    memberCountryField.classList.remove('show');
+                    $('memberCountry').value = '';
+                }
+            });
+        });
+    }
+}
+
+/* ============ MEMBER PANEL FUNCTIONS ============ */
+function validateEditPanelForMemberEditing() {
+  // Check if household head has valid contact number
+  if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
+    alert('Please enter a valid Philippine mobile number for the household head first.');
+    $('edit_contactNo').focus();
+    return false;
+  }
+  
+  // Check if household head name is filled
+  const headName = $('edit_householdHead').value.trim();
+  if (!headName) {
+    alert('Please enter household head name first.');
+    $('edit_householdHead').focus();
+    return false;
+  }
+  
+  // Check if barangay is selected
+  const barangay = $('edit_barangay').value;
+  if (!barangay) {
+    alert('Please select barangay first.');
+    $('edit_barangay').focus();
+    return false;
+  }
+  
+  return true;
+}
+
+function openMemberPanelForEdit(index){
+  // Ensure we have valid head data first
+  if (!validateEditPanelForMemberEditing()) {
+    return;
+  }
+  
+  // Collect head data
+  collectHeadFromEditForm();
+  
+  // Ensure the members array exists
+  if (!editMembers || !Array.isArray(editMembers)) {
+    editMembers = [];
+  }
+  
+  // Ensure we have enough members
+  while (editMembers.length <= index) {
+    editMembers.push(createEmptyMember());
+  }
+  
+  memberEditIndex = index;
+  const total = Math.max(1, editMembers.length);
+  $('memberPanelTitle').innerText = `Member ${index+1} of ${total}`;
+  fillMemberPanelFromEdit(index);
+  $('memberPanel')?.classList.add('open');
+  $('panelOverlay')?.classList.add('show');
+  
+  // Focus on the first field
+  setTimeout(() => $('memberName')?.focus(), 100);
+}
+
+function fillMemberPanelFromEdit(idx){
+  const m = editMembers[idx] || createEmptyMember();
+  
+  // Basic Information
+  $('memberName').value = m['Name of Household Member/s'] || '';
+  
+  // FishR/RBIS Registered
+  const hasRegistration = m['FishR Registered/RBIS Registered'] && m['FishR Registered/RBIS Registered'] !== '';
+  $('memberRegisteredCheckbox').checked = hasRegistration;
+  if (hasRegistration) {
+    $('memberRegistrationField').classList.add('show');
+    $('memberRegistration').value = m['FishR Registered/RBIS Registered'] || '';
+  }
+  
+  $('memberContact').value = m['Contact no.'] || '';
+  qAll("input[name='member_sex']").forEach(r => r.checked = (r.value === (m['Sex'] || '')));
+  $('memberBirthdate').value = toInputDate(m['Birthdate'] || '');
+  updateMemberAgeStage();
+  
+  // Educational & Economic Status
+  $('memberEducationalAttainment').value = m['Educational Attainment'] || '';
+  if (m['Educational Attainment'] === 'College Graduate') {
+    $('memberCollegeCourseField').classList.add('show');
+    $('memberCollegeCourse').value = m['College Graduate Course'] || '';
+  }
+  $('memberEmployment').value = m['Employment'] || '';
+  if (m['Employment'] === 'Employed') {
+    $('memberJobTitleField').classList.add('show');
+    $('memberJobTitle').value = m['Job Title'] || '';
+  }
+  qAll("input[name='member_ofw_status']").forEach(r => r.checked = (r.value === (m['Overseas Filipino Worker(OFW)'] || 'No')));
+  if (m['Overseas Filipino Worker(OFW)'] === 'Yes') {
+    $('memberCountryField').classList.add('show');
+    $('memberCountry').value = m['Country'] || '';
+  }
+  
+  // Health and Status
+  qAll("input[name='member_pwd']").forEach(r => r.checked = (r.value === (m['Persons with Disability (PWD)'] || 'No')));
+  $('memberStatus').value = m['Status'] || '';
+  
+  // Transportation & Evacuation Details
+  $('memberTransport').value = m['Transportation'] || '';
+  $('memberPickup').value = m['Designated Pick-Up Point'] || m['Pick-Up Location'] || '';
+  $('memberDropoff').value = m['Drop-Off Point'] || m['Drop-Off Location'] || '';
+  $('memberCamp').value = m['Name of Camp'] || m['Evacuation Camp Name'] || '';
+  $('memberCampCap').value = m['Capacity'] || '';
+  $('memberInside').value = m['No. of Individuals Inside Camp'] || m['Individuals Currently in Camp'] || '';
+  $('memberOutside').value = m['No. of Individuals Outside Camp'] || m['Individuals Outside Camp'] || '';
+  $('memberReason').value = m['Reasons for Displacement'] || '';
+  
+  // Government Assistance Programs
+  $('member_tupad').checked = (m['TUPAD'] === 'Yes');
+  $('member_local4ps').checked = (m['Local 4Ps'] === 'Yes');
+  $('member_intl4ps').checked = (m['National 4Ps'] === 'Yes');
+  $('member_locsp').checked = (m['Local Social Pension'] === 'Yes');
+  $('member_intlsp').checked = (m['National Social Pension'] === 'Yes');
+  $('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes');
+  $('member_relief').checked = (m['Relief Goods'] === 'Yes');
+  $('member_cash').checked = (m['Cash Subsidy'] === 'Yes');
+  $('memberAics').value = m['AICS'] || '';
+}
+
+function collectHeadFromEditForm(){
+  const bd_input = $('edit_householdBirthdate').value || '';
+  const headBirthForSheet = toSheetDate(bd_input);
+  const headAgeInfo = computeAgeDetailed(bd_input);
+  const headAgeVal = headAgeInfo ? headAgeInfo.display : '';
+
+  // Get head registration value only if checkbox is checked
+  let headRegistrationValue = "";
+  if ($('edit_headRegisteredCheckbox').checked) {
+    headRegistrationValue = $('edit_headRegistration').value || "";
+  }
+
+  // Preserve the original submittedBy value
+  const originalSubmittedBy = editHead['Submitted By'] || editHead['submittedBy'] || '';
+  
+  editHead = {
+    'Data ID': editDataID,
+    'Coordinate': $('edit_coordinate').value || '',
+    'Coordinates': $('edit_coordinate').value || '',
+    'Barangay': $('edit_barangay').value || '',
+    'Sitio / Purok': $('edit_sitio').value || '',
+    'Name of Household Head': ($('edit_householdHead').value || '').trim(),
+    'FishR Registered/RBIS Registered': headRegistrationValue,
+    'Contact no.': $('edit_contactNo').value || '',
+    'Sex': document.querySelector("input[name='edit_head_sex']:checked")?.value || '',
+    'Birthdate': headBirthForSheet,
+    'Age': headAgeVal,
+    'Stage': headAgeInfo ? headAgeInfo.stage : '',
+    'No. of Household Member/s': String($('edit_memberCount').value || '0'),
+    'Persons with Disability (PWD)': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
+    'Status': $('edit_head_status').value || '',
+    'Educational Attainment': $('edit_educationalAttainment').value || '',
+    'College Graduate Course': $('edit_collegeCourse').value || '',
+    'Employment': $('edit_employment').value || '',
+    'Job Title': $('edit_jobTitle').value || '',
+    'Overseas Filipino Worker(OFW)': document.querySelector("input[name='edit_ofw_status']:checked")?.value || 'No',
+    'Country': $('edit_country').value || '',
+    'Transportation': $('edit_head_transport').value || '',
+    'Designated Pick-Up Point': $('edit_pickup').value || '',
+    'Pick-Up Location': $('edit_pickup').value || '',
+    'Drop-Off Point': $('edit_dropoff').value || '',
+    'Drop-Off Location': $('edit_dropoff').value || '',
+    'Name of Camp': $('edit_campName').value || '',
+    'Evacuation Camp Name': $('edit_campName').value || '',
+    'Capacity': $('edit_capacity').value || '',
+    'No. of Individuals Inside Camp': $('edit_insideCamp').value || '',
+    'Individuals Currently in Camp': $('edit_insideCamp').value || '',
+    'No. of Individuals Outside Camp': $('edit_outsideCamp').value || '',
+    'Individuals Outside Camp': $('edit_outsideCamp').value || '',
+    'Reasons for Displacement': $('edit_reasons').value || '',
+    'Dog': $('edit_dog_chk').checked ? 'Yes' : 'No',
+    'Dog Qty.': $('edit_dog_qty').value || '',
+    'Cat': $('edit_cat_chk').checked ? 'Yes' : 'No',
+    'Cat Qty.': $('edit_cat_qty').value || '',
+    'Pig': $('edit_pig_chk').checked ? 'Yes' : 'No',
+    'Pig Qty.': $('edit_pig_qty').value || '',
+    'Cow': $('edit_cow_chk').checked ? 'Yes' : 'No',
+    'Cow Qty.': $('edit_cow_qty').value || '',
+    'Carabao': $('edit_carabao_chk').checked ? 'Yes' : 'No',
+    'Carabao Qty.': $('edit_carabao_qty').value || '',
+    'Chicken': $('edit_chicken_chk').checked ? 'Yes' : 'No',
+    'Chicken Qty.': $('edit_chicken_qty').value || '',
+    'Others': $('edit_animals_others').value || '',
+    'TUPAD': $('edit_ass_tupad').checked ? 'Yes' : 'No',
+    'Local 4Ps': $('edit_ass_local4ps').checked ? 'Yes' : 'No',
+    'National 4Ps': $('edit_ass_intl4ps').checked ? 'Yes' : 'No',
+    'Local Social Pension': $('edit_ass_locsp').checked ? 'Yes' : 'No',
+    'National Social Pension': $('edit_ass_intlsp').checked ? 'Yes' : 'No',
+    'Solo Parent Assistance': $('edit_ass_solo').checked ? 'Yes' : 'No',
+    'Relief Goods': $('edit_ass_relief').checked ? 'Yes' : 'No',
+    'Cash Subsidy': $('edit_ass_cash').checked ? 'Yes' : 'No',
+    'AICS': $('edit_ass_aics').value || '',
+    // Preserve the Submitted By field
+    'Submitted By': originalSubmittedBy || getUserFullName()
+  };
+}
+
+function collectMemberPanelToEdit(){
+  const name = $('memberName').value.trim();
+  const birthdate_input = $('memberBirthdate').value || '';
+  const birth_for_sheet = toSheetDate(birthdate_input);
+  const ageObj = computeAgeDetailed(birthdate_input);
+  const ageVal = ageObj ? ageObj.display : '';
+  const stageVal = ageObj ? ageObj.stage : '';
+
+  // Get registration value only if checkbox is checked
+  let registrationValue = "";
+  if ($('memberRegisteredCheckbox').checked) {
+    registrationValue = $('memberRegistration').value || "";
+  }
+
+  // Get the current member to preserve existing submittedBy
+  const currentMember = editMembers[memberEditIndex] || {};
+  const existingSubmittedBy = currentMember['Submitted By'] || '';
+
+  const obj = {
+    'Data ID': editDataID,
+    'Name of Household Member/s': name,
+    'FishR Registered/RBIS Registered': registrationValue,
+    'Contact no.': $('memberContact').value || '',
+    'Sex': document.querySelector("input[name='member_sex']:checked")?.value || '',
+    'Birthdate': birth_for_sheet,
+    'Age': ageVal,
+    'Stage': stageVal,
+    'Persons with Disability (PWD)': document.querySelector("input[name='member_pwd']:checked")?.value || 'No',
+    'Status': $('memberStatus').value || '',
+    'Educational Attainment': $('memberEducationalAttainment').value || '',
+    'College Graduate Course': $('memberCollegeCourse').value || '',
+    'Employment': $('memberEmployment').value || '',
+    'Job Title': $('memberJobTitle').value || '',
+    'Overseas Filipino Worker(OFW)': document.querySelector("input[name='member_ofw_status']:checked")?.value || 'No',
+    'Country': $('memberCountry').value || '',
+    'Transportation': $('memberTransport').value || '',
+    'Designated Pick-Up Point': $('memberPickup').value || '',
+    'Pick-Up Location': $('memberPickup').value || '',
+    'Drop-Off Point': $('memberDropoff').value || '',
+    'Drop-Off Location': $('memberDropoff').value || '',
+    'Name of Camp': $('memberCamp').value || '',
+    'Evacuation Camp Name': $('memberCamp').value || '',
+    'Capacity': $('memberCampCap').value || '',
+    'No. of Individuals Inside Camp': $('memberInside').value || '',
+    'Individuals Currently in Camp': $('memberInside').value || '',
+    'No. of Individuals Outside Camp': $('memberOutside').value || '',
+    'Individuals Outside Camp': $('memberOutside').value || '',
+    'Reasons for Displacement': $('memberReason').value || '',
+    'TUPAD': $('member_tupad').checked ? 'Yes' : 'No',
+    'Local 4Ps': $('member_local4ps').checked ? 'Yes' : 'No',
+    'National 4Ps': $('member_intl4ps').checked ? 'Yes' : 'No',
+    'Local Social Pension': $('member_locsp').checked ? 'Yes' : 'No',
+    'National Social Pension': $('member_intlsp').checked ? 'Yes' : 'No',
+    'Solo Parent Assistance': $('member_solo').checked ? 'Yes' : 'No',
+    'Relief Goods': $('member_relief').checked ? 'Yes' : 'No',
+    'Cash Subsidy': $('member_cash').checked ? 'Yes' : 'No',
+    'AICS': $('memberAics').value || '',
+    // Preserve existing submittedBy or use current user's full name
+    'Submitted By': existingSubmittedBy || getUserFullName()
+  };
+  editMembers[memberEditIndex] = obj;
+}
+
+function updateMemberAgeStage(){
+  const date = $('memberBirthdate').value;
+  const ageObj = computeAgeDetailed(date);
+  if(!ageObj){ 
+      $('memberAge').value=''; 
+      $('memberStage').value=''; 
+      return; 
+  }
+  $('memberAge').value = ageObj.display;
+  $('memberStage').value = ageObj.stage;
+}
+
+function memberPanelNext() {
+    const name = $('memberName').value.trim();
+    const contact = $('memberContact').value.trim();
+    const birthdate = $('memberBirthdate').value;
+    const sex = document.querySelector("input[name='member_sex']:checked")?.value;
+    
+    // Validate all required fields
+    if(!name){ 
+        alert('Please enter member name'); 
+        $('memberName').focus();
+        return; 
+    }
+    
+    if(!sex){
+        alert('Please select member sex');
+        qAll("input[name='member_sex']")[0]?.focus();
+        return;
+    }
+    
+    if(!birthdate){
+        alert('Please enter member birthdate');
+        $('memberBirthdate').focus();
+        return;
+    }
+    
+    // Validate contact number (if provided)
+    if (contact && !validateContactInput($('memberContact'), $('memberContactError'))) {
+        alert('Please enter a valid Philippine mobile number');
+        $('memberContact').focus();
+        return;
+    }
+    
+    collectMemberPanelToEdit();
+    memberEditIndex++;
+    
+    if(memberEditIndex >= editMembers.length){
+        $('memberPanel')?.classList.remove('open');
+        updateEditMembersPreview();
+        if(sequenceMode){
+            sequenceMode = false;
+            saveEditedHousehold(true);
+        }
+        return;
+    }
+    
+    fillMemberPanelFromEdit(memberEditIndex);
+    $('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`;
+}
+
+function memberPanelBack() {
+    collectMemberPanelToEdit();
+    if(memberEditIndex > 0){ 
+        memberEditIndex--; 
+        fillMemberPanelFromEdit(memberEditIndex); 
+        $('memberPanelTitle').innerText = `Member ${memberEditIndex+1} of ${editMembers.length}`; 
+    }
+    else { 
+        $('memberPanel')?.classList.remove('open'); 
+        updateEditMembersPreview(); 
+    }
+}
+
+/* ============ SAVE EDITED HOUSEHOLD ============ */
+async function saveEditedHousehold(silentReload = false){
+  try {
+    // Validate required fields
+    const contactNo = $('edit_contactNo').value.trim();
+    if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
+        alert('Please enter a valid Philippine mobile number for the household head');
+        $('edit_contactNo').focus();
+        return;
+    }
+    
+    collectHeadFromEditForm();
+
+    const expected = Number($('edit_memberCount')?.value || 0);
+    while(editMembers.length < expected) editMembers.push(createEmptyMember());
+    if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
+
+    const userFullName = getUserFullName();
+
+    // Add "Last Edited By" field
+    editHead['Last Edited By'] = userFullName;
+    editHead['Last Edit Date'] = new Date().toLocaleDateString();
+    
+    // Ensure all members have the correct Data ID
+    editMembers.forEach(member => {
+      member['Data ID'] = editDataID;
+      // Ensure members have the same barangay and purok as the head
+      member['Barangay'] = editHead['Barangay'];
+      member['Sitio / Purok'] = editHead['Sitio / Purok'];
+      member['Coordinate'] = editHead['Coordinate'];
+      member['Coordinates'] = editHead['Coordinates'];
+      member['Last Edited By'] = userFullName;
+      member['Last Edit Date'] = new Date().toLocaleDateString();
+    });
+
+    const fd = new FormData();
+    fd.append('action','updateHousehold');
+    fd.append('dataID', editDataID);
+    fd.append('actor', userFullName);
+    fd.append('head', JSON.stringify(editHead));
+    fd.append('members', JSON.stringify(editMembers || []));
+    fd.append('submittedBy', editHead['Submitted By'] || userFullName);
+    fd.append('barangay', editHead['Barangay']);
+
+    const btn = $('saveEditBtn');
+    const originalText = btn ? btn.innerText : 'Save changes';
+    if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
+
+    const res = await fetch(SCRIPT_URL, { 
+      method: 'POST', 
+      body: fd,
+      timeout: 30000
+    });
+    
+    if (!res.ok) {
+      throw new Error(`Server responded with status: ${res.status}`);
+    }
+    
+    const text = await res.text();
+    let json;
+    try { 
+      json = JSON.parse(text); 
+    } catch(e){ 
+      throw new Error('Invalid server response format'); 
+    }
+    
+    if(!json.success){ 
+      alert('Save failed: ' + (json.message || JSON.stringify(json))); 
+      console.error(json); 
+    }
+    else {
+      if(!silentReload) alert('Household updated (Data ID: ' + (editDataID||'') + ')');
+      closeEditPanel();
+      loadRecords();
+    }
+  } catch(err){
+    console.error('Save error', err);
+    alert('Error saving data: ' + err.message + '\nPlease check your connection and try again.');
+  } finally {
+    const btn = $('saveEditBtn');
+    if(btn){ 
+      btn.disabled = false; 
+      btn.innerText = originalText || 'Save changes'; 
+    }
+  }
+}
+
+/* ============ DELETE FUNCTION ============ */
 async function onDelete(id){
     if(!confirm("Delete household " + id + "?")) return;
     
-    // Get current user's full name
-    const currentUserFullName = localStorage.getItem("staffName") || 
-                               localStorage.getItem("username") || 
-                               "System";
+    const currentUserFullName = getUserFullName();
 
     const fd = new FormData();
     fd.append("action", "deleteHousehold");
     fd.append("dataID", id);
-    fd.append("actor", currentUserFullName);  // Send full name as actor
+    fd.append("actor", currentUserFullName);
 
     try{
         const res = await fetch(SCRIPT_URL, { method: "POST", body: fd });
@@ -1465,7 +3497,6 @@ async function onDelete(id){
 
         if(json.success){
             alert(`Data has been deleted. Data ID: ${id} from Master and Barangay`);
-            // Clear cache and reload fresh data after delete
             localStorage.removeItem('recordsCache');
             localStorage.removeItem('recordsCacheTime');
             await loadRecords();
@@ -1476,6 +3507,314 @@ async function onDelete(id){
         console.error("Delete error", err);
         alert("Delete failed — see console");
     }
+}
+
+/* ============ SYNC ANIMAL CHECKBOXES ============ */
+function syncAnimalCheckboxes() {
+  document.querySelectorAll('#editPanel .animal-card input[type="checkbox"]').forEach(checkbox => {
+    const qtyInput = checkbox.closest('.animal-card').querySelector('.qty');
+    
+    // Set initial state
+    qtyInput.disabled = !checkbox.checked;
+    if (!checkbox.checked) qtyInput.value = '';
+    
+    // Add change listener
+    checkbox.addEventListener('change', function() {
+      qtyInput.disabled = !this.checked;
+      if (!this.checked) qtyInput.value = '';
+    });
+  });
+}
+
+/* ============ WIRE EDIT PANEL UI ============ */
+function wireEditPanelUI() {
+  // Coordinate buttons
+  if ($('edit_getLocationBtn')) {
+    $('edit_getLocationBtn').addEventListener('click', () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            $('edit_coordinate').value = `${lat}, ${lng}`;
+          },
+          (err) => {
+            alert('Unable to retrieve location. Please enable location services or enter coordinates manually.');
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser.');
+      }
+    });
+  }
+  
+  if ($('edit_hazardHunterBtn')) {
+    $('edit_hazardHunterBtn').addEventListener('click', () => {
+      alert('Open Hazard Hunter in another tab to get coordinates, then paste them in the coordinate field.');
+      window.open('https://hazardhunter.georisk.gov.ph/map#', '_blank');
+    });
+  }
+
+  // Contact number validation
+  if ($('edit_contactNo')) {
+    $('edit_contactNo').addEventListener('blur', () => {
+      validateContactInput($('edit_contactNo'), $('edit_contactError'));
+    });
+    
+    $('edit_contactNo').addEventListener('input', () => {
+      $('edit_contactNo').classList.remove('input-error');
+      $('edit_contactError').style.display = 'none';
+    });
+  }
+  
+  if ($('memberContact')) {
+    $('memberContact').addEventListener('blur', () => {
+      validateContactInput($('memberContact'), $('memberContactError'));
+    });
+    
+    $('memberContact').addEventListener('input', () => {
+      $('memberContact').classList.remove('input-error');
+      $('memberContactError').style.display = 'none';
+    });
+  }
+
+  // Add/Edit Members button
+  if($('edit_addMember')) $('edit_addMember').addEventListener('click', ()=>{
+    // Validate the head information first
+    if (!validateEditPanelForMemberEditing()) {
+      return;
+    }
+    
+    // Collect head data to ensure it's saved
+    collectHeadFromEditForm();
+    
+    // First, update the member count to reflect the new addition
+    const currentCount = editMembers.length || 0;
+    const newCount = currentCount + 1;
+    
+    // Update the member count input
+    $('edit_memberCount').value = newCount;
+    
+    // Create a new empty member and add it to the array
+    const newMember = createEmptyMember();
+    editMembers.push(newMember);
+    
+    // Update the preview to show the new member
+    updateEditMembersPreview();
+    
+    // Open the member panel for editing the new member
+    memberEditIndex = editMembers.length - 1;
+    openMemberPanelForEdit(memberEditIndex);
+  });
+
+  // Remove Member button
+  if($('edit_removeMember')) $('edit_removeMember').addEventListener('click', ()=>{
+    if (editMembers.length === 0) {
+      alert('No members to remove.');
+      return;
+    }
+    
+    // Show a list of members to remove
+    const memberList = editMembers.map((m, i) => 
+      `${i+1}. ${m['Name of Household Member/s'] || 'Unnamed Member'}`
+    ).join('\n');
+    
+    const memberIndex = prompt(
+      `Enter the number of the member to remove (1-${editMembers.length}):\n\n${memberList}`
+    );
+    
+    const index = parseInt(memberIndex) - 1;
+    
+    if (index >= 0 && index < editMembers.length) {
+      if (confirm(`Remove member "${editMembers[index]['Name of Household Member/s'] || 'Unnamed Member'}"?`)) {
+        editMembers.splice(index, 1);
+        
+        // Update member count
+        $('edit_memberCount').value = editMembers.length;
+        
+        updateEditMembersPreview();
+        alert('Member removed.');
+      }
+    } else if (memberIndex !== null) {
+      alert('Invalid member number.');
+    }
+  });
+
+  // Member panel navigation
+  if($('memberNext')) $('memberNext').addEventListener('click', memberPanelNext);
+  if($('memberBack')) $('memberBack').addEventListener('click', memberPanelBack);
+  
+  if($('memberPanelClose')) $('memberPanelClose').addEventListener('click', ()=> {
+    if(confirm('Close member entry? Unsaved member edits will be kept in panel preview.')) { 
+        $('memberPanel')?.classList.remove('open'); 
+        updateEditMembersPreview(); 
+    }
+  });
+  
+  // Date change handlers
+  if($('memberBirthdate')) $('memberBirthdate').addEventListener('change', updateMemberAgeStage);
+  if($('edit_householdBirthdate')) $('edit_householdBirthdate').addEventListener('change', updateEditHeadAgeStage);
+  
+  // Member count change handler
+  if ($('edit_memberCount')) {
+    $('edit_memberCount').addEventListener('change', function() {
+      const newCount = parseInt(this.value) || 0;
+      const currentCount = editMembers.length;
+      
+      if (newCount < currentCount) {
+        // Remove extra members
+        if (confirm(`Reduce members from ${currentCount} to ${newCount}? This will remove the last ${currentCount - newCount} member(s).`)) {
+          editMembers = editMembers.slice(0, newCount);
+          updateEditMembersPreview();
+        } else {
+          this.value = currentCount;
+        }
+      } else if (newCount > currentCount) {
+        // Add empty members
+        const toAdd = newCount - currentCount;
+        for (let i = 0; i < toAdd; i++) {
+          editMembers.push(createEmptyMember());
+        }
+        updateEditMembersPreview();
+      }
+    });
+  }
+
+  // Cancel buttons
+  if($('cancelEditBtn')) $('cancelEditBtn').addEventListener('click', ()=> { 
+    if(confirm('Discard ALL changes and close? This includes both head and member changes.')) {
+      closeEditPanel();
+    }
+  });
+
+  if($('panelClose')) $('panelClose').addEventListener('click', ()=> { 
+    if(confirm('Discard ALL changes and close? This includes both head and member changes.')) {
+      closeEditPanel();
+    }
+  });
+
+  if($('panelOverlay')) $('panelOverlay').addEventListener('click', ()=>{
+    if($('memberPanel')?.classList.contains('open')) {
+      if(confirm('Close member panel? Unsaved member changes will be lost.')) {
+        $('memberPanel')?.classList.remove('open');
+      }
+      return;
+    }
+    if(confirm('Close edit panel? ALL unsaved changes will be lost.')) {
+      closeEditPanel();
+    }
+  });
+
+  // Start sequence button
+  if($('startSequenceBtn')) $('startSequenceBtn').addEventListener('click', (ev)=> {
+    ev.preventDefault();
+    
+    // Validate ALL head required fields first
+    const requiredFields = [
+      { id: 'edit_barangay', name: 'Barangay' },
+      { id: 'edit_sitio', name: 'Sitio/Purok' },
+      { id: 'edit_householdHead', name: 'Household Head Name' },
+      { id: 'edit_contactNo', name: 'Contact Number' },
+      { id: 'edit_householdBirthdate', name: 'Birthdate' }
+    ];
+    
+    for (const field of requiredFields) {
+      const element = $(field.id);
+      if (!element || !element.value.trim()) {
+        alert(`Please fill in ${field.name}`);
+        element?.focus();
+        return;
+      }
+    }
+    
+    // Validate contact number
+    if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
+      alert('Please enter a valid Philippine mobile number for the household head');
+      $('edit_contactNo').focus();
+      return;
+    }
+    
+    // Check if sex is selected
+    const headSex = document.querySelector("input[name='edit_head_sex']:checked")?.value;
+    if (!headSex) {
+      alert('Please select head sex');
+      qAll("input[name='edit_head_sex']")[0]?.focus();
+      return;
+    }
+    
+    collectHeadFromEditForm();
+    const expected = Number($('edit_memberCount')?.value || 0);
+    
+    // Ensure we have the right number of members
+    while(editMembers.length < expected) editMembers.push(createEmptyMember());
+    if (expected === 0) {
+        // No members, just save
+        saveEditedHousehold(true);
+        return;
+    }
+    
+    // Start member sequence
+    sequenceMode = true; 
+    memberEditIndex = 0; 
+    openMemberPanelForEdit(memberEditIndex);
+  });
+
+  // Save edit button
+  if($('saveEditBtn')) $('saveEditBtn').addEventListener('click', (ev)=> { 
+    ev.preventDefault(); 
+    
+    // Validate head data
+    const requiredFields = [
+      { id: 'edit_barangay', name: 'Barangay' },
+      { id: 'edit_sitio', name: 'Sitio/Purok' },
+      { id: 'edit_householdHead', name: 'Household Head Name' },
+      { id: 'edit_contactNo', name: 'Contact Number' },
+      { id: 'edit_householdBirthdate', name: 'Birthdate' }
+    ];
+    
+    for (const field of requiredFields) {
+      const element = $(field.id);
+      if (!element || !element.value.trim()) {
+        alert(`Please fill in ${field.name}`);
+        element?.focus();
+        return;
+      }
+    }
+    
+    // Validate contact number
+    if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
+      alert('Please enter a valid Philippine mobile number for the household head');
+      $('edit_contactNo').focus();
+      return;
+    }
+    
+    // Check if sex is selected
+    const headSex = document.querySelector("input[name='edit_head_sex']:checked")?.value;
+    if (!headSex) {
+      alert('Please select head sex');
+      qAll("input[name='edit_head_sex']")[0]?.focus();
+      return;
+    }
+    
+    // Validate all members if there are any
+    if (editMembers.length > 0) {
+      const invalidMembers = [];
+      editMembers.forEach((member, index) => {
+        if (!member['Name of Household Member/s'] || !member['Name of Household Member/s'].trim()) {
+          invalidMembers.push(index + 1);
+        }
+      });
+      
+      if (invalidMembers.length > 0) {
+        if (confirm(`Members #${invalidMembers.join(', ')} are missing names. Save anyway?`)) {
+          saveEditedHousehold(false);
+        }
+        return;
+      }
+    }
+    
+    saveEditedHousehold(false); 
+  });
 }
 
 /* ============ EXPORT ============ */
@@ -1560,7 +3899,6 @@ document.addEventListener('click', function(event) {
 
 /* ============ UI BINDINGS ============ */
 document.getElementById("refreshBtn").onclick = function() {
-    // Clear cache and reload fresh data
     localStorage.removeItem('recordsCache');
     localStorage.removeItem('recordsCacheTime');
     loadRecords();
@@ -1569,7 +3907,7 @@ document.getElementById("refreshBtn").onclick = function() {
 // Client-side filtering for search and barangay dropdown
 document.getElementById("filterBarangay").onchange = filterRecords;
 
-// Real-time search filtering (no debounce needed since it's client-side)
+// Real-time search filtering
 document.getElementById("searchInput").addEventListener("input", filterRecords);
 
 // Export dropdown toggle
@@ -1600,7 +3938,6 @@ document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 /* ============ WINDOW RESIZE HANDLER ============ */
 window.addEventListener('resize', function() {
     if (window.innerWidth > 768) {
-        // On desktop, ensure sidebar is not in mobile-open state
         const sidebar = document.getElementById('sidebar');
         const mobileToggle = document.getElementById('mobileMenuToggle');
         
@@ -1612,11 +3949,9 @@ window.addEventListener('resize', function() {
 
 /* ============ PREVENT BACK BUTTON ISSUES ============ */
 window.addEventListener('pageshow', function(event) {
-  // If page is loaded from cache (back/forward button)
   if (event.persisted) {
     console.log('Page loaded from cache, checking session...');
     
-    // Don't automatically redirect. Just check session and reload data
     sessionCheck().then(isAuthenticated => {
       if (isAuthenticated) {
         loadRecords();
@@ -1645,10 +3980,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     
     // Check screen width and adjust sidebar
     if (window.innerWidth <= 768) {
-        // On mobile, collapse sidebar by default
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.remove('mobile-open');
     }
+    
+    // Setup conditional fields
+    setupEditConditionalFields();
+    
+    // Wire edit panel UI
+    wireEditPanelUI();
     
     loadRecords();
   }
@@ -1658,7 +3998,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
-
-
-
