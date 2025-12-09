@@ -6,6 +6,7 @@
 <title>Purok Kaligtasan — Household Records</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+   /* ORIGINAL RECORDS STYLES */
    :root{
     --bg:#f6f8f7;
     --card-bg:#fff;
@@ -14,8 +15,6 @@
     --accent2:#34b78f;
     --accent3: #ff7a00;
     --accent4: #ffa500;
-    --hazard-red: #dc2626;
-    --hazard-orange: #ef4444;
     --light-green: #e9f7f2;
     --border: #e1e8e5;
     --shadow: 0 6px 18px rgba(6,30,20,0.06);
@@ -24,7 +23,395 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
-   /* Description Styling */
+   
+   /* EDIT PANEL STYLES FROM edit.html */
+   .member-panel {
+     position: fixed;
+     right: 0;
+     top: 0;
+     height: 100vh;
+     width: 520px;
+     max-width: 96%;
+     background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98));
+     box-shadow: -18px 0 40px rgba(6,30,20,0.12);
+     transform: translateX(110%);
+     transition: transform 280ms cubic-bezier(.2,.9,.3,1);
+     z-index: 6000;
+     padding: 18px;
+     overflow-y: auto;
+   }
+   
+   .member-panel.open {
+     transform: translateX(0%);
+   }
+   
+   .member-panel .panel-header {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     margin-bottom: 10px;
+   }
+   
+   .member-panel h3 {
+     margin: 0;
+     font-size: 18px;
+     color: var(--accent1);
+   }
+   
+   .member-panel .panel-body {
+     margin-top: 8px;
+   }
+   
+   .member-panel .panel-actions {
+     display: flex;
+     gap: 8px;
+     justify-content: flex-end;
+     margin-top: 12px;
+   }
+   
+   .panel-overlay {
+     position: fixed;
+     inset: 0;
+     background: rgba(0,0,0,0.32);
+     opacity: 0;
+     transition: opacity 200ms;
+     pointer-events: none;
+     z-index: 5900;
+   }
+   
+   .panel-overlay.show {
+     opacity: 1;
+     pointer-events: auto;
+   }
+   
+   /* Form styling from edit.html */
+   .radio-line {
+     display: flex;
+     gap: 18px;
+     align-items: center;
+     padding: 6px 0;
+   }
+   
+   .radio-item {
+     display: flex;
+     align-items: center;
+     gap: 6px;
+     font-weight: 700;
+     font-size: 14px;
+   }
+   
+   .btn.secondary {
+     background: transparent;
+     color: #0f7a4a;
+     border: 1px solid rgba(6,30,20,0.06);
+   }
+   
+   /* Card styling for edit form */
+   .edit-card {
+     padding: 14px;
+     border-radius: 10px;
+     background: #fff;
+     margin-bottom: 12px;
+     box-shadow: 0 6px 18px rgba(6,30,20,0.04);
+   }
+   
+   .form-grid {
+     display: grid;
+     grid-template-columns: repeat(2,1fr);
+     gap: 12px;
+   }
+   
+   .small-muted {
+     font-size: 13px;
+     color: #666;
+   }
+   
+   .green {
+     color: #0f7a4a;
+     font-weight: 700;
+   }
+   
+   /* Specific edit form styling */
+   .coordinate-container {
+     display: flex;
+     gap: 8px;
+     align-items: flex-start;
+     flex-wrap: wrap;
+   }
+   
+   .coordinate-container input {
+     flex: 1;
+     min-width: 200px;
+   }
+   
+   .coordinate-container .btn {
+     white-space: nowrap;
+     padding: 8px 12px;
+     font-size: 14px;
+   }
+   
+   /* Form controls */
+   .member-panel input,
+   .member-panel select,
+   .member-panel textarea {
+     width: 100%;
+     padding: 8px 10px;
+     border: 1px solid var(--border);
+     border-radius: var(--radius-sm);
+     font-size: 14px;
+     font-family: inherit;
+     box-sizing: border-box;
+     margin-top: 4px;
+   }
+   
+   .member-panel input:focus,
+   .member-panel select:focus,
+   .member-panel textarea:focus {
+     outline: none;
+     border-color: var(--accent1);
+     box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+   }
+   
+   .member-panel label {
+     font-weight: 600;
+     font-size: 14px;
+     color: var(--muted);
+     display: block;
+     margin-bottom: 4px;
+   }
+   
+   /* Hazard hunter button */
+   .btn.hazard-hunter {
+     background: linear-gradient(90deg, #dc2626, #ef4444) !important;
+     color: white !important;
+     border: none !important;
+   }
+   
+   /* Checkbox styling */
+   .checkbox-item {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     font-weight: 600;
+     color: var(--accent1);
+     cursor: pointer;
+     margin: 4px 0;
+   }
+   
+   .checkbox-item input[type="checkbox"] {
+     accent-color: var(--accent1);
+     transform: scale(1.1);
+     width: auto;
+     margin: 0;
+   }
+   
+   /* Conditional fields */
+   .conditional-field {
+     display: none;
+     margin-top: 8px;
+   }
+   
+   .conditional-field.show {
+     display: block;
+   }
+   
+   /* Animal grid */
+   .domestic-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+     gap: 12px;
+     margin-top: 12px;
+   }
+   
+   .animal-card {
+     background: var(--light-green);
+     padding: 12px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+   }
+   
+   .animal-header {
+     display: flex;
+     align-items: center;
+     gap: 12px;
+     margin-bottom: 8px;
+   }
+   
+   .animal-qty {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+   }
+   
+   .animal-qty label {
+     margin: 0;
+     font-weight: 600;
+     color: var(--muted);
+     font-size: 14px;
+   }
+   
+   .qty {
+     width: 70px;
+     padding: 6px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+     text-align: center;
+     font-size: 14px;
+   }
+   
+   .others-box {
+     width: 100%;
+     min-height: 80px;
+     padding: 12px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+     font-family: inherit;
+     font-size: 14px;
+     margin-top: 8px;
+     resize: vertical;
+   }
+   
+   /* Government support grid */
+   .gov-support-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+     gap: 12px 20px;
+     margin-top: 12px;
+   }
+   
+   .gov-support-grid .checkbox-item {
+     min-height: 40px;
+     padding: 10px 0;
+   }
+   
+   /* Error messages */
+   .error-message {
+     color: #dc2626;
+     font-size: 12px;
+     margin-top: 4px;
+     display: none;
+   }
+   
+   .input-error {
+     border-color: #dc2626 !important;
+   }
+   
+   /* Required field indicator */
+   .required {
+     color: #dc2626;
+     margin-left: 2px;
+   }
+   
+   /* Panel improvements */
+   .panel-body {
+     padding-right: 8px;
+   }
+   
+   .panel-body h4 {
+     margin: 16px 0 12px 0;
+     color: var(--accent1);
+     font-size: 16px;
+     border-bottom: 2px solid var(--light-green);
+     padding-bottom: 8px;
+   }
+   
+   /* Data ID display */
+   .data-id-display {
+     background: #f0f9ff;
+     padding: 8px 12px;
+     border-radius: 8px;
+     border: 1px solid #d1e9ff;
+     margin-bottom: 12px;
+     font-weight: bold;
+     color: #0f7a4a;
+   }
+   
+   .data-id-display span {
+     background: #e3f2fd;
+     padding: 4px 8px;
+     border-radius: 4px;
+     font-family: monospace;
+   }
+   
+   /* Member preview improvements */
+   .member-preview {
+     list-style: none;
+     padding: 0;
+     margin: 12px 0;
+     max-height: 200px;
+     overflow-y: auto;
+     border: 1px solid var(--border);
+     border-radius: 8px;
+     padding: 8px;
+   }
+   
+   .member-preview li {
+     padding: 8px 12px;
+     border-bottom: 1px solid #eee;
+     cursor: pointer;
+     transition: background 0.2s;
+   }
+   
+   .member-preview li:hover {
+     background: #f0f9ff;
+   }
+   
+   .member-preview li:last-child {
+     border-bottom: none;
+   }
+   
+   .member-preview li .member-actions {
+     float: right;
+     display: flex;
+     gap: 6px;
+   }
+   
+   .member-preview li .member-actions button {
+     background: none;
+     border: none;
+     cursor: pointer;
+     padding: 2px 6px;
+     font-size: 12px;
+   }
+   
+   .member-preview li .member-actions .edit-btn {
+     color: #0f7a4a;
+   }
+   
+   .member-preview li .member-actions .remove-btn {
+     color: #dc2626;
+   }
+   
+   /* Form section spacing */
+   .member-panel .edit-card + .edit-card {
+     margin-top: 16px;
+   }
+   
+   /* Specific grid column spans */
+   .member-panel .form-grid > div[style*="grid-column"] {
+     grid-column: 1 / -1;
+   }
+   
+   /* Responsive for edit panel */
+   @media(max-width:900px){
+     .form-grid {
+       grid-template-columns: 1fr;
+     }
+     
+     .member-panel {
+       width: 100%;
+     }
+     
+     .domestic-grid {
+       grid-template-columns: 1fr;
+     }
+     
+     .gov-support-grid {
+       grid-template-columns: repeat(2, 1fr);
+     }
+   }
+
+   /* ORIGINAL RECORDS STYLES CONTINUED */
    #disc {
     margin-bottom: 10px;
     background: var(--light-green);
@@ -400,38 +787,36 @@
     width:100%;
     min-width:1400px;
     border-collapse:collapse;
-    font-size: 14px; /* Changed from 12px to 14px */
+    font-size: 14px;
    }
 
-   /* Fixed: Table header and cells made smaller with proper z-index */
    .records-table th{
     background: var(--light-green);
-    padding: 10px 8px; /* Increased padding for larger text */
+    padding: 10px 8px;
     text-align: center;
     font-weight: 600;
     position: sticky;
     top: 0;
     z-index: 100;
-    font-size: 14px; /* Changed from 11px to 14px */
+    font-size: 14px;
     color: var(--accent1);
     border-bottom: 2px solid rgba(15,122,74,0.15);
     white-space: nowrap;
     vertical-align: middle;
-    height: 40px; /* Increased height for larger text */
+    height: 40px;
     box-sizing: border-box;
    }
 
-   /* Fixed: Reduced row height for data rows */
    .records-table td{
-    padding: 8px 6px; /* Increased padding for larger text */
-    font-size: 14px; /* Changed from 11px to 14px */
+    padding: 8px 6px;
+    font-size: 14px;
     border-bottom: 1px solid rgba(15,122,74,0.08);
     vertical-align: middle;
     color: var(--muted);
     text-align: center;
-    height: 36px; /* Increased height for larger text */
+    height: 36px;
     box-sizing: border-box;
-    line-height: 1.3; /* Increased line height */
+    line-height: 1.3;
    }
 
    .records-table tbody tr:hover{
@@ -720,341 +1105,6 @@
     to { transform: rotate(360deg); }
    }
 
-   /* EDIT PANEL STYLES - Extracted from edit.html */
-   .member-panel {
-    position: fixed;
-    right: 0;
-    top: 0;
-    height: 100vh;
-    width: 520px;
-    max-width: 96%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98));
-    box-shadow: -18px 0 40px rgba(6,30,20,0.12);
-    transform: translateX(110%);
-    transition: transform 280ms cubic-bezier(.2,.9,.3,1);
-    z-index: 6000;
-    padding: 18px;
-    overflow-y: auto;
-   }
-   
-   .member-panel.open {
-    transform: translateX(0%);
-   }
-   
-   .member-panel .panel-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-   }
-   
-   .member-panel h3 {
-    margin: 0;
-    font-size: 18px;
-    color: var(--accent1);
-   }
-   
-   .member-panel .panel-body {
-    margin-top: 8px;
-   }
-   
-   .member-panel .panel-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    margin-top: 12px;
-   }
-   
-   .panel-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.32);
-    opacity: 0;
-    transition: opacity 200ms;
-    pointer-events: none;
-    z-index: 5900;
-   }
-   
-   .panel-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-   }
-   
-   .radio-line {
-    display: flex;
-    gap: 18px;
-    align-items: center;
-    padding: 6px 0;
-   }
-   
-   .radio-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 700;
-    font-size: 14px;
-   }
-   
-   .btn.secondary {
-    background: transparent;
-    color: #0f7a4a;
-    border: 1px solid rgba(6,30,20,0.06);
-   }
-   
-   .card {
-    padding: 14px;
-    border-radius: 10px;
-    background: #fff;
-    margin-bottom: 12px;
-    box-shadow: 0 6px 18px rgba(6,30,20,0.04);
-   }
-   
-   .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    gap: 12px;
-   }
-   
-   .small-muted {
-    font-size: 13px;
-    color: #666;
-   }
-   
-   .green {
-    color: #0f7a4a;
-    font-weight: 700;
-   }
-   
-   .coordinate-container {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-   }
-   
-   .coordinate-container input {
-    flex: 1;
-    min-width: 200px;
-   }
-   
-   .coordinate-container .btn {
-    white-space: nowrap;
-    padding: 8px 12px;
-    font-size: 14px;
-   }
-   
-   .btn.hazard-hunter {
-    background: linear-gradient(90deg, var(--hazard-red), var(--hazard-orange)) !important;
-    color: white !important;
-    border: none !important;
-   }
-   
-   .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: var(--accent1);
-    cursor: pointer;
-    margin: 4px 0;
-   }
-   
-   .checkbox-item input[type="checkbox"] {
-    accent-color: var(--accent1);
-    transform: scale(1.1);
-   }
-   
-   .conditional-field {
-    display: none;
-    margin-top: 8px;
-   }
-   
-   .conditional-field.show {
-    display: block;
-   }
-   
-   .domestic-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-    margin-top: 12px;
-   }
-   
-   .animal-card {
-    background: var(--light-green);
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    border: 2px solid var(--border);
-   }
-   
-   .animal-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-   }
-   
-   .animal-qty {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-   }
-   
-   .animal-qty label {
-    margin: 0;
-    font-weight: 600;
-    color: var(--muted);
-    font-size: 14px;
-   }
-   
-   .qty {
-    width: 70px;
-    padding: 6px;
-    border-radius: var(--radius-sm);
-    border: 2px solid var(--border);
-    text-align: center;
-    font-size: 14px;
-   }
-   
-   .others-box {
-    width: 100%;
-    min-height: 80px;
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    border: 2px solid var(--border);
-    font-family: inherit;
-    font-size: 14px;
-    margin-top: 8px;
-    resize: vertical;
-   }
-   
-   .gov-support-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px 20px;
-    margin-top: 12px;
-   }
-   
-   .gov-support-grid .checkbox-item {
-    min-height: 40px;
-    padding: 10px 0;
-   }
-   
-   .error-message {
-    color: #dc2626;
-    font-size: 12px;
-    margin-top: 4px;
-    display: none;
-   }
-   
-   .input-error {
-    border-color: #dc2626 !important;
-   }
-   
-   /* Required field indicator */
-   .required {
-    color: #dc2626;
-    margin-left: 2px;
-   }
-   
-   /* Panel improvements */
-   .panel-body {
-    padding-right: 8px;
-   }
-   
-   .panel-body h4 {
-    margin: 16px 0 12px 0;
-    color: var(--accent1);
-    font-size: 16px;
-    border-bottom: 2px solid var(--light-green);
-    padding-bottom: 8px;
-   }
-   
-   /* Data ID display */
-   .data-id-display {
-    background: #f0f9ff;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #d1e9ff;
-    margin-bottom: 12px;
-    font-weight: bold;
-    color: #0f7a4a;
-   }
-   
-   .data-id-display span {
-    background: #e3f2fd;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-family: monospace;
-   }
-   
-   /* Member preview improvements */
-   .member-preview {
-    list-style: none;
-    padding: 0;
-    margin: 12px 0;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px;
-   }
-   
-   .member-preview li {
-    padding: 8px 12px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: background 0.2s;
-   }
-   
-   .member-preview li:hover {
-    background: #f0f9ff;
-   }
-   
-   .member-preview li:last-child {
-    border-bottom: none;
-   }
-   
-   .member-preview li .member-actions {
-    float: right;
-    display: flex;
-    gap: 6px;
-   }
-   
-   .member-preview li .member-actions button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 2px 6px;
-    font-size: 12px;
-   }
-   
-   .member-preview li .member-actions .edit-btn {
-    color: #0f7a4a;
-   }
-   
-   .member-preview li .member-actions .remove-btn {
-    color: #dc2626;
-   }
-   
-   @media(max-width:900px){
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .member-panel {
-      width: 100%;
-    }
-    
-    .domestic-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .gov-support-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-   }
-
    /* Mobile Styles */
    @media (max-width: 768px) {
     .page-container {
@@ -1176,22 +1226,22 @@
     }
     
     .records-table {
-        font-size: 12px; /* Changed from 11px to 12px */
+        font-size: 12px;
         min-width: 1200px;
     }
     
     .records-table th,
     .records-table td {
-        font-size: 12px; /* Changed from 10px to 12px */
-        padding: 6px 5px; /* Increased padding for mobile */
+        font-size: 12px;
+        padding: 6px 5px;
     }
     
     .records-table th {
-        height: 36px; /* Increased height for mobile */
+        height: 36px;
     }
     
     .records-table td {
-        height: 32px; /* Increased height for mobile */
+        height: 32px;
     }
    }
 
@@ -1214,8 +1264,8 @@
     
     .records-table th,
     .records-table td {
-        font-size: 13px; /* Changed from 11px to 13px */
-        padding: 8px 6px; /* Increased padding for tablet */
+        font-size: 13px;
+        padding: 8px 6px;
     }
    }
 
@@ -1395,7 +1445,7 @@
     
     <form id="editForm" onsubmit="return false;">
       <!-- Head editing -->
-      <div class="card">
+      <div class="edit-card">
         <h4>Household Head — Edit</h4>
         <div class="form-grid">
           <!-- Coordinate Field -->
@@ -1424,6 +1474,7 @@
               <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
             </select>
           </div>
+          
           <div>
             <label>Sitio / Purok <span class="required">*</span></label>
             <select id="edit_sitio" required>
@@ -1841,7 +1892,7 @@
       </div>
 
       <!-- Members preview + edit controls -->
-      <div class="card">
+      <div class="edit-card">
         <h4>Members</h4>
         <div class="small-muted">Count: <strong id="edit_previewCount">0</strong></div>
         <ul id="edit_membersPreview" class="member-preview"></ul>
