@@ -2846,11 +2846,9 @@ function renderTable(){
     const tbody = document.getElementById("tableBody");
     thead.innerHTML = ""; tbody.innerHTML = "";
 
-    // header row - ADD THE NEW COLUMNS
+    // header row - FIXED: Only use header columns that exist in data
     let th = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
     header.forEach(c => th += `<th>${c}</th>`);
-    // Add these new columns before the actions columns
-    th += `<th>Updated By</th><th>Updated On</th>`;
     th += `<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>`;
     thead.innerHTML = th;
 
@@ -2872,7 +2870,7 @@ function renderTable(){
         tdSel.innerHTML = `<input type="checkbox" class="row-select" data-id="${g.dataID}" ${selected.has(g.dataID) ? "checked" : ""}>`;
         tr.appendChild(tdSel);
 
-        // header columns
+        // header columns - FIXED: Only render columns from header array
         header.forEach(col=>{
             const td = document.createElement("td");
             const cellValue = head[col] || "";
@@ -2891,16 +2889,6 @@ function renderTable(){
             }
             tr.appendChild(td);
         });
-
-        // ADD THESE NEW COLUMNS FOR HEAD
-        const tdUpdatedBy = document.createElement("td");
-        tdUpdatedBy.innerHTML = highlight(head['Updated By'] || 'N/A', keyword);
-        tr.appendChild(tdUpdatedBy);
-        
-        const tdUpdatedOn = document.createElement("td");
-        const updatedOnValue = head['Updated On'] || head['Last Edit Date'] || 'N/A';
-        tdUpdatedOn.innerHTML = highlight(formatDateForDisplay(updatedOnValue), keyword);
-        tr.appendChild(tdUpdatedOn);
 
         // show toggle
         const tdShow = document.createElement("td"); 
@@ -2923,7 +2911,7 @@ function renderTable(){
 
         tbody.appendChild(tr);
 
-        // member rows - also add for members
+        // member rows
         g.members.forEach(m=>{
             const mr = document.createElement("tr");
             mr.className = "member-row hidden";
@@ -2948,16 +2936,6 @@ function renderTable(){
                 }
                 mr.appendChild(td);
             });
-            
-            // ADD THESE FOR MEMBERS TOO
-            const memberUpdatedBy = document.createElement("td");
-            memberUpdatedBy.innerHTML = highlight(m['Updated By'] || 'N/A', keyword);
-            mr.appendChild(memberUpdatedBy);
-            
-            const memberUpdatedOn = document.createElement("td");
-            const memberUpdatedOnValue = m['Updated On'] || m['Last Edit Date'] || 'N/A';
-            memberUpdatedOn.innerHTML = highlight(formatDateForDisplay(memberUpdatedOnValue), keyword);
-            mr.appendChild(memberUpdatedOn);
             
             mr.appendChild(document.createElement("td")); // empty members column
             mr.appendChild(document.createElement("td")); // empty actions column
@@ -2990,8 +2968,8 @@ function renderTable(){
     });
 
     updateCounts();
-} // <-- END OF FUNCTION - NOTHING AFTER THIS!
-
+}
+   
 /* ============ TOGGLE MEMBERS ============ */
 function toggleMembers(id){
     const memberRows = document.querySelectorAll(`tr.member-row[data-parent="${id}"]`);
@@ -3515,6 +3493,8 @@ function collectHeadFromEditForm(){
 
   // Preserve the original submittedBy value
   const originalSubmittedBy = editHead['Submitted By'] || editHead['submittedBy'] || '';
+  // FIXED: Preserve original Submitted On date
+  const originalSubmittedOn = editHead['Submitted On'] || '';
   
   editHead = {
     'Data ID': editDataID,
@@ -3573,8 +3553,9 @@ function collectHeadFromEditForm(){
     'Relief Goods': $('edit_ass_relief').checked ? 'Yes' : 'No',
     'Cash Subsidy': $('edit_ass_cash').checked ? 'Yes' : 'No',
     'AICS': $('edit_ass_aics').value || '',
-    // Preserve the Submitted By field
-    'Submitted By': originalSubmittedBy || getUserFullName()
+    // Preserve the Submitted By and Submitted On fields
+    'Submitted By': originalSubmittedBy || getUserFullName(),
+    'Submitted On': originalSubmittedOn // FIXED: Preserve original Submitted On date
   };
 }
 
@@ -3734,20 +3715,44 @@ async function saveEditedHousehold(silentReload = false){
 
     const userFullName = getUserFullName();
 
-    // Add "Last Edited By" field
+    // FIXED: Create properly formatted date for Philippines timezone
+    const now = new Date();
+    // Format: MM/DD/YYYY, HH:MM:SS AM/PM (matching formatTimestampPH_ in code.gs)
+    const formattedDate = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}/${now.getFullYear()}, ` +
+                         `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} ` +
+                         `${now.getHours() >= 12 ? 'PM' : 'AM'}`;
+
+    // Add "Last Edited By" field with formatted date
     editHead['Last Edited By'] = userFullName;
-    editHead['Last Edit Date'] = new Date().toLocaleDateString();
+    editHead['Last Edit Date'] = formattedDate;
     
-    // Ensure all members have the correct Data ID
-    editMembers.forEach(member => {
+    // FIXED: Preserve original Submitted On date if it exists
+    if (!editHead['Submitted On']) {
+        editHead['Submitted On'] = formattedDate; // Use current date if not set
+    }
+    
+    // Add Updated By and Updated On fields for tracking
+    editHead['Updated By'] = userFullName;
+    editHead['Updated On'] = formattedDate;
+    
+    // Ensure all members have the correct Data ID with formatted dates
+    editMembers.forEach((member, index) => {
       member['Data ID'] = editDataID;
       // Ensure members have the same barangay and purok as the head
       member['Barangay'] = editHead['Barangay'];
       member['Sitio / Purok'] = editHead['Sitio / Purok'];
       member['Coordinate'] = editHead['Coordinate'];
       member['Coordinates'] = editHead['Coordinates'];
+      
+      // FIXED: Preserve original Submitted On for members if it exists
+      if (!member['Submitted On']) {
+          member['Submitted On'] = formattedDate;
+      }
+      
       member['Last Edited By'] = userFullName;
-      member['Last Edit Date'] = new Date().toLocaleDateString();
+      member['Last Edit Date'] = formattedDate;
+      member['Updated By'] = userFullName;
+      member['Updated On'] = formattedDate;
     });
 
     const fd = new FormData();
@@ -4329,5 +4334,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
-
