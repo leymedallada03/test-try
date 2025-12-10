@@ -504,6 +504,53 @@
      }
    }
 
+   /* FIX: Ensure member panel action buttons are visible */
+   #memberPanel .panel-actions {
+     display: flex !important;
+     gap: 8px;
+     justify-content: flex-end;
+     margin-top: 20px;
+     padding: 16px 0;
+     border-top: 1px solid var(--border);
+   }
+
+   #memberPanel .panel-actions button {
+     min-width: 120px;
+   }
+
+   /* FIX: Ensure all form elements in member panel are properly spaced */
+   #memberPanel .edit-card {
+     margin-bottom: 20px;
+   }
+
+   #memberPanel .edit-card:last-of-type {
+     margin-bottom: 0;
+   }
+
+   /* FIX: Improve contact number input validation styling */
+   .member-panel input[type="text"][id$="contact"],
+   .member-panel input[type="tel"] {
+     font-family: monospace;
+     letter-spacing: 0.5px;
+   }
+
+   .member-panel input.input-error {
+     border-color: #dc2626 !important;
+     background-color: #fff5f5;
+   }
+
+   #memberContactError, #edit_contactError {
+     color: #dc2626;
+     font-size: 12px;
+     margin-top: 4px;
+     display: none;
+   }
+
+   /* Ensure the member panel body has enough padding at bottom */
+   #memberPanel .panel-body {
+     padding-bottom: 80px !important;
+   }
+
    /* ORIGINAL RECORDS STYLES CONTINUED */
    #disc {
     margin-bottom: 10px;
@@ -2714,10 +2761,28 @@ function validatePhilippineMobileNumber(number) {
 }
 
 function validateContactInput(input, errorElement) {
+    if (!input || !errorElement) return true;
+    
     const value = input.value.trim();
+    
+    // Allow empty for optional fields (check if field is required)
+    const isRequired = input.hasAttribute('required');
+    if (!value && !isRequired) {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+    }
+    
+    if (!value && isRequired) {
+        input.classList.add('input-error');
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Contact number is required';
+        return false;
+    }
+    
     const isValid = validatePhilippineMobileNumber(value);
     
-    if (value && !isValid) {
+    if (!isValid) {
         input.classList.add('input-error');
         errorElement.style.display = 'block';
         errorElement.textContent = 'Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)';
@@ -3745,8 +3810,11 @@ function memberPanelBack() {
     }
 }
 
-/* ============ SAVE EDITED HOUSEHOLD ============ */
+/* ============ FIXED SAVE EDITED HOUSEHOLD FUNCTION ============ */
 async function saveEditedHousehold(silentReload = false){
+  const btn = $('saveEditBtn');
+  const originalText = btn ? btn.innerText : 'Save changes';
+  
   try {
     // Validate required fields
     const contactNo = $('edit_contactNo').value.trim();
@@ -3764,9 +3832,8 @@ async function saveEditedHousehold(silentReload = false){
 
     const userFullName = getUserFullName();
 
-    // FIXED: Create properly formatted date for Philippines timezone
+    // Create properly formatted date for Philippines timezone
     const now = new Date();
-    // Format: MM/DD/YYYY, HH:MM:SS AM/PM (matching formatTimestampPH_ in code.gs)
     const formattedDate = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}/${now.getFullYear()}, ` +
                          `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} ` +
                          `${now.getHours() >= 12 ? 'PM' : 'AM'}`;
@@ -3775,9 +3842,9 @@ async function saveEditedHousehold(silentReload = false){
     editHead['Last Edited By'] = userFullName;
     editHead['Last Edit Date'] = formattedDate;
     
-    // FIXED: Preserve original Submitted On date if it exists
+    // Preserve original Submitted On date if it exists
     if (!editHead['Submitted On']) {
-        editHead['Submitted On'] = formattedDate; // Use current date if not set
+        editHead['Submitted On'] = formattedDate;
     }
     
     // Add Updated By and Updated On fields for tracking
@@ -3787,13 +3854,11 @@ async function saveEditedHousehold(silentReload = false){
     // Ensure all members have the correct Data ID with formatted dates
     editMembers.forEach((member, index) => {
       member['Data ID'] = editDataID;
-      // Ensure members have the same barangay and purok as the head
       member['Barangay'] = editHead['Barangay'];
       member['Sitio / Purok'] = editHead['Sitio / Purok'];
       member['Coordinate'] = editHead['Coordinate'];
       member['Coordinates'] = editHead['Coordinates'];
       
-      // FIXED: Preserve original Submitted On for members if it exists
       if (!member['Submitted On']) {
           member['Submitted On'] = formattedDate;
       }
@@ -3813,8 +3878,7 @@ async function saveEditedHousehold(silentReload = false){
     fd.append('submittedBy', editHead['Submitted By'] || userFullName);
     fd.append('barangay', editHead['Barangay']);
 
-    const btn = $('saveEditBtn');
-    const originalText = btn ? btn.innerText : 'Save changes';
+    // Set loading state AFTER validation
     if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
 
     const res = await fetch(SCRIPT_URL, { 
@@ -3848,7 +3912,6 @@ async function saveEditedHousehold(silentReload = false){
     console.error('Save error', err);
     alert('Error saving data: ' + err.message + '\nPlease check your connection and try again.');
   } finally {
-    const btn = $('saveEditBtn');
     if(btn){ 
       btn.disabled = false; 
       btn.innerText = originalText || 'Save changes'; 
@@ -3902,6 +3965,65 @@ function syncAnimalCheckboxes() {
   });
 }
 
+/* ============ SETUP CONTACT VALIDATION ============ */
+function setupContactValidation() {
+  // Head contact validation
+  const editContactInput = $('edit_contactNo');
+  const editContactError = $('edit_contactError');
+  
+  if (editContactInput) {
+    editContactInput.addEventListener('input', function() {
+      // Auto-format: remove non-numeric characters except + at the beginning
+      let value = this.value.replace(/[^\d+]/g, '');
+      
+      // Ensure it starts with 09 or +639
+      if (value.startsWith('+639') && value.length > 13) {
+        value = value.substring(0, 13);
+      } else if (value.startsWith('09') && value.length > 11) {
+        value = value.substring(0, 11);
+      }
+      
+      this.value = value;
+      
+      // Clear error on input
+      this.classList.remove('input-error');
+      if (editContactError) editContactError.style.display = 'none';
+    });
+    
+    editContactInput.addEventListener('blur', function() {
+      validateContactInput(this, editContactError);
+    });
+  }
+  
+  // Member contact validation
+  const memberContactInput = $('memberContact');
+  const memberContactError = $('memberContactError');
+  
+  if (memberContactInput) {
+    memberContactInput.addEventListener('input', function() {
+      // Auto-format: remove non-numeric characters except + at the beginning
+      let value = this.value.replace(/[^\d+]/g, '');
+      
+      // Ensure it starts with 09 or +639
+      if (value.startsWith('+639') && value.length > 13) {
+        value = value.substring(0, 13);
+      } else if (value.startsWith('09') && value.length > 11) {
+        value = value.substring(0, 11);
+      }
+      
+      this.value = value;
+      
+      // Clear error on input
+      this.classList.remove('input-error');
+      if (memberContactError) memberContactError.style.display = 'none';
+    });
+    
+    memberContactInput.addEventListener('blur', function() {
+      validateContactInput(this, memberContactError);
+    });
+  }
+}
+
 /* ============ WIRE EDIT PANEL UI ============ */
 function wireEditPanelUI() {
   // Coordinate modal
@@ -3933,28 +4055,8 @@ function wireEditPanelUI() {
     $('modal_cancelBtn').addEventListener('click', closeCoordinateModal);
   }
 
-  // Contact number validation
-  if ($('edit_contactNo')) {
-    $('edit_contactNo').addEventListener('blur', () => {
-      validateContactInput($('edit_contactNo'), $('edit_contactError'));
-    });
-    
-    $('edit_contactNo').addEventListener('input', () => {
-      $('edit_contactNo').classList.remove('input-error');
-      $('edit_contactError').style.display = 'none';
-    });
-  }
-  
-  if ($('memberContact')) {
-    $('memberContact').addEventListener('blur', () => {
-      validateContactInput($('memberContact'), $('memberContactError'));
-    });
-    
-    $('memberContact').addEventListener('input', () => {
-      $('memberContact').classList.remove('input-error');
-      $('memberContactError').style.display = 'none';
-    });
-  }
+  // Setup contact validation
+  setupContactValidation();
 
   // Add/Edit Members button
   if($('edit_addMember')) $('edit_addMember').addEventListener('click', ()=>{
@@ -4137,9 +4239,12 @@ function wireEditPanelUI() {
     openMemberPanelForEdit(memberEditIndex);
   });
 
-  // Save edit button
-  if($('saveEditBtn')) $('saveEditBtn').addEventListener('click', (ev)=> { 
+  // Save edit button - FIXED VERSION
+  if($('saveEditBtn')) $('saveEditBtn').addEventListener('click', async (ev)=> { 
     ev.preventDefault(); 
+    
+    const btn = $('saveEditBtn');
+    const originalBtnText = btn ? btn.innerText : 'Save changes';
     
     // Validate head data
     const requiredFields = [
@@ -4185,13 +4290,31 @@ function wireEditPanelUI() {
       
       if (invalidMembers.length > 0) {
         if (confirm(`Members #${invalidMembers.join(', ')} are missing names. Save anyway?`)) {
-          saveEditedHousehold(false);
+          // Set loading state
+          if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
+          try {
+            await saveEditedHousehold(false);
+          } finally {
+            if(btn){ 
+              btn.disabled = false; 
+              btn.innerText = originalBtnText; 
+            }
+          }
         }
         return;
       }
     }
     
-    saveEditedHousehold(false); 
+    // Set loading state
+    if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
+    try {
+      await saveEditedHousehold(false);
+    } finally {
+      if(btn){ 
+        btn.disabled = false; 
+        btn.innerText = originalBtnText; 
+      }
+    }
   });
 }
 
