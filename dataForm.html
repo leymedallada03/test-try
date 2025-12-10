@@ -2214,7 +2214,247 @@
 <script>
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+/* SESSION MANAGEMENT FUNCTIONS */
+// Validate session with server
+async function validateSession() {
+    const username = localStorage.getItem("username");
+    const sessionId = sessionStorage.getItem("sessionId");
+    
+    if (!username || !sessionId) {
+        console.log("No username or sessionId found for validation");
+        return false;
+    }
+    
+    try {
+        // ADD TIMEOUT LIKE DASHBOARD
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const formData = new FormData();
+        formData.append("action", "validateSession");
+        formData.append("username", username);
+        formData.append("sessionId", sessionId);
+        
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: formData,
+            signal: controller.signal  // ADD SIGNAL FOR TIMEOUT
+        });
+        
+        clearTimeout(timeoutId);
+        
+        const data = await response.json();
+        
+        // MATCH DASHBOARD LOGIC EXACTLY
+        if (data.success && data.isLoggedIn) {
+            return true;
+        } else {
+            console.log("Session invalid:", data.message);
+            return false;
+        }
+    } catch (error) {
+        console.error("Session validation error:", error);
+        if (error.name === 'AbortError') {
+            console.log("Session validation timeout");
+            // Be more lenient on timeout - don't logout immediately
+            return true; // Allow user to stay logged in on timeout
+        }
+        return false;
+    }
+}
+
+// Start session monitoring
+function startSessionMonitoring() {
+    // Check session every 10 seconds
+    sessionMonitorInterval = setInterval(async () => {
+        const isValid = await validateSession();
+        if (!isValid) {
+            // Session invalidated
+            stopSessionMonitoring();
+            alert("Your session has been terminated from another device. You have been logged out.");
+            handleLogout();  // This should be the same as dashboard's enhancedLogout()
+        }
+    }, 10000); // Check every 10 seconds
+    
+    // Also check when page becomes visible
+    document.addEventListener("visibilitychange", async () => {
+        if (!document.hidden) {
+            await validateSession();
+        }
+    });
+    
+    console.log("Session monitoring started");
+}
+
+// Stop session monitoring
+function stopSessionMonitoring() {
+    if (sessionMonitorInterval) {
+        clearInterval(sessionMonitorInterval);
+        sessionMonitorInterval = null;
+    }
+}
+
+/* SEPARATE FUNCTION TO CHECK ADMIN STATUS */
+function checkAdminStatus() {
+  const isAdmin = localStorage.getItem("userRole") === "admin";
+  console.log("checkAdminStatus - Role:", localStorage.getItem("userRole"), "Is admin?", isAdmin);
+  
+  const adminItems = document.querySelectorAll(".admin-only");
+  console.log("checkAdminStatus - Found admin items:", adminItems.length);
+  
+  adminItems.forEach(item => {
+    const shouldShow = isAdmin ? "block" : "none";
+    item.style.display = shouldShow;
+    console.log("Setting admin item display to:", shouldShow, "for element:", item);
+  });
+}
+
+/* ENHANCED SESSION CHECK FUNCTION */
+async function sessionCheck() {
+  let isAuthenticated = false;
+  
+  try {
+    // Check if we have required session data
+    const loggedIn = localStorage.getItem("loggedIn");
+    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+    const sessionId = sessionStorage.getItem("sessionId");
+    
+    console.log("Session check - loggedIn:", loggedIn, "userName:", userName, "sessionId exists:", !!sessionId);
+    
+    // Basic validation
+    if (loggedIn !== "true" || !userName || userName === "User" || !sessionId) {
+      console.log("Missing session data, redirecting...");
+      window.location.href = 'index.html?session=expired';
+      return false;
+    }
+    
+    // Validate with server
+    const isValid = await validateSession();
+    if (!isValid) {
+      console.log("Session invalidated by server");
+      sessionStorage.removeItem('authenticated');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html?session=invalid';
+      return false;
+    }
+    
+    // Session is valid, set up UI
+    document.getElementById('userName').innerText = userName;
+    
+    // Set session flag
+    sessionStorage.setItem('authenticated', 'true');
+    
+    // Start session monitoring
+    startSessionMonitoring();
+    
+    isAuthenticated = true;
+    
+  } catch(e){ 
+    console.warn('Session check failed', e);
+    // On error, still allow access but log it
+    document.getElementById('userName').innerText = "User";
+    isAuthenticated = true; // Allow access even on error
+  }
+  
+  // CRITICAL: ALWAYS check admin status (whether try succeeded or failed)
+  checkAdminStatus();
+  
+  return isAuthenticated;
+}
+
+/* ENHANCED LOGOUT FUNCTION */
+async function handleLogout() {
+  try {
+    const username = localStorage.getItem("username");
+    const sessionId = sessionStorage.getItem("sessionId");
+    
+    // Stop session monitoring
+    stopSessionMonitoring();
+    
+    // Call server logout if we have session data
+    if (username && sessionId) {
+      try {
+        const formData = new FormData();
+        formData.append("action", "logout");
+        formData.append("username", username);
+        formData.append("sessionId", sessionId);
+        
+        // Fire and forget - don't wait for response
+        fetch(API_URL, {
+          method: "POST",
+          body: formData
+        }).catch(() => { /* ignore errors */ });
+      } catch (e) {
+        console.error("Logout API error:", e);
+      }
+    }
+    
+  } catch (err) {
+    console.error("Logout error:", err);
+  } finally {
+    // Always clear storage and redirect
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Redirect with cache-busting parameter
+    window.location.replace('index.html?logout=true&t=' + Date.now());
+  }
+}
+
+/* SETUP AUTO LOGOUT FOR INACTIVITY */
+function setupAutoLogout() {
+    let inactivityTimer;
+    
+    function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            // Show warning 1 minute before logout (29 minutes of inactivity)
+            if (confirm("You've been inactive for 29 minutes. Click OK to stay logged in, or Cancel to logout.")) {
+                resetTimer();
+            } else {
+                handleLogout();
+            }
+        }, 29 * 60 * 1000); // 29 minutes
+    }
+    
+    // Reset timer on user activity
+    ['click', 'keypress', 'mousemove', 'scroll'].forEach(event => {
+        document.addEventListener(event, resetTimer);
+    });
+    
+    // Start the timer
+    resetTimer();
+}
+
+/* INITIALIZATION - FIXED FOR dataForm.html */
+window.addEventListener('DOMContentLoaded', async () => {
+  // First check session with server validation
+  const isAuthenticated = await sessionCheck();
+  
+  if (!isAuthenticated) {
+    return; // Already redirected
+  }
+  
+  // Setup auto-logout for inactivity
+  setupAutoLogout();
+  
+  // REMOVED: Dashboard functions that don't exist in dataForm.html
+  // await loadLastUpdated();  // ← REMOVE THIS - doesn't exist here
+  // await loadDashboard();    // ← REMOVE THIS - doesn't exist here
+  
+  // REMOVED: Auto-refresh dashboard data (not needed in dataForm.html)
+  // if (refreshInterval) clearInterval(refreshInterval);
+  // refreshInterval = setInterval(loadDashboard, 30000);
+  
+  // Check screen width and adjust sidebar
+  if (window.innerWidth <= 768) {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.remove('mobile-open');
+  }
+});
+
    
+
 /* ============ HAZARD HUNTER INTEGRATION ============ */
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
 
@@ -3486,4 +3726,3 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
-
