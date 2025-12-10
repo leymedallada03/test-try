@@ -1085,49 +1085,67 @@ function initDashboardSession() {
 
 // Validate dashboard session
 async function validateDashboardSession() {
-    const username = localStorage.getItem("username");
-    const sessionId = localStorage.getItem("sessionId");
+  const username = localStorage.getItem("username");
+  const sessionId = localStorage.getItem("sessionId");
+  
+  if (!username || !sessionId) {
+    console.log("No username or sessionId found for dashboard");
+    return false;
+  }
+  
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     
-    if (!username || !sessionId) {
-        console.log("No username or sessionId found for dashboard");
-        return false;
-    }
+    const formData = new FormData();
+    formData.append('action', 'validateSession');
+    formData.append('username', username);
+    formData.append('sessionId', sessionId);
+    
+    const response = await fetch(DASHBOARD_API_URL, {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    const text = await response.text();
     
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const data = JSON.parse(text);
+      // Allow a grace period - if server is validating but browser thinks it's expired
+      if (!data.success || !data.isLoggedIn) {
+        // Check if we should give a grace period
+        const lastValidated = sessionStorage.getItem('lastValidatedSession') || 0;
+        const now = Date.now();
         
-        // Use FormData for Google Apps Script compatibility
-        const formData = new FormData();
-        formData.append('action', 'validateSession');
-        formData.append('username', username);
-        formData.append('sessionId', sessionId);
-        
-        const response = await fetch(DASHBOARD_API_URL, {
-            method: 'POST',
-            body: formData,
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        const text = await response.text();
-        
-        try {
-            const data = JSON.parse(text);
-            return data.success && data.isLoggedIn;
-        } catch (e) {
-            console.error("Failed to parse session validation response:", e);
-            return false;
+        // Allow 5 minute grace period for network/server issues
+        if (now - lastValidated < 5 * 60 * 1000) {
+          console.log("Using grace period for session validation");
+          return true;
         }
         
-    } catch (error) {
-        console.error("Dashboard session validation error:", error);
-        if (error.name === 'AbortError') {
-            console.log("Dashboard session validation timeout");
-        }
-        // If server is unreachable, assume session is still valid temporarily
-        return true;
+        return false;
+      }
+      
+      // Update last validated time
+      sessionStorage.setItem('lastValidatedSession', now.toString());
+      return true;
+    } catch (e) {
+      console.error("Failed to parse session validation response:", e);
+      // Use grace period on parse errors
+      const lastValidated = sessionStorage.getItem('lastValidatedSession') || 0;
+      const now = Date.now();
+      return (now - lastValidated < 5 * 60 * 1000);
     }
+    
+  } catch (error) {
+    console.error("Dashboard session validation error:", error);
+    // Use grace period on network errors
+    const lastValidated = sessionStorage.getItem('lastValidatedSession') || 0;
+    const now = Date.now();
+    return (now - lastValidated < 5 * 60 * 1000);
+  }
 }
 
 // Start dashboard session management
@@ -2629,6 +2647,7 @@ function notifyDataUpdated() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
 
 
 
