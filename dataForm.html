@@ -2215,31 +2215,16 @@
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
-/* INITIALIZATION - FIXED FOR dataForm.html */
-window.addEventListener('DOMContentLoaded', async () => {
-  // First check session with server validation
-  const isAuthenticated = await sessionCheck();
-  
-  if (!isAuthenticated) {
-    return; // Already redirected
-  }
-  
-  // Setup auto-logout for inactivity
-  setupAutoLogout();
-  
-  // REMOVED: Dashboard functions that don't exist in dataForm.html
-  // await loadLastUpdated();  // ← REMOVE THIS - doesn't exist here
-  // await loadDashboard();    // ← REMOVE THIS - doesn't exist here
-  
-  // REMOVED: Auto-refresh dashboard data (not needed in dataForm.html)
-  // if (refreshInterval) clearInterval(refreshInterval);
-  // refreshInterval = setInterval(loadDashboard, 30000);
+document.addEventListener('DOMContentLoaded', function() {
+  // SESSION IS HANDLED BY session-manager.js - NO NEED TO CHECK HERE
   
   // Check screen width and adjust sidebar
   if (window.innerWidth <= 768) {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.remove('mobile-open');
   }
+  
+  // FORM INITIALIZATION CONTINUES BELOW (your existing code after this block)
 });
 
    
@@ -3516,5 +3501,6 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
