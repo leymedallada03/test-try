@@ -586,6 +586,8 @@
                     <i class="fas fa-sign-in-alt"></i>
                     <span class="btn-text">Login to System</span>
                 </button>
+                <div id="loginError"></div>
+<div id="statusText"></div>
             </form>
 
             <!-- Footer -->
@@ -598,6 +600,28 @@
     <script src="index.js"></script>
         <!-- Offline detection script -->
     <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const loggedIn = localStorage.getItem('loggedIn');
+    const loginTime = localStorage.getItem('loginTime');
+    const sessionId = sessionStorage.getItem('sessionId');
+    
+    if (loggedIn === 'true' && loginTime && sessionId) {
+        // Check if session expired locally
+        const sessionAge = Date.now() - parseInt(loginTime);
+        const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+        
+        if (sessionAge < SESSION_TIMEOUT) {
+            // Redirect to dashboard if already logged in
+            console.log("Already logged in, redirecting to dashboard...");
+            window.location.href = 'dashboard.html';
+        } else {
+            // Clear expired session
+            localStorage.clear();
+            sessionStorage.clear();
+        }
+    }
+});
     // Simple offline detection
     window.addEventListener('online', () => {
         document.getElementById('offlineAlert').style.display = 'none';
@@ -618,3 +642,4 @@
     </script>
 </body>
 </html>
+
