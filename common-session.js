@@ -1,5 +1,5 @@
 // common-session.js - Handles common session tasks
-const COMMON_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+// Remove duplicate API_URL declaration
 
 // Setup logout button
 function setupLogoutButton() {
@@ -25,6 +25,9 @@ async function handleLogout(e) {
     }
     
     try {
+        // Use the global API_URL
+        const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+        
         // Log logout activity
         const formData = new FormData();
         formData.append('action', 'logActivity');
@@ -32,7 +35,7 @@ async function handleLogout(e) {
         formData.append('actor', actor);
         formData.append('action', 'User Logout');
         
-        await fetch(COMMON_API_URL, {
+        await fetch(API_URL, {
             method: 'POST',
             body: formData
         }).catch(() => {
@@ -45,7 +48,7 @@ async function handleLogout(e) {
         logoutFormData.append('username', username);
         logoutFormData.append('sessionId', sessionId);
         
-        await fetch(COMMON_API_URL, {
+        await fetch(API_URL, {
             method: 'POST',
             body: logoutFormData
         }).catch(() => {
