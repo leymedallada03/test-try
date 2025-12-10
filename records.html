@@ -2990,50 +2990,7 @@ function renderTable(){
     });
 
     updateCounts();
-}
-    
-    // ADD THESE FOR MEMBERS TOO
-    const memberUpdatedBy = document.createElement("td");
-    memberUpdatedBy.innerHTML = highlight(m['Updated By'] || 'N/A', keyword);
-    mr.appendChild(memberUpdatedBy);
-    
-    const memberUpdatedOn = document.createElement("td");
-    const memberUpdatedOnValue = m['Updated On'] || m['Last Edit Date'] || 'N/A';
-    memberUpdatedOn.innerHTML = highlight(formatDateForDisplay(memberUpdatedOnValue), keyword);
-    mr.appendChild(memberUpdatedOn);
-    
-    mr.appendChild(document.createElement("td")); // empty members column
-    mr.appendChild(document.createElement("td")); // empty actions column
-    tbody.appendChild(mr);
-});
-    });
-
-    // select all logic for page
-    const selectAll = document.getElementById("selectAll");
-    if(selectAll){
-        selectAll.checked = pageRows.every(g => selected.has(g.dataID));
-        selectAll.onchange = function(){
-            pageRows.forEach(g => {
-                if(this.checked) selected.add(g.dataID); 
-                else selected.delete(g.dataID);
-            });
-            renderTable();
-            updateCounts();
-        };
-    }
-
-    // row selects
-    document.querySelectorAll(".row-select").forEach(cb=>{
-        cb.onchange = function(){
-            const id = this.dataset.id;
-            if(this.checked) selected.add(id); 
-            else selected.delete(id);
-            updateCounts();
-        };
-    });
-
-    updateCounts();
-}
+} // <-- END OF FUNCTION - NOTHING AFTER THIS!
 
 /* ============ TOGGLE MEMBERS ============ */
 function toggleMembers(id){
@@ -4372,4 +4329,5 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
 
