@@ -3487,8 +3487,9 @@ if (sidebarToggle) {
 /* ============ VISIBILITY CHANGE HANDLER ============ */
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) {
-    // Tab became active, check session
-    sessionCheck();
+    // Tab became active - session is already monitored by session-manager.js
+    // No need to check session manually
+    console.log("Tab became active");
   }
 });
 </script>
@@ -3497,6 +3498,7 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
 
