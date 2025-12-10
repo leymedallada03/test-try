@@ -964,6 +964,13 @@
     z-index: 49;
    }
 
+   /* NEW: Style for the Updated By and Updated On columns */
+.records-table td:nth-last-child(3),
+.records-table td:nth-last-child(4) {
+  background: rgba(255,255,255,0.95);
+  z-index: 48;
+}
+
    /* Checkbox styling */
    .select-col input[type="checkbox"] {
     width: 14px;
@@ -2805,15 +2812,45 @@ function groupRows(){
     groups = Object.values(map).sort((a,b)=> Number(a.dataID) - Number(b.dataID));
 }
 
+function formatDateForDisplay(dateValue) {
+  if (!dateValue || dateValue === 'N/A') return 'N/A';
+  
+  try {
+    // If it's already a readable date string, return as is
+    if (typeof dateValue === 'string' && dateValue.includes('/')) {
+      return dateValue;
+    }
+    
+    // If it's an ISO string or timestamp
+    const date = new Date(dateValue);
+    if (!isNaN(date)) {
+      // Format as DD/MM/YYYY HH:MM
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+    
+    return dateValue;
+  } catch (e) {
+    return dateValue;
+  }
+}
+
 /* ============ RENDER ============ */
 function renderTable(){
     const thead = document.getElementById("tableHead");
     const tbody = document.getElementById("tableBody");
     thead.innerHTML = ""; tbody.innerHTML = "";
 
-    // header row
+    // header row - ADD THE NEW COLUMNS
     let th = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
     header.forEach(c => th += `<th>${c}</th>`);
+    // Add these new columns before the actions columns
+    th += `<th>Updated By</th><th>Updated On</th>`;
     th += `<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>`;
     thead.innerHTML = th;
 
@@ -2855,6 +2892,16 @@ function renderTable(){
             tr.appendChild(td);
         });
 
+        // ADD THESE NEW COLUMNS FOR HEAD
+        const tdUpdatedBy = document.createElement("td");
+        tdUpdatedBy.innerHTML = highlight(head['Updated By'] || 'N/A', keyword);
+        tr.appendChild(tdUpdatedBy);
+        
+        const tdUpdatedOn = document.createElement("td");
+        const updatedOnValue = head['Updated On'] || head['Last Edit Date'] || 'N/A';
+        tdUpdatedOn.innerHTML = highlight(formatDateForDisplay(updatedOnValue), keyword);
+        tr.appendChild(tdUpdatedOn);
+
         // show toggle
         const tdShow = document.createElement("td"); 
         tdShow.className = "actions-col";
@@ -2876,12 +2923,13 @@ function renderTable(){
 
         tbody.appendChild(tr);
 
-        // member rows
+        // member rows - also add for members
         g.members.forEach(m=>{
             const mr = document.createElement("tr");
             mr.className = "member-row hidden";
             mr.dataset.parent = g.dataID;
             mr.appendChild(document.createElement("td")); // empty select col
+            
             header.forEach(col=>{
                 const td = document.createElement("td");
                 const cellValue = m[col] || "";
@@ -2900,10 +2948,64 @@ function renderTable(){
                 }
                 mr.appendChild(td);
             });
+            
+            // ADD THESE FOR MEMBERS TOO
+            const memberUpdatedBy = document.createElement("td");
+            memberUpdatedBy.innerHTML = highlight(m['Updated By'] || 'N/A', keyword);
+            mr.appendChild(memberUpdatedBy);
+            
+            const memberUpdatedOn = document.createElement("td");
+            const memberUpdatedOnValue = m['Updated On'] || m['Last Edit Date'] || 'N/A';
+            memberUpdatedOn.innerHTML = highlight(formatDateForDisplay(memberUpdatedOnValue), keyword);
+            mr.appendChild(memberUpdatedOn);
+            
             mr.appendChild(document.createElement("td")); // empty members column
             mr.appendChild(document.createElement("td")); // empty actions column
             tbody.appendChild(mr);
         });
+    });
+
+    // select all logic for page
+    const selectAll = document.getElementById("selectAll");
+    if(selectAll){
+        selectAll.checked = pageRows.every(g => selected.has(g.dataID));
+        selectAll.onchange = function(){
+            pageRows.forEach(g => {
+                if(this.checked) selected.add(g.dataID); 
+                else selected.delete(g.dataID);
+            });
+            renderTable();
+            updateCounts();
+        };
+    }
+
+    // row selects
+    document.querySelectorAll(".row-select").forEach(cb=>{
+        cb.onchange = function(){
+            const id = this.dataset.id;
+            if(this.checked) selected.add(id); 
+            else selected.delete(id);
+            updateCounts();
+        };
+    });
+
+    updateCounts();
+}
+    
+    // ADD THESE FOR MEMBERS TOO
+    const memberUpdatedBy = document.createElement("td");
+    memberUpdatedBy.innerHTML = highlight(m['Updated By'] || 'N/A', keyword);
+    mr.appendChild(memberUpdatedBy);
+    
+    const memberUpdatedOn = document.createElement("td");
+    const memberUpdatedOnValue = m['Updated On'] || m['Last Edit Date'] || 'N/A';
+    memberUpdatedOn.innerHTML = highlight(formatDateForDisplay(memberUpdatedOnValue), keyword);
+    mr.appendChild(memberUpdatedOn);
+    
+    mr.appendChild(document.createElement("td")); // empty members column
+    mr.appendChild(document.createElement("td")); // empty actions column
+    tbody.appendChild(mr);
+});
     });
 
     // select all logic for page
@@ -4270,3 +4372,4 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
