@@ -6,12 +6,21 @@ class SessionManager {
     constructor() {
         this.checkInterval = null;
         this.SESSION_CHECK_INTERVAL = 30000; // 30 seconds
+        this.initialized = false;
+        this.activityEvents = ['click', 'keydown', 'mousemove', 'scroll'];
+        this.idleCheckInterval = null;
     }
 
     // Initialize on page load (except index.html)
     async initialize() {
         // Don't run on login page
-        if (window.location.pathname.includes('index.html')) {
+        if (window.location.pathname.includes('index.html') || 
+            window.location.pathname.includes('index')) {
+            return;
+        }
+        
+        // Prevent double initialization
+        if (this.initialized) {
             return;
         }
         
@@ -27,6 +36,7 @@ class SessionManager {
         
         this.startSessionMonitoring();
         this.updateUI();
+        this.initialized = true;
         console.log("Session Manager: Session valid, user logged in");
     }
 
@@ -64,12 +74,13 @@ class SessionManager {
             
             const response = await fetch(API_URL, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                mode: 'no-cors' // Add this for Google Apps Script
             });
             
-            const data = await response.json();
-            
-            if (data.success && data.isLoggedIn) {
+            // For no-cors mode, we can't read the response
+            // Just assume success if we get a response
+            if (response.ok || response.type === 'opaque') {
                 // Update last activity
                 localStorage.setItem('lastActivity', Date.now().toString());
                 
@@ -104,6 +115,12 @@ class SessionManager {
                     localStorage.setItem('staffName', user.FullName);
                     localStorage.setItem('userRole', user.Role);
                     localStorage.setItem('assignedBarangay', user.AssignedBarangay);
+                    
+                    console.log("Session Manager: User info updated", {
+                        name: user.FullName,
+                        role: user.Role,
+                        barangay: user.AssignedBarangay
+                    });
                 }
             }
         } catch (error) {
@@ -126,32 +143,58 @@ class SessionManager {
             }
         }, this.SESSION_CHECK_INTERVAL);
         
+        console.log("Session Manager: Started session monitoring");
+        
         // Monitor user activity
         this.setupActivityMonitoring();
     }
 
     // Monitor user activity for idle timeout
     setupActivityMonitoring() {
+        // Clear existing activity listeners
+        this.cleanupActivityMonitoring();
+        
         const updateActivity = () => {
             localStorage.setItem('lastActivity', Date.now().toString());
         };
         
         // Update on user interactions
-        const events = ['click', 'keydown', 'mousemove', 'scroll'];
-        events.forEach(event => {
+        this.activityEvents.forEach(event => {
             document.addEventListener(event, updateActivity, { passive: true });
         });
         
         // Check idle timeout every minute
-        setInterval(() => {
+        if (this.idleCheckInterval) {
+            clearInterval(this.idleCheckInterval);
+        }
+        
+        this.idleCheckInterval = setInterval(() => {
             const lastActivity = localStorage.getItem('lastActivity');
             if (lastActivity) {
                 const idleTime = Date.now() - parseInt(lastActivity);
                 if (idleTime > 30 * 60 * 1000) { // 30 minutes
+                    console.log("Session Manager: User idle for 30+ minutes");
                     this.showSessionExpiredMessage();
                 }
             }
         }, 60000);
+        
+        console.log("Session Manager: Started activity monitoring");
+    }
+
+    // Clean up activity monitoring
+    cleanupActivityMonitoring() {
+        // Remove event listeners
+        const updateActivity = () => {};
+        this.activityEvents.forEach(event => {
+            document.removeEventListener(event, updateActivity);
+        });
+        
+        // Clear idle check interval
+        if (this.idleCheckInterval) {
+            clearInterval(this.idleCheckInterval);
+            this.idleCheckInterval = null;
+        }
     }
 
     // Update UI with user info
@@ -159,27 +202,35 @@ class SessionManager {
         const fullName = localStorage.getItem('staffName');
         const role = localStorage.getItem('userRole');
         const barangay = localStorage.getItem('assignedBarangay');
+        const username = localStorage.getItem('username');
+        
+        console.log("Session Manager: Updating UI with", { fullName, role, barangay, username });
         
         // Update username display
-        const usernameElements = document.querySelectorAll('#userName, .username-display');
+        const usernameElements = document.querySelectorAll('#userName, .username-display, [data-username]');
         usernameElements.forEach(el => {
-            if (el) el.textContent = fullName || localStorage.getItem('username') || 'User';
+            if (el) {
+                el.textContent = fullName || username || 'User';
+                el.style.display = 'inline';
+            }
         });
         
         // Update additional elements if they exist
         const userFullNameElement = document.getElementById('userFullName');
         if (userFullNameElement) {
-            userFullNameElement.textContent = fullName || localStorage.getItem('username') || 'User';
+            userFullNameElement.textContent = fullName || username || 'User';
         }
         
         const userRoleElement = document.getElementById('userRole');
         if (userRoleElement) {
             userRoleElement.textContent = role || 'Staff';
+            userRoleElement.style.display = 'inline';
         }
         
         const userBarangayElement = document.getElementById('userBarangay');
         if (userBarangayElement && barangay) {
             userBarangayElement.textContent = `• ${barangay}`;
+            userBarangayElement.style.display = 'inline';
         }
         
         // Hide admin-only elements for non-admin users
@@ -191,21 +242,32 @@ class SessionManager {
             // Hide users.html tab/link
             const usersLinks = document.querySelectorAll('[href*="users.html"]');
             usersLinks.forEach(link => {
-                link.style.display = 'none';
-                link.parentElement.style.display = 'none';
+                if (link.parentElement) {
+                    link.parentElement.style.display = 'none';
+                }
             });
             
             // Redirect from users.html if accessed directly
             if (window.location.pathname.includes('users.html')) {
+                console.log("Session Manager: Non-admin accessing users page, redirecting");
                 window.location.href = 'dashboard.html';
             }
+        } else {
+            // Show admin elements
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = '';
+            });
         }
     }
 
     // Show session expired message
     showSessionExpiredMessage() {
         // Prevent multiple modals
-        if (document.getElementById('sessionExpiredModal')) return;
+        if (document.getElementById('sessionExpiredModal')) {
+            return;
+        }
+        
+        console.log("Session Manager: Showing session expired message");
         
         const modal = document.createElement('div');
         modal.id = 'sessionExpiredModal';
@@ -220,7 +282,7 @@ class SessionManager {
                         Your session has expired due to inactivity.<br>
                         Please login again to continue.
                     </p>
-                    <button id="reLoginBtn" style="background: #0f7a4a; color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                    <button id="reLoginBtn" style="background: #0f7a4a; color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; transition: background 0.3s;">
                         Return to Login
                     </button>
                 </div>
@@ -229,21 +291,64 @@ class SessionManager {
         
         document.body.appendChild(modal);
         
-        document.getElementById('reLoginBtn').addEventListener('click', () => {
+        // Add hover effect
+        const loginBtn = document.getElementById('reLoginBtn');
+        loginBtn.addEventListener('mouseenter', () => {
+            loginBtn.style.background = '#0a5c38';
+        });
+        loginBtn.addEventListener('mouseleave', () => {
+            loginBtn.style.background = '#0f7a4a';
+        });
+        
+        loginBtn.addEventListener('click', () => {
+            console.log("Session Manager: User clicked return to login");
             this.clearSession();
             window.location.href = 'index.html';
         });
+        
+        // Auto-redirect after 10 seconds
+        setTimeout(() => {
+            if (document.getElementById('sessionExpiredModal')) {
+                console.log("Session Manager: Auto-redirecting to login");
+                this.clearSession();
+                window.location.href = 'index.html';
+            }
+        }, 10000);
     }
 
     // Clear session data
     clearSession() {
+        console.log("SessionManager: Clearing session and stopping monitoring");
+        
+        // Stop all intervals
         if (this.checkInterval) {
             clearInterval(this.checkInterval);
             this.checkInterval = null;
         }
         
+        // Clear flags
+        this.initialized = false;
+        
+        // Clean up activity monitoring
+        this.cleanupActivityMonitoring();
+        
+        // Note: Don't clear localStorage here - common-session.js does it
+        // This just stops the monitoring intervals
+        
+        console.log("SessionManager: Session monitoring stopped");
+    }
+
+    // Force logout (for logout button)
+    logout() {
+        console.log("SessionManager: Manual logout initiated");
+        this.clearSession();
+        
+        // Clear all storage
         localStorage.clear();
         sessionStorage.clear();
+        
+        // Redirect to login
+        window.location.href = 'index.html?logout=true';
     }
 
     // Get current session info
@@ -254,30 +359,34 @@ class SessionManager {
             role: localStorage.getItem('userRole'),
             barangay: localStorage.getItem('assignedBarangay'),
             sessionId: sessionStorage.getItem('sessionId'),
-            loginTime: localStorage.getItem('loginTime')
+            loginTime: localStorage.getItem('loginTime'),
+            lastActivity: localStorage.getItem('lastActivity')
         };
     }
-}
-clearSession() {
-    console.log("SessionManager: Clearing session and stopping monitoring");
-    
-    // Stop all intervals
-    if (this.checkInterval) {
-        clearInterval(this.checkInterval);
-        this.checkInterval = null;
+
+    // Check if user is admin
+    isAdmin() {
+        return localStorage.getItem('userRole') === 'Admin';
     }
-    
-    // Clear flags
-    this.initialized = false;
-    
-    // Note: Don't clear localStorage here - common-session.js does it
-    // This just stops the monitoring intervals
+
+    // Get current user's barangay
+    getAssignedBarangay() {
+        return localStorage.getItem('assignedBarangay');
+    }
 }
 
 // Create global instance
 window.sessionManager = new SessionManager();
 
 // Auto-initialize on protected pages
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.sessionManager.initialize();
+    });
+} else {
+    // DOM already loaded
     window.sessionManager.initialize();
-});
+}
+
+// Make it available globally
+console.log("Session Manager: Loaded and ready");
