@@ -1,11 +1,4 @@
-// In index.js, change from:
-const API_URL = "your-url";
-
-// To:
-if (typeof window.SCRIPT_URL === 'undefined') {
-    window.SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
-}
-const SCRIPT_URL = window.SCRIPT_URL; // Use SCRIPT_URL consistently
+const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 
 // Session timeout (30 minutes = 1800000 ms)
