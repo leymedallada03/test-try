@@ -1,6 +1,8 @@
 // Activity Tracking for All Pages
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
-
+// Only define SCRIPT_URL globally if it doesn't already exist
+if (typeof window.SCRIPT_URL === 'undefined') {
+  window.SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+}
 // Log user activity to server
 // Log user activity to server
 function logUserActivityToServer(action = "Page View") {
