@@ -1035,6 +1035,8 @@
 <script>
 /* CONFIG */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+// ADD THIS LINE - define DASHBOARD_API_URL (same as API_URL)
+const DASHBOARD_API_URL = API_URL; // Use the same URL
 let chart = null;
 let lastUpdatedTime = null;
 let refreshInterval = null;
@@ -1095,26 +1097,36 @@ async function validateDashboardSession() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
         
+        // Use FormData for Google Apps Script compatibility
+        const formData = new FormData();
+        formData.append('action', 'validateSession');
+        formData.append('username', username);
+        formData.append('sessionId', sessionId);
+        
         const response = await fetch(DASHBOARD_API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `action=validateSession&username=${encodeURIComponent(username)}&sessionId=${encodeURIComponent(sessionId)}`,
+            body: formData,
             signal: controller.signal
         });
         
         clearTimeout(timeoutId);
-        const data = await response.json();
+        const text = await response.text();
         
-        return data.success && data.isLoggedIn;
+        try {
+            const data = JSON.parse(text);
+            return data.success && data.isLoggedIn;
+        } catch (e) {
+            console.error("Failed to parse session validation response:", e);
+            return false;
+        }
         
     } catch (error) {
         console.error("Dashboard session validation error:", error);
         if (error.name === 'AbortError') {
             console.log("Dashboard session validation timeout");
         }
-        return false;
+        // If server is unreachable, assume session is still valid temporarily
+        return true;
     }
 }
 
@@ -1186,12 +1198,16 @@ function setupDashboardActivityTracking(username) {
 
 // Log dashboard activity
 function logDashboardActivity(username, action) {
+    if (!username || !DASHBOARD_API_URL) return;
+    
+    const formData = new FormData();
+    formData.append('action', 'logActivity');
+    formData.append('username', username);
+    formData.append('action', `Dashboard: ${action}`);
+    
     fetch(DASHBOARD_API_URL, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `action=logActivity&username=${encodeURIComponent(username)}&action=${encodeURIComponent("Dashboard: " + action)}`
+        body: formData
     }).catch(() => {
         // Silently fail if server unreachable
     });
@@ -1216,12 +1232,14 @@ async function enhancedDashboardLogout() {
     // Send logout to server
     if (username && sessionId) {
         try {
+            const formData = new FormData();
+            formData.append('action', 'logout');
+            formData.append('username', username);
+            formData.append('sessionId', sessionId);
+            
             await fetch(DASHBOARD_API_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=logout&username=${encodeURIComponent(username)}&sessionId=${encodeURIComponent(sessionId)}`,
+                body: formData,
                 keepalive: true
             });
         } catch (error) {
@@ -1271,6 +1289,11 @@ function showDashboardSessionExpired() {
     document.body.appendChild(modal);
 }
 
+// Enhanced logout for dashboard (compatibility with existing code)
+function enhancedLogout() {
+    enhancedDashboardLogout();
+}
+   
 /* DASHBOARD INITIALIZATION */
 document.addEventListener('DOMContentLoaded', async function() {
     // Initialize dashboard session management
@@ -1280,41 +1303,44 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
     
-    // Load dashboard data
-    if (typeof loadDashboard === 'function') {
-        await loadDashboard();
-    }
-    
-    // Load last updated time
-    if (typeof loadLastUpdated === 'function') {
-        await loadLastUpdated();
-    }
-    
-    // Setup auto-refresh for dashboard data
-    if (typeof refreshInterval !== 'undefined' && refreshInterval) {
-        clearInterval(refreshInterval);
-    }
-    
-    // Auto-refresh dashboard every 30 seconds
-    refreshInterval = setInterval(() => {
+    // Wait a moment for session validation to start
+    setTimeout(async () => {
+        // Load dashboard data
         if (typeof loadDashboard === 'function') {
-            loadDashboard();
+            await loadDashboard();
         }
-    }, 30000);
-    
-    // Handle responsive sidebar
-    if (window.innerWidth <= 768) {
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            sidebar.classList.remove('mobile-open');
+        
+        // Load last updated time
+        if (typeof loadLastUpdated === 'function') {
+            await loadLastUpdated();
         }
-    }
-    
-    // Track dashboard widget loading
-    const username = localStorage.getItem("username");
-    if (username) {
-        logDashboardActivity(username, "Dashboard widgets loaded");
-    }
+        
+        // Setup auto-refresh for dashboard data
+        if (typeof refreshInterval !== 'undefined' && refreshInterval) {
+            clearInterval(refreshInterval);
+        }
+        
+        // Auto-refresh dashboard every 30 seconds
+        refreshInterval = setInterval(() => {
+            if (typeof loadDashboard === 'function') {
+                loadDashboard();
+            }
+        }, 30000);
+        
+        // Handle responsive sidebar
+        if (window.innerWidth <= 768) {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.remove('mobile-open');
+            }
+        }
+        
+        // Track dashboard widget loading
+        const username = localStorage.getItem("username");
+        if (username) {
+            logDashboardActivity(username, "Dashboard widgets loaded");
+        }
+    }, 500); // Small delay to ensure session validation is ready
 });
 
 /* helpers */
@@ -2603,6 +2629,7 @@ function notifyDataUpdated() {
 <script src="activity-tracking.js"></script>
 </body>
 </html>
+
 
 
 
