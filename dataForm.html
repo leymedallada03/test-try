@@ -2963,21 +2963,15 @@ document.addEventListener('input', (ev) => {
 });
 
 /* ---------------- DOM loaded bindings ---------------- */
-document.addEventListener('DOMContentLoaded', async () => {
-  // First check session
-  const isAuthenticated = await sessionCheck();
+document.addEventListener('DOMContentLoaded', function() {
+  // SESSION IS HANDLED BY session-manager.js
   
-  if (!isAuthenticated) {
-    return; // Stop if not authenticated
-  }
-
   // Original DOMContentLoaded code continues here...
-  ensureLoginOrRedirect(); // You can remove this if using sessionCheck()
-  document.getElementById("userName").innerText = localStorage.getItem("staffName") || "";
+  ensureLoginOrRedirect(); // Basic local check
+  document.getElementById("userName").innerText = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
 
-  // Check if user is admin - THIS IS NOW HANDLED IN sessionCheck()
-  // But keep for backward compatibility
-  const isAdmin = localStorage.getItem("userRole") === "admin";
+  // Check if user is admin - session-manager.js handles this, but keep as backup
+  const isAdmin = localStorage.getItem("userRole") === "Admin";
   const adminItems = document.querySelectorAll(".admin-only");
   adminItems.forEach(item => {
     item.style.display = isAdmin ? "block" : "none";
@@ -2996,15 +2990,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const contactInput = document.getElementById("contactNo");
   const contactError = document.getElementById("contactError");
   
-  contactInput.addEventListener('blur', () => {
-    validateContactInput(contactInput, contactError);
-  });
-  
-  contactInput.addEventListener('input', () => {
-    // Clear error while typing
-    contactInput.classList.remove('input-error');
-    contactError.style.display = 'none';
-  });
+  if (contactInput) {
+    contactInput.addEventListener('blur', () => {
+      validateContactInput(contactInput, contactError);
+    });
+    
+    contactInput.addEventListener('input', () => {
+      // Clear error while typing
+      contactInput.classList.remove('input-error');
+      contactError.style.display = 'none';
+    });
+  }
 
   // Member contact number validation
   const memberContactInput = document.getElementById("memberContact");
@@ -3501,6 +3497,7 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
 
