@@ -1,33 +1,32 @@
-// session-manager.js - Session Manager for All Pages
+// session-manager.js
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
 class SessionManager {
     constructor() {
-        this.sessionId = null;
-        this.username = null;
         this.checkInterval = null;
         this.SESSION_CHECK_INTERVAL = 30000; // 30 seconds
-        this.SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
     }
 
-    // Initialize on all pages
+    // Initialize on page load (except index.html)
     async initialize() {
-        console.log("Session Manager initializing...");
-        
-        // Don't validate on login page
+        // Don't run on login page
         if (window.location.pathname.includes('index.html')) {
             return;
         }
         
+        console.log("Session Manager: Checking session...");
+        
         const isValid = await this.validateSession();
         
         if (!isValid) {
+            console.log("Session Manager: Invalid session, redirecting to login");
             window.location.href = 'index.html?session=expired';
             return;
         }
         
         this.startSessionMonitoring();
         this.updateUI();
+        console.log("Session Manager: Session valid, user logged in");
     }
 
     // Validate session with server
@@ -37,21 +36,25 @@ class SessionManager {
         const sessionId = sessionStorage.getItem('sessionId');
         const loginTime = localStorage.getItem('loginTime');
         
+        // Basic checks
         if (loggedIn !== 'true' || !username || !sessionId || !loginTime) {
+            console.log("Session Manager: Missing session data");
             this.clearSession();
             return false;
         }
         
-        // Check local timeout first
+        // Check local timeout (30 minutes)
         const sessionAge = Date.now() - parseInt(loginTime);
-        if (sessionAge > this.SESSION_TIMEOUT) {
+        if (sessionAge > 30 * 60 * 1000) {
+            console.log("Session Manager: Session expired locally");
             this.clearSession();
             return false;
         }
         
         try {
+            // Validate with server
             const formData = new FormData();
-            formData.append('action', 'validateSessionWithFullName');
+            formData.append('action', 'validateSession');
             formData.append('username', username);
             formData.append('sessionId', sessionId);
             
@@ -63,27 +66,42 @@ class SessionManager {
             const data = await response.json();
             
             if (data.success && data.isLoggedIn) {
-                this.sessionId = sessionId;
-                this.username = username;
-                
-                // Store user data
-                if (data.user) {
-                    localStorage.setItem('staffName', data.user.FullName);
-                    localStorage.setItem('userRole', data.user.Role);
-                    localStorage.setItem('assignedBarangay', data.user.AssignedBarangay);
-                }
-                
                 // Update last activity
                 localStorage.setItem('lastActivity', Date.now().toString());
                 
+                // Try to get updated user info
+                await this.updateUserInfo(username);
+                
                 return true;
             } else {
+                console.log("Session Manager: Server validation failed");
                 this.clearSession();
                 return false;
             }
         } catch (error) {
-            console.error('Session validation error:', error);
-            return false;
+            console.error("Session Manager: Validation error, continuing with local session", error);
+            // If server unreachable, continue with local session
+            localStorage.setItem('lastActivity', Date.now().toString());
+            return true;
+        }
+    }
+
+    // Update user info from server
+    async updateUserInfo(username) {
+        try {
+            const response = await fetch(`${API_URL}?action=users&t=${Date.now()}`);
+            const data = await response.json();
+            
+            if (data.success && data.users) {
+                const user = data.users.find(u => u.Username === username);
+                if (user) {
+                    localStorage.setItem('staffName', user.FullName);
+                    localStorage.setItem('userRole', user.Role);
+                    localStorage.setItem('assignedBarangay', user.AssignedBarangay);
+                }
+            }
+        } catch (error) {
+            console.error("Session Manager: Failed to update user info", error);
         }
     }
 
@@ -94,7 +112,7 @@ class SessionManager {
             clearInterval(this.checkInterval);
         }
         
-        // Check session every 30 seconds
+        // Check session periodically
         this.checkInterval = setInterval(async () => {
             const isValid = await this.validateSession();
             if (!isValid) {
@@ -106,13 +124,13 @@ class SessionManager {
         this.setupActivityMonitoring();
     }
 
-    // Setup activity monitoring
+    // Monitor user activity for idle timeout
     setupActivityMonitoring() {
-        // Update activity on user interactions
         const updateActivity = () => {
             localStorage.setItem('lastActivity', Date.now().toString());
         };
         
+        // Update on user interactions
         const events = ['click', 'keydown', 'mousemove', 'scroll'];
         events.forEach(event => {
             document.addEventListener(event, updateActivity, { passive: true });
@@ -123,7 +141,7 @@ class SessionManager {
             const lastActivity = localStorage.getItem('lastActivity');
             if (lastActivity) {
                 const idleTime = Date.now() - parseInt(lastActivity);
-                if (idleTime > this.SESSION_TIMEOUT) {
+                if (idleTime > 30 * 60 * 1000) { // 30 minutes
                     this.showSessionExpiredMessage();
                 }
             }
@@ -137,29 +155,15 @@ class SessionManager {
         const barangay = localStorage.getItem('assignedBarangay');
         
         // Update username display
-        const usernameElements = document.querySelectorAll('#userName, .user-fullname');
+        const usernameElements = document.querySelectorAll('#userName, .username-display');
         usernameElements.forEach(el => {
-            if (el) el.textContent = fullName || 'User';
+            if (el) el.textContent = fullName || localStorage.getItem('username') || 'User';
         });
         
-        // Hide admin-only elements
-        if (role !== 'Admin') {
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            // Hide users.html tab/link
-            const usersLinks = document.querySelectorAll('[href*="users.html"]');
-            usersLinks.forEach(link => {
-                link.style.display = 'none';
-                link.parentElement.style.display = 'none';
-            });
-        }
-        
-        // Add user info to header if elements exist
+        // Update additional elements if they exist
         const userFullNameElement = document.getElementById('userFullName');
         if (userFullNameElement) {
-            userFullNameElement.textContent = fullName || 'User';
+            userFullNameElement.textContent = fullName || localStorage.getItem('username') || 'User';
         }
         
         const userRoleElement = document.getElementById('userRole');
@@ -171,18 +175,45 @@ class SessionManager {
         if (userBarangayElement && barangay) {
             userBarangayElement.textContent = `• ${barangay}`;
         }
+        
+        // Hide admin-only elements for non-admin users
+        if (role !== 'Admin') {
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Hide users.html tab/link
+            const usersLinks = document.querySelectorAll('[href*="users.html"]');
+            usersLinks.forEach(link => {
+                link.style.display = 'none';
+                link.parentElement.style.display = 'none';
+            });
+            
+            // Redirect from users.html if accessed directly
+            if (window.location.pathname.includes('users.html')) {
+                window.location.href = 'dashboard.html';
+            }
+        }
     }
 
     // Show session expired message
     showSessionExpiredMessage() {
+        // Prevent multiple modals
+        if (document.getElementById('sessionExpiredModal')) return;
+        
         const modal = document.createElement('div');
+        modal.id = 'sessionExpiredModal';
         modal.innerHTML = `
             <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; text-align: center;">
-                    <h3 style="color: #d32f2f; margin-top: 0;">
-                        <i class="fas fa-exclamation-triangle"></i> Session Expired
-                    </h3>
-                    <p>Your session has expired due to inactivity.</p>
+                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    <div style="font-size: 48px; color: #ff9800; margin-bottom: 20px;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">Session Expired</h3>
+                    <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">
+                        Your session has expired due to inactivity.<br>
+                        Please login again to continue.
+                    </p>
                     <button id="reLoginBtn" style="background: #0f7a4a; color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600;">
                         Return to Login
                     </button>
@@ -198,7 +229,7 @@ class SessionManager {
         });
     }
 
-    // Clear session
+    // Clear session data
     clearSession() {
         if (this.checkInterval) {
             clearInterval(this.checkInterval);
@@ -209,14 +240,15 @@ class SessionManager {
         sessionStorage.clear();
     }
 
-    // Get user info
-    getUserInfo() {
+    // Get current session info
+    getSessionInfo() {
         return {
             username: localStorage.getItem('username'),
             fullName: localStorage.getItem('staffName'),
             role: localStorage.getItem('userRole'),
             barangay: localStorage.getItem('assignedBarangay'),
-            sessionId: sessionStorage.getItem('sessionId')
+            sessionId: sessionStorage.getItem('sessionId'),
+            loginTime: localStorage.getItem('loginTime')
         };
     }
 }
@@ -224,7 +256,7 @@ class SessionManager {
 // Create global instance
 window.sessionManager = new SessionManager();
 
-// Auto-initialize on page load
+// Auto-initialize on protected pages
 document.addEventListener('DOMContentLoaded', () => {
     window.sessionManager.initialize();
 });
