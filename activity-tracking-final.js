@@ -1,5 +1,5 @@
 // activity-tracking.js - Enhanced with Full Name support
-const ACTIVITY_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+// Remove duplicate API_URL declaration
 
 class ActivityTracker {
     constructor() {
@@ -39,6 +39,8 @@ class ActivityTracker {
         if (!username || username === 'Unknown') return;
         
         try {
+            const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+            
             const formData = new FormData();
             formData.append('action', 'logActivity');
             formData.append('username', username);
@@ -49,7 +51,7 @@ class ActivityTracker {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
             
-            await fetch(ACTIVITY_API_URL, {
+            await fetch(API_URL, {
                 method: 'POST',
                 body: formData,
                 signal: controller.signal
