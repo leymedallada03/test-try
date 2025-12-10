@@ -3869,6 +3869,14 @@ async function saveEditedHousehold(silentReload = false){
       member['Updated On'] = formattedDate;
     });
 
+    // ADD DEBUG LOGGING HERE
+    console.log('=== DEBUG: Sending update to server ===');
+    console.log('Data ID:', editDataID);
+    console.log('Head:', editHead);
+    console.log('Members count:', editMembers.length);
+    console.log('Members:', editMembers);
+    console.log('=== END DEBUG ===');
+
     const fd = new FormData();
     fd.append('action','updateHousehold');
     fd.append('dataID', editDataID);
@@ -3880,6 +3888,9 @@ async function saveEditedHousehold(silentReload = false){
     
     // CRITICAL: Add clearExisting flag to tell server to clear existing rows
     fd.append('clearExisting', 'true');
+    
+    // NEW: Add insertAtOriginalPosition flag to tell server to insert at correct position
+    fd.append('insertAtOriginalPosition', 'true');
 
     // Set loading state AFTER validation
     if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
@@ -3904,11 +3915,15 @@ async function saveEditedHousehold(silentReload = false){
     
     if(!json.success){ 
       alert('Save failed: ' + (json.message || JSON.stringify(json))); 
-      console.error(json); 
+      console.error('Server error:', json); 
     }
     else {
       if(!silentReload) alert('Household updated (Data ID: ' + (editDataID||'') + ')');
       closeEditPanel();
+      
+      // Clear cache and reload
+      localStorage.removeItem('recordsCache');
+      localStorage.removeItem('recordsCacheTime');
       loadRecords();
     }
   } catch(err){
