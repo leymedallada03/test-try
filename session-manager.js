@@ -1,5 +1,6 @@
-// session-manager.js
-const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+// session-manager.js - Session Manager for All Pages
+// Remove this line: const API_URL = "YOUR_URL";
+// Use the existing API_URL from index.js
 
 class SessionManager {
     constructor() {
@@ -52,6 +53,9 @@ class SessionManager {
         }
         
         try {
+            // Use the global API_URL from index.js or define it locally
+            const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+            
             // Validate with server
             const formData = new FormData();
             formData.append('action', 'validateSession');
@@ -89,6 +93,8 @@ class SessionManager {
     // Update user info from server
     async updateUserInfo(username) {
         try {
+            const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+            
             const response = await fetch(`${API_URL}?action=users&t=${Date.now()}`);
             const data = await response.json();
             
