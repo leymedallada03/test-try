@@ -815,3 +815,28 @@ async function testAPIConnection() {
 // Make functions available globally
 window.handleForceLogout = handleForceLogout;
 window.closeError = closeError;
+// In your index.js, update the storeSessionData function:
+function storeSessionData(user, pwHash, sessionId) {
+    // Clear any existing storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Store in sessionStorage
+    sessionStorage.setItem('sessionId', sessionId);
+    sessionStorage.setItem('sessionExpiry', (Date.now() + SESSION_TIMEOUT).toString());
+    sessionStorage.setItem('authenticated', 'true');
+    
+    // Store in localStorage
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('username', user.Username);
+    localStorage.setItem('staffName', user.FullName); // This is the Full Name
+    localStorage.setItem('userRole', user.Role);
+    localStorage.setItem('role', user.Role);
+    localStorage.setItem('assignedBarangay', user.AssignedBarangay || '');
+    localStorage.setItem('pwHash', pwHash);
+    localStorage.setItem('loginTime', Date.now().toString());
+    localStorage.setItem('lastActivity', Date.now().toString());
+    localStorage.setItem('deviceInfo', JSON.stringify(getDeviceInfo()));
+
+    console.log("Session data stored. Full Name:", user.FullName);
+}
