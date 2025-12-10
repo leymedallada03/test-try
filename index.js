@@ -1,14 +1,21 @@
 /* COMPLETE index.js with Enhanced Session Management - UPDATED VERSION */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
-// Session timeout (15 minutes = 900000 ms) - REDUCED FROM 30 TO 15 MINUTES
-const SESSION_TIMEOUT = 15 * 60 * 1000;
+// Session timeout (30 minutes = 1800000 ms) - UPDATED TO 30 MINUTES TO MATCH BACKEND
+const SESSION_TIMEOUT = 30 * 60 * 1000;
 const SESSION_CHECK_INTERVAL = 30000; // Check every 30 seconds
+const SESSION_RENEWAL_INTERVAL = 10 * 60 * 1000; // Renew every 10 minutes
 let sessionCheckInterval = null;
 let sessionActivityInterval = null;
 let passiveViewInterval = null;
 let lastActivityUpdate = 0;
 const MIN_UPDATE_INTERVAL = 10000; // 10 seconds minimum between updates
+
+// Session intervals for cleanup
+window.sessionIntervals = {
+    heartbeat: null,
+    renewal: null
+};
 
 // Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,6 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Check if user was previously logged in
     checkPreviousSession();
+    
+    // Setup beforeunload cleanup
+    window.addEventListener('beforeunload', cleanupBeforeUnload);
 });
 
 // --------------------------
@@ -152,7 +162,7 @@ function setupUI() {
                     e.preventDefault();
                 }
             } else if (focused.id === 'password') {
-                const loginForm = document.getElementById('loginForm');
+                const loginForm = document.getElementById("loginForm");
                 if (loginForm) {
                     loginForm.dispatchEvent(new Event('submit'));
                 }
@@ -373,6 +383,7 @@ function storeSession(userData, sessionId) {
     localStorage.setItem("userRole", userData.Role);
     localStorage.setItem("sessionId", sessionId);
     localStorage.setItem("assignedBarangay", userData.AssignedBarangay || "");
+    localStorage.setItem("lastSessionRenewal", Date.now().toString());
 }
 
 // Check stored session on page load
@@ -528,6 +539,17 @@ async function validateSession() {
             // Server validation error
             console.warn("Session validation error:", response.message);
             
+            // Check grace period
+            const lastValidated = sessionStorage.getItem('lastValidatedSession') || 0;
+            const now = Date.now();
+            
+            // Allow 5 minute grace period for network/server issues
+            if (now - lastValidated < 5 * 60 * 1000) {
+                console.log("Using grace period for session validation");
+                sessionStorage.setItem('lastActivity', Date.now().toString());
+                return true;
+            }
+            
             // Don't logout immediately for validation errors
             // Keep local session alive for now
             sessionStorage.setItem('lastActivity', Date.now().toString());
@@ -536,6 +558,15 @@ async function validateSession() {
         
         if (!response.isLoggedIn) {
             // Session invalid or expired
+            // Check grace period first
+            const lastValidated = sessionStorage.getItem('lastValidatedSession') || 0;
+            const now = Date.now();
+            
+            if (now - lastValidated < 5 * 60 * 1000) {
+                console.log("Using grace period for expired session");
+                return true;
+            }
+            
             if (response.code === "SESSION_EXPIRED") {
                 showToast('Session expired due to inactivity', 'error');
             } else {
@@ -550,46 +581,117 @@ async function validateSession() {
         } else {
             // Session valid, update activity timestamp
             sessionStorage.setItem('lastActivity', Date.now().toString());
+            sessionStorage.setItem('lastValidatedSession', Date.now().toString());
             return true;
         }
     } catch (error) {
         console.warn('Session validation failed (server unreachable)');
+        
+        // Check grace period for network errors
+        const lastValidated = sessionStorage.getItem('lastValidatedSession') || 0;
+        const now = Date.now();
+        
+        if (now - lastValidated < 5 * 60 * 1000) {
+            console.log("Using grace period for network error");
+            sessionStorage.setItem('lastActivity', Date.now().toString());
+            return true; // Keep session alive during grace period
+        }
+        
         // If server unreachable, maintain local session but log warning
         sessionStorage.setItem('lastActivity', Date.now().toString());
         return true; // Keep session alive when server is unreachable
     }
 }
 
-function startSessionHeartbeat(username, sessionId) {
-    // Send heartbeat every 5 minutes to keep session alive
-    const heartbeatInterval = setInterval(() => {
-        if (document.hidden) return; // Don't heartbeat if tab is hidden
-        
-        fetchJSON(API_URL, {
-            action: "logActivity",
-            username: username,
-            action: "Heartbeat"
-        }).catch(() => {
-            // Silently fail
-        });
-        
-        // Also update local session activity
-        sessionStorage.setItem('lastActivity', Date.now().toString());
-    }, 4.5 * 60 * 1000); // 4.5 minutes (less than 5 minute timeout)
+// Session renewal function
+async function renewSessionIfNeeded(username, sessionId) {
+    const lastRenewal = localStorage.getItem('lastSessionRenewal') || 0;
+    const now = Date.now();
     
-    // Return function to stop heartbeat
-    return () => clearInterval(heartbeatInterval);
+    // Renew session every 10 minutes
+    if (now - lastRenewal > SESSION_RENEWAL_INTERVAL) {
+        try {
+            console.log("Attempting to renew session...");
+            const response = await fetchJSON(API_URL, {
+                action: "renewSession",
+                username: username,
+                sessionId: sessionId
+            });
+            
+            if (response.success && response.newSessionId) {
+                // Update session ID
+                localStorage.setItem("sessionId", response.newSessionId);
+                sessionId = response.newSessionId; // Update local variable
+                
+                // Update session data
+                const sessionDataStr = localStorage.getItem("sessionData");
+                if (sessionDataStr) {
+                    const sessionData = JSON.parse(sessionDataStr);
+                    sessionData.sessionId = response.newSessionId;
+                    sessionData.timestamp = Date.now();
+                    sessionData.expires = Date.now() + (8 * 60 * 60 * 1000);
+                    localStorage.setItem("sessionData", JSON.stringify(sessionData));
+                }
+                
+                localStorage.setItem('lastSessionRenewal', now.toString());
+                console.log("Session renewed successfully");
+                return response.newSessionId;
+            } else {
+                console.log("Session renewal failed:", response.message);
+                return sessionId;
+            }
+        } catch (renewErr) {
+            console.log("Session renewal error (non-critical):", renewErr);
+            return sessionId;
+        }
+    }
+    return sessionId;
 }
 
-// Update startSessionManagement function in index.js
+// Start session heartbeat
+function startSessionHeartbeat(username, sessionId) {
+    // Clear any existing heartbeat
+    if (window.sessionIntervals.heartbeat) {
+        clearInterval(window.sessionIntervals.heartbeat);
+    }
+    
+    // Send heartbeat every 5 minutes to keep session alive
+    window.sessionIntervals.heartbeat = setInterval(async () => {
+        if (document.hidden) return; // Don't heartbeat if tab is hidden
+        
+        try {
+            // Send heartbeat activity
+            await fetchJSON(API_URL, {
+                action: "logActivity",
+                username: username,
+                action: "Heartbeat"
+            });
+            
+            // Also renew session if needed
+            const renewedSessionId = await renewSessionIfNeeded(username, sessionId);
+            if (renewedSessionId !== sessionId) {
+                sessionId = renewedSessionId;
+            }
+            
+            // Update local session activity
+            sessionStorage.setItem('lastActivity', Date.now().toString());
+            
+        } catch (err) {
+            console.log("Heartbeat failed (non-critical):", err);
+            // Don't logout on heartbeat failure
+        }
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    return window.sessionIntervals.heartbeat;
+}
+
+// Update startSessionManagement function
 function startSessionManagement(username, sessionId) {
     // Clear any existing intervals
-    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
-    if (sessionActivityInterval) clearInterval(sessionActivityInterval);
-    if (passiveViewInterval) clearInterval(passiveViewInterval);
+    cleanupSessionIntervals();
     
-    // Start heartbeat
-    const stopHeartbeat = startSessionHeartbeat(username, sessionId);
+    // Start heartbeat with session renewal
+    startSessionHeartbeat(username, sessionId);
     
     // Check session more frequently (every 30 seconds)
     sessionCheckInterval = setInterval(checkSessionActivity, SESSION_CHECK_INTERVAL);
@@ -626,8 +728,7 @@ function startSessionManagement(username, sessionId) {
         });
     }, 5 * 60 * 1000);
     
-    // Store stop function for cleanup
-    window.stopSessionHeartbeat = stopHeartbeat;
+    console.log("Enhanced session management started for user:", username);
 }
 
 async function attemptSessionRecovery(username, sessionId) {
@@ -661,50 +762,6 @@ async function attemptSessionRecovery(username, sessionId) {
     return false;
 }
 
-// In code.gs - ADD renewSession function
-function renewSession(data) {
-  try {
-    const username = data.username;
-    const oldSessionId = data.sessionId;
-    
-    // Verify old session exists
-    const oldSession = getActiveSession(username);
-    
-    if (!oldSession || oldSession.sessionId !== oldSessionId) {
-      return {
-        success: false,
-        message: "Cannot renew invalid session"
-      };
-    }
-    
-    // Generate new session ID
-    const newSessionId = generateSessionId();
-    
-    // Update session with new ID
-    oldSession.sessionId = newSessionId;
-    oldSession.lastActivity = new Date().toISOString();
-    
-    // Store updated session
-    SESSIONS.setProperty(`session_${username}`, JSON.stringify(oldSession));
-    
-    // Update sheet
-    updateUserSessionInSheet(username, newSessionId, "Active");
-    
-    return {
-      success: true,
-      newSessionId: newSessionId,
-      message: "Session renewed successfully"
-    };
-    
-  } catch (err) {
-    console.error("renewSession error:", err);
-    return {
-      success: false,
-      message: "Error renewing session: " + err.toString()
-    };
-  }
-}
-
 // Enhanced session activity checker
 function checkSessionActivity() {
     // Check if session is still valid locally first
@@ -715,6 +772,14 @@ function checkSessionActivity() {
         const inactivityTime = now - parseInt(lastActivity);
         
         if (inactivityTime > SESSION_TIMEOUT) {
+            // Local session expired - check grace period
+            const lastValidated = sessionStorage.getItem('lastValidatedSession') || 0;
+            
+            if (now - lastValidated < 5 * 60 * 1000) {
+                console.log("Using grace period for local session expiry");
+                return;
+            }
+            
             // Local session expired
             showToast('Session expired due to inactivity', 'error');
             setTimeout(() => {
@@ -728,16 +793,18 @@ function checkSessionActivity() {
     // Update last activity time
     sessionStorage.setItem('lastActivity', now.toString());
     
-    // Validate session with server periodically
-    validateSession();
+    // Validate session with server periodically (but less frequently)
+    const lastValidation = sessionStorage.getItem('lastServerValidation') || 0;
+    if (now - lastValidation > 60000) { // Validate with server every minute
+        validateSession();
+        sessionStorage.setItem('lastServerValidation', now.toString());
+    }
 }
 
 // Start Enhanced Session Management
-function startSessionManagement(username, sessionId) {
+function startEnhancedSessionManagement(username, sessionId) {
     // Clear any existing intervals
-    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
-    if (sessionActivityInterval) clearInterval(sessionActivityInterval);
-    if (passiveViewInterval) clearInterval(passiveViewInterval);
+    cleanupSessionIntervals();
     
     // Check session more frequently (every 30 seconds)
     sessionCheckInterval = setInterval(checkSessionActivity, SESSION_CHECK_INTERVAL);
@@ -773,6 +840,9 @@ function startSessionManagement(username, sessionId) {
             // Silently fail
         });
     }, 5 * 60 * 1000);
+    
+    // Start heartbeat with renewal
+    startSessionHeartbeat(username, sessionId);
 }
 
 function startPassiveViewTracking() {
@@ -818,6 +888,48 @@ function trackDataFetching() {
         
         return originalFetch.apply(this, args);
     };
+}
+
+// --------------------------
+// Cleanup Functions
+// --------------------------
+function cleanupSessionIntervals() {
+    // Clear all session intervals
+    if (sessionCheckInterval) {
+        clearInterval(sessionCheckInterval);
+        sessionCheckInterval = null;
+    }
+    if (sessionActivityInterval) {
+        clearInterval(sessionActivityInterval);
+        sessionActivityInterval = null;
+    }
+    if (passiveViewInterval) {
+        clearInterval(passiveViewInterval);
+        passiveViewInterval = null;
+    }
+    
+    // Clear heartbeat interval
+    if (window.sessionIntervals && window.sessionIntervals.heartbeat) {
+        clearInterval(window.sessionIntervals.heartbeat);
+        window.sessionIntervals.heartbeat = null;
+    }
+}
+
+function cleanupBeforeUnload() {
+    cleanupSessionIntervals();
+    
+    // Don't clear session on refresh - only log activity
+    const username = localStorage.getItem("username");
+    if (username) {
+        // Use sendBeacon for reliable logout logging
+        const data = new FormData();
+        data.append('action', 'logActivity');
+        data.append('username', username);
+        data.append('actor', username);
+        data.append('action', 'Page Unload');
+        
+        navigator.sendBeacon(API_URL, data);
+    }
 }
 
 // --------------------------
@@ -923,7 +1035,7 @@ async function handleLogin(event) {
         storeSessionData(response.user, pwHash, response.sessionId);
         
         // Start enhanced session management
-        startSessionManagement(response.user.Username, response.sessionId);
+        startEnhancedSessionManagement(response.user.Username, response.sessionId);
         
         // Show success toast
         showToast('Login successful! Redirecting...', 'success');
@@ -1137,7 +1249,7 @@ async function handleForceLogout(username, password) {
                     // Login successful
                     storeSession(loginResponse.user, loginResponse.sessionId);
                     storeSessionData(loginResponse.user, pwHash, loginResponse.sessionId);
-                    startSessionManagement(username, loginResponse.sessionId);
+                    startEnhancedSessionManagement(username, loginResponse.sessionId);
                     
                     // Show success and redirect
                     showToast('Login successful after force logout!', 'success');
@@ -1197,6 +1309,8 @@ function storeSessionData(user, pwHash, sessionId) {
     sessionStorage.setItem('sessionId', sessionId);
     sessionStorage.setItem('sessionExpiry', (Date.now() + SESSION_TIMEOUT).toString());
     sessionStorage.setItem('authenticated', 'true');
+    sessionStorage.setItem('lastValidatedSession', Date.now().toString());
+    sessionStorage.setItem('lastServerValidation', Date.now().toString());
     
     // Store in localStorage (persists)
     localStorage.setItem('loggedIn', 'true');
@@ -1208,6 +1322,7 @@ function storeSessionData(user, pwHash, sessionId) {
     localStorage.setItem('pwHash', pwHash);
     localStorage.setItem('loginTime', Date.now().toString());
     localStorage.setItem('deviceInfo', JSON.stringify(getDeviceInfo()));
+    localStorage.setItem('lastSessionRenewal', Date.now().toString());
 
     console.log("Session data stored successfully. Session ID:", sessionId);
 }
@@ -1216,21 +1331,21 @@ function storeSessionData(user, pwHash, sessionId) {
 // Clear Session Data
 // --------------------------
 function clearSessionData() {
-    if (sessionCheckInterval) {
-        clearInterval(sessionCheckInterval);
-        sessionCheckInterval = null;
-    }
-    if (sessionActivityInterval) {
-        clearInterval(sessionActivityInterval);
-        sessionActivityInterval = null;
-    }
-    if (passiveViewInterval) {
-        clearInterval(passiveViewInterval);
-        passiveViewInterval = null;
-    }
+    // Cleanup all intervals
+    cleanupSessionIntervals();
     
+    // Clear all storage
     localStorage.clear();
     sessionStorage.clear();
+    
+    // Clear window intervals object
+    if (window.sessionIntervals) {
+        window.sessionIntervals = {
+            heartbeat: null,
+            renewal: null
+        };
+    }
+    
     console.log("Session data cleared");
 }
 
@@ -1389,3 +1504,5 @@ window.handleForceLogout = handleForceLogout;
 window.closeError = closeError;
 window.showToast = showToast;
 window.updateSessionActivity = updateSessionActivity;
+window.cleanupSessionIntervals = cleanupSessionIntervals;
+window.validateSession = validateSession;
