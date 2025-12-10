@@ -1,23 +1,11 @@
-// common-session.js - Common session utilities
+// common-session.js - Handles common session tasks
 const COMMON_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
-// Initialize common session functions
-function initializeCommonSession() {
-    // Setup logout button
+// Setup logout button
+function setupLogoutButton() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
-    }
-    
-    // Check if user is on a protected page without session
-    const protectedPages = ['dashboard.html', 'dataForm.html', 'records.html', 'charts.html', 'users.html'];
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    if (protectedPages.includes(currentPage)) {
-        const loggedIn = localStorage.getItem('loggedIn');
-        if (loggedIn !== 'true') {
-            window.location.href = 'index.html?session=required';
-        }
     }
 }
 
@@ -28,6 +16,13 @@ async function handleLogout(e) {
     const username = localStorage.getItem('username');
     const sessionId = sessionStorage.getItem('sessionId');
     const actor = localStorage.getItem('staffName') || username;
+    
+    if (!username) {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'index.html?logout=true';
+        return;
+    }
     
     try {
         // Log logout activity
@@ -40,6 +35,8 @@ async function handleLogout(e) {
         await fetch(COMMON_API_URL, {
             method: 'POST',
             body: formData
+        }).catch(() => {
+            // Silently fail if server unreachable
         });
         
         // Call server logout
@@ -51,6 +48,8 @@ async function handleLogout(e) {
         await fetch(COMMON_API_URL, {
             method: 'POST',
             body: logoutFormData
+        }).catch(() => {
+            // Silently fail if server unreachable
         });
     } catch (error) {
         console.error('Logout error:', error);
@@ -62,4 +61,9 @@ async function handleLogout(e) {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', initializeCommonSession);
+document.addEventListener('DOMContentLoaded', function() {
+    // Only run on protected pages (not index.html)
+    if (!window.location.pathname.includes('index.html')) {
+        setupLogoutButton();
+    }
+});
