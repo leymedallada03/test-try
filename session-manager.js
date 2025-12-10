@@ -258,6 +258,21 @@ class SessionManager {
         };
     }
 }
+clearSession() {
+    console.log("SessionManager: Clearing session and stopping monitoring");
+    
+    // Stop all intervals
+    if (this.checkInterval) {
+        clearInterval(this.checkInterval);
+        this.checkInterval = null;
+    }
+    
+    // Clear flags
+    this.initialized = false;
+    
+    // Note: Don't clear localStorage here - common-session.js does it
+    // This just stops the monitoring intervals
+}
 
 // Create global instance
 window.sessionManager = new SessionManager();
