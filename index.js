@@ -524,13 +524,28 @@ async function validateSession() {
             sessionId: sessionId
         });
         
-        if (!response.success || !response.isLoggedIn) {
+        if (!response.success) {
+            // Server validation error
+            console.warn("Session validation error:", response.message);
+            
+            // Don't logout immediately for validation errors
+            // Keep local session alive for now
+            sessionStorage.setItem('lastActivity', Date.now().toString());
+            return true;
+        }
+        
+        if (!response.isLoggedIn) {
             // Session invalid or expired
-            showToast('Session expired or invalid', 'error');
+            if (response.code === "SESSION_EXPIRED") {
+                showToast('Session expired due to inactivity', 'error');
+            } else {
+                showToast('Session invalid', 'error');
+            }
+            
             setTimeout(() => {
                 clearSessionData();
                 window.location.href = 'index.html';
-            }, 2000);
+            }, 3000); // Give user 3 seconds to see the message
             return false;
         } else {
             // Session valid, update activity timestamp
@@ -540,8 +555,154 @@ async function validateSession() {
     } catch (error) {
         console.warn('Session validation failed (server unreachable)');
         // If server unreachable, maintain local session but log warning
-        return true;
+        sessionStorage.setItem('lastActivity', Date.now().toString());
+        return true; // Keep session alive when server is unreachable
     }
+}
+
+function startSessionHeartbeat(username, sessionId) {
+    // Send heartbeat every 5 minutes to keep session alive
+    const heartbeatInterval = setInterval(() => {
+        if (document.hidden) return; // Don't heartbeat if tab is hidden
+        
+        fetchJSON(API_URL, {
+            action: "logActivity",
+            username: username,
+            action: "Heartbeat"
+        }).catch(() => {
+            // Silently fail
+        });
+        
+        // Also update local session activity
+        sessionStorage.setItem('lastActivity', Date.now().toString());
+    }, 4.5 * 60 * 1000); // 4.5 minutes (less than 5 minute timeout)
+    
+    // Return function to stop heartbeat
+    return () => clearInterval(heartbeatInterval);
+}
+
+// Update startSessionManagement function in index.js
+function startSessionManagement(username, sessionId) {
+    // Clear any existing intervals
+    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+    if (sessionActivityInterval) clearInterval(sessionActivityInterval);
+    if (passiveViewInterval) clearInterval(passiveViewInterval);
+    
+    // Start heartbeat
+    const stopHeartbeat = startSessionHeartbeat(username, sessionId);
+    
+    // Check session more frequently (every 30 seconds)
+    sessionCheckInterval = setInterval(checkSessionActivity, SESSION_CHECK_INTERVAL);
+    
+    // Check session immediately on load
+    checkSessionActivity();
+    
+    // Track passive viewing every 30 seconds
+    startPassiveViewTracking();
+    
+    // Track user interactions for activity
+    ['click', 'keydown', 'scroll', 'mousemove'].forEach(eventType => {
+        document.addEventListener(eventType, function(event) {
+            // Don't track modifier keys alone for keydown
+            if (eventType === 'keydown' && ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(event.key)) {
+                return;
+            }
+            updateSessionActivity();
+        }, { passive: true });
+    });
+    
+    // Track data fetching
+    trackDataFetching();
+    
+    // Log activity every 5 minutes to keep session alive
+    sessionActivityInterval = setInterval(() => {
+        updateSessionActivity();
+        fetchJSON(API_URL, {
+            action: "logActivity",
+            username: username,
+            action: "Active Session"
+        }).catch(() => {
+            // Silently fail
+        });
+    }, 5 * 60 * 1000);
+    
+    // Store stop function for cleanup
+    window.stopSessionHeartbeat = stopHeartbeat;
+}
+
+async function attemptSessionRecovery(username, sessionId) {
+    try {
+        // Try to get new session without requiring re-login
+        const response = await fetchJSON(API_URL, {
+            action: "renewSession",
+            username: username,
+            sessionId: sessionId
+        });
+        
+        if (response.success && response.newSessionId) {
+            // Update session ID
+            localStorage.setItem("sessionId", response.newSessionId);
+            
+            // Update session data
+            const sessionDataStr = localStorage.getItem("sessionData");
+            if (sessionDataStr) {
+                const sessionData = JSON.parse(sessionDataStr);
+                sessionData.sessionId = response.newSessionId;
+                sessionData.timestamp = Date.now();
+                sessionData.expires = Date.now() + (8 * 60 * 60 * 1000);
+                localStorage.setItem("sessionData", JSON.stringify(sessionData));
+            }
+            
+            return true;
+        }
+    } catch (error) {
+        console.error("Session recovery failed:", error);
+    }
+    return false;
+}
+
+// In code.gs - ADD renewSession function
+function renewSession(data) {
+  try {
+    const username = data.username;
+    const oldSessionId = data.sessionId;
+    
+    // Verify old session exists
+    const oldSession = getActiveSession(username);
+    
+    if (!oldSession || oldSession.sessionId !== oldSessionId) {
+      return {
+        success: false,
+        message: "Cannot renew invalid session"
+      };
+    }
+    
+    // Generate new session ID
+    const newSessionId = generateSessionId();
+    
+    // Update session with new ID
+    oldSession.sessionId = newSessionId;
+    oldSession.lastActivity = new Date().toISOString();
+    
+    // Store updated session
+    SESSIONS.setProperty(`session_${username}`, JSON.stringify(oldSession));
+    
+    // Update sheet
+    updateUserSessionInSheet(username, newSessionId, "Active");
+    
+    return {
+      success: true,
+      newSessionId: newSessionId,
+      message: "Session renewed successfully"
+    };
+    
+  } catch (err) {
+    console.error("renewSession error:", err);
+    return {
+      success: false,
+      message: "Error renewing session: " + err.toString()
+    };
+  }
 }
 
 // Enhanced session activity checker
