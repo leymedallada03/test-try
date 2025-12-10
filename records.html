@@ -3877,6 +3877,9 @@ async function saveEditedHousehold(silentReload = false){
     fd.append('members', JSON.stringify(editMembers || []));
     fd.append('submittedBy', editHead['Submitted By'] || userFullName);
     fd.append('barangay', editHead['Barangay']);
+    
+    // CRITICAL: Add clearExisting flag to tell server to clear existing rows
+    fd.append('clearExisting', 'true');
 
     // Set loading state AFTER validation
     if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
