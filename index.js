@@ -1,9 +1,11 @@
-// At the very top of your index.js, add:
-if (typeof window.API_URL === 'undefined') {
-    window.API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
-}
+// In index.js, change from:
+const API_URL = "your-url";
 
-const API_URL = window.API_URL; // Your existing line/* COMPLETE index.js with Single-Session Restriction - UPDATED VERSION */
+// To:
+if (typeof window.SCRIPT_URL === 'undefined') {
+    window.SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+}
+const SCRIPT_URL = window.SCRIPT_URL; // Use SCRIPT_URL consistently
 
 
 // Session timeout (30 minutes = 1800000 ms)
