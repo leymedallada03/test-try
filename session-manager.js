@@ -230,7 +230,7 @@ class SessionManager {
     }
 
     // Update UI with user info
-    updateUI() {
+updateUI() {
         const fullName = localStorage.getItem('staffName');
         const role = localStorage.getItem('userRole');
         const barangay = localStorage.getItem('assignedBarangay');
@@ -238,14 +238,7 @@ class SessionManager {
         
         console.log("Session Manager: Updating UI with", { fullName, role, barangay, username });
         
-        // IMMEDIATELY handle admin mode on body element
-        if (role === 'Admin') {
-            document.body.classList.add('admin-mode');
-        } else {
-            document.body.classList.remove('admin-mode');
-        }
-        
-        // Update username display (in case it changed from server update)
+        // Update username display
         const usernameElements = document.querySelectorAll('#userName, .username-display, [data-username]');
         usernameElements.forEach(el => {
             if (el) {
@@ -272,9 +265,13 @@ class SessionManager {
             userBarangayElement.style.display = 'inline';
         }
         
-        // For sidebar list items specifically (if you need additional control)
+        // Hide admin-only elements for non-admin users
         if (role !== 'Admin') {
-            // Hide users.html tab/link as additional backup
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Hide users.html tab/link
             const usersLinks = document.querySelectorAll('[href*="users.html"]');
             usersLinks.forEach(link => {
                 if (link.parentElement) {
@@ -288,14 +285,13 @@ class SessionManager {
                 window.location.href = 'dashboard.html';
             }
         } else {
-            // Admin users: ensure sidebar list items are visible
-            const adminListItems = document.querySelectorAll('.sidebar .admin-only');
-            adminListItems.forEach(el => {
-                el.style.display = 'list-item'; // Override CSS for list items
+            // Show admin elements
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = '';
             });
         }
     }
-
+        
     // Show session expired message
     showSessionExpiredMessage() {
         // Prevent multiple modals
