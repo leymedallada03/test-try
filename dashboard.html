@@ -26,112 +26,7 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
-/* Enhanced User Display Styles */
-.user-display-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-right: 15px;
-}
 
-.user-avatar {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #0f7a4a, #0a5c38);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-fullname {
-  font-weight: 600;
-  color: #333;
-  font-size: 14px;
-  line-height: 1.2;
-}
-
-.user-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: #666;
-  line-height: 1.2;
-}
-
-.user-role {
-  background: #e8f5e9;
-  color: #0f7a4a;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: 500;
-  font-size: 11px;
-  text-transform: capitalize;
-}
-
-.user-barangay {
-  font-size: 11px;
-  opacity: 0.8;
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .user-display-container {
-    margin-right: 10px;
-  }
-  
-  .user-details {
-    display: none; /* Hide details on mobile, show only avatar */
-  }
-  
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 12px;
-  }
-}
-
-@media (min-width: 769px) {
-  .user-details {
-    display: flex; /* Always show on desktop */
-  }
-}
-
-/* Logout button styling */
-#logoutBtn {
-  background: #ffebee;
-  color: #d32f2f;
-  border: 1px solid #ffcdd2;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-#logoutBtn:hover {
-  background: #ffcdd2;
-  transform: translateY(-1px);
-}
-
-/* Admin-only menu item */
-.admin-only {
-  display: none; /* Hidden by default, shown for admins via JS */
-}
-   
    body {
     background-color: var(--bg);
     margin: 0;
@@ -712,6 +607,7 @@
 
 <body>
 <div class="page-container">
+
   <header class="topbar">
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
@@ -725,21 +621,7 @@
       <button class="mobile-menu-toggle" id="mobileMenuToggle">
         <i class="fas fa-bars"></i>
       </button>
-      
-      <!-- Enhanced User Display -->
-      <div class="user-display-container">
-        <div class="user-avatar">
-          <span id="userInitials">JD</span>
-        </div>
-        <div class="user-details">
-          <div class="user-fullname" id="userFullName">Juan Dela Cruz</div>
-          <div class="user-meta">
-            <span class="user-role" id="userRole">Admin</span>
-            <span class="user-barangay" id="userBarangay">• Barangay Kaligtasan</span>
-          </div>
-        </div>
-      </div>
-      
+      <span id="userName"></span>
       <button id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
@@ -2674,14 +2556,10 @@ function notifyDataUpdated() {
 }
 </script>
 <script src="session-manager.js"></script>
-<script src="activity-tracking-final.js"></script>
 <script src="common-session.js"></script>
+<script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
 
 
 
