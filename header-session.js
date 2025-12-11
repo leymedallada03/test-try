@@ -1,55 +1,15 @@
-// header-session.js - Session management for header/navigation
-const SESSION_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
-
-class HeaderSessionManager {
+// header-session.js - ONLY for displaying user info in header
+class HeaderDisplayManager {
     constructor() {
-        this.currentUser = null;
-        this.checkInterval = null;
+        console.log("Header Display Manager initialized");
     }
 
     // Initialize on page load
-    async initialize() {
-        console.log("Header Session Manager initializing...");
-        
-        // Check if we're on a protected page
-        if (this.isProtectedPage() && !this.isLoggedInLocally()) {
-            window.location.href = 'index.html?session=expired';
-            return;
-        }
-        
-        if (this.isLoggedInLocally()) {
-            await this.updateUserDisplay();
-            this.setupLogoutHandler();
-            this.setupSessionMonitoring();
-            this.updateNavigation();
-        }
-    }
-
-    // Check if page requires authentication
-    isProtectedPage() {
-        const protectedPages = ['dashboard.html', 'dataForm.html', 'records.html', 'charts.html', 'users.html'];
-        const currentPage = window.location.pathname.split('/').pop();
-        return protectedPages.includes(currentPage);
-    }
-
-    // Check local session
-    isLoggedInLocally() {
-        const loggedIn = localStorage.getItem('loggedIn');
-        const username = localStorage.getItem('username');
-        const sessionId = sessionStorage.getItem('sessionId');
-        const loginTime = localStorage.getItem('loginTime');
-        
-        if (loggedIn === 'true' && username && sessionId && loginTime) {
-            // Check session timeout (30 minutes)
-            const sessionAge = Date.now() - parseInt(loginTime);
-            if (sessionAge < 30 * 60 * 1000) {
-                return true;
-            } else {
-                this.clearSession();
-                return false;
-            }
-        }
-        return false;
+    initialize() {
+        console.log("Header Display Manager: Updating user display...");
+        this.updateUserDisplay();
+        this.setupLogoutHandler();
+        this.updateNavigation();
     }
 
     // Get user initials from full name
@@ -67,9 +27,11 @@ class HeaderSessionManager {
 
     // Update user display in header
     updateUserDisplay() {
-        const fullName = localStorage.getItem('staffName') || localStorage.getItem('username');
+        const fullName = localStorage.getItem('staffName') || localStorage.getItem('username') || 'User';
         const role = localStorage.getItem('userRole') || 'Staff';
         const barangay = localStorage.getItem('assignedBarangay') || '';
+        
+        console.log(`Header Display: ${fullName} (${role}) - ${barangay}`);
         
         // Update Full Name
         const fullNameElement = document.getElementById('userFullName');
@@ -116,46 +78,33 @@ class HeaderSessionManager {
         }
     }
 
-    // Setup logout handler
+    // Setup logout handler (just calls the main logout function)
     setupLogoutHandler() {
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await this.handleLogout();
-            });
-        }
-    }
-
-    // Handle logout
-    async handleLogout() {
-        const username = localStorage.getItem('username');
-        const sessionId = sessionStorage.getItem('sessionId');
-        const actor = localStorage.getItem('staffName') || username;
-        
-        try {
-            // Log logout activity
-            await fetch(SESSION_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=logActivity&username=${encodeURIComponent(username)}&actor=${encodeURIComponent(actor)}&action=User Logout`
-            });
+            // Remove any existing handlers
+            const newLogoutBtn = logoutBtn.cloneNode(true);
+            logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
             
-            // Call server logout
-            await fetch(SESSION_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=logout&username=${encodeURIComponent(username)}&sessionId=${encodeURIComponent(sessionId)}`
+            // Add new handler that calls the main logout function
+            newLogoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Check if enhancedLogout exists (from dashboard)
+                if (typeof enhancedLogout === 'function') {
+                    enhancedLogout();
+                } 
+                // Fallback to window logout if exists
+                else if (typeof window.performLogout === 'function') {
+                    window.performLogout();
+                }
+                // Last resort - clear and redirect
+                else {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.href = 'index.html';
+                }
             });
-        } catch (error) {
-            console.error('Logout error:', error);
-        } finally {
-            this.clearSession();
-            window.location.href = 'index.html?logout=true';
         }
     }
 
@@ -181,121 +130,10 @@ class HeaderSessionManager {
             });
         }
     }
-
-    // Setup session monitoring
-    setupSessionMonitoring() {
-        // Clear existing interval
-        if (this.checkInterval) {
-            clearInterval(this.checkInterval);
-        }
-        
-        // Check session every 30 seconds
-        this.checkInterval = setInterval(async () => {
-            await this.validateSession();
-        }, 30000);
-        
-        // Update activity on user interactions
-        const updateActivity = () => {
-            localStorage.setItem('lastActivity', Date.now().toString());
-        };
-        
-        ['click', 'keydown', 'scroll'].forEach(event => {
-            document.addEventListener(event, updateActivity, { passive: true });
-        });
-        
-        // Check idle timeout every minute
-        setInterval(() => {
-            this.checkIdleTimeout();
-        }, 60000);
-    }
-
-    // Validate session with server
-    async validateSession() {
-        const username = localStorage.getItem('username');
-        const sessionId = sessionStorage.getItem('sessionId');
-        
-        if (!username || !sessionId) return false;
-        
-        try {
-            const response = await fetch(SESSION_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=validateSession&username=${encodeURIComponent(username)}&sessionId=${encodeURIComponent(sessionId)}`
-            });
-            
-            const data = await response.json();
-            
-            if (!data.success || !data.isLoggedIn) {
-                this.showSessionExpiredMessage();
-                return false;
-            }
-            
-            return true;
-        } catch (error) {
-            console.error('Session validation error:', error);
-            return true; // Continue if server unreachable
-        }
-    }
-
-    // Check idle timeout
-    checkIdleTimeout() {
-        const lastActivity = localStorage.getItem('lastActivity');
-        if (lastActivity) {
-            const idleTime = Date.now() - parseInt(lastActivity);
-            if (idleTime > 30 * 60 * 1000) { // 30 minutes
-                this.showSessionExpiredMessage();
-            }
-        }
-    }
-
-    // Show session expired message
-    showSessionExpiredMessage() {
-        if (document.getElementById('sessionExpiredModal')) return;
-        
-        const modal = document.createElement('div');
-        modal.id = 'sessionExpiredModal';
-        modal.innerHTML = `
-            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                    <div style="font-size: 48px; color: #ff9800; margin-bottom: 20px;">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3 style="margin: 0 0 10px 0; color: #333;">Session Expired</h3>
-                    <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">
-                        Your session has expired due to inactivity.<br>
-                        Please login again to continue.
-                    </p>
-                    <button id="returnToLoginBtn" style="background: #0f7a4a; color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600;">
-                        Return to Login
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        document.getElementById('returnToLoginBtn').addEventListener('click', () => {
-            this.clearSession();
-            window.location.href = 'index.html';
-        });
-    }
-
-    // Clear session data
-    clearSession() {
-        if (this.checkInterval) {
-            clearInterval(this.checkInterval);
-            this.checkInterval = null;
-        }
-        
-        localStorage.clear();
-        sessionStorage.clear();
-    }
 }
 
-// Create and initialize the session manager
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    window.headerSessionManager = new HeaderSessionManager();
-    window.headerSessionManager.initialize();
+    window.headerDisplayManager = new HeaderDisplayManager();
+    window.headerDisplayManager.initialize();
 });
