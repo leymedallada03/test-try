@@ -1180,6 +1180,7 @@ async function sessionCheck() {
     return false;  // CHANGED THIS FROM true TO false
   }
 }
+
 /* ENHANCED LOGOUT FUNCTION */
 async function enhancedLogout() {
   try {
@@ -1254,33 +1255,6 @@ function setupAutoLogout() {
     resetTimer();
 }
 
-/* INITIALIZATION - UPDATED */
-window.addEventListener('DOMContentLoaded', async () => {
-  // First check session with server validation
-  const isAuthenticated = await sessionCheck();
-  
-  if (!isAuthenticated) {
-    return; // Already redirected
-  }
-  
-  // Setup auto-logout for inactivity
-  setupAutoLogout();
-  
-  // Load dashboard data
-  await loadLastUpdated();
-  await loadDashboard();
-  
-  // Auto-refresh dashboard data every 30 seconds
-  if (refreshInterval) clearInterval(refreshInterval);
-  refreshInterval = setInterval(loadDashboard, 30000);
-  
-  // Check screen width and adjust sidebar
-  if (window.innerWidth <= 768) {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.remove('mobile-open');
-  }
-});
-
 /* helpers */
 function getField(obj, name){
   if(!obj) return "";
@@ -1340,619 +1314,683 @@ function updateLastUpdated() {
   document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
 }
 
-/* main dashboard load */
-async function loadDashboard(){
-  showLoading(true);
-  try{
-    const data = await fetchRecords();
-    if(!data.success) throw new Error('Failed fetch');
-    const rows = data.rows || [];
+/* NEW: Load cached dashboard data - Shows instantly without loading screen */
+function loadCachedDashboardData() {
+    try {
+        const cached = localStorage.getItem('dashboardDataCache');
+        if (cached) {
+            console.log("📊 Loading dashboard from cache (instant)");
+            const data = JSON.parse(cached);
+            if (data.rows && data.rows.length > 0) {
+                // Process and display cached data
+                processDashboardData(data);
+                return true;
+            }
+        }
+    } catch (err) {
+        console.error('Error loading cached data:', err);
+    }
+    return false;
+}
 
+/* NEW: Store dashboard data in cache */
+function cacheDashboardData(data) {
+    try {
+        localStorage.setItem('dashboardDataCache', JSON.stringify(data));
+        console.log("📊 Dashboard data cached");
+    } catch (err) {
+        console.error('Error caching data:', err);
+    }
+}
+
+/* NEW: Main dashboard load - shows cached data immediately, loads fresh in background */
+async function loadDashboard(showLoader = false){
+    // Only show loading if explicitly requested AND no cache exists
+    const hasCache = localStorage.getItem('dashboardDataCache');
+    const shouldShowLoader = showLoader && !hasCache;
+    
+    if (shouldShowLoader) {
+        showLoading(true);
+    }
+    
+    try{
+        const data = await fetchRecords();
+        if(!data.success) throw new Error('Failed fetch');
+        const rows = data.rows || [];
+        
+        // Cache the data for next time
+        cacheDashboardData(data);
+        
+        // Process and display the fresh data
+        processDashboardData(data);
+        
+        // Update last updated time
+        updateLastUpdated();
+        
+        console.log("📊 Fresh dashboard data loaded");
+        
+    } catch(err){
+        console.error('Load dashboard error', err);
+        // Don't alert if we have cache, just log error
+        if (!hasCache && showLoader) {
+            alert('Error loading dashboard data');
+        }
+    }
+    
+    if (shouldShowLoader) {
+        showLoading(false);
+    }
+}
+
+/* Process dashboard data (used by both cache and fresh load) */
+function processDashboardData(data) {
+    const rows = data.rows || [];
+    
     // init containers
     let totalHeads = 0, totalMembers = 0, headsWithCoords = 0;
     const barangayMap = {};
     
     // Initialize statistics
     const demographicsStats = {
-      male: 0,
-      female: 0,
-      pwd: 0
+        male: 0,
+        female: 0,
+        pwd: 0
     };
     
     const overallEducation = {
-      noFormalEducation: 0,
-      elementaryLevel: 0,
-      elementaryGraduate: 0,
-      juniorHighSchoolLevel: 0,
-      juniorHighSchoolGraduate: 0,
-      seniorHighSchoolLevel: 0,
-      seniorHighSchoolGraduate: 0,
-      collegeLevel: 0,
-      collegeGraduate: 0
+        noFormalEducation: 0,
+        elementaryLevel: 0,
+        elementaryGraduate: 0,
+        juniorHighSchoolLevel: 0,
+        juniorHighSchoolGraduate: 0,
+        seniorHighSchoolLevel: 0,
+        seniorHighSchoolGraduate: 0,
+        collegeLevel: 0,
+        collegeGraduate: 0
     };
     
     const overallEmployment = {
-      employed: 0,
-      unemployed: 0
+        employed: 0,
+        unemployed: 0
     };
     
     const fishrStats = {
-      fishrRegistered: 0,
-      rbisRegistered: 0,
-      bothRegistered: 0,
-      notRegistered: 0
+        fishrRegistered: 0,
+        rbisRegistered: 0,
+        bothRegistered: 0,
+        notRegistered: 0
     };
     
     // Job Categories
     const jobCategories = {
-      // Office & Administrative Jobs
-      adminAssistant: 0,
-      officeClerk: 0,
-      secretary: 0,
-      
-      // Business & Management
-      projectManager: 0,
-      operationsManager: 0,
-      hrStaff: 0,
-      accountManager: 0,
-      
-      // Accounting & Finance
-      accountingStaff: 0,
-      bookkeeper: 0,
-      payrollOfficer: 0,
-      auditor: 0,
-      
-      // IT & Tech
-      itSupport: 0,
-      webDeveloper: 0,
-      softwareDeveloper: 0,
-      dataAnalyst: 0,
-      systemAdministrator: 0,
-      
-      // Healthcare
-      nurse: 0,
-      medicalTechnologist: 0,
-      caregiver: 0,
-      pharmacist: 0,
-      
-      // Education
-      teacher: 0,
-      tutor: 0,
-      schoolAdministrator: 0,
-      
-      // Sales & Customer Service
-      csr: 0,
-      salesAssociate: 0,
-      cashier: 0,
-      storeSupervisor: 0,
-      
-      // Skilled Work & Labor
-      electrician: 0,
-      plumber: 0,
-      welder: 0,
-      constructionWorker: 0,
-      
-      // Delivery & Logistics
-      driver: 0,
-      logisticsStaff: 0,
-      rider: 0,
-      
-      // Food & Hospitality
-      cook: 0,
-      waiter: 0,
-      barista: 0,
-      housekeepingStaff: 0,
-      
-      // Security & Public Service
-      securityGuard: 0,
-      barangayStaff: 0,
-      policeOfficer: 0,
-      fireOfficer: 0,
-      
-      // Media, Design & Creative
-      graphicDesigner: 0,
-      videoEditor: 0,
-      contentWriter: 0,
-      socialMediaManager: 0
+        // Office & Administrative Jobs
+        adminAssistant: 0,
+        officeClerk: 0,
+        secretary: 0,
+        
+        // Business & Management
+        projectManager: 0,
+        operationsManager: 0,
+        hrStaff: 0,
+        accountManager: 0,
+        
+        // Accounting & Finance
+        accountingStaff: 0,
+        bookkeeper: 0,
+        payrollOfficer: 0,
+        auditor: 0,
+        
+        // IT & Tech
+        itSupport: 0,
+        webDeveloper: 0,
+        softwareDeveloper: 0,
+        dataAnalyst: 0,
+        systemAdministrator: 0,
+        
+        // Healthcare
+        nurse: 0,
+        medicalTechnologist: 0,
+        caregiver: 0,
+        pharmacist: 0,
+        
+        // Education
+        teacher: 0,
+        tutor: 0,
+        schoolAdministrator: 0,
+        
+        // Sales & Customer Service
+        csr: 0,
+        salesAssociate: 0,
+        cashier: 0,
+        storeSupervisor: 0,
+        
+        // Skilled Work & Labor
+        electrician: 0,
+        plumber: 0,
+        welder: 0,
+        constructionWorker: 0,
+        
+        // Delivery & Logistics
+        driver: 0,
+        logisticsStaff: 0,
+        rider: 0,
+        
+        // Food & Hospitality
+        cook: 0,
+        waiter: 0,
+        barista: 0,
+        housekeepingStaff: 0,
+        
+        // Security & Public Service
+        securityGuard: 0,
+        barangayStaff: 0,
+        policeOfficer: 0,
+        fireOfficer: 0,
+        
+        // Media, Design & Creative
+        graphicDesigner: 0,
+        videoEditor: 0,
+        contentWriter: 0,
+        socialMediaManager: 0
     };
     
     const ofwCountries = {
-      saudiArabia: 0,
-      uae: 0,
-      qatar: 0,
-      kuwait: 0,
-      bahrain: 0,
-      oman: 0,
-      hongKong: 0,
-      singapore: 0,
-      japan: 0,
-      taiwan: 0,
-      malaysia: 0,
-      australia: 0,
-      newZealand: 0,
-      italy: 0,
-      uk: 0,
-      germany: 0,
-      cyprus: 0,
-      canada: 0,
-      usa: 0,
-      libya: 0,
-      others: 0
+        saudiArabia: 0,
+        uae: 0,
+        qatar: 0,
+        kuwait: 0,
+        bahrain: 0,
+        oman: 0,
+        hongKong: 0,
+        singapore: 0,
+        japan: 0,
+        taiwan: 0,
+        malaysia: 0,
+        australia: 0,
+        newZealand: 0,
+        italy: 0,
+        uk: 0,
+        germany: 0,
+        cyprus: 0,
+        canada: 0,
+        usa: 0,
+        libya: 0,
+        others: 0
     };
     
     const livestockStats = {
-      dog: 0,
-      cat: 0,
-      pig: 0,
-      cow: 0,
-      carabao: 0,
-      chicken: 0,
-      others: 0
+        dog: 0,
+        cat: 0,
+        pig: 0,
+        cow: 0,
+        carabao: 0,
+        chicken: 0,
+        others: 0
     };
 
     rows.forEach(r=>{
-      const isHead = String(getField(r,'Name of Household Member/s')||'').trim() === '';
-      const barangay = String(getField(r,'Barangay')||'Unknown').trim() || 'Unknown';
-      const sex = String(getField(r,'Sex')||'').trim().toLowerCase();
-      
-      // FIXED: Check multiple possible coordinate field names
-      const coord = String(getField(r,'Coordinate') || getField(r,'Coordinates') || '').trim();
+        const isHead = String(getField(r,'Name of Household Member/s')||'').trim() === '';
+        const barangay = String(getField(r,'Barangay')||'Unknown').trim() || 'Unknown';
+        const sex = String(getField(r,'Sex')||'').trim().toLowerCase();
+        
+        // FIXED: Check multiple possible coordinate field names
+        const coord = String(getField(r,'Coordinate') || getField(r,'Coordinates') || '').trim();
 
-      if(!barangayMap[barangay]){
-        barangayMap[barangay] = {
-          heads:0, members:0, male:0, female:0, coords:0, pwds:0,
-          status:{}, reasons:{}, livestock:{}, ageBuckets:{}, sitio:{},
-          support: {
-            "TUPAD":0, "Local 4Ps":0, "National 4Ps":0, "Local Social Pension":0, "National Social Pension":0,
-            "Solo Parent Assistance":0, "Relief Goods":0, "Cash Subsidy":0
-          },
-          education: {
-            noFormalEducation: 0,
-            elementaryLevel: 0,
-            elementaryGraduate: 0,
-            juniorHighSchoolLevel: 0,
-            juniorHighSchoolGraduate: 0,
-            seniorHighSchoolLevel: 0,
-            seniorHighSchoolGraduate: 0,
-            collegeLevel: 0,
-            collegeGraduate: 0
-          },
-          employment: {
-            employed: 0,
-            unemployed: 0
-          },
-          fishr: {
-            fishrRegistered: 0,
-            rbisRegistered: 0,
-            bothRegistered: 0,
-            notRegistered: 0
-          },
-          ofw: {
-            saudiArabia: 0,
-            uae: 0,
-            qatar: 0,
-            kuwait: 0,
-            bahrain: 0,
-            oman: 0,
-            hongKong: 0,
-            singapore: 0,
-            japan: 0,
-            taiwan: 0,
-            malaysia: 0,
-            australia: 0,
-            newZealand: 0,
-            italy: 0,
-            uk: 0,
-            germany: 0,
-            cyprus: 0,
-            canada: 0,
-            usa: 0,
-            libya: 0,
-            others: 0
-          },
-          livestock: {
-            dog: 0,
-            cat: 0,
-            pig: 0,
-            cow: 0,
-            carabao: 0,
-            chicken: 0,
-            others: 0
-          }
-        };
-      }
-      const b = barangayMap[barangay];
-
-      if(isHead){ 
-        totalHeads++; 
-        b.heads++; 
-        // FIXED: Households with Coordinates - Check for valid coordinates
-        if(coord && coord.trim() !== '' && coord !== 'N/A' && coord !== 'none' && coord !== 'undefined' && !coord.toLowerCase().includes('no')) { 
-          // Check if it looks like coordinates (contains numbers and maybe comma)
-          if (coord.match(/[-]?\d+\.?\d*[,\s]*[-]?\d+\.?\d*/) || coord.includes(',') || coord.includes('.')) {
-            headsWithCoords++; 
-            b.coords++; 
-          }
-        } 
-      } else { 
-        totalMembers++; 
-        b.members++; 
-      }
-
-      // sex
-      if(sex === 'male') { 
-        b.male++; 
-        demographicsStats.male++;
-      }
-      else if(sex === 'female') { 
-        b.female++; 
-        demographicsStats.female++;
-      }
-
-      // PWD
-      const pwdField = String(getField(r,'Persons with Disability (PWD)')||'').toLowerCase().trim();
-      if(pwdField === 'yes' || pwdField === 'true' || pwdField === '1') {
-        b.pwds++;
-        demographicsStats.pwd++;
-      }
-
-      // STATUS accumulation
-      const statusRaw = String(getField(r,'Status')||'').trim();
-      if(statusRaw){
-        b.status[statusRaw] = (b.status[statusRaw]||0) + 1;
-      }
-
-      // Reasons
-      const reason = String(getField(r,'Reasons for Displacement')||'').trim();
-      if(reason) b.reasons[reason] = (b.reasons[reason]||0) + 1;
-
-      // Sitio / Purok
-      const sitioRaw = String(getField(r,'Sitio / Purok')||'').trim();
-      let sitioKey = 'Unknown';
-      if(sitioRaw){
-        const m = sitioRaw.match(/I{1,3}|IV|V|VI|VII|\b1\b|\b2\b|\b3\b|\b4\b|\b5\b|\b6\b|\b7\b/i);
-        if(m){
-          sitioKey = m[0].toString().replace(/\b1\b/,'I').replace(/\b2\b/,'II').replace(/\b3\b/,'III').replace(/\b4\b/,'IV').replace(/\b5\b/,'V').replace(/\b6\b/,'VI').replace(/\b7\b/,'VII').toUpperCase();
-        } else {
-          sitioKey = sitioRaw;
+        if(!barangayMap[barangay]){
+            barangayMap[barangay] = {
+                heads:0, members:0, male:0, female:0, coords:0, pwds:0,
+                status:{}, reasons:{}, livestock:{}, ageBuckets:{}, sitio:{},
+                support: {
+                    "TUPAD":0, "Local 4Ps":0, "National 4Ps":0, "Local Social Pension":0, "National Social Pension":0,
+                    "Solo Parent Assistance":0, "Relief Goods":0, "Cash Subsidy":0
+                },
+                education: {
+                    noFormalEducation: 0,
+                    elementaryLevel: 0,
+                    elementaryGraduate: 0,
+                    juniorHighSchoolLevel: 0,
+                    juniorHighSchoolGraduate: 0,
+                    seniorHighSchoolLevel: 0,
+                    seniorHighSchoolGraduate: 0,
+                    collegeLevel: 0,
+                    collegeGraduate: 0
+                },
+                employment: {
+                    employed: 0,
+                    unemployed: 0
+                },
+                fishr: {
+                    fishrRegistered: 0,
+                    rbisRegistered: 0,
+                    bothRegistered: 0,
+                    notRegistered: 0
+                },
+                ofw: {
+                    saudiArabia: 0,
+                    uae: 0,
+                    qatar: 0,
+                    kuwait: 0,
+                    bahrain: 0,
+                    oman: 0,
+                    hongKong: 0,
+                    singapore: 0,
+                    japan: 0,
+                    taiwan: 0,
+                    malaysia: 0,
+                    australia: 0,
+                    newZealand: 0,
+                    italy: 0,
+                    uk: 0,
+                    germany: 0,
+                    cyprus: 0,
+                    canada: 0,
+                    usa: 0,
+                    libya: 0,
+                    others: 0
+                },
+                livestock: {
+                    dog: 0,
+                    cat: 0,
+                    pig: 0,
+                    cow: 0,
+                    carabao: 0,
+                    chicken: 0,
+                    others: 0
+                }
+            };
         }
-      }
-      b.sitio[sitioKey] = (b.sitio[sitioKey]||0) + 1;
+        const b = barangayMap[barangay];
 
-      // Livestock - FIXED: Collect livestock data
-      if (isHead) {
-        const animals = ['Dog', 'Cat', 'Pig', 'Cow', 'Carabao', 'Chicken', 'Others'];
-        animals.forEach(animal => {
-          const qtyField = animal === 'Others' ? 'Others' : animal + ' Qty.';
-          const val = String(getField(r, animal) || getField(r, qtyField) || '').trim();
-          if (val) {
-            const num = parseInt(val) || 1;
-            b.livestock[animal.toLowerCase()] += num;
-            livestockStats[animal.toLowerCase()] += num;
-          }
+        if(isHead){ 
+            totalHeads++; 
+            b.heads++; 
+            // FIXED: Households with Coordinates - Check for valid coordinates
+            if(coord && coord.trim() !== '' && coord !== 'N/A' && coord !== 'none' && coord !== 'undefined' && !coord.toLowerCase().includes('no')) { 
+                // Check if it looks like coordinates (contains numbers and maybe comma)
+                if (coord.match(/[-]?\d+\.?\d*[,\s]*[-]?\d+\.?\d*/) || coord.includes(',') || coord.includes('.')) {
+                    headsWithCoords++; 
+                    b.coords++; 
+                }
+            } 
+        } else { 
+            totalMembers++; 
+            b.members++; 
+        }
+
+        // sex
+        if(sex === 'male') { 
+            b.male++; 
+            demographicsStats.male++;
+        }
+        else if(sex === 'female') { 
+            b.female++; 
+            demographicsStats.female++;
+        }
+
+        // PWD
+        const pwdField = String(getField(r,'Persons with Disability (PWD)')||'').toLowerCase().trim();
+        if(pwdField === 'yes' || pwdField === 'true' || pwdField === '1') {
+            b.pwds++;
+            demographicsStats.pwd++;
+        }
+
+        // STATUS accumulation
+        const statusRaw = String(getField(r,'Status')||'').trim();
+        if(statusRaw){
+            b.status[statusRaw] = (b.status[statusRaw]||0) + 1;
+        }
+
+        // Reasons
+        const reason = String(getField(r,'Reasons for Displacement')||'').trim();
+        if(reason) b.reasons[reason] = (b.reasons[reason]||0) + 1;
+
+        // Sitio / Purok
+        const sitioRaw = String(getField(r,'Sitio / Purok')||'').trim();
+        let sitioKey = 'Unknown';
+        if(sitioRaw){
+            const m = sitioRaw.match(/I{1,3}|IV|V|VI|VII|\b1\b|\b2\b|\b3\b|\b4\b|\b5\b|\b6\b|\b7\b/i);
+            if(m){
+                sitioKey = m[0].toString().replace(/\b1\b/,'I').replace(/\b2\b/,'II').replace(/\b3\b/,'III').replace(/\b4\b/,'IV').replace(/\b5\b/,'V').replace(/\b6\b/,'VI').replace(/\b7\b/,'VII').toUpperCase();
+            } else {
+                sitioKey = sitioRaw;
+            }
+        }
+        b.sitio[sitioKey] = (b.sitio[sitioKey]||0) + 1;
+
+        // Livestock - FIXED: Collect livestock data
+        if (isHead) {
+            const animals = ['Dog', 'Cat', 'Pig', 'Cow', 'Carabao', 'Chicken', 'Others'];
+            animals.forEach(animal => {
+                const qtyField = animal === 'Others' ? 'Others' : animal + ' Qty.';
+                const val = String(getField(r, animal) || getField(r, qtyField) || '').trim();
+                if (val) {
+                    const num = parseInt(val) || 1;
+                    b.livestock[animal.toLowerCase()] += num;
+                    livestockStats[animal.toLowerCase()] += num;
+                }
+            });
+        }
+
+        // Government support flags
+        ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'].forEach(k=>{
+            if(String(getField(r,k)||'').toLowerCase().trim() === 'yes'){
+                b.support[k] = (b.support[k]||0) + 1;
+            }
         });
-      }
 
-      // Government support flags
-      ['TUPAD','Local 4Ps','National 4Ps','Local Social Pension','National Social Pension','Solo Parent Assistance','Relief Goods','Cash Subsidy'].forEach(k=>{
-        if(String(getField(r,k)||'').toLowerCase().trim() === 'yes'){
-          b.support[k] = (b.support[k]||0) + 1;
+        // Age buckets
+        const ageField = String(getField(r,'Age')||'').trim();
+        let y = null;
+        if(ageField){
+            const m = ageField.match(/(\d+)/);
+            if(m) y = Number(m[1]);
         }
-      });
-
-      // Age buckets
-      const ageField = String(getField(r,'Age')||'').trim();
-      let y = null;
-      if(ageField){
-        const m = ageField.match(/(\d+)/);
-        if(m) y = Number(m[1]);
-      }
-      const ab = (y === null) ? 'Unknown' : (y <=5 ? '0-5' : y <=17 ? '6-17' : y <=59 ? '18-59' : '60+');
-      b.ageBuckets[ab] = (b.ageBuckets[ab]||0) + 1;
-      
-      // Educational Attainment - FIXED: Check multiple field names
-      const educationField = String(getField(r,'Educational Attainment')||getField(r,'Educational')||'').trim();
-      if(educationField) {
-        const eduLower = educationField.toLowerCase();
+        const ab = (y === null) ? 'Unknown' : (y <=5 ? '0-5' : y <=17 ? '6-17' : y <=59 ? '18-59' : '60+');
+        b.ageBuckets[ab] = (b.ageBuckets[ab]||0) + 1;
         
-        if(eduLower.includes('no formal') || eduLower === 'none' || eduLower === 'no education') {
-          b.education.noFormalEducation++;
-          overallEducation.noFormalEducation++;
+        // Educational Attainment - FIXED: Check multiple field names
+        const educationField = String(getField(r,'Educational Attainment')||getField(r,'Educational')||'').trim();
+        if(educationField) {
+            const eduLower = educationField.toLowerCase();
+            
+            if(eduLower.includes('no formal') || eduLower === 'none' || eduLower === 'no education') {
+                b.education.noFormalEducation++;
+                overallEducation.noFormalEducation++;
+            }
+            else if(eduLower.includes('elementary level') || eduLower === 'elementary undergraduate') {
+                b.education.elementaryLevel++;
+                overallEducation.elementaryLevel++;
+            }
+            else if(eduLower.includes('elementary graduate') || eduLower === 'elementary') {
+                b.education.elementaryGraduate++;
+                overallEducation.elementaryGraduate++;
+            }
+            else if(eduLower.includes('junior high school level') || eduLower.includes('junior high level') || eduLower === 'junior high') {
+                b.education.juniorHighSchoolLevel++;
+                overallEducation.juniorHighSchoolLevel++;
+            }
+            else if(eduLower.includes('junior high school graduate') || eduLower.includes('junior high graduate') || eduLower === 'junior high grad') {
+                b.education.juniorHighSchoolGraduate++;
+                overallEducation.juniorHighSchoolGraduate++;
+            }
+            else if(eduLower.includes('senior high school level') || eduLower.includes('senior high level') || eduLower === 'senior high') {
+                b.education.seniorHighSchoolLevel++;
+                overallEducation.seniorHighSchoolLevel++;
+            }
+            else if(eduLower.includes('senior high school graduate') || eduLower.includes('senior high graduate') || eduLower === 'senior high grad') {
+                b.education.seniorHighSchoolGraduate++;
+                overallEducation.seniorHighSchoolGraduate++;
+            }
+            else if(eduLower.includes('college level') || eduLower === 'college undergraduate' || eduLower === 'college') {
+                b.education.collegeLevel++;
+                overallEducation.collegeLevel++;
+            }
+            else if(eduLower.includes('college graduate') || eduLower === 'college grad') {
+                b.education.collegeGraduate++;
+                overallEducation.collegeGraduate++;
+            }
         }
-        else if(eduLower.includes('elementary level') || eduLower === 'elementary undergraduate') {
-          b.education.elementaryLevel++;
-          overallEducation.elementaryLevel++;
-        }
-        else if(eduLower.includes('elementary graduate') || eduLower === 'elementary') {
-          b.education.elementaryGraduate++;
-          overallEducation.elementaryGraduate++;
-        }
-        else if(eduLower.includes('junior high school level') || eduLower.includes('junior high level') || eduLower === 'junior high') {
-          b.education.juniorHighSchoolLevel++;
-          overallEducation.juniorHighSchoolLevel++;
-        }
-        else if(eduLower.includes('junior high school graduate') || eduLower.includes('junior high graduate') || eduLower === 'junior high grad') {
-          b.education.juniorHighSchoolGraduate++;
-          overallEducation.juniorHighSchoolGraduate++;
-        }
-        else if(eduLower.includes('senior high school level') || eduLower.includes('senior high level') || eduLower === 'senior high') {
-          b.education.seniorHighSchoolLevel++;
-          overallEducation.seniorHighSchoolLevel++;
-        }
-        else if(eduLower.includes('senior high school graduate') || eduLower.includes('senior high graduate') || eduLower === 'senior high grad') {
-          b.education.seniorHighSchoolGraduate++;
-          overallEducation.seniorHighSchoolGraduate++;
-        }
-        else if(eduLower.includes('college level') || eduLower === 'college undergraduate' || eduLower === 'college') {
-          b.education.collegeLevel++;
-          overallEducation.collegeLevel++;
-        }
-        else if(eduLower.includes('college graduate') || eduLower === 'college grad') {
-          b.education.collegeGraduate++;
-          overallEducation.collegeGraduate++;
-        }
-      }
-      
-      // Employment Status - FIXED: Check multiple field names
-      const employmentField = String(getField(r,'Employment Status')||getField(r,'Employment')||'').trim().toLowerCase();
-      if(employmentField) {
-        if(employmentField.includes('employed') || employmentField === 'yes' || employmentField === 'working' || employmentField === 'work') {
-          b.employment.employed++;
-          overallEmployment.employed++;
-        } else if(employmentField.includes('unemployed') || employmentField === 'no' || employmentField === 'not working' || employmentField === 'not work' || employmentField === 'none') {
-          b.employment.unemployed++;
-          overallEmployment.unemployed++;
-        }
-      }
-      
-      // Job Title/Description - FIXED: Check multiple field names
-      const jobField = String(getField(r,'Job Title/Description')||getField(r,'Job Title')||getField(r,'Job')||'').trim();
-      if(jobField && overallEmployment.employed > 0) {
-        const jobLower = jobField.toLowerCase();
         
-        // Office & Administrative Jobs
-        if(jobLower.includes('administrative assistant') || jobLower.includes('admin assistant') || jobLower.includes('admin staff') || jobLower.includes('administrative')) {
-          jobCategories.adminAssistant++;
+        // Employment Status - FIXED: Check multiple field names
+        const employmentField = String(getField(r,'Employment Status')||getField(r,'Employment')||'').trim().toLowerCase();
+        if(employmentField) {
+            if(employmentField.includes('employed') || employmentField === 'yes' || employmentField === 'working' || employmentField === 'work') {
+                b.employment.employed++;
+                overallEmployment.employed++;
+            } else if(employmentField.includes('unemployed') || employmentField === 'no' || employmentField === 'not working' || employmentField === 'not work' || employmentField === 'none') {
+                b.employment.unemployed++;
+                overallEmployment.unemployed++;
+            }
         }
-        else if(jobLower.includes('office clerk') || jobLower === 'clerk') {
-          jobCategories.officeClerk++;
+        
+        // Job Title/Description - FIXED: Check multiple field names
+        const jobField = String(getField(r,'Job Title/Description')||getField(r,'Job Title')||getField(r,'Job')||'').trim();
+        if(jobField && overallEmployment.employed > 0) {
+            const jobLower = jobField.toLowerCase();
+            
+            // Office & Administrative Jobs
+            if(jobLower.includes('administrative assistant') || jobLower.includes('admin assistant') || jobLower.includes('admin staff') || jobLower.includes('administrative')) {
+                jobCategories.adminAssistant++;
+            }
+            else if(jobLower.includes('office clerk') || jobLower === 'clerk') {
+                jobCategories.officeClerk++;
+            }
+            else if(jobLower.includes('secretary') || jobLower.includes('executive assistant')) {
+                jobCategories.secretary++;
+            }
+            // Business & Management
+            else if(jobLower.includes('project manager')) {
+                jobCategories.projectManager++;
+            }
+            else if(jobLower.includes('operations manager')) {
+                jobCategories.operationsManager++;
+            }
+            else if(jobLower.includes('hr staff') || jobLower.includes('hr officer') || jobLower.includes('human resources')) {
+                jobCategories.hrStaff++;
+            }
+            else if(jobLower.includes('account manager')) {
+                jobCategories.accountManager++;
+            }
+            // Accounting & Finance
+            else if(jobLower.includes('accounting staff') || jobLower.includes('accountant')) {
+                jobCategories.accountingStaff++;
+            }
+            else if(jobLower.includes('bookkeeper') || jobLower.includes('book keeping')) {
+                jobCategories.bookkeeper++;
+            }
+            else if(jobLower.includes('payroll officer') || jobLower.includes('payroll')) {
+                jobCategories.payrollOfficer++;
+            }
+            else if(jobLower.includes('auditor')) {
+                jobCategories.auditor++;
+            }
+            // IT & Tech
+            else if(jobLower.includes('it support') || jobLower.includes('it technician') || jobLower === 'it') {
+                jobCategories.itSupport++;
+            }
+            else if(jobLower.includes('web developer') || jobLower.includes('web dev')) {
+                jobCategories.webDeveloper++;
+            }
+            else if(jobLower.includes('software developer') || jobLower.includes('programmer') || jobLower.includes('coder')) {
+                jobCategories.softwareDeveloper++;
+            }
+            else if(jobLower.includes('data analyst')) {
+                jobCategories.dataAnalyst++;
+            }
+            else if(jobLower.includes('system administrator') || jobLower.includes('system admin')) {
+                jobCategories.systemAdministrator++;
+            }
+            // Healthcare
+            else if(jobLower.includes('nurse') || jobLower.includes('registered nurse')) {
+                jobCategories.nurse++;
+            }
+            else if(jobLower.includes('medical technologist') || jobLower.includes('med tech')) {
+                jobCategories.medicalTechnologist++;
+            }
+            else if(jobLower.includes('caregiver')) {
+                jobCategories.caregiver++;
+            }
+            else if(jobLower.includes('pharmacist')) {
+                jobCategories.pharmacist++;
+            }
+            // Education
+            else if(jobLower.includes('teacher') || jobLower.includes('instructor') || jobLower.includes('faculty')) {
+                jobCategories.teacher++;
+            }
+            else if(jobLower.includes('tutor')) {
+                jobCategories.tutor++;
+            }
+            else if(jobLower.includes('school administrator') || jobLower.includes('principal')) {
+                jobCategories.schoolAdministrator++;
+            }
+            // Sales & Customer Service
+            else if(jobLower.includes('customer service') || jobLower.includes('csr') || jobLower.includes('call center')) {
+                jobCategories.csr++;
+            }
+            else if(jobLower.includes('sales associate') || jobLower.includes('salesperson') || jobLower.includes('sales agent')) {
+                jobCategories.salesAssociate++;
+            }
+            else if(jobLower.includes('cashier')) {
+                jobCategories.cashier++;
+            }
+            else if(jobLower.includes('store supervisor') || jobLower.includes('store manager')) {
+                jobCategories.storeSupervisor++;
+            }
+            // Skilled Work & Labor
+            else if(jobLower.includes('electrician')) {
+                jobCategories.electrician++;
+            }
+            else if(jobLower.includes('plumber')) {
+                jobCategories.plumber++;
+            }
+            else if(jobLower.includes('welder')) {
+                jobCategories.welder++;
+            }
+            else if(jobLower.includes('construction worker') || jobLower.includes('skilled laborer') || jobLower.includes('laborer')) {
+                jobCategories.constructionWorker++;
+            }
+            // Delivery & Logistics
+            else if(jobLower.includes('driver') || jobLower.includes('delivery driver') || jobLower.includes('truck driver')) {
+                jobCategories.driver++;
+            }
+            else if(jobLower.includes('logistics staff') || jobLower.includes('logistics')) {
+                jobCategories.logisticsStaff++;
+            }
+            else if(jobLower.includes('rider') || jobLower.includes('motorcycle delivery') || jobLower.includes('foodpanda') || jobLower.includes('grab')) {
+                jobCategories.rider++;
+            }
+            // Food & Hospitality
+            else if(jobLower.includes('cook') || jobLower.includes('chef')) {
+                jobCategories.cook++;
+            }
+            else if(jobLower.includes('waiter') || jobLower.includes('service crew') || jobLower.includes('waitress')) {
+                jobCategories.waiter++;
+            }
+            else if(jobLower.includes('barista')) {
+                jobCategories.barista++;
+            }
+            else if(jobLower.includes('housekeeping') || jobLower.includes('housekeeper')) {
+                jobCategories.housekeepingStaff++;
+            }
+            // Security & Public Service
+            else if(jobLower.includes('security guard') || jobLower.includes('guard')) {
+                jobCategories.securityGuard++;
+            }
+            else if(jobLower.includes('barangay staff') || jobLower.includes('barangay council') || jobLower.includes('barangay official')) {
+                jobCategories.barangayStaff++;
+            }
+            else if(jobLower.includes('police officer') || jobLower.includes('policeman') || jobLower.includes('police')) {
+                jobCategories.policeOfficer++;
+            }
+            else if(jobLower.includes('fire officer') || jobLower.includes('fireman') || jobLower.includes('firefighter')) {
+                jobCategories.fireOfficer++;
+            }
+            // Media, Design & Creative
+            else if(jobLower.includes('graphic designer') || jobLower.includes('graphics designer')) {
+                jobCategories.graphicDesigner++;
+            }
+            else if(jobLower.includes('video editor') || jobLower.includes('video editing')) {
+                jobCategories.videoEditor++;
+            }
+            else if(jobLower.includes('content writer') || jobLower.includes('writer')) {
+                jobCategories.contentWriter++;
+            }
+            else if(jobLower.includes('social media manager') || jobLower.includes('social media')) {
+                jobCategories.socialMediaManager++;
+            }
         }
-        else if(jobLower.includes('secretary') || jobLower.includes('executive assistant')) {
-          jobCategories.secretary++;
-        }
-        // Business & Management
-        else if(jobLower.includes('project manager')) {
-          jobCategories.projectManager++;
-        }
-        else if(jobLower.includes('operations manager')) {
-          jobCategories.operationsManager++;
-        }
-        else if(jobLower.includes('hr staff') || jobLower.includes('hr officer') || jobLower.includes('human resources')) {
-          jobCategories.hrStaff++;
-        }
-        else if(jobLower.includes('account manager')) {
-          jobCategories.accountManager++;
-        }
-        // Accounting & Finance
-        else if(jobLower.includes('accounting staff') || jobLower.includes('accountant')) {
-          jobCategories.accountingStaff++;
-        }
-        else if(jobLower.includes('bookkeeper') || jobLower.includes('book keeping')) {
-          jobCategories.bookkeeper++;
-        }
-        else if(jobLower.includes('payroll officer') || jobLower.includes('payroll')) {
-          jobCategories.payrollOfficer++;
-        }
-        else if(jobLower.includes('auditor')) {
-          jobCategories.auditor++;
-        }
-        // IT & Tech
-        else if(jobLower.includes('it support') || jobLower.includes('it technician') || jobLower === 'it') {
-          jobCategories.itSupport++;
-        }
-        else if(jobLower.includes('web developer') || jobLower.includes('web dev')) {
-          jobCategories.webDeveloper++;
-        }
-        else if(jobLower.includes('software developer') || jobLower.includes('programmer') || jobLower.includes('coder')) {
-          jobCategories.softwareDeveloper++;
-        }
-        else if(jobLower.includes('data analyst')) {
-          jobCategories.dataAnalyst++;
-        }
-        else if(jobLower.includes('system administrator') || jobLower.includes('system admin')) {
-          jobCategories.systemAdministrator++;
-        }
-        // Healthcare
-        else if(jobLower.includes('nurse') || jobLower.includes('registered nurse')) {
-          jobCategories.nurse++;
-        }
-        else if(jobLower.includes('medical technologist') || jobLower.includes('med tech')) {
-          jobCategories.medicalTechnologist++;
-        }
-        else if(jobLower.includes('caregiver')) {
-          jobCategories.caregiver++;
-        }
-        else if(jobLower.includes('pharmacist')) {
-          jobCategories.pharmacist++;
-        }
-        // Education
-        else if(jobLower.includes('teacher') || jobLower.includes('instructor') || jobLower.includes('faculty')) {
-          jobCategories.teacher++;
-        }
-        else if(jobLower.includes('tutor')) {
-          jobCategories.tutor++;
-        }
-        else if(jobLower.includes('school administrator') || jobLower.includes('principal')) {
-          jobCategories.schoolAdministrator++;
-        }
-        // Sales & Customer Service
-        else if(jobLower.includes('customer service') || jobLower.includes('csr') || jobLower.includes('call center')) {
-          jobCategories.csr++;
-        }
-        else if(jobLower.includes('sales associate') || jobLower.includes('salesperson') || jobLower.includes('sales agent')) {
-          jobCategories.salesAssociate++;
-        }
-        else if(jobLower.includes('cashier')) {
-          jobCategories.cashier++;
-        }
-        else if(jobLower.includes('store supervisor') || jobLower.includes('store manager')) {
-          jobCategories.storeSupervisor++;
-        }
-        // Skilled Work & Labor
-        else if(jobLower.includes('electrician')) {
-          jobCategories.electrician++;
-        }
-        else if(jobLower.includes('plumber')) {
-          jobCategories.plumber++;
-        }
-        else if(jobLower.includes('welder')) {
-          jobCategories.welder++;
-        }
-        else if(jobLower.includes('construction worker') || jobLower.includes('skilled laborer') || jobLower.includes('laborer')) {
-          jobCategories.constructionWorker++;
-        }
-        // Delivery & Logistics
-        else if(jobLower.includes('driver') || jobLower.includes('delivery driver') || jobLower.includes('truck driver')) {
-          jobCategories.driver++;
-        }
-        else if(jobLower.includes('logistics staff') || jobLower.includes('logistics')) {
-          jobCategories.logisticsStaff++;
-        }
-        else if(jobLower.includes('rider') || jobLower.includes('motorcycle delivery') || jobLower.includes('foodpanda') || jobLower.includes('grab')) {
-          jobCategories.rider++;
-        }
-        // Food & Hospitality
-        else if(jobLower.includes('cook') || jobLower.includes('chef')) {
-          jobCategories.cook++;
-        }
-        else if(jobLower.includes('waiter') || jobLower.includes('service crew') || jobLower.includes('waitress')) {
-          jobCategories.waiter++;
-        }
-        else if(jobLower.includes('barista')) {
-          jobCategories.barista++;
-        }
-        else if(jobLower.includes('housekeeping') || jobLower.includes('housekeeper')) {
-          jobCategories.housekeepingStaff++;
-        }
-        // Security & Public Service
-        else if(jobLower.includes('security guard') || jobLower.includes('guard')) {
-          jobCategories.securityGuard++;
-        }
-        else if(jobLower.includes('barangay staff') || jobLower.includes('barangay council') || jobLower.includes('barangay official')) {
-          jobCategories.barangayStaff++;
-        }
-        else if(jobLower.includes('police officer') || jobLower.includes('policeman') || jobLower.includes('police')) {
-          jobCategories.policeOfficer++;
-        }
-        else if(jobLower.includes('fire officer') || jobLower.includes('fireman') || jobLower.includes('firefighter')) {
-          jobCategories.fireOfficer++;
-        }
-        // Media, Design & Creative
-        else if(jobLower.includes('graphic designer') || jobLower.includes('graphics designer')) {
-          jobCategories.graphicDesigner++;
-        }
-        else if(jobLower.includes('video editor') || jobLower.includes('video editing')) {
-          jobCategories.videoEditor++;
-        }
-        else if(jobLower.includes('content writer') || jobLower.includes('writer')) {
-          jobCategories.contentWriter++;
-        }
-        else if(jobLower.includes('social media manager') || jobLower.includes('social media')) {
-          jobCategories.socialMediaManager++;
-        }
-      }
-      
-      // FishR & RBIS Registration - FIXED: Check multiple field names
-      const fishrField = String(getField(r,'FishR & RBIS')||getField(r,'FishR Registered/RBIS Registered')||getField(r,'FishR')||'').trim().toLowerCase();
-      if(fishrField) {
-        if(fishrField.includes('fishr') && fishrField.includes('rbis')) {
-          b.fishr.bothRegistered++;
-          fishrStats.bothRegistered++;
-        } else if(fishrField.includes('fishr')) {
-          b.fishr.fishrRegistered++;
-          fishrStats.fishrRegistered++;
-        } else if(fishrField.includes('rbis')) {
-          b.fishr.rbisRegistered++;
-          fishrStats.rbisRegistered++;
+        
+        // FishR & RBIS Registration - FIXED: Check multiple field names
+        const fishrField = String(getField(r,'FishR & RBIS')||getField(r,'FishR Registered/RBIS Registered')||getField(r,'FishR')||'').trim().toLowerCase();
+        if(fishrField) {
+            if(fishrField.includes('fishr') && fishrField.includes('rbis')) {
+                b.fishr.bothRegistered++;
+                fishrStats.bothRegistered++;
+            } else if(fishrField.includes('fishr')) {
+                b.fishr.fishrRegistered++;
+                fishrStats.fishrRegistered++;
+            } else if(fishrField.includes('rbis')) {
+                b.fishr.rbisRegistered++;
+                fishrStats.rbisRegistered++;
+            } else {
+                b.fishr.notRegistered++;
+                fishrStats.notRegistered++;
+            }
         } else {
-          b.fishr.notRegistered++;
-          fishrStats.notRegistered++;
+            b.fishr.notRegistered++;
+            fishrStats.notRegistered++;
         }
-      } else {
-        b.fishr.notRegistered++;
-        fishrStats.notRegistered++;
-      }
-      
-      // OFW Country - FIXED: Check multiple field names
-      const ofwField = String(getField(r,'Overseas Filipino Worker(OFW)')||getField(r,'Overseas Filipino Worker (OFW)')||getField(r,'OFW')||'').trim().toLowerCase();
-      if(ofwField === 'yes' || ofwField === 'true' || ofwField === '1' || ofwField.includes('ofw')) {
-        const countryField = String(getField(r,'Country')||'').trim().toLowerCase();
         
-        if(countryField.includes('saudi')) {
-          ofwCountries.saudiArabia++;
-          b.ofw.saudiArabia++;
-        } else if(countryField.includes('uae') || countryField.includes('united arab emirates')) {
-          ofwCountries.uae++;
-          b.ofw.uae++;
-        } else if(countryField.includes('qatar')) {
-          ofwCountries.qatar++;
-          b.ofw.qatar++;
-        } else if(countryField.includes('kuwait')) {
-          ofwCountries.kuwait++;
-          b.ofw.kuwait++;
-        } else if(countryField.includes('bahrain')) {
-          ofwCountries.bahrain++;
-          b.ofw.bahrain++;
-        } else if(countryField.includes('oman')) {
-          ofwCountries.oman++;
-          b.ofw.oman++;
-        } else if(countryField.includes('hong kong')) {
-          ofwCountries.hongKong++;
-          b.ofw.hongKong++;
-        } else if(countryField.includes('singapore')) {
-          ofwCountries.singapore++;
-          b.ofw.singapore++;
-        } else if(countryField.includes('japan')) {
-          ofwCountries.japan++;
-          b.ofw.japan++;
-        } else if(countryField.includes('taiwan')) {
-          ofwCountries.taiwan++;
-          b.ofw.taiwan++;
-        } else if(countryField.includes('malaysia')) {
-          ofwCountries.malaysia++;
-          b.ofw.malaysia++;
-        } else if(countryField.includes('australia')) {
-          ofwCountries.australia++;
-          b.ofw.australia++;
-        } else if(countryField.includes('new zealand')) {
-          ofwCountries.newZealand++;
-          b.ofw.newZealand++;
-        } else if(countryField.includes('italy')) {
-          ofwCountries.italy++;
-          b.ofw.italy++;
-        } else if(countryField.includes('uk') || countryField.includes('united kingdom')) {
-          ofwCountries.uk++;
-          b.ofw.uk++;
-        } else if(countryField.includes('germany')) {
-          ofwCountries.germany++;
-          b.ofw.germany++;
-        } else if(countryField.includes('cyprus')) {
-          ofwCountries.cyprus++;
-          b.ofw.cyprus++;
-        } else if(countryField.includes('canada')) {
-          ofwCountries.canada++;
-          b.ofw.canada++;
-        } else if(countryField.includes('usa') || countryField.includes('united states')) {
-          ofwCountries.usa++;
-          b.ofw.usa++;
-        } else if(countryField.includes('libya')) {
-          ofwCountries.libya++;
-          b.ofw.libya++;
-        } else if(countryField.trim() !== '') {
-          ofwCountries.others++;
-          b.ofw.others++;
+        // OFW Country - FIXED: Check multiple field names
+        const ofwField = String(getField(r,'Overseas Filipino Worker(OFW)')||getField(r,'Overseas Filipino Worker (OFW)')||getField(r,'OFW')||'').trim().toLowerCase();
+        if(ofwField === 'yes' || ofwField === 'true' || ofwField === '1' || ofwField.includes('ofw')) {
+            const countryField = String(getField(r,'Country')||'').trim().toLowerCase();
+            
+            if(countryField.includes('saudi')) {
+                ofwCountries.saudiArabia++;
+                b.ofw.saudiArabia++;
+            } else if(countryField.includes('uae') || countryField.includes('united arab emirates')) {
+                ofwCountries.uae++;
+                b.ofw.uae++;
+            } else if(countryField.includes('qatar')) {
+                ofwCountries.qatar++;
+                b.ofw.qatar++;
+            } else if(countryField.includes('kuwait')) {
+                ofwCountries.kuwait++;
+                b.ofw.kuwait++;
+            } else if(countryField.includes('bahrain')) {
+                ofwCountries.bahrain++;
+                b.ofw.bahrain++;
+            } else if(countryField.includes('oman')) {
+                ofwCountries.oman++;
+                b.ofw.oman++;
+            } else if(countryField.includes('hong kong')) {
+                ofwCountries.hongKong++;
+                b.ofw.hongKong++;
+            } else if(countryField.includes('singapore')) {
+                ofwCountries.singapore++;
+                b.ofw.singapore++;
+            } else if(countryField.includes('japan')) {
+                ofwCountries.japan++;
+                b.ofw.japan++;
+            } else if(countryField.includes('taiwan')) {
+                ofwCountries.taiwan++;
+                b.ofw.taiwan++;
+            } else if(countryField.includes('malaysia')) {
+                ofwCountries.malaysia++;
+                b.ofw.malaysia++;
+            } else if(countryField.includes('australia')) {
+                ofwCountries.australia++;
+                b.ofw.australia++;
+            } else if(countryField.includes('new zealand')) {
+                ofwCountries.newZealand++;
+                b.ofw.newZealand++;
+            } else if(countryField.includes('italy')) {
+                ofwCountries.italy++;
+                b.ofw.italy++;
+            } else if(countryField.includes('uk') || countryField.includes('united kingdom')) {
+                ofwCountries.uk++;
+                b.ofw.uk++;
+            } else if(countryField.includes('germany')) {
+                ofwCountries.germany++;
+                b.ofw.germany++;
+            } else if(countryField.includes('cyprus')) {
+                ofwCountries.cyprus++;
+                b.ofw.cyprus++;
+            } else if(countryField.includes('canada')) {
+                ofwCountries.canada++;
+                b.ofw.canada++;
+            } else if(countryField.includes('usa') || countryField.includes('united states')) {
+                ofwCountries.usa++;
+                b.ofw.usa++;
+            } else if(countryField.includes('libya')) {
+                ofwCountries.libya++;
+                b.ofw.libya++;
+            } else if(countryField.trim() !== '') {
+                ofwCountries.others++;
+                b.ofw.others++;
+            }
         }
-      }
     });
 
     // Update top cards - FIXED: Households with Coordinates
@@ -1966,10 +2004,10 @@ async function loadDashboard(){
     demographicsStatsDiv.innerHTML = '';
     
     [['Male', demographicsStats.male], ['Female', demographicsStats.female], ['PWD', demographicsStats.pwd]].forEach(it=>{
-      const div = document.createElement('div'); 
-      div.className = 'category-card'; 
-      div.innerHTML = `<div class="category-label">${it[0]}</div><div class="category-value">${it[1]}</div>`;
-      demographicsStatsDiv.appendChild(div);
+        const div = document.createElement('div'); 
+        div.className = 'category-card'; 
+        div.innerHTML = `<div class="category-label">${it[0]}</div><div class="category-value">${it[1]}</div>`;
+        demographicsStatsDiv.appendChild(div);
     });
     
     // Educational Attainment Section
@@ -1977,25 +2015,25 @@ async function loadDashboard(){
     educationStatsDiv.innerHTML = '';
     
     const educationLabels = {
-      noFormalEducation: 'No Formal Education',
-      elementaryLevel: 'Elementary Level',
-      elementaryGraduate: 'Elementary Graduate',
-      juniorHighSchoolLevel: 'Junior High School Level',
-      juniorHighSchoolGraduate: 'Junior High School Graduate',
-      seniorHighSchoolLevel: 'Senior High School Level',
-      seniorHighSchoolGraduate: 'Senior High School Graduate',
-      collegeLevel: 'College Level',
-      collegeGraduate: 'College Graduate'
+        noFormalEducation: 'No Formal Education',
+        elementaryLevel: 'Elementary Level',
+        elementaryGraduate: 'Elementary Graduate',
+        juniorHighSchoolLevel: 'Junior High School Level',
+        juniorHighSchoolGraduate: 'Junior High School Graduate',
+        seniorHighSchoolLevel: 'Senior High School Level',
+        seniorHighSchoolGraduate: 'Senior High School Graduate',
+        collegeLevel: 'College Level',
+        collegeGraduate: 'College Graduate'
     };
     
     Object.entries(educationLabels).forEach(([key, label]) => {
-      const count = overallEducation[key] || 0;
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        educationStatsDiv.appendChild(div);
-      }
+        const count = overallEducation[key] || 0;
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            educationStatsDiv.appendChild(div);
+        }
     });
     
     // Employment Status Section - FIXED: Now shows data
@@ -2004,11 +2042,11 @@ async function loadDashboard(){
     
     // Always show both employed and unemployed
     ['Employed', 'Unemployed'].forEach(status => {
-      const count = status === 'Employed' ? overallEmployment.employed : overallEmployment.unemployed;
-      const div = document.createElement('div'); 
-      div.className = 'category-card'; 
-      div.innerHTML = `<div class="category-label">${status}</div><div class="category-value">${count}</div>`;
-      employmentStatsDiv.appendChild(div);
+        const count = status === 'Employed' ? overallEmployment.employed : overallEmployment.unemployed;
+        const div = document.createElement('div'); 
+        div.className = 'category-card'; 
+        div.innerHTML = `<div class="category-label">${status}</div><div class="category-value">${count}</div>`;
+        employmentStatsDiv.appendChild(div);
     });
     
     // FishR & RBIS Section
@@ -2018,10 +2056,10 @@ async function loadDashboard(){
     [['FishR Registered', fishrStats.fishrRegistered], 
      ['RBIS Registered', fishrStats.rbisRegistered], 
      ['FishR & RBIS Registered', fishrStats.bothRegistered]].forEach(it=>{
-      const div = document.createElement('div'); 
-      div.className = 'category-card'; 
-      div.innerHTML = `<div class="category-label">${it[0]}</div><div class="category-value">${it[1]}</div>`;
-      fishrStatsDiv.appendChild(div);
+        const div = document.createElement('div'); 
+        div.className = 'category-card'; 
+        div.innerHTML = `<div class="category-label">${it[0]}</div><div class="category-value">${it[1]}</div>`;
+        fishrStatsDiv.appendChild(div);
     });
     
     // Job Categories Sections
@@ -2032,12 +2070,12 @@ async function loadDashboard(){
     [['Admin Assistant', jobCategories.adminAssistant], 
      ['Office Clerk', jobCategories.officeClerk], 
      ['Secretary', jobCategories.secretary]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        officeJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            officeJobsDiv.appendChild(div);
+        }
     });
     
     // Business & Management
@@ -2047,12 +2085,12 @@ async function loadDashboard(){
      ['Operations Manager', jobCategories.operationsManager], 
      ['HR Staff', jobCategories.hrStaff], 
      ['Account Manager', jobCategories.accountManager]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        businessJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            businessJobsDiv.appendChild(div);
+        }
     });
     
     // Accounting & Finance
@@ -2062,12 +2100,12 @@ async function loadDashboard(){
      ['Bookkeeper', jobCategories.bookkeeper], 
      ['Payroll Officer', jobCategories.payrollOfficer], 
      ['Auditor', jobCategories.auditor]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        accountingJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            accountingJobsDiv.appendChild(div);
+        }
     });
     
     // IT & Tech
@@ -2078,12 +2116,12 @@ async function loadDashboard(){
      ['Software Developer', jobCategories.softwareDeveloper], 
      ['Data Analyst', jobCategories.dataAnalyst], 
      ['System Admin', jobCategories.systemAdministrator]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        itJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            itJobsDiv.appendChild(div);
+        }
     });
     
     // Healthcare
@@ -2093,12 +2131,12 @@ async function loadDashboard(){
      ['Medical Technologist', jobCategories.medicalTechnologist], 
      ['Caregiver', jobCategories.caregiver], 
      ['Pharmacist', jobCategories.pharmacist]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        healthcareJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            healthcareJobsDiv.appendChild(div);
+        }
     });
     
     // Education
@@ -2107,12 +2145,12 @@ async function loadDashboard(){
     [['Teacher', jobCategories.teacher], 
      ['Tutor', jobCategories.tutor], 
      ['School Admin', jobCategories.schoolAdministrator]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        educationJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            educationJobsDiv.appendChild(div);
+        }
     });
     
     // Sales & Customer Service
@@ -2122,12 +2160,12 @@ async function loadDashboard(){
      ['Sales Associate', jobCategories.salesAssociate], 
      ['Cashier', jobCategories.cashier], 
      ['Store Supervisor', jobCategories.storeSupervisor]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        salesJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            salesJobsDiv.appendChild(div);
+        }
     });
     
     // Skilled Work & Labor
@@ -2137,12 +2175,12 @@ async function loadDashboard(){
      ['Plumber', jobCategories.plumber], 
      ['Welder', jobCategories.welder], 
      ['Construction Worker', jobCategories.constructionWorker]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        skilledJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            skilledJobsDiv.appendChild(div);
+        }
     });
     
     // Delivery & Logistics
@@ -2151,12 +2189,12 @@ async function loadDashboard(){
     [['Driver', jobCategories.driver], 
      ['Logistics Staff', jobCategories.logisticsStaff], 
      ['Rider', jobCategories.rider]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        deliveryJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            deliveryJobsDiv.appendChild(div);
+        }
     });
     
     // Food & Hospitality
@@ -2166,12 +2204,12 @@ async function loadDashboard(){
      ['Waiter', jobCategories.waiter], 
      ['Barista', jobCategories.barista], 
      ['Housekeeping', jobCategories.housekeepingStaff]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        foodJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            foodJobsDiv.appendChild(div);
+        }
     });
     
     // Security & Public Service
@@ -2181,12 +2219,12 @@ async function loadDashboard(){
      ['Barangay Staff', jobCategories.barangayStaff], 
      ['Police Officer', jobCategories.policeOfficer], 
      ['Fire Officer', jobCategories.fireOfficer]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        securityJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            securityJobsDiv.appendChild(div);
+        }
     });
     
     // Media, Design & Creative
@@ -2196,12 +2234,12 @@ async function loadDashboard(){
      ['Video Editor', jobCategories.videoEditor], 
      ['Content Writer', jobCategories.contentWriter], 
      ['Social Media Manager', jobCategories.socialMediaManager]].forEach(([label, count]) => {
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        mediaJobsDiv.appendChild(div);
-      }
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            mediaJobsDiv.appendChild(div);
+        }
     });
     
     // OFW Countries Section - FIXED: Now shows data
@@ -2209,36 +2247,36 @@ async function loadDashboard(){
     ofwCountriesStatsDiv.innerHTML = '';
     
     const ofwLabels = {
-      saudiArabia: 'Saudi Arabia',
-      uae: 'United Arab Emirates',
-      qatar: 'Qatar',
-      kuwait: 'Kuwait',
-      bahrain: 'Bahrain',
-      oman: 'Oman',
-      hongKong: 'Hong Kong',
-      singapore: 'Singapore',
-      japan: 'Japan',
-      taiwan: 'Taiwan',
-      malaysia: 'Malaysia',
-      australia: 'Australia',
-      newZealand: 'New Zealand',
-      italy: 'Italy',
-      uk: 'United Kingdom',
-      germany: 'Germany',
-      cyprus: 'Cyprus',
-      canada: 'Canada',
-      usa: 'United States',
-      libya: 'Libya'
+        saudiArabia: 'Saudi Arabia',
+        uae: 'United Arab Emirates',
+        qatar: 'Qatar',
+        kuwait: 'Kuwait',
+        bahrain: 'Bahrain',
+        oman: 'Oman',
+        hongKong: 'Hong Kong',
+        singapore: 'Singapore',
+        japan: 'Japan',
+        taiwan: 'Taiwan',
+        malaysia: 'Malaysia',
+        australia: 'Australia',
+        newZealand: 'New Zealand',
+        italy: 'Italy',
+        uk: 'United Kingdom',
+        germany: 'Germany',
+        cyprus: 'Cyprus',
+        canada: 'Canada',
+        usa: 'United States',
+        libya: 'Libya'
     };
     
     Object.entries(ofwLabels).forEach(([key, label]) => {
-      const count = ofwCountries[key] || 0;
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        ofwCountriesStatsDiv.appendChild(div);
-      }
+        const count = ofwCountries[key] || 0;
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            ofwCountriesStatsDiv.appendChild(div);
+        }
     });
     
     // Domestic Livestock Section
@@ -2246,23 +2284,23 @@ async function loadDashboard(){
     livestockStatsDiv.innerHTML = '';
     
     const livestockLabels = {
-      dog: 'Dog',
-      cat: 'Cat',
-      pig: 'Pig',
-      cow: 'Cow',
-      carabao: 'Carabao',
-      chicken: 'Chicken',
-      others: 'Others'
+        dog: 'Dog',
+        cat: 'Cat',
+        pig: 'Pig',
+        cow: 'Cow',
+        carabao: 'Carabao',
+        chicken: 'Chicken',
+        others: 'Others'
     };
     
     Object.entries(livestockLabels).forEach(([key, label]) => {
-      const count = livestockStats[key] || 0;
-      if(count > 0) {
-        const div = document.createElement('div'); 
-        div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
-        livestockStatsDiv.appendChild(div);
-      }
+        const count = livestockStats[key] || 0;
+        if(count > 0) {
+            const div = document.createElement('div'); 
+            div.className = 'category-card'; 
+            div.innerHTML = `<div class="category-label">${label}</div><div class="category-value">${count}</div>`;
+            livestockStatsDiv.appendChild(div);
+        }
     });
 
     // Chart: heads vs members per barangay
@@ -2272,43 +2310,43 @@ async function loadDashboard(){
     const membersData = labels.map(l => barangayMap[l].members || 0);
     const ctx = document.getElementById('barangayChart').getContext('2d');
     chart = new Chart(ctx, {
-      type: 'bar',
-      data: { 
-        labels, 
-        datasets: [
-          { 
-            label: 'Heads', 
-            data: headsData, 
-            backgroundColor: '#2b9348' 
-          }, 
-          { 
-            label: 'Members', 
-            data: membersData, 
-            backgroundColor: '#55a630' 
-          }
-        ] 
-      },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: true,
-        plugins:{ 
-          legend:{ 
-            position:'bottom',
-            labels: {
-              padding: 20,
-              usePointStyle: true
-            }
-          } 
-        }, 
-        scales:{ 
-          y:{ 
-            beginAtZero:true,
-            ticks: {
-              precision: 0
-            }
-          } 
-        } 
-      }
+        type: 'bar',
+        data: { 
+            labels, 
+            datasets: [
+                { 
+                    label: 'Heads', 
+                    data: headsData, 
+                    backgroundColor: '#2b9348' 
+                }, 
+                { 
+                    label: 'Members', 
+                    data: membersData, 
+                    backgroundColor: '#55a630' 
+                }
+            ] 
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: true,
+            plugins:{ 
+                legend:{ 
+                    position:'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                } 
+            }, 
+            scales:{ 
+                y:{ 
+                    beginAtZero:true,
+                    ticks: {
+                        precision: 0
+                    }
+                } 
+            } 
+        }
     });
 
     // Populate all breakdown tables
@@ -2316,10 +2354,10 @@ async function loadDashboard(){
     const tbodySummary = document.querySelector('#tblSummary tbody'); 
     tbodySummary.innerHTML = '';
     labels.forEach(l => {
-      const s = barangayMap[l];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td><td>${s.pwds||0}</td><td>${s.male||0}</td><td>${s.female||0}</td><td>${s.coords||0}</td>`;
-      tbodySummary.appendChild(tr);
+        const s = barangayMap[l];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td><td>${s.pwds||0}</td><td>${s.male||0}</td><td>${s.female||0}</td><td>${s.coords||0}</td>`;
+        tbodySummary.appendChild(tr);
     });
 
     // 2) Government Support
@@ -2327,11 +2365,11 @@ async function loadDashboard(){
     const tbodySupport = document.querySelector('#tblSupport tbody'); 
     tbodySupport.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = supportKeys.map(k => s.support && s.support[k] ? s.support[k] : 0);
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodySupport.appendChild(tr);
+        const s = barangayMap[l];
+        const cells = supportKeys.map(k => s.support && s.support[k] ? s.support[k] : 0);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+        tbodySupport.appendChild(tr);
     });
 
     // 3) Status breakdown
@@ -2339,11 +2377,11 @@ async function loadDashboard(){
     const tbodyStatus = document.querySelector('#tblStatus tbody'); 
     tbodyStatus.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = statusKeys.map(k => s.status && s.status[k] ? s.status[k] : 0);
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyStatus.appendChild(tr);
+        const s = barangayMap[l];
+        const cells = statusKeys.map(k => s.status && s.status[k] ? s.status[k] : 0);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+        tbodyStatus.appendChild(tr);
     });
 
     // 4) Age buckets
@@ -2351,11 +2389,11 @@ async function loadDashboard(){
     const tbodyAge = document.querySelector('#tblAge tbody'); 
     tbodyAge.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = ageKeys.map(k => s.ageBuckets && s.ageBuckets[k] ? s.ageBuckets[k] : 0);
-      const tr = document.createElement('tr'); 
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyAge.appendChild(tr);
+        const s = barangayMap[l];
+        const cells = ageKeys.map(k => s.ageBuckets && s.ageBuckets[k] ? s.ageBuckets[k] : 0);
+        const tr = document.createElement('tr'); 
+        tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+        tbodyAge.appendChild(tr);
     });
 
     // 5) Sitio / Purok
@@ -2363,105 +2401,129 @@ async function loadDashboard(){
     const tbodySitio = document.querySelector('#tblSitio tbody'); 
     tbodySitio.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = sitios.map(pk => s.sitio && s.sitio[pk] ? s.sitio[pk] : 0);
-      const tr = document.createElement('tr'); 
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodySitio.appendChild(tr);
+        const s = barangayMap[l];
+        const cells = sitios.map(pk => s.sitio && s.sitio[pk] ? s.sitio[pk] : 0);
+        const tr = document.createElement('tr'); 
+        tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+        tbodySitio.appendChild(tr);
     });
 
     // 6) Livestock (with Others column)
     const tbodyLiv = document.querySelector('#tblLivestock tbody'); 
     tbodyLiv.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const animals = ['dog', 'cat', 'pig', 'cow', 'carabao', 'chicken', 'others'];
-      const cells = animals.map(a => s.livestock && s.livestock[a] ? s.livestock[a] : 0);
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyLiv.appendChild(tr);
+        const s = barangayMap[l];
+        const animals = ['dog', 'cat', 'pig', 'cow', 'carabao', 'chicken', 'others'];
+        const cells = animals.map(a => s.livestock && s.livestock[a] ? s.livestock[a] : 0);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+        tbodyLiv.appendChild(tr);
     });
     
     // 7) Barangay Educational Attainment
     const tbodyBarangayEducation = document.querySelector('#tblBarangayEducation tbody'); 
     tbodyBarangayEducation.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = [
-        s.education.noFormalEducation || 0,
-        s.education.elementaryLevel || 0,
-        s.education.elementaryGraduate || 0,
-        s.education.juniorHighSchoolLevel || 0,
-        s.education.juniorHighSchoolGraduate || 0,
-        s.education.seniorHighSchoolLevel || 0,
-        s.education.seniorHighSchoolGraduate || 0,
-        s.education.collegeLevel || 0,
-        s.education.collegeGraduate || 0
-      ];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyBarangayEducation.appendChild(tr);
+        const s = barangayMap[l];
+        const cells = [
+            s.education.noFormalEducation || 0,
+            s.education.elementaryLevel || 0,
+            s.education.elementaryGraduate || 0,
+            s.education.juniorHighSchoolLevel || 0,
+            s.education.juniorHighSchoolGraduate || 0,
+            s.education.seniorHighSchoolLevel || 0,
+            s.education.seniorHighSchoolGraduate || 0,
+            s.education.collegeLevel || 0,
+            s.education.collegeGraduate || 0
+        ];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+        tbodyBarangayEducation.appendChild(tr);
     });
     
     // 8) Barangay Employment - FIXED: Now showing correct totals
     const tbodyBarangayEmployment = document.querySelector('#tblBarangayEmployment tbody'); 
     tbodyBarangayEmployment.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td><td>${s.employment.employed || 0}</td><td>${s.employment.unemployed || 0}</td>`;
-      tbodyBarangayEmployment.appendChild(tr);
+        const s = barangayMap[l];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td><td>${s.employment.employed || 0}</td><td>${s.employment.unemployed || 0}</td>`;
+        tbodyBarangayEmployment.appendChild(tr);
     });
     
     // 9) Barangay FishR & RBIS
     const tbodyBarangayFishR = document.querySelector('#tblBarangayFishR tbody'); 
     tbodyBarangayFishR.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td><td>${s.fishr.fishrRegistered || 0}</td><td>${s.fishr.rbisRegistered || 0}</td><td>${s.fishr.bothRegistered || 0}</td><td>${s.fishr.notRegistered || 0}</td>`;
-      tbodyBarangayFishR.appendChild(tr);
+        const s = barangayMap[l];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td><td>${s.fishr.fishrRegistered || 0}</td><td>${s.fishr.rbisRegistered || 0}</td><td>${s.fishr.bothRegistered || 0}</td><td>${s.fishr.notRegistered || 0}</td>`;
+        tbodyBarangayFishR.appendChild(tr);
     });
     
     // 10) Barangay OFW Countries - FIXED: All countries in header
     const tbodyBarangayOFW = document.querySelector('#tblBarangayOFW tbody'); 
     tbodyBarangayOFW.innerHTML = '';
     labels.forEach(l=>{
-      const s = barangayMap[l];
-      const cells = [
-        s.ofw.saudiArabia || 0,
-        s.ofw.uae || 0,
-        s.ofw.qatar || 0,
-        s.ofw.kuwait || 0,
-        s.ofw.bahrain || 0,
-        s.ofw.oman || 0,
-        s.ofw.hongKong || 0,
-        s.ofw.singapore || 0,
-        s.ofw.japan || 0,
-        s.ofw.taiwan || 0,
-        s.ofw.malaysia || 0,
-        s.ofw.australia || 0,
-        s.ofw.newZealand || 0,
-        s.ofw.italy || 0,
-        s.ofw.uk || 0,
-        s.ofw.germany || 0,
-        s.ofw.cyprus || 0,
-        s.ofw.canada || 0,
-        s.ofw.usa || 0,
-        s.ofw.libya || 0,
-        s.ofw.others || 0
-      ];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
-      tbodyBarangayOFW.appendChild(tr);
+        const s = barangayMap[l];
+        const cells = [
+            s.ofw.saudiArabia || 0,
+            s.ofw.uae || 0,
+            s.ofw.qatar || 0,
+            s.ofw.kuwait || 0,
+            s.ofw.bahrain || 0,
+            s.ofw.oman || 0,
+            s.ofw.hongKong || 0,
+            s.ofw.singapore || 0,
+            s.ofw.japan || 0,
+            s.ofw.taiwan || 0,
+            s.ofw.malaysia || 0,
+            s.ofw.australia || 0,
+            s.ofw.newZealand || 0,
+            s.ofw.italy || 0,
+            s.ofw.uk || 0,
+            s.ofw.germany || 0,
+            s.ofw.cyprus || 0,
+            s.ofw.canada || 0,
+            s.ofw.usa || 0,
+            s.ofw.libya || 0,
+            s.ofw.others || 0
+        ];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l}</td>` + cells.map(c=>`<td>${c}</td>`).join('');
+        tbodyBarangayOFW.appendChild(tr);
     });
-
-  } catch(err){
-    console.error('Load dashboard error', err);
-    alert('Error loading dashboard data');
-  }
-  showLoading(false);
 }
+
+/* INITIALIZATION - UPDATED */
+window.addEventListener('DOMContentLoaded', async () => {
+  // First check session with server validation
+  const isAuthenticated = await sessionCheck();
+  
+  if (!isAuthenticated) {
+    return; // Already redirected
+  }
+  
+  // Setup auto-logout for inactivity
+  setupAutoLogout();
+  
+  // STEP 1: Load cached dashboard data IMMEDIATELY (no loading screen)
+  const hasCache = loadCachedDashboardData();
+  
+  // STEP 2: Load fresh data from server in background
+  // Only show loading if there's NO cache (first visit)
+  loadDashboard(!hasCache);
+  
+  // Auto-refresh dashboard data every 30 seconds (no loading screen)
+  if (refreshInterval) clearInterval(refreshInterval);
+  refreshInterval = setInterval(() => loadDashboard(false), 30000);
+  
+  // Check screen width and adjust sidebar
+  if (window.innerWidth <= 768) {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.remove('mobile-open');
+  }
+});
 
 /* SIDEBAR FUNCTIONS */
 function toggleSidebar() {
@@ -2538,15 +2600,15 @@ window.addEventListener('pageshow', function(event) {
     console.log('Page loaded from cache, checking session...');
     
     // Don't automatically redirect. Just reload the dashboard data
-    loadDashboard();
+    loadDashboard(false);
   }
 });
 
 /* Listen for data changes from other pages */
 window.addEventListener('storage', function(e) {
-  if (e.key === 'lastDataUpdate') {
-    console.log('Data updated from another tab, reloading dashboard...');
-    loadDashboard();
+  if (e.key === 'dashboardDataCache') {
+    console.log('Dashboard data updated from another tab, refreshing...');
+    loadCachedDashboardData();
   }
 });
 
@@ -2554,7 +2616,7 @@ window.addEventListener('storage', function(e) {
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) {
     console.log('Tab became active, refreshing dashboard...');
-    loadDashboard();
+    loadDashboard(false);
   }
 });
 
@@ -2568,6 +2630,7 @@ function notifyDataUpdated() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
 
