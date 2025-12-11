@@ -198,68 +198,70 @@ class SessionManager {
     }
 
     // Update UI with user info
-    updateUI() {
-        const fullName = localStorage.getItem('staffName');
-        const role = localStorage.getItem('userRole');
-        const barangay = localStorage.getItem('assignedBarangay');
-        const username = localStorage.getItem('username');
+updateUI() {
+    const fullName = localStorage.getItem('staffName');
+    const role = localStorage.getItem('userRole');
+    const barangay = localStorage.getItem('assignedBarangay');
+    const username = localStorage.getItem('username');
+    
+    console.log("Session Manager: Updating UI with", { fullName, role, barangay, username });
+    
+    // IMMEDIATELY handle admin mode before anything else
+    if (role === 'Admin') {
+        document.body.classList.add('admin-mode');
+        // Show admin elements
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = '';
+        });
+    } else {
+        document.body.classList.remove('admin-mode');
+        // QUICKLY hide admin-only elements to prevent flash
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = 'none';
+        });
         
-        console.log("Session Manager: Updating UI with", { fullName, role, barangay, username });
-        
-        // Update username display
-        const usernameElements = document.querySelectorAll('#userName, .username-display, [data-username]');
-        usernameElements.forEach(el => {
-            if (el) {
-                el.textContent = fullName || username || 'User';
-                el.style.display = 'inline';
+        // Hide users.html tab/link
+        const usersLinks = document.querySelectorAll('[href*="users.html"]');
+        usersLinks.forEach(link => {
+            if (link.parentElement) {
+                link.parentElement.style.display = 'none';
             }
         });
         
-        // Update additional elements if they exist
-        const userFullNameElement = document.getElementById('userFullName');
-        if (userFullNameElement) {
-            userFullNameElement.textContent = fullName || username || 'User';
-        }
-        
-        const userRoleElement = document.getElementById('userRole');
-        if (userRoleElement) {
-            userRoleElement.textContent = role || 'Staff';
-            userRoleElement.style.display = 'inline';
-        }
-        
-        const userBarangayElement = document.getElementById('userBarangay');
-        if (userBarangayElement && barangay) {
-            userBarangayElement.textContent = `• ${barangay}`;
-            userBarangayElement.style.display = 'inline';
-        }
-        
-        // Hide admin-only elements for non-admin users
-        if (role !== 'Admin') {
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            // Hide users.html tab/link
-            const usersLinks = document.querySelectorAll('[href*="users.html"]');
-            usersLinks.forEach(link => {
-                if (link.parentElement) {
-                    link.parentElement.style.display = 'none';
-                }
-            });
-            
-            // Redirect from users.html if accessed directly
-            if (window.location.pathname.includes('users.html')) {
-                console.log("Session Manager: Non-admin accessing users page, redirecting");
-                window.location.href = 'dashboard.html';
-            }
-        } else {
-            // Show admin elements
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = '';
-            });
+        // Redirect from users.html if accessed directly
+        if (window.location.pathname.includes('users.html')) {
+            console.log("Session Manager: Non-admin accessing users page, redirecting");
+            window.location.href = 'dashboard.html';
         }
     }
-
+    
+    // Update username display
+    const usernameElements = document.querySelectorAll('#userName, .username-display, [data-username]');
+    usernameElements.forEach(el => {
+        if (el) {
+            el.textContent = fullName || username || 'User';
+            el.style.display = 'inline';
+        }
+    });
+    
+    // Update additional elements if they exist
+    const userFullNameElement = document.getElementById('userFullName');
+    if (userFullNameElement) {
+        userFullNameElement.textContent = fullName || username || 'User';
+    }
+    
+    const userRoleElement = document.getElementById('userRole');
+    if (userRoleElement) {
+        userRoleElement.textContent = role || 'Staff';
+        userRoleElement.style.display = 'inline';
+    }
+    
+    const userBarangayElement = document.getElementById('userBarangay');
+    if (userBarangayElement && barangay) {
+        userBarangayElement.textContent = `• ${barangay}`;
+        userBarangayElement.style.display = 'inline';
+    }
+}
     // Show session expired message
     showSessionExpiredMessage() {
         // Prevent multiple modals
