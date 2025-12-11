@@ -15,6 +15,8 @@
     --accent2:#34b78f;
     --accent3: #ff7a00;
     --accent4: #ffa500;
+    --hazard-red: #dc2626;
+    --hazard-orange: #ef4444;
     --light-green: #e9f7f2;
     --border: #e1e8e5;
     --shadow: 0 6px 18px rgba(6,30,20,0.06);
@@ -84,33 +86,35 @@
      pointer-events: auto;
    }
    
-   /* FIX 1: Improved radio button alignment */
+   /* FIX 1: Improved radio button alignment - UPDATED to match dataForm.html */
    .form-row {
      margin-bottom: 12px;
    }
    
-   .radio-group {
+   .radio-line, .radio-group {
      margin-top: 8px;
      padding: 8px 0;
      display: flex;
-     gap: 20px;
+     gap: 16px;
      align-items: center;
+     flex-wrap: wrap;
    }
    
-   .radio-label {
+   .radio-item {
      display: flex;
      align-items: center;
-     gap: 6px;
+     gap: 8px;
      font-weight: 600;
-     color: var(--muted);
+     color: var(--accent1);
      cursor: pointer;
    }
    
-   .radio-label input[type="radio"] {
+   .radio-item input[type="radio"] {
      accent-color: var(--accent1);
      width: 18px;
      height: 18px;
      margin: 0;
+     transform: scale(1.1);
    }
    
    .btn.secondary {
@@ -212,20 +216,26 @@
    
    /* Hazard hunter button */
    .btn.hazard-hunter {
-     background: linear-gradient(90deg, #dc2626, #ef4444) !important;
+     background: linear-gradient(90deg, var(--hazard-red), var(--hazard-orange)) !important;
      color: white !important;
      border: none !important;
    }
    
-   /* FIX 2: Larger checkboxes like dataForm.html */
+   .btn.hazard-hunter:hover {
+     background: linear-gradient(90deg, #b91c1c, var(--hazard-red)) !important;
+     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2) !important;
+   }
+   
+   /* FIX 2: Larger checkboxes like dataForm.html - UPDATED */
    .checkbox-item {
      display: flex;
      align-items: center;
-     gap: 8px;
+     gap: 10px;
      font-weight: 600;
      color: var(--accent1);
      cursor: pointer;
      margin: 6px 0;
+     padding: 4px 0;
    }
    
    .checkbox-item input[type="checkbox"] {
@@ -234,16 +244,23 @@
      height: 20px;
      margin: 0;
      cursor: pointer;
+     transform: scale(1.1);
    }
    
    /* Conditional fields */
    .conditional-field {
      display: none;
      margin-top: 8px;
+     animation: fadeIn 0.3s ease;
    }
    
    .conditional-field.show {
      display: block;
+   }
+   
+   @keyframes fadeIn {
+     from { opacity: 0; transform: translateY(-5px); }
+     to { opacity: 1; transform: translateY(0); }
    }
    
    /* Animal grid */
@@ -259,6 +276,13 @@
      padding: 12px;
      border-radius: var(--radius-sm);
      border: 2px solid var(--border);
+     transition: all 0.3s ease;
+   }
+   
+   .animal-card:hover {
+     border-color: var(--accent1);
+     transform: translateY(-2px);
+     box-shadow: 0 4px 12px rgba(15,122,74,0.1);
    }
    
    .animal-header {
@@ -549,6 +573,49 @@
    /* Ensure the member panel body has enough padding at bottom */
    #memberPanel .panel-body {
      padding-bottom: 80px !important;
+   }
+
+   /* Head name with checkbox container - FIXED */
+   .head-name-container {
+     display: flex;
+     align-items: flex-start;
+     gap: 0;
+     flex-wrap: wrap;
+     margin-bottom: 0;
+   }
+
+   .head-name-container input[type="text"] {
+     flex: 1;
+     min-width: 200px;
+     margin-bottom: 0;
+   }
+
+   /* FIXED: Remove space between Household Head Full Name and FishR/RBIS Registered button */
+   .head-registration-container {
+     display: flex;
+     align-items: center;
+     gap: 16px;
+     margin-top: 3px;
+     padding: 0;
+     background: transparent;
+     border-radius: 0;
+     border-left: none;
+   }
+
+   .head-registration-container .checkbox-item {
+     margin: 0;
+   }
+
+   /* FIXED: Better alignment for conditional field in Educational & Economic Status */
+   .form-grid .conditional-field {
+     grid-column: 1 / -1;
+     margin-top: 8px;
+     margin-bottom: 0;
+   }
+
+   /* FIXED: Ensure proper spacing in form grids */
+   .form-grid > div:not(:last-child) {
+     margin-bottom: 0;
    }
 
    /* ORIGINAL RECORDS STYLES CONTINUED */
@@ -1624,19 +1691,19 @@
           <h5>Household Head Information</h5>
         </div>
         
-        <!-- Coordinate Field with Modal -->
+        <!-- Coordinate Field - UPDATED to match dataForm.html -->
         <div style="grid-column: 1 / -1;">
           <label>Coordinates (optional)</label>
           <div class="coordinate-container">
-            <input type="text" id="edit_coordinate" placeholder="Latitude, Longitude" readonly />
-            <button type="button" id="edit_openCoordinateModal" class="btn secondary">
-              <i class="fas fa-map-marker-alt"></i> Set Coordinates
+            <input type="text" id="edit_coordinate" placeholder="Latitude, Longitude" />
+            <button type="button" id="edit_getLocationBtn" class="btn secondary">
+              <i class="fas fa-map-marker-alt"></i> Get My Location
             </button>
             <button type="button" id="edit_hazardHunterBtn" class="btn hazard-hunter">
-              <i class="fas fa-map-marked-alt"></i> Hazard Hunter
+              <i class="fas fa-map-marked-alt"></i> Pick from Hazard Hunter
             </button>
           </div>
-          <div class="small-muted">Click "Set Coordinates" to enter or update location</div>
+          <div class="small-muted">Optional — paste `lat, lng` if available, or use the buttons above.</div>
         </div>
 
         <div class="form-grid">
@@ -1663,12 +1730,16 @@
             </select>
           </div>
 
+          <!-- UPDATED: Household Head Full Name section to match dataForm.html -->
           <div style="grid-column: 1 / -1;">
             <label>Household Head Full Name<span class="required">*</span></label>
-            <input type="text" id="edit_householdHead" required/>
+            <div class="head-name-container">
+              <input type="text" id="edit_householdHead" required/>
+            </div>
             
-            <div style="margin-top: 8px;">
-              <div class="checkbox-item">
+            <!-- FIXED: FishR/RBIS Registered button moved inline -->
+            <div class="head-registration-container">
+              <div class="checkbox-item" style="margin-bottom: 0;">
                 <input type="checkbox" id="edit_headRegisteredCheckbox">
                 <label for="edit_headRegisteredCheckbox">FishR/RBIS Registered</label>
               </div>
@@ -1694,9 +1765,9 @@
 
           <div>
             <label>Sex <span class="required">*</span></label>
-            <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="edit_head_sex" value="Male" required> Male</label>
-              <label class="radio-label"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Male" required> Male</label>
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
             </div>
           </div>
 
@@ -1836,9 +1907,9 @@
 
           <div>
             <label>Overseas Filipino Worker (OFW)</label>
-            <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="edit_ofw_status" value="Yes"> Yes</label>
-              <label class="radio-label"><input type="radio" name="edit_ofw_status" value="No" checked> No</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="No" checked> No</label>
             </div>
           </div>
 
@@ -1877,9 +1948,9 @@
         <div class="form-grid">
           <div>
             <label>Persons with Disability (PWD)</label>
-            <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="edit_head_pwd" value="Yes"> Yes</label>
-              <label class="radio-label"><input type="radio" name="edit_head_pwd" value="No" checked> No</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="No" checked> No</label>
             </div>
           </div>
           <div>
@@ -2142,9 +2213,9 @@
 
           <div>
             <label>Sex <span class="required">*</span></label>
-            <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="member_sex" value="Male" required> Male</label>
-              <label class="radio-label"><input type="radio" name="member_sex" value="Female"> Female</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="member_sex" value="Male" required> Male</label>
+              <label class="radio-item"><input type="radio" name="member_sex" value="Female"> Female</label>
             </div>
           </div>
 
@@ -2280,9 +2351,9 @@
 
           <div>
             <label>Overseas Filipino Worker (OFW)</label>
-            <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="member_ofw_status" value="Yes"> Yes</label>
-              <label class="radio-label"><input type="radio" name="member_ofw_status" value="No" checked> No</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="member_ofw_status" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="member_ofw_status" value="No" checked> No</label>
             </div>
           </div>
 
@@ -2323,9 +2394,9 @@
         <div class="form-grid">
           <div>
             <label>Persons with Disability (PWD)</label>
-            <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
-              <label class="radio-label"><input type="radio" name="member_pwd" value="No" checked> No</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked> No</label>
             </div>
           </div>
 
@@ -2506,6 +2577,7 @@
 <script>
 /* ============ CONFIG ============ */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
 
 /* ============ STATE ============ */
 let header = [];
@@ -2558,7 +2630,7 @@ function resetEditState() {
   sequenceMode = false;
 }
 
-/* ============ COORDINATE MODAL FUNCTIONS ============ */
+/* ============ COORDINATE FUNCTIONS ============ */
 function openCoordinateModal() {
   const modal = $('coordinateModal');
   const currentCoord = $('edit_coordinate').value || '';
@@ -2607,7 +2679,76 @@ function getCurrentLocationForModal() {
 
 function openHazardHunterForModal() {
   alert('Open Hazard Hunter in another tab to get coordinates, then paste them in the coordinate field.');
-  window.open('https://hazardhunter.georisk.gov.ph/map#', '_blank');
+  window.open(HAZARD_HUNTER_URL, '_blank');
+}
+
+/* ============ GET CURRENT LOCATION FUNCTION ============ */
+function getCurrentLocation() {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser.");
+    return;
+  }
+
+  showLoading(true);
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      $('edit_coordinate').value = `${lat}, ${lng}`;
+      showLoading(false);
+      
+      // Ask user if they want to verify on Hazard Hunter
+      if (confirm("Location captured successfully!\n\nWould you like to verify this location on Hazard Hunter to check for hazards?")) {
+        openHazardHunterVerification(lat, lng);
+      }
+    },
+    (err) => {
+      showLoading(false);
+      alert("Unable to retrieve GPS location. Please allow location access or use the Hazard Hunter option.");
+      console.error("GPS Error:", err);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 8000,
+      maximumAge: 0
+    }
+  );
+}
+
+/* ============ HAZARD HUNTER FUNCTIONS ============ */
+function openHazardHunterPicker() {
+  // Store current form data temporarily
+  const formData = {
+    barangay: $('edit_barangay').value,
+    sitio: $('edit_sitio').value,
+    householdHead: $('edit_householdHead').value,
+    contactNo: $('edit_contactNo').value,
+  };
+  
+  // Store in sessionStorage so we can retrieve it when we come back
+  sessionStorage.setItem('tempFormData', JSON.stringify(formData));
+  sessionStorage.setItem('awaitingCoordinates', 'true');
+  
+  // Show instructions
+  alert('Hazard Hunter will open in a new tab.\n\nInstructions:\n1. Navigate to the desired location\n2. Click on the map to get coordinates\n3. Copy the coordinates (latitude, longitude)\n4. Return to this tab and paste them in the coordinate field');
+  
+  // Open Hazard Hunter in new tab
+  window.open(HAZARD_HUNTER_URL, '_blank');
+}
+
+function openHazardHunterVerification(lat, lng) {
+  // Hazard Hunter URL format for specific coordinates
+  const verificationUrl = `${HAZARD_HUNTER_URL}?lat=${lat}&lng=${lng}`;
+  
+  // Store that we're in verification mode
+  sessionStorage.setItem('verifyingCoordinates', 'true');
+  sessionStorage.setItem('originalCoordinates', `${lat}, ${lng}`);
+  
+  // Open in new tab
+  window.open(verificationUrl, '_blank');
+  
+  alert("Hazard Hunter opened with your location.\n\nYou can check for hazards and update coordinates if needed.\n\nReturn to this tab and update the coordinates field if necessary.");
 }
 
 /* ============ DATE FORMATTING FUNCTIONS ============ */
@@ -3139,6 +3280,38 @@ function updateCounts(){
     document.getElementById("selectedCount").innerText = selectedCount;
 }
 
+/* ============ SYNC ANIMAL CHECKBOXES - UPDATED ============ */
+function syncAnimalCheckboxes() {
+  document.querySelectorAll('#editPanel .animal-card input[type="checkbox"]').forEach(checkbox => {
+    const qtyInput = checkbox.closest('.animal-card').querySelector('.qty');
+    
+    // Set initial state
+    qtyInput.disabled = !checkbox.checked;
+    if (!checkbox.checked) qtyInput.value = '';
+    
+    // Add change listener - set to 1 when checked (like dataForm.html)
+    checkbox.addEventListener('change', function() {
+      qtyInput.disabled = !this.checked;
+      if (this.checked) {
+        qtyInput.value = qtyInput.value || '1';
+      } else {
+        qtyInput.value = '';
+      }
+    });
+    
+    // Also sync quantity input changes
+    qtyInput.addEventListener('input', function() {
+      if (this.value !== '' && this.value !== '0') {
+        checkbox.checked = true;
+        qtyInput.disabled = false;
+      } else if (this.value === '' || this.value === '0') {
+        checkbox.checked = false;
+        qtyInput.disabled = true;
+      }
+    });
+  });
+}
+
 /* ============ EDIT FUNCTION - MODIFIED FOR IN-PLACE EDITING ============ */
 function onEdit(id){
     resetEditState();
@@ -3169,15 +3342,20 @@ function onEdit(id){
     $('edit_sitio').value = editHead['Sitio / Purok'] || '';
     $('edit_householdHead').value = editHead['Name of Household Head'] || '';
     
-    // FishR/RBIS Registered
+    // FishR/RBIS Registered - FIXED
     const hasRegistration = editHead['FishR Registered/RBIS Registered'] && editHead['FishR Registered/RBIS Registered'] !== '';
     $('edit_headRegisteredCheckbox').checked = hasRegistration;
     if (hasRegistration) {
         $('edit_headRegistrationField').classList.add('show');
         $('edit_headRegistration').value = editHead['FishR Registered/RBIS Registered'] || '';
+    } else {
+        $('edit_headRegistrationField').classList.remove('show');
+        $('edit_headRegistration').value = '';
     }
     
     $('edit_contactNo').value = editHead['Contact no.'] || '';
+    
+    // Set radio buttons - FIXED to use radio-line styling
     qAll("input[name='edit_head_sex']").forEach(r => r.checked = (r.value === (editHead['Sex'] || '')));
     $('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
     updateEditHeadAgeStage();
@@ -3188,23 +3366,35 @@ function onEdit(id){
     if (editHead['Educational Attainment'] === 'College Graduate') {
         $('edit_collegeCourseField').classList.add('show');
         $('edit_collegeCourse').value = editHead['College Graduate Course'] || '';
+    } else {
+        $('edit_collegeCourseField').classList.remove('show');
+        $('edit_collegeCourse').value = '';
     }
+    
     $('edit_employment').value = editHead['Employment'] || '';
     if (editHead['Employment'] === 'Employed') {
         $('edit_jobTitleField').classList.add('show');
         $('edit_jobTitle').value = editHead['Job Title'] || '';
+    } else {
+        $('edit_jobTitleField').classList.remove('show');
+        $('edit_jobTitle').value = '';
     }
+    
+    // Set OFW status - FIXED to use radio-line styling
     qAll("input[name='edit_ofw_status']").forEach(r => r.checked = (r.value === (editHead['Overseas Filipino Worker(OFW)'] || 'No')));
     if (editHead['Overseas Filipino Worker(OFW)'] === 'Yes') {
         $('edit_countryField').classList.add('show');
         $('edit_country').value = editHead['Country'] || '';
+    } else {
+        $('edit_countryField').classList.remove('show');
+        $('edit_country').value = '';
     }
     
-    // Health & Status
+    // Health & Status - FIXED to use radio-line styling
     qAll("input[name='edit_head_pwd']").forEach(r => r.checked = (r.value === (editHead['PWD'] || 'No')));
     $('edit_head_status').value = editHead['Status'] || '';
     
-    // Domestic Animals
+    // Domestic Animals - FIXED with checkbox sync
     $('edit_dog_chk').checked = (editHead['Dog'] === 'Yes');
     $('edit_dog_qty').value = editHead['Dog Qty.'] || '';
     $('edit_cat_chk').checked = (editHead['Cat'] === 'Yes');
@@ -3219,7 +3409,7 @@ function onEdit(id){
     $('edit_chicken_qty').value = editHead['Chicken Qty.'] || '';
     $('edit_animals_others').value = editHead['Others'] || '';
     
-    // Sync animal checkboxes
+    // Sync animal checkboxes with quantity fields
     syncAnimalCheckboxes();
     
     // Transportation & Evacuation
@@ -3351,14 +3541,17 @@ function setupEditConditionalFields() {
     // Head Registered Checkbox
     const headRegisteredCheckbox = $('edit_headRegisteredCheckbox');
     const headRegistrationField = $('edit_headRegistrationField');
+    const headRegistrationSelect = $('edit_headRegistration');
     
     if (headRegisteredCheckbox) {
         headRegisteredCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 headRegistrationField.classList.add('show');
+                headRegistrationSelect.required = true;
             } else {
                 headRegistrationField.classList.remove('show');
-                $('edit_headRegistration').value = '';
+                headRegistrationSelect.required = false;
+                headRegistrationSelect.value = '';
             }
         });
     }
@@ -3366,14 +3559,17 @@ function setupEditConditionalFields() {
     // Educational Attainment -> College Course
     const educationSelect = $('edit_educationalAttainment');
     const collegeCourseField = $('edit_collegeCourseField');
+    const collegeCourseInput = $('edit_collegeCourse');
     
     if (educationSelect) {
         educationSelect.addEventListener('change', function() {
             if (this.value === 'College Graduate') {
                 collegeCourseField.classList.add('show');
+                collegeCourseInput.required = true;
             } else {
                 collegeCourseField.classList.remove('show');
-                $('edit_collegeCourse').value = '';
+                collegeCourseInput.required = false;
+                collegeCourseInput.value = '';
             }
         });
     }
@@ -3381,14 +3577,17 @@ function setupEditConditionalFields() {
     // Employment -> Job Title
     const employmentSelect = $('edit_employment');
     const jobTitleField = $('edit_jobTitleField');
+    const jobTitleSelect = $('edit_jobTitle');
     
     if (employmentSelect) {
         employmentSelect.addEventListener('change', function() {
             if (this.value === 'Employed') {
                 jobTitleField.classList.add('show');
+                jobTitleSelect.required = true;
             } else {
                 jobTitleField.classList.remove('show');
-                $('edit_jobTitle').value = '';
+                jobTitleSelect.required = false;
+                jobTitleSelect.value = '';
             }
         });
     }
@@ -3396,15 +3595,18 @@ function setupEditConditionalFields() {
     // OFW Status -> Country
     const ofwRadios = document.querySelectorAll('input[name="edit_ofw_status"]');
     const countryField = $('edit_countryField');
+    const countrySelect = $('edit_country');
     
     if (ofwRadios.length > 0) {
         ofwRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 if (this.value === 'Yes') {
                     countryField.classList.add('show');
+                    countrySelect.required = true;
                 } else {
                     countryField.classList.remove('show');
-                    $('edit_country').value = '';
+                    countrySelect.required = false;
+                    countrySelect.value = '';
                 }
             });
         });
@@ -3413,14 +3615,17 @@ function setupEditConditionalFields() {
     // Member Registered Checkbox
     const memberRegisteredCheckbox = $('memberRegisteredCheckbox');
     const memberRegistrationField = $('memberRegistrationField');
+    const memberRegistrationSelect = $('memberRegistration');
     
     if (memberRegisteredCheckbox) {
         memberRegisteredCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 memberRegistrationField.classList.add('show');
+                memberRegistrationSelect.required = true;
             } else {
                 memberRegistrationField.classList.remove('show');
-                $('memberRegistration').value = '';
+                memberRegistrationSelect.required = false;
+                memberRegistrationSelect.value = '';
             }
         });
     }
@@ -3428,14 +3633,17 @@ function setupEditConditionalFields() {
     // Member Educational Attainment -> College Course
     const memberEducationSelect = $('memberEducationalAttainment');
     const memberCollegeCourseField = $('memberCollegeCourseField');
+    const memberCollegeCourseInput = $('memberCollegeCourse');
     
     if (memberEducationSelect) {
         memberEducationSelect.addEventListener('change', function() {
             if (this.value === 'College Graduate') {
                 memberCollegeCourseField.classList.add('show');
+                memberCollegeCourseInput.required = true;
             } else {
                 memberCollegeCourseField.classList.remove('show');
-                $('memberCollegeCourse').value = '';
+                memberCollegeCourseInput.required = false;
+                memberCollegeCourseInput.value = '';
             }
         });
     }
@@ -3443,14 +3651,17 @@ function setupEditConditionalFields() {
     // Member Employment -> Job Title
     const memberEmploymentSelect = $('memberEmployment');
     const memberJobTitleField = $('memberJobTitleField');
+    const memberJobTitleSelect = $('memberJobTitle');
     
     if (memberEmploymentSelect) {
         memberEmploymentSelect.addEventListener('change', function() {
             if (this.value === 'Employed') {
                 memberJobTitleField.classList.add('show');
+                memberJobTitleSelect.required = true;
             } else {
                 memberJobTitleField.classList.remove('show');
-                $('memberJobTitle').value = '';
+                memberJobTitleSelect.required = false;
+                memberJobTitleSelect.value = '';
             }
         });
     }
@@ -3458,15 +3669,18 @@ function setupEditConditionalFields() {
     // Member OFW Status -> Country
     const memberOfwRadios = document.querySelectorAll('input[name="member_ofw_status"]');
     const memberCountryField = $('memberCountryField');
+    const memberCountrySelect = $('memberCountry');
     
     if (memberOfwRadios.length > 0) {
         memberOfwRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 if (this.value === 'Yes') {
                     memberCountryField.classList.add('show');
+                    memberCountrySelect.required = true;
                 } else {
                     memberCountryField.classList.remove('show');
-                    $('memberCountry').value = '';
+                    memberCountrySelect.required = false;
+                    memberCountrySelect.value = '';
                 }
             });
         });
@@ -3537,12 +3751,15 @@ function fillMemberPanelFromEdit(idx){
   // Basic Information
   $('memberName').value = m['Name of Household Member/s'] || '';
   
-  // FishR/RBIS Registered
+  // FishR/RBIS Registered - FIXED
   const hasRegistration = m['FishR Registered/RBIS Registered'] && m['FishR Registered/RBIS Registered'] !== '';
   $('memberRegisteredCheckbox').checked = hasRegistration;
   if (hasRegistration) {
     $('memberRegistrationField').classList.add('show');
     $('memberRegistration').value = m['FishR Registered/RBIS Registered'] || '';
+  } else {
+    $('memberRegistrationField').classList.remove('show');
+    $('memberRegistration').value = '';
   }
   
   $('memberContact').value = m['Contact no.'] || '';
@@ -3555,16 +3772,27 @@ function fillMemberPanelFromEdit(idx){
   if (m['Educational Attainment'] === 'College Graduate') {
     $('memberCollegeCourseField').classList.add('show');
     $('memberCollegeCourse').value = m['College Graduate Course'] || '';
+  } else {
+    $('memberCollegeCourseField').classList.remove('show');
+    $('memberCollegeCourse').value = '';
   }
+  
   $('memberEmployment').value = m['Employment'] || '';
   if (m['Employment'] === 'Employed') {
     $('memberJobTitleField').classList.add('show');
     $('memberJobTitle').value = m['Job Title'] || '';
+  } else {
+    $('memberJobTitleField').classList.remove('show');
+    $('memberJobTitle').value = '';
   }
+  
   qAll("input[name='member_ofw_status']").forEach(r => r.checked = (r.value === (m['Overseas Filipino Worker(OFW)'] || 'No')));
   if (m['Overseas Filipino Worker(OFW)'] === 'Yes') {
     $('memberCountryField').classList.add('show');
     $('memberCountry').value = m['Country'] || '';
+  } else {
+    $('memberCountryField').classList.remove('show');
+    $('memberCountry').value = '';
   }
   
   // Health and Status
@@ -3966,23 +4194,6 @@ async function onDelete(id){
     }
 }
 
-/* ============ SYNC ANIMAL CHECKBOXES ============ */
-function syncAnimalCheckboxes() {
-  document.querySelectorAll('#editPanel .animal-card input[type="checkbox"]').forEach(checkbox => {
-    const qtyInput = checkbox.closest('.animal-card').querySelector('.qty');
-    
-    // Set initial state
-    qtyInput.disabled = !checkbox.checked;
-    if (!checkbox.checked) qtyInput.value = '';
-    
-    // Add change listener
-    checkbox.addEventListener('change', function() {
-      qtyInput.disabled = !this.checked;
-      if (!this.checked) qtyInput.value = '';
-    });
-  });
-}
-
 /* ============ SETUP CONTACT VALIDATION ============ */
 function setupContactValidation() {
   // Head contact validation
@@ -4044,16 +4255,13 @@ function setupContactValidation() {
 
 /* ============ WIRE EDIT PANEL UI ============ */
 function wireEditPanelUI() {
-  // Coordinate modal
-  if ($('edit_openCoordinateModal')) {
-    $('edit_openCoordinateModal').addEventListener('click', openCoordinateModal);
+  // Coordinate buttons
+  if ($('edit_getLocationBtn')) {
+    $('edit_getLocationBtn').addEventListener('click', getCurrentLocation);
   }
   
   if ($('edit_hazardHunterBtn')) {
-    $('edit_hazardHunterBtn').addEventListener('click', () => {
-      alert('Open Hazard Hunter in another tab to get coordinates, then paste them in the coordinate field.');
-      window.open('https://hazardhunter.georisk.gov.ph/map#', '_blank');
-    });
+    $('edit_hazardHunterBtn').addEventListener('click', openHazardHunterPicker);
   }
 
   // Coordinate modal buttons
@@ -4479,6 +4687,37 @@ window.addEventListener('pageshow', function(event) {
   }
 });
 
+/* ============ CHECK RETURN FROM HAZARD HUNTER ============ */
+function checkReturnFromHazardHunter() {
+    window.addEventListener('pageshow', (event) => {
+        if (sessionStorage.getItem('awaitingCoordinates') === 'true') {
+            // User returned from Hazard Hunter
+            setTimeout(() => {
+                const coordInput = $('edit_coordinate');
+                if (coordInput && !coordInput.value.trim()) {
+                    alert("Paste your Hazard Hunter coordinates (Ctrl+V) in the coordinate field.");
+                }
+            }, 1000);
+            sessionStorage.removeItem('awaitingCoordinates');
+        }
+        
+        // Restore form data if we have it
+        const tempData = sessionStorage.getItem('tempFormData');
+        if (tempData) {
+            try {
+                const data = JSON.parse(tempData);
+                if (data.barangay) $('edit_barangay').value = data.barangay;
+                if (data.sitio) $('edit_sitio').value = data.sitio;
+                if (data.householdHead) $('edit_householdHead').value = data.householdHead;
+                if (data.contactNo) $('edit_contactNo').value = data.contactNo;
+                sessionStorage.removeItem('tempFormData');
+            } catch (e) {
+                console.error("Error restoring form data:", e);
+            }
+        }
+    });
+}
+
 /* ============ INIT ============ */
 window.addEventListener("DOMContentLoaded", async () => {
   // First check session
@@ -4516,6 +4755,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
     });
     
+    // Check if returning from Hazard Hunter
+    checkReturnFromHazardHunter();
+    
     loadRecords();
   }
 });
@@ -4525,4 +4767,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
