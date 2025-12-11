@@ -246,7 +246,15 @@
      cursor: pointer;
      transform: scale(1.1);
    }
-   
+    .checkbox-head input[type="checkbox"] {
+     accent-color: var(--accent1);
+     width: 20px;
+     height: 20px;
+     margin: 0;
+     cursor: pointer;
+     transform: scale(1.1);
+   }
+
    /* Conditional fields */
    .conditional-field {
      display: none;
@@ -595,7 +603,6 @@
      display: flex;
      align-items: center;
      gap: 16px;
-     margin-top: 3px;
      padding: 0;
      background: transparent;
      border-radius: 0;
@@ -1739,7 +1746,7 @@
             
             <!-- FIXED: FishR/RBIS Registered button moved inline -->
             <div class="head-registration-container">
-              <div class="checkbox-item" style="margin-bottom: 0;">
+              <div class="checkbox-head" style="margin-bottom: 0;">
                 <input type="checkbox" id="edit_headRegisteredCheckbox">
                 <label for="edit_headRegisteredCheckbox">FishR/RBIS Registered</label>
               </div>
