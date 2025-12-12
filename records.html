@@ -2694,6 +2694,22 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
 
+window.addEventListener('storage', function(e) {
+  if (e.key === 'activityLog') {
+    console.log('Activity log updated from another tab');
+    loadActivityLog();
+  }
+});
+
+/* Listen for messages from other pages */
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'activity') {
+    const activity = event.data;
+    if (ALLOWED_ACTIONS.includes(activity.action)) {
+      recordUserActivity(activity.action, activity.details);
+    }
+  }
+});
 /* ============ STATE ============ */
 let header = [];
 let rawRows = [];
@@ -4923,3 +4939,4 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
