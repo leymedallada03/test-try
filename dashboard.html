@@ -361,6 +361,45 @@
     color: var(--accent1);
    }
 
+   /* FIXED: Households with Coordinates Card - Same style as Male/Female/PWD */
+   .household-coords-card {
+    max-width: 280px;
+    padding: 14px;
+    background: var(--light-green);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 15px 0 25px 0;
+   }
+
+   .household-coords-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    color: var(--accent1);
+    font-weight: 700;
+   }
+
+   .household-coords-card .card-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent1);
+    margin: 4px 0;
+   }
+
+   .household-coords-card .mini {
+    font-size: 0.8rem;
+    color: var(--muted);
+   }
+
+   .household-coords-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(6,30,20,0.1);
+   }
+
    /* Barangay Breakdown - FULL WIDTH STACK */
    .breakdown-section {
     margin-top: 24px;
@@ -378,7 +417,7 @@
     gap: 8px;
    }
 
-   /* Fix table headers for horizontal scrolling */
+   /* FIXED: Table headers and scrollbar styling */
    .breakdown-table-container {
     background: var(--card-bg);
     border-radius: var(--radius);
@@ -401,8 +440,9 @@
    .breakdown-table thead {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 20;
     background: var(--card-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
    }
 
    .breakdown-table th {
@@ -411,11 +451,16 @@
     font-weight: 700;
     font-size: 0.85rem;
     color: var(--accent1);
-    border-bottom: 2px solid rgba(15,122,74,0.1);
+    border-bottom: 2px solid rgba(15,122,74,0.15);
     position: sticky;
     top: 0;
-    z-index: 5;
+    z-index: 15;
     white-space: nowrap;
+    border-right: 1px solid rgba(15,122,74,0.1);
+   }
+
+   .breakdown-table th:last-child {
+    border-right: none;
    }
 
    .breakdown-table td {
@@ -423,6 +468,11 @@
     border-bottom: 1px solid rgba(15,122,74,0.08);
     font-size: 0.85rem;
     color: var(--muted);
+    border-right: 1px solid rgba(15,122,74,0.05);
+   }
+
+   .breakdown-table td:last-child {
+    border-right: none;
    }
 
    .breakdown-table tbody tr:hover {
@@ -432,38 +482,48 @@
    .breakdown-table th:first-child {
     position: sticky;
     left: 0;
-    z-index: 20;
-    background: rgba(15,122,74,0.1);
+    z-index: 25;
+    background: rgba(15,122,74,0.12);
     text-align: left;
+    border-right: 2px solid rgba(15,122,74,0.2);
    }
 
    .breakdown-table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 1;
+    z-index: 10;
     background: var(--card-bg);
     text-align: left;
     font-weight: 600;
     color: var(--accent1);
+    border-right: 2px solid rgba(15,122,74,0.1);
    }
 
-   /* Ensure table headers don't overlap during horizontal scroll */
+   /* FIXED: Scrollbar styling - muted gray instead of green */
    .breakdown-table-container::-webkit-scrollbar {
-    height: 8px;
+    height: 10px;
    }
 
    .breakdown-table-container::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 4px;
+    border-radius: 6px;
+    margin: 0 4px;
    }
 
    .breakdown-table-container::-webkit-scrollbar-thumb {
-    background: var(--accent2);
-    border-radius: 4px;
+    background: #cccccc;
+    border-radius: 6px;
+    border: 2px solid #f1f1f1;
    }
 
    .breakdown-table-container::-webkit-scrollbar-thumb:hover {
-    background: var(--accent1);
+    background: #b3b3b3;
+   }
+
+   /* Firefox scrollbar */
+   .breakdown-table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #cccccc #f1f1f1;
    }
 
    /* Mobile Styles */
@@ -561,6 +621,10 @@
     #logoutBtn {
         padding: 6px 12px;
         font-size: 0.85rem;
+    }
+
+    .household-coords-card {
+        max-width: 100%;
     }
    }
 
@@ -717,13 +781,11 @@
       </div>
       <div class="category-grid" id="demographicsStats"></div>
       
-      <!-- Households with Coordinates Card (moved from top) -->
-      <div style="margin: 15px 0 25px 0;">
-        <div class="card" style="max-width: 280px;">
-          <h3>Households with Coordinates</h3>
-          <div id="withCoords" class="card-value">0</div>
-          <div class="mini">Heads that provided latitude & longitude</div>
-        </div>
+      <!-- FIXED: Households with Coordinates Card - Same style as Male/Female/PWD -->
+      <div class="household-coords-card">
+        <h3>Households with Coordinates</h3>
+        <div id="withCoords" class="card-value">0</div>
+        <div class="mini">Heads that provided latitude & longitude</div>
       </div>
       
       <!-- Educational Attainment Section -->
@@ -1075,6 +1137,9 @@ let lastUpdatedTime = null;
 let refreshInterval = null;
 let sessionMonitorInterval = null; // Added for session monitoring
 
+// FIXED: Define allowed actions for Last Activity display
+const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
+
 /* ENHANCED SESSION VALIDATION FUNCTIONS */
 // Validate session with server
 async function validateSession() {
@@ -1321,33 +1386,121 @@ function showLoading(yes){
   document.getElementById("loading").style.display = yes ? "flex" : "none"; 
 }
 
-/* Load and store activity log */
+/* FIXED: Load activity log from Google Sheets API */
 async function loadActivityLog() {
   try {
-    const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-    if (activityLog.length > 0) {
-      const latestActivity = activityLog[activityLog.length - 1];
-      lastUpdatedTime = new Date(latestActivity.timestamp);
-      document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+    console.log("Loading activity log...");
+    
+    // First check localStorage (for backward compatibility)
+    const localActivityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+    
+    if (localActivityLog.length > 0) {
+      // Filter to only show allowed actions
+      const filteredLog = localActivityLog.filter(activity => 
+        ALLOWED_ACTIONS.includes(activity.action)
+      );
       
-      // Display action details
-      const detailsDiv = document.getElementById('lastUpdatedDetails');
-      detailsDiv.innerHTML = `
-        <div style="font-size: 11px; line-height: 1.4;">
-          <strong>Action:</strong> ${latestActivity.action}<br>
-          <strong>Actor:</strong> ${latestActivity.actor}<br>
-          <strong>Details:</strong> ${latestActivity.details}
-        </div>
-      `;
+      if (filteredLog.length > 0) {
+        const latestActivity = filteredLog[filteredLog.length - 1];
+        lastUpdatedTime = new Date(latestActivity.timestamp);
+        document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+        
+        const detailsDiv = document.getElementById('lastUpdatedDetails');
+        detailsDiv.innerHTML = `
+          <div style="font-size: 11px; line-height: 1.4;">
+            <strong>Action:</strong> ${latestActivity.action}<br>
+            <strong>Actor:</strong> ${latestActivity.actor}<br>
+            <strong>Details:</strong> ${latestActivity.details}
+          </div>
+        `;
+        return;
+      }
     }
+    
+    // If no local activities, fetch from API
+    console.log("Fetching audit logs from API...");
+    const response = await fetch(`${API_URL}?action=logs`);
+    const data = await response.json();
+    
+    if (data.success && data.logs && data.logs.length > 0) {
+      // Filter to only show allowed actions
+      const filteredLogs = data.logs.filter(log => 
+        ALLOWED_ACTIONS.includes(log.Action || log.action)
+      );
+      
+      if (filteredLogs.length > 0) {
+        // Get the most recent log
+        const latestLog = filteredLogs[0];
+        
+        // Try to parse the timestamp
+        let timestamp = new Date();
+        if (latestLog.Timestamp) {
+          timestamp = new Date(latestLog.Timestamp);
+        } else if (latestLog.timestamp) {
+          timestamp = new Date(latestLog.timestamp);
+        }
+        
+        lastUpdatedTime = timestamp;
+        document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+        
+        const action = latestLog.Action || latestLog.action || "Unknown";
+        const actor = latestLog.Actor || latestLog.actor || "Unknown";
+        const details = latestLog.Details || latestLog.details || "";
+        
+        const detailsDiv = document.getElementById('lastUpdatedDetails');
+        detailsDiv.innerHTML = `
+          <div style="font-size: 11px; line-height: 1.4;">
+            <strong>Action:</strong> ${action}<br>
+            <strong>Actor:</strong> ${actor}<br>
+            <strong>Details:</strong> ${details}
+          </div>
+        `;
+        
+        // Also store in localStorage for next time
+        const activityEntry = {
+          action: action,
+          actor: actor,
+          details: details,
+          timestamp: timestamp.toISOString()
+        };
+        
+        const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+        activityLog.push(activityEntry);
+        
+        // Keep only last 10 activities
+        if (activityLog.length > 10) {
+          activityLog.splice(0, activityLog.length - 10);
+        }
+        
+        localStorage.setItem('activityLog', JSON.stringify(activityLog));
+        
+        console.log("Latest activity loaded from API:", activityEntry);
+      } else {
+        showDefaultMessage();
+      }
+    } else {
+      showDefaultMessage();
+    }
+    
   } catch(err) {
     console.error('Error loading activity log:', err);
+    showDefaultMessage();
   }
 }
 
-/* Record user activity */
+function showDefaultMessage() {
+  document.getElementById('lastUpdated').innerText = '---';
+  document.getElementById('lastUpdatedDetails').innerText = 'No recent activity';
+}
+
+/* FIXED: Record user activity - Only record allowed actions */
 function recordUserActivity(action, details = '') {
   try {
+    // Only record allowed actions
+    if (!ALLOWED_ACTIONS.includes(action)) {
+      return;
+    }
+    
     const username = localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown User';
     const timestamp = new Date().toISOString();
     
@@ -1364,15 +1517,18 @@ function recordUserActivity(action, details = '') {
     // Add new activity
     activityLog.push(activity);
     
-    // Keep only last 50 activities to prevent storage bloat
-    if (activityLog.length > 50) {
-      activityLog.splice(0, activityLog.length - 50);
+    // Keep only last 10 activities to prevent storage bloat
+    if (activityLog.length > 10) {
+      activityLog.splice(0, activityLog.length - 10);
     }
     
     // Save to localStorage
     localStorage.setItem('activityLog', JSON.stringify(activityLog));
     
-    // Update display
+    // Also log to Google Sheets via API
+    logActivityToAPI(username, action, details);
+    
+    // Update display immediately
     lastUpdatedTime = new Date(timestamp);
     document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
     
@@ -1392,6 +1548,27 @@ function recordUserActivity(action, details = '') {
   }
 }
 
+/* Helper function to log activity to Google Sheets API */
+async function logActivityToAPI(username, action, details) {
+  try {
+    const formData = new FormData();
+    formData.append("action", "logActivity");
+    formData.append("username", username);
+    formData.append("action", action); // The activity action
+    formData.append("actor", username);
+    formData.append("details", details);
+    
+    // Fire and forget - don't wait for response
+    fetch(API_URL, {
+      method: "POST",
+      body: formData
+    }).catch(() => { /* ignore errors */ });
+    
+  } catch(err) {
+    console.error('Error logging activity to API:', err);
+  }
+}
+
 /* Initialize activity monitoring */
 function setupActivityMonitoring() {
   // Listen for messages from other pages
@@ -1406,7 +1583,10 @@ function setupActivityMonitoring() {
   if (pendingActivity) {
     try {
       const activity = JSON.parse(pendingActivity);
-      recordUserActivity(activity.action, activity.details);
+      // Only record if it's an allowed action
+      if (ALLOWED_ACTIONS.includes(activity.action)) {
+        recordUserActivity(activity.action, activity.details);
+      }
       sessionStorage.removeItem('pendingActivity');
     } catch(err) {
       console.error('Error processing pending activity:', err);
@@ -1416,6 +1596,11 @@ function setupActivityMonitoring() {
 
 /* Helper function for other pages to record activities */
 function recordActivityFromOtherPage(action, details) {
+  // Only record allowed actions
+  if (!ALLOWED_ACTIONS.includes(action)) {
+    return;
+  }
+  
   // Store in sessionStorage for the dashboard to pick up
   sessionStorage.setItem('pendingActivity', JSON.stringify({
     action: action,
@@ -1496,11 +1681,6 @@ async function loadDashboard(showLoader = false){
         
         // Process and display the fresh data
         processDashboardData(data);
-        
-        // Record this data refresh as an activity
-        if (showLoader) {
-          recordUserActivity('Data Refresh', 'Dashboard data refreshed from server');
-        }
         
         console.log("📊 Fresh dashboard data loaded");
         
@@ -1944,7 +2124,7 @@ function processDashboardData(data) {
             }
             else if(jobLower.includes('caregiver')) {
                 jobCategories.caregiver++;
-    }
+            }
             else if(jobLower.includes('pharmacist')) {
                 jobCategories.pharmacist++;
             }
@@ -2128,7 +2308,7 @@ function processDashboardData(data) {
         }
     });
 
-    // Update top cards - FIXED: Households with Coordinates moved to Demographics section
+    // Update top cards
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
     document.getElementById('withCoords').innerText = headsWithCoords;
@@ -2631,7 +2811,10 @@ function processDashboardData(data) {
 }
 
 function notifyDataUpdated(action = 'Data Updated', details = 'Dashboard data refreshed') {
-  recordUserActivity(action, details);
+  // Only record allowed actions
+  if (ALLOWED_ACTIONS.includes(action)) {
+    recordUserActivity(action, details);
+  }
   localStorage.setItem('dashboardDataCache', JSON.stringify({})); // Clear cache to force refresh
 }
 
