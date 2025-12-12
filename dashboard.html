@@ -324,12 +324,12 @@
     margin-top: 0;
    }
    
-.category-grid {
+   .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 12px;
     margin-bottom: 20px;
-}
+   }
    
    .category-card {
     padding: 14px;
@@ -359,6 +359,45 @@
     font-size: 1.6rem;
     font-weight: 800;
     color: var(--accent1);
+   }
+
+   /* FIXED: Households with Coordinates Card - Same style as Male/Female/PWD */
+   .household-coords-card {
+    max-width: 280px;
+    padding: 14px;
+    background: var(--light-green);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 15px 0 25px 0;
+   }
+
+   .household-coords-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    color: var(--accent1);
+    font-weight: 700;
+   }
+
+   .household-coords-card .card-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent1);
+    margin: 4px 0;
+   }
+
+   .household-coords-card .mini {
+    font-size: 0.8rem;
+    color: var(--muted);
+   }
+
+   .household-coords-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(6,30,20,0.1);
    }
 
    /* Barangay Breakdown - FULL WIDTH STACK */
@@ -741,7 +780,14 @@
         <i class="fas fa-users"></i> Demographics
       </div>
       <div class="category-grid" id="demographicsStats"></div>
-
+      
+      <!-- FIXED: Households with Coordinates Card - Same style as Male/Female/PWD -->
+      <div class="household-coords-card">
+        <h3>Households with Coordinates</h3>
+        <div id="withCoords" class="card-value">0</div>
+        <div class="mini">Heads that provided latitude & longitude</div>
+      </div>
+      
       <!-- Educational Attainment Section -->
       <div class="section-title">
         <i class="fas fa-graduation-cap"></i> Educational Attainment
@@ -2265,34 +2311,19 @@ function processDashboardData(data) {
     // Update top cards
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
+    document.getElementById('withCoords').innerText = headsWithCoords;
 
     // Update Basic Population Overview - Single Card
     // Demographics Section
-const demographicsStatsDiv = document.getElementById('demographicsStats');
-demographicsStatsDiv.innerHTML = '';
-
-// Create all 4 cards with SHORT labels for equal sizing
-const demographicCards = [
-    { label: 'Male', value: demographicsStats.male, subtitle: '' },
-    { label: 'Female', value: demographicsStats.female, subtitle: '' },
-    { label: 'PWD', value: demographicsStats.pwd, subtitle: '' },
-    { label: 'Coordinates', value: headsWithCoords, subtitle: 'Households' }
-];
-
-demographicCards.forEach(card => {
-    const div = document.createElement('div'); 
-    div.className = 'category-card'; 
+    const demographicsStatsDiv = document.getElementById('demographicsStats');
+    demographicsStatsDiv.innerHTML = '';
     
-    let html = `<div class="category-label">${card.label}</div>
-                <div class="category-value">${card.value}</div>`;
-    
-    if (card.subtitle) {
-        html += `<div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">${card.subtitle}</div>`;
-    }
-    
-    div.innerHTML = html;
-    demographicsStatsDiv.appendChild(div);
-});
+    [['Male', demographicsStats.male], ['Female', demographicsStats.female], ['PWD', demographicsStats.pwd]].forEach(it=>{
+        const div = document.createElement('div'); 
+        div.className = 'category-card'; 
+        div.innerHTML = `<div class="category-label">${it[0]}</div><div class="category-value">${it[1]}</div>`;
+        demographicsStatsDiv.appendChild(div);
+    });
     
     // Educational Attainment Section
     const educationStatsDiv = document.getElementById('educationStats');
