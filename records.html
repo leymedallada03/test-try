@@ -164,24 +164,35 @@
      font-weight: 700;
    }
    
-   /* Specific edit form styling */
-   .coordinate-container {
-     display: flex;
-     gap: 8px;
-     align-items: flex-start;
-     flex-wrap: wrap;
-   }
-   
-   .coordinate-container input {
-     flex: 1;
-     min-width: 200px;
-   }
-   
-   .coordinate-container .btn {
-     white-space: nowrap;
-     padding: 8px 12px;
-     font-size: 14px;
-   }
+/* Specific edit form styling */
+.coordinate-container {
+  display: flex;
+  gap: 8px;
+  align-items: center; /* This ensures vertical centering */
+  flex-wrap: wrap;
+}
+
+.coordinate-container input {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+  height: 40px; /* Set consistent height */
+}
+
+.coordinate-container .btn {
+  white-space: nowrap;
+  padding: 8px 12px;
+  font-size: 14px;
+  height: 40px; /* Match the input height */
+  align-self: center; /* Center vertically */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Specifically for the Get My Location button - REMOVE the previous margin-top */
+#edit_getLocationBtn {
+  margin-top: 6px;
+}
    
    /* Form controls */
    .member-panel input,
@@ -410,54 +421,78 @@
      border-radius: 4px;
    }
    
-   /* Member preview improvements */
-   .member-preview {
-     list-style: none;
-     padding: 0;
-     margin: 12px 0;
-     max-height: 200px;
-     overflow-y: auto;
-     border: 1px solid var(--border);
-     border-radius: 8px;
-     padding: 8px;
-   }
-   
-   .member-preview li {
-     padding: 10px 12px;
-     border-bottom: 1px solid #eee;
-     cursor: pointer;
-     transition: background 0.2s;
-   }
-   
-   .member-preview li:hover {
-     background: #f0f9ff;
-   }
-   
-   .member-preview li:last-child {
-     border-bottom: none;
-   }
-   
-   .member-preview li .member-actions {
-     float: right;
-     display: flex;
-     gap: 6px;
-   }
-   
-   .member-preview li .member-actions button {
-     background: none;
-     border: none;
-     cursor: pointer;
-     padding: 2px 6px;
-     font-size: 12px;
-   }
-   
-   .member-preview li .member-actions .edit-btn {
-     color: #0f7a4a;
-   }
-   
-   .member-preview li .member-actions .remove-btn {
-     color: #dc2626;
-   }
+/* Member preview improvements - FIX 6 */
+.member-preview {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.member-preview li {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.member-preview li:hover {
+  background: #f0f9ff;
+}
+
+.member-preview li:last-child {
+  border-bottom: none;
+}
+
+.member-preview li .member-actions {
+  float: right;
+  display: flex;
+  gap: 6px;
+}
+
+/* REMOVE BACKGROUND FROM BUTTONS */
+.member-preview li .member-actions button {
+  background: none !important; /* Remove background */
+  border: none !important; /* Remove border */
+  cursor: pointer;
+  padding: 4px !important; /* Adjust padding */
+  font-size: 14px !important; /* Slightly larger icons */
+  border-radius: 0 !important; /* Remove rounded corners */
+  width: auto !important; /* Remove fixed width */
+  height: auto !important; /* Remove fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style for edit button - green icon */
+.member-preview li .member-actions .edit-btn {
+  color: var(--accent1) !important; /* Green color */
+}
+
+.member-preview li .member-actions .edit-btn:hover {
+  color: #0a5c36 !important; /* Darker green on hover */
+}
+
+/* Style for delete button - red icon */
+.member-preview li .member-actions .remove-btn {
+  color: #dc2626 !important; /* Red color */
+}
+
+.member-preview li .member-actions .remove-btn:hover {
+  color: #b91c1c !important; /* Darker red on hover */
+}
+
+/* Remove hover background effects */
+.member-preview li .member-actions button:hover {
+  background: transparent !important;
+  transform: translateY(0) !important;
+  box-shadow: none !important;
+}
    
    /* Form section spacing */
    .member-panel .edit-card + .edit-card {
@@ -592,9 +627,18 @@
      display: none;
    }
 
-   /* Ensure the member panel body has enough padding at bottom */
+   /* FIX 4: Ensure the member panel body has enough padding at bottom */
    #memberPanel .panel-body {
-     padding-bottom: 20px !important;
+     padding-bottom: 10px !important;
+   }
+
+   /* FIX 4: Add margin at bottom of edit panel for head */
+   #editPanel .panel-body {
+     padding-bottom: 10px !important;
+   }
+   
+   #editPanel .edit-card:first-of-type {
+     margin-bottom: 5px;
    }
 
    /* Head name with checkbox container - FIXED */
@@ -637,6 +681,36 @@
    /* FIXED: Ensure proper spacing in form grids */
    .form-grid > div:not(:last-child) {
      margin-bottom: 0;
+   }
+
+   /* FIX 5: Center align text in all buttons */
+   .btn {
+     text-align: center;
+     justify-content: center;
+   }
+
+   /* Specific alignment for action buttons */
+   .panel-actions .btn,
+   #memberPanel .panel-actions .btn,
+   #editPanel .panel-actions .btn {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+   }
+
+   /* Center text in edit panel action buttons */
+   #editPanel .edit-card:last-of-type .btn {
+     text-align: center;
+     justify-content: center;
+   }
+
+   /* For Back, Save & Next buttons specifically - FIX 5 */
+   #memberBack, #memberNext, #saveEditBtn, #cancelEditBtn, #startSequenceBtn {
+     text-align: center !important;
+     display: flex !important;
+     align-items: center !important;
+     justify-content: center !important;
    }
 
    /* ORIGINAL RECORDS STYLES CONTINUED */
@@ -1648,8 +1722,9 @@
         </button>
 
         <div class="export-wrapper">
+          <!-- FIX 1: Changed export icon -->
           <button id="exportBtn" class="btn btn-export">
-            <i class="fas fa-download"></i> Export ▼
+            <i class="fas fa-file-export"></i> Export 
           </button>
           <div id="exportDropdown" class="export-dropdown hidden" role="menu" aria-hidden="true">
             <div onclick="exportAll()">
@@ -3383,15 +3458,23 @@ function onEdit(id){
     $('edit_householdHead').value = editHead['Name of Household Head'] || '';
     
     // FishR/RBIS Registered - FIXED
-    const hasRegistration = editHead['FishR Registered/RBIS Registered'] && editHead['FishR Registered/RBIS Registered'] !== '';
-    $('edit_headRegisteredCheckbox').checked = hasRegistration;
-    if (hasRegistration) {
-        $('edit_headRegistrationField').classList.add('show');
-        $('edit_headRegistration').value = editHead['FishR Registered/RBIS Registered'] || '';
-    } else {
-        $('edit_headRegistrationField').classList.remove('show');
-        $('edit_headRegistration').value = '';
-    }
+let headRegistrationValue = '';
+
+// Try different possible field names
+if (editHead['FishR & RBIS'] && editHead['FishR & RBIS'] !== '') {
+  headRegistrationValue = editHead['FishR & RBIS'];
+} else if (editHead['FishR Registered/RBIS Registered'] && editHead['FishR Registered/RBIS Registered'] !== '') {
+  headRegistrationValue = editHead['FishR Registered/RBIS Registered'];
+}
+
+$('edit_headRegisteredCheckbox').checked = headRegistrationValue !== '';
+if (headRegistrationValue !== '') {
+  $('edit_headRegistrationField').classList.add('show');
+  $('edit_headRegistration').value = headRegistrationValue;
+} else {
+  $('edit_headRegistrationField').classList.remove('show');
+  $('edit_headRegistration').value = '';
+}
     
     $('edit_contactNo').value = editHead['Contact no.'] || '';
     
@@ -3537,6 +3620,7 @@ function createEmptyMember(){
   };
 }
 
+/* ============ FIX 2 & 6: UPDATED updateEditMembersPreview FUNCTION ============ */
 function updateEditMembersPreview(){
   const ul = $('edit_membersPreview');
   if(!ul) return;
@@ -3550,8 +3634,13 @@ function updateEditMembersPreview(){
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span>#${i+1} — ${escapeHtml(m['Name of Household Member/s'] || '(empty)')} (${m['Contact no.']||''})</span>
         <div class="member-actions">
-          <button class="edit-btn" title="Edit this member" onclick="event.stopPropagation(); openMemberPanelForEdit(${i})">✏️</button>
-          <button class="remove-btn" title="Remove this member" onclick="event.stopPropagation(); removeMember(${i})">🗑️</button>
+          <!-- REMOVE INLINE STYLES - just clean icons -->
+          <button class="edit-btn" title="Edit this member" onclick="event.stopPropagation(); openMemberPanelForEdit(${i})">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="remove-btn" title="Remove this member" onclick="event.stopPropagation(); removeMember(${i})">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
       </div>
     `;
@@ -3755,6 +3844,107 @@ function validateEditPanelForMemberEditing() {
   return true;
 }
 
+/* ============ FIX 2: UPDATED fillMemberPanelFromEdit FUNCTION ============ */
+function fillMemberPanelFromEdit(idx){
+  const m = editMembers[idx] || createEmptyMember();
+  
+  // Basic Information - FIXED: Added missing fields
+  $('memberName').value = m['Name of Household Member/s'] || '';
+  
+  // FishR/RBIS Registered - FIXED: Check both possible field names
+  let registrationValue = '';
+  
+  // Try different possible field names
+  if (m['FishR & RBIS'] && m['FishR & RBIS'] !== '') {
+    registrationValue = m['FishR & RBIS'];
+  } else if (m['FishR Registered/RBIS Registered'] && m['FishR Registered/RBIS Registered'] !== '') {
+    registrationValue = m['FishR Registered/RBIS Registered'];
+  }
+  
+  const hasRegistration = registrationValue !== '';
+  $('memberRegisteredCheckbox').checked = hasRegistration;
+  if (hasRegistration) {
+    $('memberRegistrationField').classList.add('show');
+    $('memberRegistration').value = registrationValue;
+  } else {
+    $('memberRegistrationField').classList.remove('show');
+    $('memberRegistration').value = '';
+  }
+  
+  $('memberContact').value = m['Contact no.'] || '';
+  
+  // FIXED: Ensure sex radio buttons are properly set
+  const memberSex = m['Sex'] || '';
+  qAll("input[name='member_sex']").forEach(r => {
+    r.checked = (r.value === memberSex);
+  });
+  
+  $('memberBirthdate').value = toInputDate(m['Birthdate'] || '');
+  updateMemberAgeStage();
+  
+  // Educational & Economic Status - FIXED: Added missing fields
+  $('memberEducationalAttainment').value = m['Educational Attainment'] || '';
+  if (m['Educational Attainment'] === 'College Graduate') {
+    $('memberCollegeCourseField').classList.add('show');
+    $('memberCollegeCourse').value = m['College Graduate Course'] || '';
+  } else {
+    $('memberCollegeCourseField').classList.remove('show');
+    $('memberCollegeCourse').value = '';
+  }
+  
+  $('memberEmployment').value = m['Employment'] || '';
+  if (m['Employment'] === 'Employed') {
+    $('memberJobTitleField').classList.add('show');
+    $('memberJobTitle').value = m['Job Title'] || '';
+  } else {
+    $('memberJobTitleField').classList.remove('show');
+    $('memberJobTitle').value = '';
+  }
+  
+  // FIXED: Ensure OFW radio buttons are properly set
+  const memberOFW = m['Overseas Filipino Worker(OFW)'] || 'No';
+  qAll("input[name='member_ofw_status']").forEach(r => {
+    r.checked = (r.value === memberOFW);
+  });
+  
+  if (m['Overseas Filipino Worker(OFW)'] === 'Yes') {
+    $('memberCountryField').classList.add('show');
+    $('memberCountry').value = m['Country'] || '';
+  } else {
+    $('memberCountryField').classList.remove('show');
+    $('memberCountry').value = '';
+  }
+  
+  // Health and Status - FIXED: Ensure PWD radio buttons are properly set
+  const memberPWD = m['Persons with Disability (PWD)'] || 'No';
+  qAll("input[name='member_pwd']").forEach(r => {
+    r.checked = (r.value === memberPWD);
+  });
+  
+  $('memberStatus').value = m['Status'] || '';
+  
+  // Transportation & Evacuation Details
+  $('memberTransport').value = m['Transportation'] || '';
+  $('memberPickup').value = m['Designated Pick-Up Point'] || m['Pick-Up Location'] || '';
+  $('memberDropoff').value = m['Drop-Off Point'] || m['Drop-Off Location'] || '';
+  $('memberCamp').value = m['Name of Camp'] || m['Evacuation Camp Name'] || '';
+  $('memberCampCap').value = m['Capacity'] || '';
+  $('memberInside').value = m['No. of Individuals Inside Camp'] || m['Individuals Currently in Camp'] || '';
+  $('memberOutside').value = m['No. of Individuals Outside Camp'] || m['Individuals Outside Camp'] || '';
+  $('memberReason').value = m['Reasons for Displacement'] || '';
+  
+  // Government Assistance Programs
+  $('member_tupad').checked = (m['TUPAD'] === 'Yes');
+  $('member_local4ps').checked = (m['Local 4Ps'] === 'Yes');
+  $('member_intl4ps').checked = (m['National 4Ps'] === 'Yes');
+  $('member_locsp').checked = (m['Local Social Pension'] === 'Yes');
+  $('member_intlsp').checked = (m['National Social Pension'] === 'Yes');
+  $('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes');
+  $('member_relief').checked = (m['Relief Goods'] === 'Yes');
+  $('member_cash').checked = (m['Cash Subsidy'] === 'Yes');
+  $('memberAics').value = m['AICS'] || '';
+}
+
 function openMemberPanelForEdit(index){
   // Ensure we have valid head data first
   if (!validateEditPanelForMemberEditing()) {
@@ -3785,82 +3975,6 @@ function openMemberPanelForEdit(index){
   setTimeout(() => $('memberName')?.focus(), 100);
 }
 
-function fillMemberPanelFromEdit(idx){
-  const m = editMembers[idx] || createEmptyMember();
-  
-  // Basic Information
-  $('memberName').value = m['Name of Household Member/s'] || '';
-  
-  // FishR/RBIS Registered - FIXED
-  const hasRegistration = m['FishR Registered/RBIS Registered'] && m['FishR Registered/RBIS Registered'] !== '';
-  $('memberRegisteredCheckbox').checked = hasRegistration;
-  if (hasRegistration) {
-    $('memberRegistrationField').classList.add('show');
-    $('memberRegistration').value = m['FishR Registered/RBIS Registered'] || '';
-  } else {
-    $('memberRegistrationField').classList.remove('show');
-    $('memberRegistration').value = '';
-  }
-  
-  $('memberContact').value = m['Contact no.'] || '';
-  qAll("input[name='member_sex']").forEach(r => r.checked = (r.value === (m['Sex'] || '')));
-  $('memberBirthdate').value = toInputDate(m['Birthdate'] || '');
-  updateMemberAgeStage();
-  
-  // Educational & Economic Status
-  $('memberEducationalAttainment').value = m['Educational Attainment'] || '';
-  if (m['Educational Attainment'] === 'College Graduate') {
-    $('memberCollegeCourseField').classList.add('show');
-    $('memberCollegeCourse').value = m['College Graduate Course'] || '';
-  } else {
-    $('memberCollegeCourseField').classList.remove('show');
-    $('memberCollegeCourse').value = '';
-  }
-  
-  $('memberEmployment').value = m['Employment'] || '';
-  if (m['Employment'] === 'Employed') {
-    $('memberJobTitleField').classList.add('show');
-    $('memberJobTitle').value = m['Job Title'] || '';
-  } else {
-    $('memberJobTitleField').classList.remove('show');
-    $('memberJobTitle').value = '';
-  }
-  
-  qAll("input[name='member_ofw_status']").forEach(r => r.checked = (r.value === (m['Overseas Filipino Worker(OFW)'] || 'No')));
-  if (m['Overseas Filipino Worker(OFW)'] === 'Yes') {
-    $('memberCountryField').classList.add('show');
-    $('memberCountry').value = m['Country'] || '';
-  } else {
-    $('memberCountryField').classList.remove('show');
-    $('memberCountry').value = '';
-  }
-  
-  // Health and Status
-  qAll("input[name='member_pwd']").forEach(r => r.checked = (r.value === (m['Persons with Disability (PWD)'] || 'No')));
-  $('memberStatus').value = m['Status'] || '';
-  
-  // Transportation & Evacuation Details
-  $('memberTransport').value = m['Transportation'] || '';
-  $('memberPickup').value = m['Designated Pick-Up Point'] || m['Pick-Up Location'] || '';
-  $('memberDropoff').value = m['Drop-Off Point'] || m['Drop-Off Location'] || '';
-  $('memberCamp').value = m['Name of Camp'] || m['Evacuation Camp Name'] || '';
-  $('memberCampCap').value = m['Capacity'] || '';
-  $('memberInside').value = m['No. of Individuals Inside Camp'] || m['Individuals Currently in Camp'] || '';
-  $('memberOutside').value = m['No. of Individuals Outside Camp'] || m['Individuals Outside Camp'] || '';
-  $('memberReason').value = m['Reasons for Displacement'] || '';
-  
-  // Government Assistance Programs
-  $('member_tupad').checked = (m['TUPAD'] === 'Yes');
-  $('member_local4ps').checked = (m['Local 4Ps'] === 'Yes');
-  $('member_intl4ps').checked = (m['National 4Ps'] === 'Yes');
-  $('member_locsp').checked = (m['Local Social Pension'] === 'Yes');
-  $('member_intlsp').checked = (m['National Social Pension'] === 'Yes');
-  $('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes');
-  $('member_relief').checked = (m['Relief Goods'] === 'Yes');
-  $('member_cash').checked = (m['Cash Subsidy'] === 'Yes');
-  $('memberAics').value = m['AICS'] || '';
-}
-
 function collectHeadFromEditForm(){
   const bd_input = $('edit_householdBirthdate').value || '';
   const headBirthForSheet = toSheetDate(bd_input);
@@ -3885,7 +3999,8 @@ function collectHeadFromEditForm(){
     'Barangay': $('edit_barangay').value || '',
     'Sitio / Purok': $('edit_sitio').value || '',
     'Name of Household Head': ($('edit_householdHead').value || '').trim(),
-    'FishR Registered/RBIS Registered': headRegistrationValue,
+    'FishR & RBIS': headRegistrationValue, // This is the actual column name
+    'FishR Registered/RBIS Registered': headRegistrationValue, // Keep for compatibility
     'Contact no.': $('edit_contactNo').value || '',
     'Sex': document.querySelector("input[name='edit_head_sex']:checked")?.value || '',
     'Birthdate': headBirthForSheet,
@@ -3962,7 +4077,8 @@ function collectMemberPanelToEdit(){
   const obj = {
     'Data ID': editDataID,
     'Name of Household Member/s': name,
-    'FishR Registered/RBIS Registered': registrationValue,
+    'FishR & RBIS': registrationValue, // This is the actual column name
+    'FishR Registered/RBIS Registered': registrationValue, // Keep both for compatibility
     'Contact no.': $('memberContact').value || '',
     'Sex': document.querySelector("input[name='member_sex']:checked")?.value || '',
     'Birthdate': birth_for_sheet,
