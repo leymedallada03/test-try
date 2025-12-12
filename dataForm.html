@@ -111,13 +111,10 @@
    }
 
    .brand .logo{
-    width:48px;
-    height:48px;
+    width:60px;
+    height:60px;
     border-radius:var(--radius-sm);
     object-fit:contain;
-    background: rgba(255,255,255,0.1);
-    padding: 4px;
-    border: 2px solid rgba(255,255,255,0.2);
    }
 
    .brand-text h1 {
@@ -388,7 +385,7 @@
    }
 
    .small-muted{ 
-     font-size:0.85rem; 
+     font-size:0.75rem; 
      color:var(--muted);
      margin-top: 4px;
    }
@@ -446,6 +443,13 @@
      display:flex;
      align-items:center;
      gap:12px; 
+     margin-bottom: 15px;
+   }
+    .section-title1{
+     display:flex;
+     align-items:center;
+     gap:12px; 
+     color: var(--accent1);
    }
 
    .section-title h3 {
@@ -453,15 +457,24 @@
     color: var(--accent1);
     flex: 1; /* Allow title to take available space */
    }
-
    .chip{
-     padding:6px 10px;
+     padding:3px 8px;
      border-radius:20px;
      background:linear-gradient(90deg, var(--accent1), var(--accent2));
      color:#fff;
      font-size:0.9rem;
      font-weight:700;
-     min-width: 32px;
+     text-align: center;
+     flex-shrink: 0; /* Prevent chip from shrinking */
+   }
+   .chip1{
+    margin-top: 20px;
+     padding:3px 8px;
+     border-radius:20px;
+     background:linear-gradient(90deg, var(--accent1), var(--accent2));
+     color:#fff;
+     font-size:0.9rem;
+     font-weight:700;
      text-align: center;
      flex-shrink: 0; /* Prevent chip from shrinking */
    }
@@ -470,7 +483,7 @@
    .instruction-label {
      color: var(--muted);
      display: block;
-    margin: 0 0 4px 65px;
+    margin: 0 0 4px 37px;
      font-size: 0.85rem;
      line-height: 1.4;
    }
@@ -480,7 +493,6 @@
      display: grid;
      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Flexible columns */
      gap: 12px 20px;
-     margin-top: 12px;
    }
 
    /* When sidebar is collapsed, the grid should adapt properly */
@@ -492,7 +504,6 @@
      display: flex;
      align-items: center;
      gap: 10px;
-     padding: 10px 0;
      min-height: 40px; /* Consistent height for all items */
      -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
    }
@@ -982,7 +993,6 @@
      .form-grid {
          grid-template-columns: repeat(2, 1fr);
          gap: 14px;
-        margin-top: 15px;
      }
      
      .gov-support-grid {
@@ -1607,7 +1617,7 @@
 
       <!-- DOMESTIC ANIMALS - REDESIGNED -->
       <div class="card">
-        <div class="section-title"><div class="chip">4</div><h3>Domestic Livestock</h3></div>
+        <div class="section-title1"><div class="chip">4</div><h3 style="margin-bottom: 0; margin-top: 0;">Domestic Livestock</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="domestic-grid-container">
@@ -1740,7 +1750,7 @@
 
       <!-- GOVERNMENT SUPPORT - FIXED ALIGNMENT -->
       <div class="card">
-        <div class="section-title"><div class="chip">6</div><h3>Government Assistance Programs</h3></div>
+        <div class="section-title1"><div class="chip">6</div><h3 style="margin-bottom: 0; margin-top: 0">Government Assistance Programs</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="gov-support-grid">
@@ -2224,23 +2234,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // FORM INITIALIZATION CONTINUES BELOW (your existing code after this block)
-});
-   
-window.addEventListener('storage', function(e) {
-  if (e.key === 'activityLog') {
-    console.log('Activity log updated from another tab');
-    loadActivityLog();
-  }
-});
-
-/* Listen for messages from other pages */
-window.addEventListener('message', function(event) {
-  if (event.data && event.data.type === 'activity') {
-    const activity = event.data;
-    if (ALLOWED_ACTIONS.includes(activity.action)) {
-      recordUserActivity(activity.action, activity.details);
-    }
-  }
 });
 
    
@@ -3514,7 +3507,6 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
 
 
 
