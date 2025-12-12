@@ -2271,12 +2271,12 @@ function processDashboardData(data) {
 const demographicsStatsDiv = document.getElementById('demographicsStats');
 demographicsStatsDiv.innerHTML = '';
 
-// Create all 4 cards in one grid
+// Create all 4 cards with SHORT labels for equal sizing
 const demographicCards = [
     { label: 'Male', value: demographicsStats.male, subtitle: '' },
     { label: 'Female', value: demographicsStats.female, subtitle: '' },
-    { label: 'PWD', value: demographicsStats.pwd, subtitle: '' }, // Changed from "Persons with Disability (PWD)"
-    { label: 'Households with Coordinates', value: headsWithCoords, subtitle: 'Heads with lat/long' }
+    { label: 'PWD', value: demographicsStats.pwd, subtitle: '' },
+    { label: 'With Coordinates', value: headsWithCoords, subtitle: 'Households' }
 ];
 
 demographicCards.forEach(card => {
@@ -2287,7 +2287,7 @@ demographicCards.forEach(card => {
                 <div class="category-value">${card.value}</div>`;
     
     if (card.subtitle) {
-        html += `<div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">${card.subtitle}</div>`;
+        html += `<div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">${card.subtitle}</div>`;
     }
     
     div.innerHTML = html;
