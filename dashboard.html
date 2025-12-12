@@ -376,24 +376,22 @@
     margin: 15px 0 25px 0;
    }
 
-   .household-coords-card h3 {
-    margin: 0 0 8px 0;
-    font-size: 0.9rem;
-    color: var(--accent1);
-    font-weight: 700;
-   }
+.household-coords-card {
+  padding: 14px;
+  background: var(--light-green);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-   .household-coords-card .card-value {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--accent1);
-    margin: 4px 0;
-   }
-
-   .household-coords-card .mini {
-    font-size: 0.8rem;
-    color: var(--muted);
-   }
+.household-coords-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(6,30,20,0.1);
+}
 
    .household-coords-card:hover {
     transform: translateY(-3px);
@@ -782,11 +780,13 @@
       <div class="category-grid" id="demographicsStats"></div>
       
       <!-- FIXED: Households with Coordinates Card - Same style as Male/Female/PWD -->
-      <div class="household-coords-card">
-        <h3>Households with Coordinates</h3>
-        <div id="withCoords" class="card-value">0</div>
-        <div class="mini">Heads that provided latitude & longitude</div>
-      </div>
+<div class="category-grid" style="margin-top: 20px;">
+  <div class="category-card household-coords-card">
+    <div class="category-label">Households with Coordinates</div>
+    <div id="withCoords" class="category-value">0</div>
+    <div class="mini" style="font-size: 0.8rem; margin-top: 4px;">Heads that provided latitude & longitude</div>
+  </div>
+</div>
       
       <!-- Educational Attainment Section -->
       <div class="section-title">
