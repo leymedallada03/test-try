@@ -378,6 +378,7 @@
     gap: 8px;
    }
 
+   /* Fix table headers for horizontal scrolling */
    .breakdown-table-container {
     background: var(--card-bg);
     border-radius: var(--radius);
@@ -386,6 +387,7 @@
     box-shadow: var(--shadow);
     overflow-x: auto;
     width: 100%;
+    position: relative;
    }
 
    .breakdown-table {
@@ -393,6 +395,14 @@
     border-collapse: collapse;
     text-align: center;
     min-width: 600px;
+    position: relative;
+   }
+
+   .breakdown-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--card-bg);
    }
 
    .breakdown-table th {
@@ -403,7 +413,8 @@
     color: var(--accent1);
     border-bottom: 2px solid rgba(15,122,74,0.1);
     position: sticky;
-    left: 0;
+    top: 0;
+    z-index: 5;
     white-space: nowrap;
    }
 
@@ -418,19 +429,41 @@
     background: rgba(52,183,143,0.05);
    }
 
-   .breakdown-table th:first-child,
+   .breakdown-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    background: rgba(15,122,74,0.1);
+    text-align: left;
+   }
+
    .breakdown-table td:first-child {
     position: sticky;
     left: 0;
-    background: var(--card-bg);
     z-index: 1;
+    background: var(--card-bg);
     text-align: left;
     font-weight: 600;
     color: var(--accent1);
    }
 
-   .breakdown-table th:first-child {
-    background: rgba(15,122,74,0.1);
+   /* Ensure table headers don't overlap during horizontal scroll */
+   .breakdown-table-container::-webkit-scrollbar {
+    height: 8px;
+   }
+
+   .breakdown-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+   }
+
+   .breakdown-table-container::-webkit-scrollbar-thumb {
+    background: var(--accent2);
+    border-radius: 4px;
+   }
+
+   .breakdown-table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--accent1);
    }
 
    /* Mobile Styles */
@@ -667,16 +700,10 @@
         <div class="mini">(all member rows)</div>
       </div>
 
-      <div class="card">
-        <h3>Households with Coordinates</h3>
-        <div id="withCoords" class="card-value">0</div>
-        <div class="mini">Heads that provided lat,lng</div>
-      </div>
-
-      <div class="card">
-        <h3>Last Updated</h3>
+      <div class="card" id="lastUpdatedCard">
+        <h3>Last Activity</h3>
         <div id="lastUpdated" class="card-value">---</div>
-        <div class="mini">(m/d/yyyy hh:mm:ss AM/PM)</div>
+        <div class="mini" id="lastUpdatedDetails">No recent activity</div>
       </div>
     </div>
 
@@ -689,6 +716,15 @@
         <i class="fas fa-users"></i> Demographics
       </div>
       <div class="category-grid" id="demographicsStats"></div>
+      
+      <!-- Households with Coordinates Card (moved from top) -->
+      <div style="margin: 15px 0 25px 0;">
+        <div class="card" style="max-width: 280px;">
+          <h3>Households with Coordinates</h3>
+          <div id="withCoords" class="card-value">0</div>
+          <div class="mini">Heads that provided latitude & longitude</div>
+        </div>
+      </div>
       
       <!-- Educational Attainment Section -->
       <div class="section-title">
@@ -1285,24 +1321,130 @@ function showLoading(yes){
   document.getElementById("loading").style.display = yes ? "flex" : "none"; 
 }
 
-/* Load and store last updated time */
-async function loadLastUpdated() {
+/* Load and store activity log */
+async function loadActivityLog() {
   try {
-    const storedTime = localStorage.getItem('lastDataUpdate');
-    if (storedTime) {
-      lastUpdatedTime = new Date(storedTime);
+    const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+    if (activityLog.length > 0) {
+      const latestActivity = activityLog[activityLog.length - 1];
+      lastUpdatedTime = new Date(latestActivity.timestamp);
       document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+      
+      // Display action details
+      const detailsDiv = document.getElementById('lastUpdatedDetails');
+      detailsDiv.innerHTML = `
+        <div style="font-size: 11px; line-height: 1.4;">
+          <strong>Action:</strong> ${latestActivity.action}<br>
+          <strong>Actor:</strong> ${latestActivity.actor}<br>
+          <strong>Details:</strong> ${latestActivity.details}
+        </div>
+      `;
     }
   } catch(err) {
-    console.error('Error loading last updated time:', err);
+    console.error('Error loading activity log:', err);
   }
 }
 
-/* Update last updated time when data changes */
-function updateLastUpdated() {
-  lastUpdatedTime = new Date();
-  localStorage.setItem('lastDataUpdate', lastUpdatedTime.toISOString());
-  document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+/* Record user activity */
+function recordUserActivity(action, details = '') {
+  try {
+    const username = localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown User';
+    const timestamp = new Date().toISOString();
+    
+    const activity = {
+      action: action,
+      actor: username,
+      details: details,
+      timestamp: timestamp
+    };
+    
+    // Get existing log or create new one
+    const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+    
+    // Add new activity
+    activityLog.push(activity);
+    
+    // Keep only last 50 activities to prevent storage bloat
+    if (activityLog.length > 50) {
+      activityLog.splice(0, activityLog.length - 50);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('activityLog', JSON.stringify(activityLog));
+    
+    // Update display
+    lastUpdatedTime = new Date(timestamp);
+    document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+    
+    const detailsDiv = document.getElementById('lastUpdatedDetails');
+    detailsDiv.innerHTML = `
+      <div style="font-size: 11px; line-height: 1.4;">
+        <strong>Action:</strong> ${action}<br>
+        <strong>Actor:</strong> ${username}<br>
+        <strong>Details:</strong> ${details}
+      </div>
+    `;
+    
+    console.log(`Activity recorded: ${action} by ${username}`);
+    
+  } catch(err) {
+    console.error('Error recording activity:', err);
+  }
+}
+
+/* Initialize activity monitoring */
+function setupActivityMonitoring() {
+  // Listen for messages from other pages
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'activityLog') {
+      loadActivityLog();
+    }
+  });
+  
+  // Check if we need to record an activity from another tab/page
+  const pendingActivity = sessionStorage.getItem('pendingActivity');
+  if (pendingActivity) {
+    try {
+      const activity = JSON.parse(pendingActivity);
+      recordUserActivity(activity.action, activity.details);
+      sessionStorage.removeItem('pendingActivity');
+    } catch(err) {
+      console.error('Error processing pending activity:', err);
+    }
+  }
+}
+
+/* Helper function for other pages to record activities */
+function recordActivityFromOtherPage(action, details) {
+  // Store in sessionStorage for the dashboard to pick up
+  sessionStorage.setItem('pendingActivity', JSON.stringify({
+    action: action,
+    details: details
+  }));
+  
+  // Also update localStorage directly for immediate update if dashboard is open
+  try {
+    const username = localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown User';
+    const timestamp = new Date().toISOString();
+    
+    const activity = {
+      action: action,
+      actor: username,
+      details: details,
+      timestamp: timestamp
+    };
+    
+    const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+    activityLog.push(activity);
+    
+    if (activityLog.length > 50) {
+      activityLog.splice(0, activityLog.length - 50);
+    }
+    
+    localStorage.setItem('activityLog', JSON.stringify(activityLog));
+  } catch(err) {
+    console.error('Error recording activity from other page:', err);
+  }
 }
 
 /* NEW: Load cached dashboard data - Shows instantly without loading screen */
@@ -1355,8 +1497,10 @@ async function loadDashboard(showLoader = false){
         // Process and display the fresh data
         processDashboardData(data);
         
-        // Update last updated time
-        updateLastUpdated();
+        // Record this data refresh as an activity
+        if (showLoader) {
+          recordUserActivity('Data Refresh', 'Dashboard data refreshed from server');
+        }
         
         console.log("📊 Fresh dashboard data loaded");
         
@@ -1800,7 +1944,7 @@ function processDashboardData(data) {
             }
             else if(jobLower.includes('caregiver')) {
                 jobCategories.caregiver++;
-            }
+    }
             else if(jobLower.includes('pharmacist')) {
                 jobCategories.pharmacist++;
             }
@@ -1984,7 +2128,7 @@ function processDashboardData(data) {
         }
     });
 
-    // Update top cards - FIXED: Households with Coordinates
+    // Update top cards - FIXED: Households with Coordinates moved to Demographics section
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
     document.getElementById('withCoords').innerText = headsWithCoords;
@@ -2486,6 +2630,11 @@ function processDashboardData(data) {
     });
 }
 
+function notifyDataUpdated(action = 'Data Updated', details = 'Dashboard data refreshed') {
+  recordUserActivity(action, details);
+  localStorage.setItem('dashboardDataCache', JSON.stringify({})); // Clear cache to force refresh
+}
+
 /* INITIALIZATION - UPDATED */
 window.addEventListener('DOMContentLoaded', async () => {
   // First check session with server validation
@@ -2497,6 +2646,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   
   // Setup auto-logout for inactivity
   setupAutoLogout();
+  
+  // Initialize activity monitoring
+  setupActivityMonitoring();
+  loadActivityLog();
   
   // STEP 1: Load cached dashboard data IMMEDIATELY (no loading screen)
   const hasCache = loadCachedDashboardData();
@@ -2610,24 +2763,9 @@ document.addEventListener('visibilitychange', function() {
     loadDashboard(false);
   }
 });
-
-function notifyDataUpdated() {
-  updateLastUpdated();
-  localStorage.setItem('lastDataUpdate', new Date().toISOString());
-}
 </script>
 <script src="session-manager.js"></script>
 <script src="common-session.js"></script>
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
