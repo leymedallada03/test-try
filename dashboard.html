@@ -341,6 +341,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative;
    }
    
    .category-card:hover {
@@ -360,44 +361,12 @@
     font-weight: 800;
     color: var(--accent1);
    }
-
-   /* FIXED: Households with Coordinates Card - Same style as Male/Female/PWD */
-   .household-coords-card {
-    max-width: 280px;
-    padding: 14px;
-    background: var(--light-green);
-    border-radius: var(--radius-sm);
-    transition: all 0.2s ease;
-    border: 1px solid var(--border);
-    min-height: 70px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 15px 0 25px 0;
-   }
-
-   .household-coords-card h3 {
-    margin: 0 0 8px 0;
-    font-size: 0.9rem;
-    color: var(--accent1);
-    font-weight: 700;
-   }
-
-   .household-coords-card .card-value {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--accent1);
-    margin: 4px 0;
-   }
-
-   .household-coords-card .mini {
+   
+   .category-card .mini {
     font-size: 0.8rem;
     color: var(--muted);
-   }
-
-   .household-coords-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(6,30,20,0.1);
+    margin-top: 4px;
+    font-style: italic;
    }
 
    /* Barangay Breakdown - FULL WIDTH STACK */
@@ -417,7 +386,7 @@
     gap: 8px;
    }
 
-   /* FIXED: Table headers and scrollbar styling */
+   /* FIXED: Table headers and scrollbar styling - REMOVED BORDER EFFECTS */
    .breakdown-table-container {
     background: var(--card-bg);
     border-radius: var(--radius);
@@ -427,6 +396,18 @@
     overflow-x: auto;
     width: 100%;
     position: relative;
+   }
+
+   .breakdown-table-container h4 {
+    font-size: 0.9rem; /* SAME SIZE AS BASIC POPULATION OVERVIEW SECTIONS */
+    color: var(--accent1);
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d1d9d6; /* Same as .section-title */
+    display: flex;
+    align-items: center;
+    gap: 10px;
    }
 
    .breakdown-table {
@@ -456,7 +437,7 @@
     top: 0;
     z-index: 15;
     white-space: nowrap;
-    border-right: 1px solid rgba(15,122,74,0.1);
+    /* REMOVED: border-right: 1px solid rgba(15,122,74,0.1); */
    }
 
    .breakdown-table th:last-child {
@@ -468,7 +449,7 @@
     border-bottom: 1px solid rgba(15,122,74,0.08);
     font-size: 0.85rem;
     color: var(--muted);
-    border-right: 1px solid rgba(15,122,74,0.05);
+    /* REMOVED: border-right: 1px solid rgba(15,122,74,0.05); */
    }
 
    .breakdown-table td:last-child {
@@ -485,7 +466,7 @@
     z-index: 25;
     background: rgba(15,122,74,0.12);
     text-align: left;
-    border-right: 2px solid rgba(15,122,74,0.2);
+    /* REMOVED: border-right: 2px solid rgba(15,122,74,0.2); */
    }
 
    .breakdown-table td:first-child {
@@ -496,7 +477,7 @@
     text-align: left;
     font-weight: 600;
     color: var(--accent1);
-    border-right: 2px solid rgba(15,122,74,0.1);
+    /* REMOVED: border-right: 2px solid rgba(15,122,74,0.1); */
    }
 
    /* FIXED: Scrollbar styling - muted gray instead of green */
@@ -609,6 +590,10 @@
         min-width: 800px;
     }
     
+    .breakdown-table-container h4 {
+        font-size: 0.85rem;
+    }
+    
     .user-info {
         gap: 8px;
     }
@@ -621,10 +606,6 @@
     #logoutBtn {
         padding: 6px 12px;
         font-size: 0.85rem;
-    }
-
-    .household-coords-card {
-        max-width: 100%;
     }
    }
 
@@ -661,7 +642,7 @@
     height: 32px;
     border: 3px solid var(--border);
     border-top-color: var(--accent1);
-    border-radius: 50%;
+    border-radius:50%;
     animation: spin 1s linear infinite;
    }
 
@@ -775,17 +756,12 @@
     <div class="card population-overview-card">
       <h3>Basic Population Overview</h3>
       
-      <!-- Demographics Section -->
+      <!-- Demographics Section - NOW INCLUDES 4 CARDS -->
       <div class="section-title">
         <i class="fas fa-users"></i> Demographics
       </div>
-      <div class="category-grid" id="demographicsStats"></div>
-      
-      <!-- FIXED: Households with Coordinates Card - Same style as Male/Female/PWD -->
-      <div class="household-coords-card">
-        <h3>Households with Coordinates</h3>
-        <div id="withCoords" class="card-value">0</div>
-        <div class="mini">Heads that provided latitude & longitude</div>
+      <div class="category-grid" id="demographicsStats">
+        <!-- Male, Female, PWD, and Households with Coordinates will be inserted here -->
       </div>
       
       <!-- Educational Attainment Section -->
@@ -908,7 +884,7 @@
 
       <!-- 1. Barangay Summary -->
       <div class="breakdown-table-container">
-        <h4>Demographics & Location Availability</h4>
+        <h4><i class="fas fa-chart-bar"></i> Demographics & Location Availability</h4>
         <table class="breakdown-table" id="tblSummary">
           <thead>
             <tr>
@@ -925,7 +901,7 @@
 
       <!-- 2. Government Support -->
       <div class="breakdown-table-container">
-        <h4>Government Assistance Programs</h4>
+        <h4><i class="fas fa-handshake"></i> Government Assistance Programs</h4>
         <table class="breakdown-table" id="tblSupport">
           <thead>
             <tr>
@@ -946,7 +922,7 @@
 
       <!-- 3. Status Breakdown -->
       <div class="breakdown-table-container">
-        <h4>Household Status</h4>
+        <h4><i class="fas fa-heartbeat"></i> Household Status</h4>
         <table class="breakdown-table" id="tblStatus">
           <thead>
             <tr>
@@ -966,7 +942,7 @@
 
       <!-- 4. Age Buckets -->
       <div class="breakdown-table-container">
-        <h4>Population Age Groups</h4>
+        <h4><i class="fas fa-users"></i> Population Age Groups</h4>
         <table class="breakdown-table" id="tblAge">
           <thead>
             <tr>
@@ -984,7 +960,7 @@
 
       <!-- 5. Sitio/Purok Distribution -->
       <div class="breakdown-table-container">
-        <h4>Sitio / Purok Summary</h4>
+        <h4><i class="fas fa-map-marker-alt"></i> Sitio / Purok Summary</h4>
         <table class="breakdown-table" id="tblSitio">
           <thead>
             <tr>
@@ -1005,7 +981,7 @@
 
       <!-- 6. Household Livestock -->
       <div class="breakdown-table-container">
-        <h4>Domestic Livestock</h4>
+        <h4><i class="fas fa-paw"></i> Domestic Livestock</h4>
         <table class="breakdown-table" id="tblLivestock">
           <thead>
             <tr>
@@ -1025,7 +1001,7 @@
 
       <!-- 7. Barangay Educational Attainment -->
       <div class="breakdown-table-container">
-        <h4>Educational Attainment by Barangay</h4>
+        <h4><i class="fas fa-graduation-cap"></i> Educational Attainment by Barangay</h4>
         <table class="breakdown-table" id="tblBarangayEducation">
           <thead>
             <tr>
@@ -1047,7 +1023,7 @@
 
       <!-- 8. Barangay Employment -->
       <div class="breakdown-table-container">
-        <h4>Employment Status by Barangay</h4>
+        <h4><i class="fas fa-briefcase"></i> Employment Status by Barangay</h4>
         <table class="breakdown-table" id="tblBarangayEmployment">
           <thead>
             <tr>
@@ -1062,7 +1038,7 @@
 
       <!-- 9. Barangay FishR & RBIS -->
       <div class="breakdown-table-container">
-        <h4>FishR & RBIS Registration by Barangay</h4>
+        <h4><i class="fas fa-fish"></i> FishR & RBIS Registration by Barangay</h4>
         <table class="breakdown-table" id="tblBarangayFishR">
           <thead>
             <tr>
@@ -1079,7 +1055,7 @@
 
       <!-- 10. Barangay OFW Countries -->
       <div class="breakdown-table-container">
-        <h4>OFW Countries by Barangay</h4>
+        <h4><i class="fas fa-globe-asia"></i> OFW Countries by Barangay</h4>
         <table class="breakdown-table" id="tblBarangayOFW">
           <thead>
             <tr>
@@ -2311,17 +2287,38 @@ function processDashboardData(data) {
     // Update top cards
     document.getElementById('totalHeads').innerText = totalHeads;
     document.getElementById('totalMembers').innerText = totalMembers;
-    document.getElementById('withCoords').innerText = headsWithCoords;
 
     // Update Basic Population Overview - Single Card
-    // Demographics Section
+    // Demographics Section - NOW WITH 4 CARDS INCLUDING COORDINATES
     const demographicsStatsDiv = document.getElementById('demographicsStats');
     demographicsStatsDiv.innerHTML = '';
     
-    [['Male', demographicsStats.male], ['Female', demographicsStats.female], ['PWD', demographicsStats.pwd]].forEach(it=>{
+    // Create array with all demographics stats INCLUDING coordinates
+    const demographicsData = [
+        ['Male', demographicsStats.male],
+        ['Female', demographicsStats.female], 
+        ['PWD', demographicsStats.pwd],
+        ['With Coordinates', headsWithCoords] // ADD THIS LINE
+    ];
+    
+    demographicsData.forEach(it => {
         const div = document.createElement('div'); 
         div.className = 'category-card'; 
-        div.innerHTML = `<div class="category-label">${it[0]}</div><div class="category-value">${it[1]}</div>`;
+        
+        // For "With Coordinates" card, add mini text
+        if (it[0] === 'With Coordinates') {
+            div.innerHTML = `
+                <div class="category-label">${it[0]}</div>
+                <div class="category-value">${it[1]}</div>
+                <div class="mini">Heads with lat/long</div>
+            `;
+        } else {
+            div.innerHTML = `
+                <div class="category-label">${it[0]}</div>
+                <div class="category-value">${it[1]}</div>
+            `;
+        }
+        
         demographicsStatsDiv.appendChild(div);
     });
     
