@@ -371,7 +371,7 @@
 
    /* Barangay Breakdown - FULL WIDTH STACK */
    .breakdown-section {
-    margin-top: 24px;
+    margin-top: 40px;
     width: 100%;
    }
 
@@ -1088,11 +1088,6 @@
       </div>
 
     </div><!-- end breakdown-section -->
-
-    <div class="small-muted" style="margin-top: 20px; font-size:12px; color:var(--muted);">
-      Tip: Data auto-refreshes every 30 seconds. Tables are responsive and optimized for all devices.
-    </div>
-
   </main>
 </div>
 
@@ -2310,7 +2305,6 @@ function processDashboardData(data) {
             div.innerHTML = `
                 <div class="category-label">${it[0]}</div>
                 <div class="category-value">${it[1]}</div>
-                <div class="mini">Heads with lat/long</div>
             `;
         } else {
             div.innerHTML = `
