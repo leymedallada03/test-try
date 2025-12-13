@@ -1458,7 +1458,7 @@
      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%230f7a4a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
      background-position: calc(100% - 12px) center;
      background-repeat: no-repeat;
-     background-size: 12px;
+     background-size: 9px;
    }
    
    /* High DPI/Retina display improvements */
@@ -2098,7 +2098,7 @@
             
             <div id="memberRegistrationField" class="conditional-field">
               <label>FishR Registered/RBIS Registered</label>
-              <select id="memberRegistration">
+              <select id="memberRegistration" class="animated">
                 <option value="">Select...</option>
                 <option value="FishR Registered">FishR Registered</option>
                 <option value="RBIS Registered">RBIS Registered</option>
@@ -2147,7 +2147,7 @@
         <div class="form-grid">
           <div>
             <label>Educational Attainment</label>
-            <select id="memberEducationalAttainment" class="member-educational">
+            <select id="memberEducationalAttainment" class="member-educational animated">
               <option value="">Select...</option>
               <option value="No Formal Education">No Formal Education</option>
               <option value="Elementary Level">Elementary Level</option>
@@ -2168,7 +2168,7 @@
 
           <div>
             <label>Employment</label>
-            <select id="memberEmployment" class="member-employment">
+            <select id="memberEmployment" class="member-employment animated">
               <option value="">Select...</option>
               <option value="Employed">Employed</option>
               <option value="Unemployed">Unemployed</option>
@@ -2177,7 +2177,7 @@
 
           <div id="memberJobTitleField" class="conditional-field">
             <label>Job Title</label>
-            <select id="memberJobTitle" class="member-jobtitle">
+            <select id="memberJobTitle" class="member-jobtitle animated">
               <option value="">Select...</option>
               <optgroup label="Office & Administrative Jobs">
                 <option>Administrative Assistant / Admin Staff</option>
@@ -2263,7 +2263,7 @@
 
           <div id="memberCountryField" class="conditional-field">
             <label>Country</label>
-            <select id="memberCountry" class="member-country">
+            <select id="memberCountry" class="member-country animated">
               <option value="">Select...</option>
               <option>Saudi Arabia</option>
               <option>United Arab Emirates (UAE)</option>
@@ -2307,7 +2307,7 @@
 
           <div>
             <label>Status</label>
-            <select id="memberStatus" class="member-status">
+            <select id="memberStatus" class="member-status animated">
               <option value="">Select...</option>
               <option>With Sickness</option>
               <option>Pregnant</option>
@@ -2329,7 +2329,7 @@
         <div class="form-grid">
           <div>
             <label>Transportation</label>
-            <select id="memberTransport" class="member-transport">
+            <select id="memberTransport" class="member-transport animated">
               <option value="">Select...</option>
               <option>Has Transportation</option>
               <option>Needs Transportation</option>
@@ -2368,7 +2368,7 @@
 
           <div style="grid-column:1/-1;">
             <label>Reason for Displacement</label>
-            <select id="memberReason" class="member-reason">
+            <select id="memberReason" class="member-reason animated">
               <option value="">Select...</option>
               <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
               <option>Typhoon</option>
@@ -2423,7 +2423,7 @@
 
         <div style="margin-top:16px">
           <label>AICS (if any)</label>
-          <select id="memberAics" class="member_aics">
+          <select id="memberAics" class="member_aics animated">
             <option value="">None</option>
             <option>Shelter Assistance</option>
             <option>Burial</option>
@@ -2434,7 +2434,7 @@
 
       <!-- Card 6: Action Buttons -->
       <div class="edit-card">
-        <div class="panel-actions" style="margin-top:20px;">
+        <div class="panel-actions" style="margin-top:5px;">
           <button id="memberBack" class="btn btn-reset" type="button">
             <i class="fas fa-arrow-left"></i> Back
           </button>
