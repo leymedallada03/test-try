@@ -16,7 +16,36 @@
   --transition: 260ms cubic-bezier(.2,.9,.3,1);
   --text-dark: #062018;
 }
+.admin-only {
+    display: none !important;
+}
 
+/* Class to show admin elements - applied by JavaScript */
+.admin-only.admin-visible {
+    display: block !important;
+}
+
+/* For list items */
+li.admin-only {
+    display: none !important;
+}
+
+li.admin-only.admin-visible {
+    display: list-item !important;
+}
+
+/* For inline elements */
+span.admin-only,
+a.admin-only,
+button.admin-only {
+    display: none !important;
+}
+
+span.admin-only.admin-visible,
+a.admin-only.admin-visible,
+button.admin-only.admin-visible {
+    display: inline !important;
+}
 .btn-export { 
   border:0;padding:10px 14px;
   border-radius:10px;
@@ -454,6 +483,7 @@ form label {
 .actions-cell {
   white-space: nowrap;
 }
+
 
 
 
