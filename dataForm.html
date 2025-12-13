@@ -28,44 +28,467 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
-           /* Background decorative elements */
-        .bg-pattern {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .bg-circle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(15, 122, 74, 0.05);
-        }
-
-        .circle-1 {
-            width: 300px;
-            height: 300px;
-            top: -150px;
-            right: -150px;
-        }
-
-        .circle-2 {
-            width: 200px;
-            height: 200px;
-            bottom: -100px;
-            left: -100px;
-            background: rgba(255, 122, 0, 0.05);
-        }
-
-        .circle-3 {
-            width: 150px;
-            height: 150px;
-            top: 50%;
-            left: 10%;
-            background: rgba(52, 183, 143, 0.05);
-        }
-
+   
+   /* EDIT PANEL STYLES FROM RECORDS.HTML */
+   .member-panel {
+     position: fixed;
+     right: 0;
+     top: 0;
+     height: 100vh;
+     width: 520px;
+     max-width: 96%;
+     background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98));
+     box-shadow: -18px 0 40px rgba(6,30,20,0.12);
+     transform: translateX(110%);
+     transition: transform 280ms cubic-bezier(.2,.9,.3,1);
+     z-index: 6000;
+     padding: 18px;
+     overflow-y: auto;
+   }
+   
+   .member-panel.open {
+     transform: translateX(0%);
+   }
+   
+   .member-panel .panel-header {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     margin-bottom: 10px;
+   }
+   
+   .member-panel h3 {
+     margin: 0;
+     font-size: 18px;
+     color: var(--accent1);
+   }
+   
+   .member-panel .panel-body {
+     margin-top: 8px;
+   }
+   
+   .member-panel .panel-actions {
+     display: flex;
+     gap: 8px;
+     justify-content: flex-end;
+     margin-top: 12px;
+   }
+   
+   .panel-overlay {
+     position: fixed;
+     inset: 0;
+     background: rgba(0,0,0,0.32);
+     opacity: 0;
+     transition: opacity 200ms;
+     pointer-events: none;
+     z-index: 5900;
+   }
+   
+   .panel-overlay.show {
+     opacity: 1;
+     pointer-events: auto;
+   }
+   
+   /* FIX 1: Improved radio button alignment - UPDATED to match records.html */
+   .form-row {
+     margin-bottom: 12px;
+   }
+   
+   .radio-line, .radio-group {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 8px 0;
+   }
+   
+   .radio-item {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     font-weight: 600;
+     color: var(--accent1);
+     cursor: pointer;
+   }
+   
+   .radio-item input[type="radio"] {
+     accent-color: var(--accent1);
+     width: 18px;
+     margin: 0;
+     transform: scale(1.1);
+   }
+   
+   .btn.secondary {
+     background: transparent;
+     color: #0f7a4a;
+     border: 1px solid rgba(6,30,20,0.06);
+   }
+   
+   /* Card styling for edit form */
+   .edit-card {
+     padding: 16px;
+     border-radius: var(--radius);
+     background: white;
+     margin-bottom: 16px;
+     box-shadow: 0 4px 12px rgba(6,30,20,0.08);
+     border: 1px solid var(--border);
+   }
+   
+   /* FIX 4: Consistent form section headers */
+   .form-section {
+     background: var(--light-green);
+     padding: 10px 14px;
+     border-radius: var(--radius-sm);
+     margin: 20px 0 16px 0;
+     border-left: 4px solid var(--accent1);
+   }
+   
+   .form-section h5 {
+     margin: 0;
+     color: var(--accent1);
+     font-size: 15px;
+     font-weight: 700;
+   }
+   
+   .form-grid {
+     display: grid;
+     grid-template-columns: repeat(2,1fr);
+     gap: 16px;
+   }
+   
+   .small-muted {
+     font-size:0.75rem; 
+     color:var(--muted);
+     margin-bottom: 10px;
+   }
+   
+   .green {
+     color: #0f7a4a;
+     font-weight: 700;
+   }
+   
+   /* Form controls */
+   .member-panel input,
+   .member-panel select,
+   .member-panel textarea {
+     width: 100%;
+     padding: 10px 12px;
+     border: 2px solid var(--border);
+     border-radius: var(--radius-sm);
+     font-size: 14px;
+     font-family: inherit;
+     box-sizing: border-box;
+     margin-top: 6px;
+   }
+   
+   .member-panel input:focus,
+   .member-panel select:focus,
+   .member-panel textarea:focus {
+     outline: none;
+     border-color: var(--accent1);
+     box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+   }
+   
+   .member-panel label {
+     font-weight: 600;
+     font-size: 14px;
+     color: var(--accent1);
+     display: block;
+     margin-bottom: 6px;
+   }
+   
+   /* FIX 2: Larger checkboxes like dataForm.html - UPDATED */
+   .checkbox-item {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     font-weight: 600;
+     color: var(--accent1);
+     cursor: pointer;
+     margin: 6px 0;
+     padding: 4px 0;
+   }
+   
+   .checkbox-item input[type="checkbox"] {
+     accent-color: var(--accent1);
+     width: 20px;
+     height: 20px;
+     margin: 0;
+     cursor: pointer;
+     transform: scale(1.1);
+   }
+   
+   .checkbox-item1 {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     margin-top: 4px;
+   }
+   
+   .checkbox-item1 input[type="checkbox"] {
+     accent-color: var(--accent1);
+     width: 20px;
+     cursor: pointer;
+     transform: scale(1.1);
+     margin: 0;
+   }
+   
+   .checkbox-item1 label {
+     margin: 0;
+     line-height: 1;
+     font-weight: 600;
+     color: #0a7a43;
+   }
+   
+   /* Conditional fields */
+   .conditional-field {
+     display: none;
+     margin-top: 8px;
+     animation: fadeIn 0.3s ease;
+   }
+   
+   .conditional-field.show {
+     display: block;
+   }
+   
+   @keyframes fadeIn {
+     from { opacity: 0; transform: translateY(-5px); }
+     to { opacity: 1; transform: translateY(0); }
+   }
+   
+   /* Animal grid */
+   .domestic-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+     gap: 12px;
+     margin-top: 12px;
+   }
+   
+   .animal-card {
+     background: var(--light-green);
+     padding: 12px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+     transition: all 0.3s ease;
+   }
+   
+   .animal-card:hover {
+     border-color: var(--accent1);
+     transform: translateY(-2px);
+     box-shadow: 0 4px 12px rgba(15,122,74,0.1);
+   }
+   
+   .animal-header {
+     display: flex;
+     align-items: center;
+     gap: 12px;
+     margin-bottom: 8px;
+   }
+   
+   .animal-qty {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+   }
+   
+   .animal-qty label {
+     margin: 0;
+     font-weight: 600;
+     color: var(--muted);
+     font-size: 14px;
+   }
+   
+   .qty {
+     width: 70px;
+     padding: 8px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+     text-align: center;
+     font-size: 14px;
+   }
+   
+   .others-box {
+     width: 100%;
+     min-height: 80px;
+     padding: 12px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+     font-family: inherit;
+     font-size: 14px;
+     margin-top: 8px;
+     resize: vertical;
+   }
+   
+   /* Government support grid */
+   .gov-support-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+     gap: 10px 16px;
+     margin-top: 0px;
+   }
+   
+   .gov-support-grid .checkbox-item {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     min-height: 40px;
+     -webkit-tap-highlight-color: transparent;
+   }
+   
+   /* Error messages */
+   .error-message {
+     color: #dc2626;
+     font-size: 12px;
+     margin-top: 4px;
+     display: none;
+   }
+   
+   .input-error {
+     border-color: #dc2626 !important;
+   }
+   
+   /* Required field indicator */
+   .required {
+     color: #dc2626;
+     margin-left: 2px;
+   }
+   
+   /* Panel improvements */
+   .panel-body {
+     padding-right: 8px;
+   }
+   
+   /* Data ID display */
+   .data-id-display {
+     background: #f0f9ff;
+     padding: 10px 14px;
+     border-radius: 8px;
+     border: 1px solid #d1e9ff;
+     margin-bottom: 16px;
+     font-weight: bold;
+     color: #0f7a4a;
+   }
+   
+   .data-id-display span {
+     background: #e3f2fd;
+     padding: 4px 8px;
+     border-radius: 4px;
+   }
+   
+   /* Head name with checkbox container - FIXED */
+   .head-name-container {
+     display: flex;
+     align-items: flex-start;
+     gap: 0;
+     flex-wrap: wrap;
+     margin-bottom: 0;
+   }
+   
+   .head-name-container input[type="text"] {
+     flex: 1;
+     min-width: 200px;
+     margin-bottom: 0;
+   }
+   
+   /* FIXED: Remove space between Household Head Full Name and FishR/RBIS Registered button */
+   .head-registration-container {
+     display: flex;
+     align-items: center;
+     gap: 16px;
+     padding: 0;
+     background: transparent;
+     border-radius: 0;
+     border-left: none;
+   }
+   
+   .head-registration-container .checkbox-item {
+     margin: 0;
+   }
+   
+   /* FIXED: Better alignment for conditional field in Educational & Economic Status */
+   .form-grid .conditional-field {
+     grid-column: 1 / -1;
+     margin-top: 8px;
+     margin-bottom: 0;
+   }
+   
+   /* FIXED: Ensure proper spacing in form grids */
+   .form-grid > div:not(:last-child) {
+     margin-bottom: 0;
+   }
+   
+   /* FIX 5: Center align text in all buttons */
+   .btn {
+     text-align: center;
+     justify-content: center;
+   }
+   
+   /* Specific alignment for action buttons */
+   .panel-actions .btn,
+   #memberPanel .panel-actions .btn {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+   }
+   
+   /* For Back, Save & Next buttons specifically - FIX 5 */
+   #memberBack, #memberNext {
+     text-align: center !important;
+     display: flex !important;
+     align-items: center !important;
+     justify-content: center !important;
+   }
+   
+   /* Ensure member panel action buttons are visible */
+   #memberPanel .panel-actions {
+     display: flex !important;
+     gap: 8px;
+     justify-content: flex-end;
+     margin-top: 20px;
+     padding: 16px 0;
+     border-top: 1px solid var(--border);
+   }
+   
+   /* ORIGINAL DATAFORM STYLES CONTINUE BELOW */
+   /* Background decorative elements */
+   .bg-pattern {
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     overflow: hidden;
+     z-index: -1;
+   }
+   
+   .bg-circle {
+     position: absolute;
+     border-radius: 50%;
+     background: rgba(15, 122, 74, 0.05);
+   }
+   
+   .circle-1 {
+     width: 300px;
+     height: 300px;
+     top: -150px;
+     right: -150px;
+   }
+   
+   .circle-2 {
+     width: 200px;
+     height: 200px;
+     bottom: -100px;
+     left: -100px;
+     background: rgba(255, 122, 0, 0.05);
+   }
+   
+   .circle-3 {
+     width: 150px;
+     height: 150px;
+     top: 50%;
+     left: 10%;
+     background: rgba(52, 183, 143, 0.05);
+   }
+   
    /* ============ ENHANCE: Better cross-platform compatibility ============ */
    body {
     background-color: var(--bg);
@@ -75,7 +498,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
    }
-
+   
    .page-container{
     max-width:1200px;
     margin:20px auto;
@@ -86,11 +509,11 @@
     align-items:start;
     transition: grid-template-columns 0.3s ease;
    }
-
+   
    .page-container.collapsed {
     grid-template-columns: 60px 1fr;
    }
-
+   
    /* Topbar - Enhanced */
    .topbar{
     grid-column:1/-1;
@@ -103,38 +526,38 @@
     color:#fff;
     box-shadow:var(--shadow-dark);
    }
-
+   
    .brand{
     display:flex;
     gap:12px;
     align-items:center;
    }
-
+   
    .brand .logo{
     width:60px;
     height:60px;
     border-radius:var(--radius-sm);
     object-fit:contain;
    }
-
+   
    .brand-text h1 {
     font-size: 1.1rem;
     font-weight: 700;
     margin: 0;
    }
-
+   
    .brand-text p {
     font-size:12px;
     opacity:0.95;
     margin: 4px 0 0 0;
    }
-
+   
    .user-info {
     display: flex;
     align-items: center;
     gap: 12px;
    }
-
+   
    #userName {
     font-weight: 600;
     border-radius: 20px;
@@ -143,7 +566,7 @@
     align-items: center;
     gap: 8px;
    }
-
+   
    #logoutBtn {
     background: rgba(255,255,255,0.15);
     color: white;
@@ -155,12 +578,12 @@
     font-size: 0.9rem;
     transition: all 0.2s ease;
    }
-
+   
    #logoutBtn:hover {
     background: rgba(255,255,255,0.25);
     transform: translateY(-1px);
    }
-
+   
    /* Sidebar - Collapsible with Icon Size Change */
    .sidebar{
     background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.20));
@@ -172,35 +595,35 @@
     overflow:auto;
     transition: width 0.3s ease;
    }
-
+   
    .sidebar-container {
     display: flex;
     flex-direction: column;
     height: 100%;
    }
-
+   
    .sidebar-toggle {
     background: linear-gradient(135deg, var(--accent1), var(--accent2));
     color: white;
     border: none;
     border-radius: var(--radius-sm);
-    width: 32px; /* Reduced from 36px */
-    height: 32px; /* Reduced from 36px */
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     margin-bottom: 12px;
     transition: all 0.3s ease;
-    font-size: 0.9rem; /* Added for consistency */
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-    touch-action: manipulation; /* Improve touch response */
+    font-size: 0.9rem;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
    }
-
+   
    .sidebar-toggle:hover {
     transform: scale(1.1);
    }
-
+   
    .sidebar ul{
     list-style:none;
     padding:0;
@@ -210,7 +633,7 @@
     gap:6px;
     flex: 1;
    }
-
+   
    .sidebar li a{
     display: flex;
     align-items: center;
@@ -224,20 +647,20 @@
     font-size: 0.9rem;
     white-space: nowrap;
     overflow: hidden;
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
    }
-
+   
    .sidebar li a:hover{
     background: var(--light-green);
     color: var(--accent1);
    }
-
+   
    .sidebar li a.active{
     background: linear-gradient(90deg, var(--accent1), var(--accent2));
     color: #fff;
     box-shadow: 0 4px 8px rgba(15,122,74,0.2);
    }
-
+   
    .sidebar li a .menu-icon {
     font-size: 1.2rem;
     width: 24px;
@@ -245,11 +668,11 @@
     flex-shrink: 0;
     transition: all 0.3s ease;
    }
-
+   
    /* When sidebar is collapsed, make icons normal size (FIXED) */
    .page-container.collapsed .sidebar li a .menu-icon {
-    font-size: 1.2rem !important; /* Changed from 1.6rem to normal size */
-    transform: scale(1) !important; /* Changed from scale(1.2) to normal */
+    font-size: 1.2rem !important;
+    transform: scale(1) !important;
    }
    
    /* For active tab in collapsed state - icon remains white */
@@ -259,19 +682,19 @@
    
    /* For inactive tabs in collapsed state - return to original color (no green) */
    .page-container.collapsed .sidebar li a:not(.active) .menu-icon {
-    color: var(--muted); /* Original muted color, not green */
+    color: var(--muted);
    }
-
+   
    .sidebar li a .menu-text {
     transition: opacity 0.3s ease;
    }
-
+   
    .page-container.collapsed .sidebar li a .menu-text {
     opacity: 0;
     width: 0;
     overflow: hidden;
    }
-
+   
    /* Content Area - Fixed Size with No Overflow */
    .content-area{
     background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
@@ -281,11 +704,10 @@
     min-height:72vh;
     height: calc(100vh - 120px);
     overflow-y: auto;
-     /* Prevent content from overflowing */
     max-width: 100%;
     box-sizing: border-box;
    }
-
+   
    /* Content Header - Fixed */
    .content-header {
     margin-top: 0;
@@ -294,7 +716,7 @@
     justify-content: space-between;
     align-items: center;
    }
-
+   
    .content-header h2 {
     margin: 0;
     font-size: 1.4rem;
@@ -303,7 +725,7 @@
     align-items: center;
     gap: 8px;
    }
-
+   
    #disc {
     margin-bottom: 10px;
     background: var(--light-green);
@@ -314,7 +736,7 @@
     color: var(--muted);
     line-height: 1.5;
    }
-
+   
    /* Card Styling */
    .card{ 
      padding:16px;
@@ -323,17 +745,16 @@
      margin-bottom:12px;
      box-shadow:var(--shadow);
      border: 1px solid rgba(255,255,255,0.8);
-     /* Prevent card content from overflowing */
      overflow: hidden;
    }
-
+   
    .form-grid{ 
      display:grid; 
      grid-template-columns:repeat(2,1fr); 
      gap:12px; 
      align-items:start;
    }
-
+   
    /* Label Styling */
    label{
      display:block;
@@ -342,7 +763,7 @@
      color:var(--accent1);
      font-size: 0.9rem;
    }
-
+   
    /* Input Fields - Fixed to prevent bumping */
    input[type="text"], input[type="date"], input[type="number"], select, textarea{
      width:100%;
@@ -352,18 +773,18 @@
      font-size:0.9rem;
      transition: all 0.3s ease;
      background:#fff;
-     box-sizing: border-box; /* Include padding in width calculation */
-     min-width: 0; /* Prevent flexbox overflow */
+     box-sizing: border-box;
+     min-width: 0;
      -webkit-appearance: none;
      -moz-appearance: none;
      appearance: none;
    }
-
+   
    /* Fix for iOS date input */
    input[type="date"] {
-     min-height: 44px; /* Better touch target for iOS */
+     min-height: 44px;
    }
-
+   
    /* Fix for input elements to prevent bumping */
    .page-container.collapsed .content-area input[type="text"],
    .page-container.collapsed .content-area input[type="date"],
@@ -373,29 +794,23 @@
      width: 100%;
      max-width: 100%;
    }
-
+   
    input[type="date"]::-webkit-calendar-picker-indicator{
      filter:invert(20%) sepia(50%) saturate(600%) hue-rotate(120deg) brightness(90%);
    }
-
+   
    input:focus, select:focus, textarea:focus{
      outline:none;
      border-color:var(--accent1);
      box-shadow:0 0 0 3px rgba(15,122,74,0.1);
    }
-
+   
    .small-muted{ 
      font-size:0.75rem; 
      color:var(--muted);
      margin-top: 4px;
    }
-
-   /* Required field indicator */
-   .required {
-     color: #dc2626;
-     margin-left: 2px;
-   }
-
+   
    /* Radio / Checkbox Alignment - FIXED */
    .radio-line, .checkbox-grid { 
      display:flex; 
@@ -404,23 +819,7 @@
      flex-wrap:wrap;
      padding: 8px 0;
    }
-
-   .radio-item, .checkbox-item{ 
-     display:flex; 
-     align-items:center; 
-     gap:8px; 
-     font-weight:600; 
-     color:var(--accent1);
-     cursor: pointer;
-     -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-   }
-
-   .radio-item input, .checkbox-item input{
-     transform:scale(1.1);
-     accent-color: var(--accent1);
-     cursor: pointer;
-   }
-
+   
    /* Member preview */
    .member-preview{ 
      margin-top:8px; 
@@ -431,13 +830,13 @@
      max-height: 200px;
      overflow-y: auto;
    }
-
+   
    .member-preview li{ 
      margin-bottom:6px;
      padding: 4px 0;
      border-bottom: 1px solid rgba(15,122,74,0.1);
    }
-
+   
    /* Section Styling */
    .section-title{
      display:flex;
@@ -445,18 +844,20 @@
      gap:12px; 
      margin-bottom: 15px;
    }
-    .section-title1{
+   
+   .section-title1{
      display:flex;
      align-items:center;
      gap:12px; 
      color: var(--accent1);
    }
-
+   
    .section-title h3 {
     margin: 0;
     color: var(--accent1);
-    flex: 1; /* Allow title to take available space */
+    flex: 1;
    }
+   
    .chip{
      padding:3px 8px;
      border-radius:20px;
@@ -465,8 +866,9 @@
      font-size:0.9rem;
      font-weight:700;
      text-align: center;
-     flex-shrink: 0; /* Prevent chip from shrinking */
+     flex-shrink: 0;
    }
+   
    .chip1{
     margin-top: 20px;
      padding:3px 8px;
@@ -476,9 +878,9 @@
      font-size:0.9rem;
      font-weight:700;
      text-align: center;
-     flex-shrink: 0; /* Prevent chip from shrinking */
+     flex-shrink: 0;
    }
-
+   
    /* Instruction label - Fixed alignment */
    .instruction-label {
      color: var(--muted);
@@ -487,36 +889,29 @@
      font-size: 0.85rem;
      line-height: 1.4;
    }
-
+   
    /* ============ FIXED: Government Support Grid - Proper responsive behavior ============ */
    .gov-support-grid {
      display: grid;
-     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Flexible columns */
+     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
      gap: 12px 20px;
+    margin-top: 0px;
    }
-
+   
    /* When sidebar is collapsed, the grid should adapt properly */
    .page-container.collapsed .content-area .gov-support-grid {
-     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Slightly smaller min-width */
+     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
    }
-
-   .gov-support-grid .checkbox-item {
-     display: flex;
-     align-items: center;
-     gap: 10px;
-     min-height: 40px; /* Consistent height for all items */
-     -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-   }
-
+   
    /* Ensure all checkboxes and labels are perfectly aligned */
    .gov-support-grid .checkbox-item input[type="checkbox"] {
      margin: 0;
      flex-shrink: 0;
      width: 18px;
      height: 18px;
-     min-width: 18px; /* Ensure checkbox doesn't shrink */
+     min-width: 18px;
    }
-
+   
    .gov-support-grid .checkbox-item label {
      margin: 0;
      font-weight: 600;
@@ -525,22 +920,22 @@
      flex: 1;
      display: flex;
      align-items: center;
-     word-break: break-word; /* Allow long text to break */
-     hyphens: auto; /* Better text wrapping */
+     word-break: break-word;
+     hyphens: auto;
    }
-
+   
    /* Domestic Animals Grid - REDESIGNED */
    .domestic-grid-container {
      margin-top: 12px;
    }
-
+   
    .domestic-grid{ 
      display:grid; 
      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
      gap:12px;
      align-items:center;
    }
-
+   
    .animal-card {
      background: var(--light-green);
      padding: 16px;
@@ -551,50 +946,35 @@
      flex-direction: column;
      gap: 12px;
    }
-
+   
    .animal-card:hover {
      border-color: var(--accent1);
      transform: translateY(-2px);
      box-shadow: 0 4px 12px rgba(15,122,74,0.1);
    }
-
+   
    .animal-header {
      display: flex;
      align-items: center;
      gap: 12px;
      margin-bottom: 8px;
    }
-
+   
    .animal-header label {
      margin: 0;
-     font-size: 0.95rem; /* Reduced from 1rem */
+     font-size: 0.95rem;
      display: flex;
      align-items: center;
      gap: 8px;
    }
-
-   .animal-qty {
-     display: flex;
-     align-items: center;
-     gap: 8px;
-   }
-
+   
    .animal-qty label {
      margin: 0;
      font-weight: 600;
      color: var(--muted);
      font-size: 0.9rem;
    }
-
-   .qty{
-     width: 70px; /* Reduced from 80px */
-     padding: 6px; /* Reduced from 8px */
-     border-radius: var(--radius-sm);
-     border: 2px solid var(--border);
-     text-align: center;
-     font-size: 0.85rem;
-   }
-
+   
    .others-box{
      width:100%;
      min-height:80px;
@@ -606,92 +986,87 @@
      margin-top: 8px;
      resize: vertical;
    }
-
+   
    /* Buttons - Made Smaller */
    .btn { 
      border:0;
-     padding: 8px 14px; /* Reduced from 10px 16px */
+     padding: 8px 14px;
      border-radius:var(--radius-sm);
      cursor:pointer;
      font-weight:600;
      background: linear-gradient(90deg, var(--accent1), var(--accent2));
      color:#fff;
-     font-size: 0.85rem; /* Reduced from 0.9rem */
+     font-size: 0.85rem;
      display: inline-flex;
      align-items: center;
      gap: 8px;
      transition: all 0.2s ease;
      white-space: nowrap;
-     min-height: 36px; /* Added for consistency */
-     -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-     touch-action: manipulation; /* Improve touch response */
+     min-height: 36px;
+     -webkit-tap-highlight-color: transparent;
+     touch-action: manipulation;
    }
-
+   
    .btn:hover {
      transform: translateY(-2px);
      box-shadow: 0 4px 12px rgba(15,122,74,0.2);
    }
-
+   
    /* Secondary button - Made Smaller */
    .btn.secondary { 
      background: transparent; 
      color: var(--accent1); 
      border:2px solid var(--border);
-     padding: 6px 12px; /* Added for secondary buttons */
+     padding: 6px 12px;
    }
-
+   
    .btn.secondary:hover {
      background: var(--light-green);
      border-color: var(--accent1);
    }
-
+   
    /* Hazard Hunter Button Styling */
    .btn.hazard-hunter {
      background: linear-gradient(90deg, var(--hazard-red), var(--hazard-orange)) !important;
      color: white !important;
      border: none !important;
    }
-
+   
    .btn.hazard-hunter:hover {
      background: linear-gradient(90deg, #b91c1c, var(--hazard-red)) !important;
      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2) !important;
    }
-
-   /* Coordinate container button */
-   .coordinate-container .btn {
-     padding: 8px 12px; /* Ensure consistent padding */
-   }
-
+   
    /* Reset Button - Same as Export Button in records.html */
    .btn-reset { 
      background: linear-gradient(90deg, var(--accent3), var(--accent4)) !important;
      color:#fff !important;
      border: none !important;
    }
-
+   
    .btn-reset:hover {
      box-shadow: 0 4px 12px rgba(255,122,0,0.2) !important;
    }
-
+   
    /* Back Button - Same as Export Button */
    .btn-back {
      background: linear-gradient(90deg, var(--accent3), var(--accent4)) !important;
      color:#fff !important;
      border: none !important;
    }
-
+   
    .btn-back:hover {
      box-shadow: 0 4px 12px rgba(255,122,0,0.2) !important;
    }
-
+   
    /* Actions Row */
    .actions-row{
      display:flex;
-     gap: 10px; /* Reduced from 12px */
+     gap: 10px;
      justify-content:flex-end;
-     margin-top: 14px; /* Reduced from 16px */
+     margin-top: 14px;
    }
-
+   
    /* Coordinate container */
    .coordinate-container {
      display: flex;
@@ -699,154 +1074,11 @@
      align-items: flex-start;
      flex-wrap: wrap;
    }
-
+   
    .coordinate-container .btn {
      white-space: nowrap;
    }
-
-   /* Member Panel (Slide-in) - FIXED with Better Button Spacing */
-   .member-panel { 
-     position: fixed; 
-     right: 0; 
-     top: 0; 
-     height: 100vh; 
-     width: 500px; 
-     max-width: 96%; 
-     background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.98)); 
-     box-shadow: -18px 0 40px rgba(6,30,20,0.12); 
-     transform: translateX(110%); 
-     transition: transform 320ms cubic-bezier(.2,.9,.3,1); 
-     z-index: 6000; 
-     padding: 24px; 
-     overflow-y: auto; 
-     border-radius: 8px 0 0 8px;
-     display: flex;
-     flex-direction: column;
-   }
-
-   .member-panel.open { 
-     transform: translateX(0%); 
-   }
-
-   .panel-overlay { 
-     position: fixed; 
-     inset: 0; 
-     background: rgba(0,0,0,0.32); 
-     opacity: 0; 
-     transition: opacity 200ms; 
-     pointer-events: none; 
-     z-index: 5900; 
-   }
-
-   .panel-overlay.show { 
-     opacity: 1; 
-     pointer-events: auto; 
-   }
-
-   .panel-header {
-     display: flex;
-     align-items: center;
-     gap: 12px;
-     margin-bottom: 20px;
-     padding-bottom: 12px;
-     border-bottom: 2px solid var(--light-green);
-     flex-shrink: 0; /* Prevent header from shrinking */
-   }
-
-   .panel-header h3 {
-     margin: 0;
-     color: var(--accent1);
-   }
-
-   /* Panel Chip */
-   .panel-chip {
-     padding: 4px 10px; /* Reduced from 6px 12px */
-     border-radius: 20px;
-     background: linear-gradient(90deg, var(--accent3), var(--accent4));
-     color: white;
-     font-size: 0.8rem; /* Reduced from 0.85rem */
-     font-weight: 700;
-     flex-shrink: 0;
-   }
-
-   /* Panel Body with Scroll */
-   .panel-body {
-     flex: 1;
-     overflow-y: auto;
-     padding-right: 8px; /* Space for scrollbar */
-     margin-bottom: 20px; /* Space for buttons */
-   }
-
-   /* Member Form Grid in Panel - FIXED */
-   .panel-body .form-grid {
-     display: grid;
-     grid-template-columns: repeat(2, 1fr);
-     gap: 12px;
-   }
-
-   /* Panel Checkbox Grid - FIXED ALIGNMENT (same as main form) */
-   .panel-checkbox-grid {
-     display: grid;
-     grid-template-columns: repeat(2, 1fr);
-     gap: 12px 24px; /* Same spacing as main form */
-     margin: 12px 0;
-     padding: 12px;
-     background: var(--light-green);
-     border-radius: var(--radius-sm);
-     align-items: center; /* Align items vertically */
-   }
-
-   .panel-checkbox-grid label {
-     display: flex;
-     align-items: center;
-     gap: 10px;
-     font-weight: 600;
-     color: var(--accent1);
-     cursor: pointer;
-     min-height: 40px; /* Consistent height */
-     word-break: break-word; /* Allow long text to break */
-     hyphens: auto; /* Better text wrapping */
-   }
-
-   .panel-checkbox-grid input[type="checkbox"] {
-     accent-color: var(--accent1);
-     transform: scale(1.1);
-     width: 18px;
-     height: 18px;
-     flex-shrink: 0;
-     margin: 0;
-     min-width: 18px; /* Ensure checkbox doesn't shrink */
-   }
-
-   /* Panel Actions - FIXED SPACING (Always visible at bottom) */
-   .panel-actions {
-     display: flex;
-     gap: 16px; /* Increased gap for better spacing */
-     justify-content: flex-end;
-     margin-top: auto; /* Push to bottom */
-     padding-top: 20px;
-     padding-bottom: 10px;
-     border-top: 2px solid var(--light-green);
-     background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98));
-     position: sticky;
-     bottom: 0;
-     z-index: 10;
-     flex-shrink: 0; /* Prevent buttons from shrinking */
-   }
-
-   /* Make buttons larger in panel (but still smaller than before) */
-   .panel-actions .btn {
-     padding: 10px 16px; /* Reduced from 12px 20px */
-     font-size: 0.9rem; /* Reduced from 1rem */
-     min-width: 100px; /* Reduced from 120px */
-   }
-
-   /* Panel header buttons */
-   .panel-header .btn {
-     padding: 6px 12px;
-     font-size: 0.85rem;
-   }
-
+   
    /* Loading overlay */
    .loading-overlay {
      display: none;
@@ -858,7 +1090,7 @@
      z-index: 9999;
      backdrop-filter: blur(2px);
    }
-
+   
    .loading-spinner {
      width: 40px;
      height: 40px;
@@ -867,11 +1099,11 @@
      border-radius: 50%;
      animation: spin 1s linear infinite;
    }
-
+   
    @keyframes spin {
      to { transform: rotate(360deg); }
    }
-
+   
    /* Error message styling */
    .error-message {
      color: #dc2626;
@@ -879,31 +1111,17 @@
      margin-top: 4px;
      display: none;
    }
-
+   
    .input-error {
      border-color: #dc2626 !important;
    }
-
+   
    .input-error:focus {
      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
    }
-
+   
    /* ============ NEW EDUCATIONAL/ECONOMIC SECTION STYLING ============ */
-   .conditional-field {
-     margin-top: 12px;
-     display: none;
-     animation: fadeIn 0.3s ease;
-   }
-
-   .conditional-field.show {
-     display: block;
-   }
-
-   @keyframes fadeIn {
-     from { opacity: 0; transform: translateY(-5px); }
-     to { opacity: 1; transform: translateY(0); }
-   }
-
+   
    /* Head name with checkbox container - FIXED */
    .head-name-container {
      display: flex;
@@ -912,13 +1130,13 @@
      flex-wrap: wrap;
      margin-bottom: 0;
    }
-
+   
    .head-name-container input[type="text"] {
      flex: 1;
      min-width: 200px;
      margin-bottom: 0;
    }
-
+   
    /* FIXED: Remove space between Household Head Full Name and FishR/RBIS Registered button */
    .head-registration-container {
      display: flex;
@@ -929,27 +1147,27 @@
      border-radius: 0;
      border-left: none;
    }
-
+   
    .head-registration-container .checkbox-item {
      margin: 0;
    }
-
+   
    /* FIXED: Better alignment for conditional field in Educational & Economic Status */
    .form-grid > div {
      margin-bottom: 0;
    }
-
+   
    .form-grid .conditional-field {
      grid-column: 1 / -1;
      margin-top: 8px;
      margin-bottom: 0;
    }
-
+   
    /* FIXED: Ensure proper spacing in form grids */
    .form-grid > div:not(:last-child) {
      margin-bottom: 0;
    }
-
+   
    /* ============ MODAL STYLING ============ */
    .modal {
      display: none;
@@ -963,7 +1181,7 @@
      align-items: center;
      justify-content: center;
    }
-
+   
    .modal-content {
      background: white;
      padding: 24px;
@@ -973,14 +1191,14 @@
      max-height: 80vh;
      overflow-y: auto;
    }
-
+   
    .modal-actions {
      display: flex;
      gap: 12px;
      justify-content: flex-end;
      margin-top: 20px;
    }
-
+   
    /* ============ RESPONSIVE DESIGN ============ */
    /* Tablet-specific improvements */
    @media (min-width: 769px) and (max-width: 1024px) {
@@ -1008,7 +1226,7 @@
          width: 450px;
      }
    }
-
+   
    /* Mobile Responsive */
    @media (max-width: 768px) {
      .page-container {
@@ -1059,14 +1277,14 @@
          color: white;
          border: none;
          border-radius: var(--radius-sm);
-         width: 36px; /* Reduced from 40px */
-         height: 36px; /* Reduced from 40px */
+         width: 36px;
+         height: 36px;
          align-items: center;
          justify-content: center;
          cursor: pointer;
-         font-size: 1rem; /* Reduced from 1.2rem */
-         -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-         touch-action: manipulation; /* Improve touch response */
+         font-size: 1rem;
+         -webkit-tap-highlight-color: transparent;
+         touch-action: manipulation;
      }
      
      .content-area {
@@ -1091,11 +1309,6 @@
      
      .member-panel .form-grid {
          grid-template-columns: 1fr !important;
-     }
-     
-     .panel-checkbox-grid {
-         grid-template-columns: 1fr !important;
-         gap: 12px !important;
      }
      
      .user-info {
@@ -1178,7 +1391,7 @@
      /* Better touch targets for mobile */
      input[type="text"], input[type="date"], input[type="number"], select, textarea {
          padding: 12px;
-         font-size: 1rem; /* Slightly larger for mobile readability */
+         font-size: 1rem;
      }
      
      /* Ensure date input is tap-friendly on mobile */
@@ -1198,7 +1411,7 @@
          gap: 12px;
      }
    }
-
+   
    /* Small mobile devices */
    @media (max-width: 480px) {
      .gov-support-grid {
@@ -1232,12 +1445,12 @@
          padding: 12px;
      }
    }
-
+   
    /* Mobile menu toggle button */
    .mobile-menu-toggle {
      display: none;
    }
-
+   
    /* Select styling */
    select.animated {
      appearance: none;
@@ -1247,7 +1460,7 @@
      background-repeat: no-repeat;
      background-size: 12px;
    }
-
+   
    /* High DPI/Retina display improvements */
    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
      .logo {
@@ -1255,7 +1468,7 @@
          image-rendering: crisp-edges;
      }
    }
-
+   
    /* Print styles for better printing experience */
    @media print {
      .sidebar, .topbar, .btn, .sidebar-toggle, .mobile-menu-toggle {
@@ -1387,7 +1600,7 @@
             
             <!-- FIXED: FishR/RBIS Registered button moved inline -->
             <div class="head-registration-container">
-              <div class="checkbox-item" style="margin-bottom: 0;">
+              <div class="checkbox-item1" style="margin-bottom: 0;">
                 <input type="checkbox" id="headRegisteredCheckbox">
                 <label for="headRegisteredCheckbox">FishR/RBIS Registered</label>
               </div>
@@ -1624,7 +1837,7 @@
           <div class="domestic-grid">
             <div class="animal-card">
               <div class="animal-header">
-                <label class="checkbox-item"><input type="checkbox" id="dog_chk"> <span style="font-size: 1.2rem;">🐕</span> Dog</label>
+                <label class="checkbox-item1"><input type="checkbox" id="dog_chk"> <span style="font-size: 1.2rem;">🐕</span> Dog</label>
               </div>
               <div class="animal-qty">
                 <label>Quantity:</label>
@@ -1634,7 +1847,7 @@
 
             <div class="animal-card">
               <div class="animal-header">
-                <label class="checkbox-item"><input type="checkbox" id="cat_chk"> <span style="font-size: 1.2rem;">🐈</span> Cat</label>
+                <label class="checkbox-item1"><input type="checkbox" id="cat_chk"> <span style="font-size: 1.2rem;">🐈</span> Cat</label>
               </div>
               <div class="animal-qty">
                 <label>Quantity:</label>
@@ -1644,7 +1857,7 @@
 
             <div class="animal-card">
               <div class="animal-header">
-                <label class="checkbox-item"><input type="checkbox" id="pig_chk"> <span style="font-size: 1.2rem;">🐖</span> Pig</label>
+                <label class="checkbox-item1"><input type="checkbox" id="pig_chk"> <span style="font-size: 1.2rem;">🐖</span> Pig</label>
               </div>
               <div class="animal-qty">
                 <label>Quantity:</label>
@@ -1654,7 +1867,7 @@
 
             <div class="animal-card">
               <div class="animal-header">
-                <label class="checkbox-item"><input type="checkbox" id="cow_chk"> <span style="font-size: 1.2rem;">🐄</span> Cow</label>
+                <label class="checkbox-item1"><input type="checkbox" id="cow_chk"> <span style="font-size: 1.2rem;">🐄</span> Cow</label>
               </div>
               <div class="animal-qty">
                 <label>Quantity:</label>
@@ -1664,7 +1877,7 @@
 
             <div class="animal-card">
               <div class="animal-header">
-                <label class="checkbox-item"><input type="checkbox" id="carabao_chk"> <span style="font-size: 1.2rem;">🐃</span> Carabao</label>
+                <label class="checkbox-item1"><input type="checkbox" id="carabao_chk"> <span style="font-size: 1.2rem;">🐃</span> Carabao</label>
               </div>
               <div class="animal-qty">
                 <label>Quantity:</label>
@@ -1674,7 +1887,7 @@
 
             <div class="animal-card">
               <div class="animal-header">
-                <label class="checkbox-item"><input type="checkbox" id="chicken_chk"> <span style="font-size: 1.2rem;">🐔</span> Chicken</label>
+                <label class="checkbox-item1"><input type="checkbox" id="chicken_chk"> <span style="font-size: 1.2rem;">🐔</span> Chicken</label>
               </div>
               <div class="animal-qty">
                 <label>Quantity:</label>
@@ -1856,35 +2069,36 @@
 <!-- Overlay + Member Panel -->
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
+<!-- MEMBER SEQUENTIAL PANEL - UPDATED DESIGN FROM RECORDS.HTML -->
 <div id="memberPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Member entry panel">
   <div class="panel-header">
-    <button id="panelClose" class="btn btn-back" title="Close panel">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <div class="panel-chip" id="panelChip">Member 1</div>
-    <h3 id="panelTitle">Household Member Details</h3>
+    <button id="panelClose" class="btn secondary" title="Close panel">←</button>
+    <h3 id="panelTitle">Member 1 of N</h3>
   </div>
 
   <div class="panel-body">
     <form id="memberForm" onsubmit="return false;">
-      <!-- Basic Information -->
-      <div class="card form-section">
-        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">1</div><h3>Basic Information</h3></div>
+      
+      <!-- Card 1: Basic Information -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Basic Information</h5>
+        </div>
         <div class="form-grid">
           <div style="grid-column: 1 / -1;">
             <label>Household Member Full Name<span class="required">*</span></label>
-            <input type="text" id="memberName" required />
+            <input type="text" id="memberName" class="member-name" required />
           </div>
 
-          <div>
-            <div class="checkbox-item" style="margin-bottom: 8px;">
+          <div style="grid-column: 1 / -1;">
+            <div class="checkbox-item1" style="margin-top: 0px;">
               <input type="checkbox" id="memberRegisteredCheckbox">
-              <label for="memberRegisteredCheckbox">Member Registered</label>
+              <label for="memberRegisteredCheckbox">FishR/RBIS Registered</label>
             </div>
             
             <div id="memberRegistrationField" class="conditional-field">
-              <label>Member Registered</label>
-              <select id="memberRegistration" class="animated">
+              <label>FishR Registered/RBIS Registered</label>
+              <select id="memberRegistration">
                 <option value="">Select...</option>
                 <option value="FishR Registered">FishR Registered</option>
                 <option value="RBIS Registered">RBIS Registered</option>
@@ -1896,9 +2110,8 @@
           <div>
             <label>Contact no. <span class="required">*</span></label>
             <input type="text" id="memberContact" placeholder="09XXXXXXXXX" required
-                   pattern="^(09|\+639)\d{9}$"
-                   title="Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)" />
-            <div class="error-message" id="memberContactError">Please enter a valid Philippine mobile number (09XXXXXXXXX)</div>
+                   pattern="^(09|\+639)\d{9}$" />
+            <div class="error-message" id="memberContactError"></div>
           </div>
 
           <div>
@@ -1911,28 +2124,30 @@
 
           <div>
             <label>Birthdate <span class="required">*</span></label>
-            <input type="date" id="memberBirthdate" required />
+            <input type="date" id="memberBirthdate" class="member-birthdate" required/>
           </div>
 
           <div>
             <label>Age</label>
-            <input type="text" id="memberAge" readonly />
+            <input type="text" id="memberAge" class="member-age" readonly/>
           </div>
 
           <div>
             <label>Age Category</label>
-            <input type="text" id="memberStage" readonly />
+            <input type="text" id="memberStage" class="member-stage" readonly/>
           </div>
         </div>
       </div>
 
-      <!-- Educational & Economic Status -->
-      <div class="card">
-        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">2</div><h3>Educational & Economic Status</h3></div>
+      <!-- Card 2: Educational & Economic Status -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Educational & Economic Status</h5>
+        </div>
         <div class="form-grid">
           <div>
             <label>Educational Attainment</label>
-            <select id="memberEducationalAttainment" class="animated">
+            <select id="memberEducationalAttainment" class="member-educational">
               <option value="">Select...</option>
               <option value="No Formal Education">No Formal Education</option>
               <option value="Elementary Level">Elementary Level</option>
@@ -1953,7 +2168,7 @@
 
           <div>
             <label>Employment</label>
-            <select id="memberEmployment" class="animated">
+            <select id="memberEmployment" class="member-employment">
               <option value="">Select...</option>
               <option value="Employed">Employed</option>
               <option value="Unemployed">Unemployed</option>
@@ -1962,7 +2177,7 @@
 
           <div id="memberJobTitleField" class="conditional-field">
             <label>Job Title</label>
-            <select id="memberJobTitle" class="animated">
+            <select id="memberJobTitle" class="member-jobtitle">
               <option value="">Select...</option>
               <optgroup label="Office & Administrative Jobs">
                 <option>Administrative Assistant / Admin Staff</option>
@@ -2048,7 +2263,7 @@
 
           <div id="memberCountryField" class="conditional-field">
             <label>Country</label>
-            <select id="memberCountry" class="animated">
+            <select id="memberCountry" class="member-country">
               <option value="">Select...</option>
               <option>Saudi Arabia</option>
               <option>United Arab Emirates (UAE)</option>
@@ -2076,9 +2291,11 @@
         </div>
       </div>
 
-      <!-- Health and Status -->
-      <div class="card">
-        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">3</div><h3>Health and Status</h3></div>
+      <!-- Card 3: Health and Status -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Health and Status</h5>
+        </div>
         <div class="form-grid">
           <div>
             <label>Persons with Disability (PWD)</label>
@@ -2090,21 +2307,29 @@
 
           <div>
             <label>Status</label>
-            <select id="memberStatus" class="animated">
+            <select id="memberStatus" class="member-status">
               <option value="">Select...</option>
-              <option>With Sickness</option><option>Pregnant</option><option>Solo Parent</option><option>Lactating</option><option>Severe Illness</option><option>HIV Positive</option><option>LGBTQ Plus</option>
+              <option>With Sickness</option>
+              <option>Pregnant</option>
+              <option>Solo Parent</option>
+              <option>Lactating</option>
+              <option>Severe Illness</option>
+              <option>HIV Positive</option>
+              <option>LGBTQ Plus</option>
             </select>
           </div>
         </div>
       </div>
 
-      <!-- Transportation & Evacuation Details -->
-      <div class="card">
-        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">4</div><h3>Transportation & Evacuation Details</h3></div>
+      <!-- Card 4: Transportation & Evacuation Details -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Transportation & Evacuation Details</h5>
+        </div>
         <div class="form-grid">
           <div>
             <label>Transportation</label>
-            <select id="memberTransport" class="animated">
+            <select id="memberTransport" class="member-transport">
               <option value="">Select...</option>
               <option>Has Transportation</option>
               <option>Needs Transportation</option>
@@ -2113,37 +2338,37 @@
           
           <div>
             <label>Pick-Up Location</label>
-            <input type="text" id="memberPickup" />
+            <input id="memberPickup" class="member-pickup"/>
           </div>
           
           <div>
             <label>Drop-Off Location</label>
-            <input type="text" id="memberDropoff" />
+            <input id="memberDropoff" class="member-dropoff"/>
           </div>
           
           <div>
             <label>Evacuation Camp Name</label>
-            <input type="text" id="memberCamp" />
+            <input id="memberCamp" class="member-camp"/>
           </div>
           
           <div>
             <label>Camp Capacity</label>
-            <input type="number" id="memberCampCap" min="0" />
+            <input type="number" id="memberCampCap" class="member-cap" min="0"/>
           </div>
           
           <div>
             <label>Individuals Currently in Camp</label>
-            <input type="number" id="memberInside" min="0" />
+            <input type="number" id="memberInside" class="member-inside" min="0"/>
           </div>
           
           <div>
             <label>Individuals Outside Camp</label>
-            <input type="number" id="memberOutside" min="0"/>
+            <input type="number" id="memberOutside" class="member-outside" min="0"/>
           </div>
 
-          <div style="grid-column:1/-1">
+          <div style="grid-column:1/-1;">
             <label>Reason for Displacement</label>
-            <select id="memberReason" class="animated">
+            <select id="memberReason" class="member-reason">
               <option value="">Select...</option>
               <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
               <option>Typhoon</option>
@@ -2156,49 +2381,49 @@
         </div>
       </div>
 
-      <!-- Government Assistance Programs -->
-      <div class="card">
-        <div class="section-title"><div class="chip" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">5</div><h3>Government Assistance Programs</h3></div>
-        <div class="instruction-label">Please check (✓) all items that apply.</div>
-
+      <!-- Card 5: Government Assistance Programs -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Government Assistance Programs</h5>
+        </div>
         <div class="gov-support-grid">
           <div class="checkbox-item">
-            <input type="checkbox" id="member_tupad">
+            <input type="checkbox" id="member_tupad" class="member_tupad">
             <label for="member_tupad">TUPAD</label>
           </div>
           <div class="checkbox-item">
-            <input type="checkbox" id="member_local4ps">
+            <input type="checkbox" id="member_local4ps" class="member_local4ps">
             <label for="member_local4ps">Local 4Ps</label>
           </div>
           <div class="checkbox-item">
-            <input type="checkbox" id="member_intl4ps">
+            <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
             <label for="member_intl4ps">National 4Ps</label>
           </div>
           <div class="checkbox-item">
-            <input type="checkbox" id="member_locsp">
+            <input type="checkbox" id="member_locsp" class="member_locsp">
             <label for="member_locsp">Local Social Pension</label>
           </div>
           <div class="checkbox-item">
-            <input type="checkbox" id="member_intlsp">
+            <input type="checkbox" id="member_intlsp" class="member_intlsp">
             <label for="member_intlsp">National Social Pension</label>
           </div>
           <div class="checkbox-item">
-            <input type="checkbox" id="member_solo">
+            <input type="checkbox" id="member_solo" class="member_solo">
             <label for="member_solo">Solo Parent Assistance</label>
           </div>
           <div class="checkbox-item">
-            <input type="checkbox" id="member_relief">
+            <input type="checkbox" id="member_relief" class="member_relief">
             <label for="member_relief">Relief Goods</label>
           </div>
           <div class="checkbox-item">
-            <input type="checkbox" id="member_cash">
+            <input type="checkbox" id="member_cash" class="member_cash">
             <label for="member_cash">Cash Subsidy</label>
           </div>
         </div>
 
-        <div style="grid-column:1/-1;margin-top:16px">
+        <div style="margin-top:16px">
           <label>AICS (if any)</label>
-          <select id="memberAics" class="animated">
+          <select id="memberAics" class="member_aics">
             <option value="">None</option>
             <option>Shelter Assistance</option>
             <option>Burial</option>
@@ -2207,14 +2432,16 @@
         </div>
       </div>
 
-      <!-- Panel Actions - Always visible at bottom -->
-      <div class="panel-actions">
-        <button id="memberBack" class="btn btn-reset" type="button">
-          <i class="fas fa-arrow-left"></i> Back
-        </button>
-        <button id="memberNext" class="btn" type="button">
-          Save & Next <i class="fas fa-arrow-right"></i>
-        </button>
+      <!-- Card 6: Action Buttons -->
+      <div class="edit-card">
+        <div class="panel-actions" style="margin-top:20px;">
+          <button id="memberBack" class="btn btn-reset" type="button">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button id="memberNext" class="btn" type="button">
+            Save & Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
       </div>
     </form>
   </div>
@@ -2235,8 +2462,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // FORM INITIALIZATION CONTINUES BELOW (your existing code after this block)
 });
-
-   
 
 /* ============ HAZARD HUNTER INTEGRATION ============ */
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
@@ -2691,9 +2916,9 @@ function fillMemberPanel(idx){
   // Handle conditional fields
   setupMemberConditionalFields();
   
-  // Update panel chip
-  document.getElementById("panelChip").textContent = `Member ${idx + 1}`;
-  document.getElementById("panelTitle").textContent = `of ${membersToCollect}`;
+  // Update panel title
+  const total = Math.max(1, membersToCollect);
+  document.getElementById("panelTitle").textContent = `Member ${idx + 1} of ${total}`;
 }
 
 /* collect member data */
@@ -3501,14 +3726,22 @@ document.addEventListener('visibilitychange', function() {
     console.log("Tab became active");
   }
 });
+
+/* ============ ADDITIONAL FUNCTIONS FOR MEMBER PANEL ============ */
+function sessionCheck() {
+  // This function should be implemented in session-manager.js
+  return true;
+}
+
+function handleLogout() {
+  // This function should be implemented in session-manager.js
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = 'index.html';
+}
 </script>
 <script src="session-manager.js"></script>
 <script src="common-session.js"></script>
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
-
