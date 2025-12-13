@@ -681,6 +681,32 @@
     padding-left: 5px;
     border-left: 2px solid var(--accent2);
    }
+   
+   /* Visual feedback for recent updates */
+   @keyframes highlight-update {
+       0% { background-color: rgba(52, 183, 143, 0.1); }
+       100% { background-color: transparent; }
+   }
+
+   .recent-update {
+       animation: highlight-update 2s ease;
+   }
+
+   /* Smooth transitions for activity updates */
+   #lastUpdated {
+       transition: all 0.3s ease;
+   }
+
+   #lastUpdatedDetails {
+       transition: all 0.3s ease;
+   }
+   
+   /* Pulse animation for activity updates */
+   @keyframes pulse {
+       0% { box-shadow: 0 0 0 0 rgba(15, 122, 74, 0.4); }
+       70% { box-shadow: 0 0 0 10px rgba(15, 122, 74, 0); }
+       100% { box-shadow: 0 0 0 0 rgba(15, 122, 74, 0); }
+   }
 </style>
 </head>
 
@@ -1194,56 +1220,113 @@ function stopSessionMonitoring() {
     }
 }
 
-/* ENHANCED SESSION CHECK FUNCTION */
-async function sessionCheck() {
-  try {
-    // Check if we have required session data
-    const loggedIn = localStorage.getItem("loggedIn");
-    const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
-    const sessionId = sessionStorage.getItem("sessionId");
-    
-    // Basic validation
-    if (loggedIn !== "true" || !userName || userName === "User" || !sessionId) {
-      console.log("Missing session data, redirecting...");
-      window.location.href = 'index.html?session=expired';
-      return false;
+/* FIXED: Enhanced session check for page refresh */
+async function enhancedSessionCheck() {
+    try {
+        // Check if we have required session data
+        const loggedIn = localStorage.getItem("loggedIn");
+        const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
+        const sessionId = sessionStorage.getItem("sessionId");
+        
+        // Special handling for page refresh
+        const isPageRefresh = performance.navigation.type === 1 || 
+                            performance.getEntriesByType("navigation")[0]?.type === "reload";
+        
+        if (isPageRefresh) {
+            console.log("Page refresh detected, using cached session");
+            
+            // Try to restore session from localStorage if sessionStorage was cleared
+            if (!sessionId && localStorage.getItem("lastSessionId")) {
+                sessionStorage.setItem("sessionId", localStorage.getItem("lastSessionId"));
+                console.log("Restored session ID from localStorage");
+            }
+        }
+        
+        // Store session ID in localStorage as backup
+        if (sessionId) {
+            localStorage.setItem("lastSessionId", sessionId);
+        }
+        
+        // Basic validation
+        if (loggedIn !== "true" || !userName || userName === "User") {
+            console.log("Missing session data, redirecting...");
+            window.location.href = 'index.html?session=expired';
+            return false;
+        }
+        
+        // Validate with server (with timeout to prevent hanging on refresh)
+        try {
+            const isValid = await Promise.race([
+                validateSession(),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), 5000)
+                )
+            ]);
+            
+            if (!isValid) {
+                console.log("Session invalidated by server");
+                sessionStorage.removeItem('authenticated');
+                localStorage.removeItem('loggedIn');
+                window.location.href = 'index.html?session=invalid';
+                return false;
+            }
+        } catch (error) {
+            console.log("Session validation timeout/error during refresh, using cached state:", error);
+            // Allow continuation with cached state on refresh timeout
+        }
+        
+        // Session is valid, set up UI
+        document.getElementById('userName').innerText = userName;
+        
+        // Check admin status
+        const isAdmin = localStorage.getItem("userRole") === "admin";
+        const adminItems = document.querySelectorAll(".admin-only");
+        adminItems.forEach(item => {
+            item.style.display = isAdmin ? "block" : "none";
+        });
+        
+        // Set session flag
+        sessionStorage.setItem('authenticated', 'true');
+        
+        // Start session monitoring (but not on initial load to prevent loops)
+        if (!isPageRefresh) {
+            startSessionMonitoring();
+        } else {
+            // For refresh, start monitoring after a delay
+            setTimeout(() => startSessionMonitoring(), 3000);
+        }
+        
+        return true;
+        
+    } catch(e){ 
+        console.warn('Session check failed', e);
+        // On refresh, try to continue with cached data
+        if (performance.navigation.type === 1) {
+            console.log("Refresh detected, allowing continuation");
+            return true;
+        }
+        window.location.href = 'index.html?session=error';
+        return false;
+    }
+}
+
+/* FIXED: Prevent multiple session checks on refresh */
+let sessionCheckInProgress = false;
+async function safeSessionCheck() {
+    if (sessionCheckInProgress) {
+        console.log("Session check already in progress");
+        return true;
     }
     
-    // Validate with server
-    const isValid = await validateSession();
-    if (!isValid) {
-      console.log("Session invalidated by server");
-      sessionStorage.removeItem('authenticated');
-      localStorage.removeItem('loggedIn');
-      window.location.href = 'index.html?session=invalid';
-      return false;
+    sessionCheckInProgress = true;
+    try {
+        return await enhancedSessionCheck();
+    } finally {
+        // Reset flag after a delay to prevent rapid successive checks
+        setTimeout(() => {
+            sessionCheckInProgress = false;
+        }, 1000);
     }
-    
-    // Session is valid, set up UI
-    document.getElementById('userName').innerText = userName;
-    
-    // Check admin status
-    const isAdmin = localStorage.getItem("userRole") === "admin";
-    const adminItems = document.querySelectorAll(".admin-only");
-    adminItems.forEach(item => {
-        item.style.display = isAdmin ? "block" : "none";
-    });
-    
-    // Set session flag
-    sessionStorage.setItem('authenticated', 'true');
-    
-    // Start session monitoring
-    startSessionMonitoring();
-    
-    return true;
-    
-  } catch(e){ 
-    console.warn('Session check failed', e);
-    // On error, redirect to login for security
-    console.log("Session check error, redirecting to login...");
-    window.location.href = 'index.html?session=error';
-    return false;  // CHANGED THIS FROM true TO false
-  }
 }
 
 /* ENHANCED LOGOUT FUNCTION */
@@ -1376,16 +1459,7 @@ async function loadActivityLog() {
       if (filteredLog.length > 0) {
         const latestActivity = filteredLog[filteredLog.length - 1];
         lastUpdatedTime = new Date(latestActivity.timestamp);
-        document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
-        
-        const detailsDiv = document.getElementById('lastUpdatedDetails');
-        detailsDiv.innerHTML = `
-          <div style="font-size: 11px; line-height: 1.4;">
-            <strong>Action:</strong> ${latestActivity.action}<br>
-            <strong>Actor:</strong> ${latestActivity.actor}<br>
-            <strong>Details:</strong> ${latestActivity.details}
-          </div>
-        `;
+        updateActivityDisplay(latestActivity);
         return;
       }
     }
@@ -1413,32 +1487,18 @@ async function loadActivityLog() {
           timestamp = new Date(latestLog.timestamp);
         }
         
-        lastUpdatedTime = timestamp;
-        document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
-        
-        const action = latestLog.Action || latestLog.action || "Unknown";
-        const actor = latestLog.Actor || latestLog.actor || "Unknown";
-        const details = latestLog.Details || latestLog.details || "";
-        
-        const detailsDiv = document.getElementById('lastUpdatedDetails');
-        detailsDiv.innerHTML = `
-          <div style="font-size: 11px; line-height: 1.4;">
-            <strong>Action:</strong> ${action}<br>
-            <strong>Actor:</strong> ${actor}<br>
-            <strong>Details:</strong> ${details}
-          </div>
-        `;
-        
-        // Also store in localStorage for next time
-        const activityEntry = {
-          action: action,
-          actor: actor,
-          details: details,
+        const activity = {
+          action: latestLog.Action || latestLog.action || "Unknown",
+          actor: latestLog.Actor || latestLog.actor || "Unknown",
+          details: latestLog.Details || latestLog.details || "",
           timestamp: timestamp.toISOString()
         };
         
+        updateActivityDisplay(activity);
+        
+        // Also store in localStorage for next time
         const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-        activityLog.push(activityEntry);
+        activityLog.push(activity);
         
         // Keep only last 10 activities
         if (activityLog.length > 10) {
@@ -1447,7 +1507,7 @@ async function loadActivityLog() {
         
         localStorage.setItem('activityLog', JSON.stringify(activityLog));
         
-        console.log("Latest activity loaded from API:", activityEntry);
+        console.log("Latest activity loaded from API:", activity);
       } else {
         showDefaultMessage();
       }
@@ -1466,59 +1526,103 @@ function showDefaultMessage() {
   document.getElementById('lastUpdatedDetails').innerText = 'No recent activity';
 }
 
-/* FIXED: Record user activity - Only record allowed actions */
-function recordUserActivity(action, details = '') {
-  try {
-    // Only record allowed actions
-    if (!ALLOWED_ACTIONS.includes(action)) {
-      return;
-    }
+/* FIXED: Update activity display immediately when actions occur */
+function updateActivityDisplay(activity) {
+    if (!activity) return;
     
-    const username = localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown User';
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date(activity.timestamp || Date.now());
+    lastUpdatedTime = timestamp;
     
-    const activity = {
-      action: action,
-      actor: username,
-      details: details,
-      timestamp: timestamp
-    };
-    
-    // Get existing log or create new one
-    const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-    
-    // Add new activity
-    activityLog.push(activity);
-    
-    // Keep only last 10 activities to prevent storage bloat
-    if (activityLog.length > 10) {
-      activityLog.splice(0, activityLog.length - 10);
-    }
-    
-    // Save to localStorage
-    localStorage.setItem('activityLog', JSON.stringify(activityLog));
-    
-    // Also log to Google Sheets via API
-    logActivityToAPI(username, action, details);
-    
-    // Update display immediately
-    lastUpdatedTime = new Date(timestamp);
-    document.getElementById('lastUpdated').innerText = formatTS(lastUpdatedTime);
+    document.getElementById('lastUpdated').innerText = formatTS(timestamp);
     
     const detailsDiv = document.getElementById('lastUpdatedDetails');
     detailsDiv.innerHTML = `
-      <div style="font-size: 11px; line-height: 1.4;">
-        <strong>Action:</strong> ${action}<br>
-        <strong>Actor:</strong> ${username}<br>
-        <strong>Details:</strong> ${details}
-      </div>
+        <div style="font-size: 11px; line-height: 1.4;">
+            <strong>Action:</strong> ${activity.action || 'Unknown'}<br>
+            <strong>Actor:</strong> ${activity.actor || 'Unknown'}<br>
+            <strong>Details:</strong> ${activity.details || 'No details'}
+        </div>
     `;
     
-    console.log(`Activity recorded: ${action} by ${username}`);
-    
-  } catch(err) {
-    console.error('Error recording activity:', err);
-  }
+    // Add visual feedback for recent update
+    const lastUpdatedCard = document.getElementById('lastUpdatedCard');
+    if (lastUpdatedCard) {
+        lastUpdatedCard.style.animation = 'none';
+        setTimeout(() => {
+            lastUpdatedCard.style.animation = 'pulse 1s';
+        }, 10);
+    }
+}
+
+/* ENHANCED: Record user activity with cross-tab communication */
+function recordUserActivity(action, details = '') {
+    try {
+        // Only record allowed actions
+        if (!ALLOWED_ACTIONS.includes(action)) {
+            return;
+        }
+        
+        const username = localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown User';
+        const timestamp = new Date().toISOString();
+        
+        const activity = {
+            action: action,
+            actor: username,
+            details: details,
+            timestamp: timestamp
+        };
+        
+        // Get existing log or create new one
+        const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+        
+        // Add new activity
+        activityLog.push(activity);
+        
+        // Keep only last 10 activities to prevent storage bloat
+        if (activityLog.length > 10) {
+            activityLog.splice(0, activityLog.length - 10);
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('activityLog', JSON.stringify(activityLog));
+        
+        // Also store as recent activity for immediate access
+        localStorage.setItem('recentActivity', JSON.stringify(activity));
+        
+        // Log to Google Sheets via API
+        logActivityToAPI(username, action, details);
+        
+        // Update display immediately
+        updateActivityDisplay(activity);
+        
+        // Broadcast to other tabs
+        broadcastActivityUpdate(activity);
+        
+        console.log(`Activity recorded: ${action} by ${username}`);
+        
+    } catch(err) {
+        console.error('Error recording activity:', err);
+    }
+}
+
+/* Broadcast activity to other tabs */
+function broadcastActivityUpdate(activity) {
+    try {
+        // Update localStorage to trigger storage event
+        localStorage.setItem('activityUpdateTrigger', Date.now().toString());
+        
+        // Also use BroadcastChannel if supported
+        if (typeof BroadcastChannel !== 'undefined') {
+            const channel = new BroadcastChannel('activity_updates');
+            channel.postMessage({
+                type: 'activityUpdate',
+                activity: activity
+            });
+            channel.close();
+        }
+    } catch(err) {
+        console.error('Error broadcasting activity:', err);
+    }
 }
 
 /* Helper function to log activity to Google Sheets API */
@@ -1567,42 +1671,62 @@ function setupActivityMonitoring() {
   }
 }
 
-/* Helper function for other pages to record activities */
-function recordActivityFromOtherPage(action, details) {
-  // Only record allowed actions
-  if (!ALLOWED_ACTIONS.includes(action)) {
-    return;
-  }
-  
-  // Store in sessionStorage for the dashboard to pick up
-  sessionStorage.setItem('pendingActivity', JSON.stringify({
-    action: action,
-    details: details
-  }));
-  
-  // Also update localStorage directly for immediate update if dashboard is open
-  try {
-    const username = localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown User';
-    const timestamp = new Date().toISOString();
+/* ENHANCED: Real-time activity monitoring and display */
+function setupRealTimeActivityUpdates() {
+    // Listen for storage events (when other tabs update activity)
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'activityLog' || e.key === 'recentActivity' || e.key === 'activityUpdateTrigger') {
+            console.log('Activity updated from another tab, refreshing...');
+            loadActivityLog();
+            
+            // Also refresh dashboard data
+            loadDashboard(false);
+        }
+    });
     
-    const activity = {
-      action: action,
-      actor: username,
-      details: details,
-      timestamp: timestamp
-    };
+    // Listen for messages from other pages
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'activityUpdate') {
+            console.log('Activity message received:', event.data);
+            loadActivityLog();
+        }
+    });
     
-    const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-    activityLog.push(activity);
-    
-    if (activityLog.length > 50) {
-      activityLog.splice(0, activityLog.length - 50);
+    // Poll for recent activity every 5 seconds
+    setInterval(() => {
+        loadActivityLog();
+    }, 5000);
+}
+
+/* ENHANCED: Reload dashboard when dashboard tab is clicked */
+function setupDashboardTabReload() {
+    const dashboardTab = document.querySelector('a[href="dashboard.html"]');
+    if (dashboardTab) {
+        // Remove existing click handler if any
+        const newTab = dashboardTab.cloneNode(true);
+        dashboardTab.parentNode.replaceChild(newTab, dashboardTab);
+        
+        newTab.addEventListener('click', function(e) {
+            // Only intercept if we're already on dashboard
+            if (window.location.pathname.includes('dashboard.html')) {
+                e.preventDefault();
+                
+                // Clear cache and force fresh load
+                localStorage.removeItem('dashboardDataCache');
+                
+                // Show loading indicator
+                showLoading(true);
+                
+                // Load fresh data
+                loadDashboard(true).then(() => {
+                    showLoading(false);
+                    
+                    // Also update activity log
+                    loadActivityLog();
+                });
+            }
+        });
     }
-    
-    localStorage.setItem('activityLog', JSON.stringify(activityLog));
-  } catch(err) {
-    console.error('Error recording activity from other page:', err);
-  }
 }
 
 /* NEW: Load cached dashboard data - Shows instantly without loading screen */
@@ -2811,38 +2935,52 @@ function notifyDataUpdated(action = 'Data Updated', details = 'Dashboard data re
   localStorage.setItem('dashboardDataCache', JSON.stringify({})); // Clear cache to force refresh
 }
 
-/* INITIALIZATION - UPDATED */
+/* ENHANCED INITIALIZATION */
 window.addEventListener('DOMContentLoaded', async () => {
-  // First check session with server validation
-  const isAuthenticated = await sessionCheck();
-  
-  if (!isAuthenticated) {
-    return; // Already redirected
-  }
-  
-  // Setup auto-logout for inactivity
-  setupAutoLogout();
-  
-  // Initialize activity monitoring
-  setupActivityMonitoring();
-  loadActivityLog();
-  
-  // STEP 1: Load cached dashboard data IMMEDIATELY (no loading screen)
-  const hasCache = loadCachedDashboardData();
-  
-  // STEP 2: Load fresh data from server in background
-  // Only show loading if there's NO cache (first visit)
-  loadDashboard(!hasCache);
-  
-  // Auto-refresh dashboard data every 30 seconds (no loading screen)
-  if (refreshInterval) clearInterval(refreshInterval);
-  refreshInterval = setInterval(() => loadDashboard(false), 30000);
-  
-  // Check screen width and adjust sidebar
-  if (window.innerWidth <= 768) {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.remove('mobile-open');
-  }
+    console.log("Dashboard initializing...");
+    
+    // First check session with enhanced validation
+    const isAuthenticated = await safeSessionCheck();
+    
+    if (!isAuthenticated) {
+        console.log("Not authenticated, redirecting...");
+        return;
+    }
+    
+    console.log("Authenticated, setting up dashboard...");
+    
+    // Setup auto-logout for inactivity
+    setupAutoLogout();
+    
+    // Initialize activity monitoring with real-time updates
+    setupActivityMonitoring();
+    setupRealTimeActivityUpdates();
+    loadActivityLog();
+    
+    // Setup dashboard tab reload functionality
+    setupDashboardTabReload();
+    
+    // STEP 1: Load cached dashboard data IMMEDIATELY (no loading screen)
+    const hasCache = loadCachedDashboardData();
+    
+    // STEP 2: Load fresh data from server in background
+    // Only show loading if there's NO cache (first visit)
+    loadDashboard(!hasCache);
+    
+    // Auto-refresh dashboard data every 30 seconds (no loading screen)
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(() => {
+        console.log("Auto-refreshing dashboard data...");
+        loadDashboard(false);
+    }, 30000);
+    
+    // Check screen width and adjust sidebar
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.remove('mobile-open');
+    }
+    
+    console.log("Dashboard initialization complete");
 });
 
 /* SIDEBAR FUNCTIONS */
