@@ -3,16 +3,13 @@
 // API URL for logging - ADD THIS AT THE TOP
 const ACTIVITY_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 
-// Don't declare ALLOWED_ACTIONS here, just use a reference
-let ACTIVITY_ALLOWED_ACTIONS = null;
-
 /* Main function to record user activity - COMPATIBLE WITH DASHBOARD */
 function recordUserActivity(action, details = '') {
     try {
         console.log(`Attempting to record activity: ${action}, Details: ${details}`);
         
         // Get ALLOWED_ACTIONS from window or use default
-        const allowedActions = window.ALLOWED_ACTIONS || ACTIVITY_ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
+        const allowedActions = window.ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
         
         // Only record allowed actions (for dashboard display)
         if (!allowedActions.includes(action)) {
@@ -249,7 +246,7 @@ function setupActivityCommunication() {
             console.log('postMessage activity received:', event.data);
             
             // Get allowed actions from window or use default
-            const allowedActions = window.ALLOWED_ACTIONS || ACTIVITY_ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
+            const allowedActions = window.ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
             
             if (allowedActions.includes(event.data.activity.action) && 
                 window.location.pathname.includes('dashboard.html')) {
@@ -325,7 +322,7 @@ function initializeActivityTracking() {
             console.log('Processing pending activity:', activity);
             
             // Get allowed actions from window or use default
-            const allowedActions = window.ALLOWED_ACTIONS || ACTIVITY_ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
+            const allowedActions = window.ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
             
             if (allowedActions.includes(activity.action)) {
                 recordUserActivity(activity.action, activity.details);
