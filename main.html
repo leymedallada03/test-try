@@ -22,6 +22,22 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+   .logo-circle {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+.logo-circle img {
+    width: 90px;
+    height: 90px;
+}
    
    body {
     background-color: var(--bg);
@@ -207,17 +223,16 @@
     overflow: hidden;
    }
 
-   /* Content Area */
+   /* Content Area - Removed scroll */
    .content-area{
     background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
     border-radius:var(--radius);
     padding:30px;
     box-shadow:0 8px 22px rgba(10,20,16,0.06);
     min-height:72vh;
-    height: calc(100vh - 120px);
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
+    overflow: visible;
    }
 
    /* Welcome Content */
@@ -226,18 +241,43 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
-    padding: 40px 20px;
    }
 
-   .welcome-icon {
-    font-size: 4rem;
-    color: var(--accent1);
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+   /* Centered Logo Container */
+   .logo-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: float 3s ease-in-out infinite;
+   }
+
+   .logo-header img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 4px solid rgba(15, 122, 74, 0.15);
+    box-shadow: 0 10px 25px rgba(15, 122, 74, 0.2);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    padding: 15px;
+    transition: all 0.3s ease;
+   }
+
+   .logo-header img:hover {
+    transform: scale(1.05);
+    border-color: rgba(15, 122, 74, 0.3);
+    box-shadow: 0 15px 35px rgba(15, 122, 74, 0.3);
+   }
+
+   /* Floating animation */
+   @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
    }
 
    .welcome-content h2 {
@@ -248,11 +288,11 @@
    }
 
    .welcome-content p {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--muted);
-    max-width: 600px;
     line-height: 1.6;
     margin-bottom: 30px;
+    margin-top: 0px
    }
 
    /* Module Cards */
@@ -260,7 +300,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-top: 30px;
     width: 100%;
     max-width: 800px;
    }
@@ -383,16 +422,26 @@
     
     .content-area {
         height: auto;
-        min-height: calc(100vh - 140px);
+        min-height: auto;
         padding: 20px;
     }
     
-    .welcome-content {
-        padding: 20px 0;
+    .logo-header img {
+        width: 140px;
+        height: 140px;
     }
     
     .welcome-content h2 {
         font-size: 1.8rem;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
     }
     
     .module-grid {
@@ -430,6 +479,11 @@
     
     .content-area {
         padding: 25px;
+    }
+    
+    .logo-header img {
+        width: 160px;
+        height: 160px;
     }
     
     .module-grid {
@@ -512,11 +566,13 @@
 
   <main class="content-area">
     <div class="welcome-content">
-      <div class="welcome-icon">
-        <i class="fas fa-home"></i>
+      <!-- Centered Logo Above Content -->
+      <div class="logo-header">
+        <img src="assets/MDRRMO Logo.png" alt="MDRRMO Logo"/>
       </div>
-      <h2>Welcome to Purok Kaligtasan</h2>
-      <p>Disaster Risk Reduction & Management System of Alitagtag. Select a module below to manage household data, view analytics, or access administrative functions.</p>
+      
+      <h2>Welcome to PUROK KALIGTASAN</h2>
+      <p>Disaster Risk Reduction & Management System of Alitagtag Household Records System. Select a module below to manage household data, view analytics, or access administrative functions.</p>
       
       <div class="module-grid">
         <a href="dashboard.html" class="module-card">
@@ -691,4 +747,3 @@ window.addEventListener('pageshow', function(event) {
 </script>
 </body>
 </html>
-
