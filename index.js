@@ -540,7 +540,7 @@ async function handleForceLogout(username, password) {
                     // Login successful
                     storeSessionData(loginResponse.user, pwHash, loginResponse.sessionId);
                     startSessionManagement(username, loginResponse.sessionId);
-                    window.location.replace("dashboard.html");
+                    window.location.replace("main.html");
                 } else {
                     showError("Login failed after force logout: " + loginResponse.message);
                     if (loginBtn) {
