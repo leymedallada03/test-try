@@ -28,6 +28,23 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+   .admin-only {
+    display: none !important;
+}
+
+/* Class to show admin elements - applied by JavaScript */
+.admin-only.admin-visible {
+    display: block !important;
+}
+
+/* For list items */
+li.admin-only {
+    display: none !important;
+}
+
+li.admin-only.admin-visible {
+    display: list-item !important;
+}
    
    /* EDIT PANEL STYLES FROM RECORDS.HTML */
    .member-panel {
@@ -3746,5 +3763,6 @@ function handleLogout() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
