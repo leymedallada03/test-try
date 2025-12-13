@@ -1183,6 +1183,93 @@ async function validateSession() {
     }
 }
 
+/* FIXED: Auto-load dashboard when dashboard tab is clicked */
+function setupDashboardAutoLoad() {
+    // Get all dashboard tab links
+    const dashboardLinks = document.querySelectorAll('a[href*="dashboard.html"]');
+    
+    dashboardLinks.forEach(link => {
+        // Remove any existing click handlers
+        const newLink = link.cloneNode(true);
+        link.parentNode.replaceChild(newLink, link);
+        
+        newLink.addEventListener('click', function(e) {
+            // If we're already on dashboard.html, reload data
+            if (window.location.pathname.includes('dashboard.html')) {
+                e.preventDefault();
+                
+                console.log("🔄 Dashboard tab clicked, refreshing data...");
+                
+                // Clear cache for fresh data
+                localStorage.removeItem('dashboardDataCache');
+                
+                // Show subtle loading indicator instead of full screen loader
+                const refreshIndicator = document.getElementById('refreshIndicator');
+                if (refreshIndicator) {
+                    refreshIndicator.style.display = 'block';
+                    refreshIndicator.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
+                    setTimeout(() => {
+                        refreshIndicator.style.display = 'none';
+                    }, 2000);
+                }
+                
+                // Load fresh data in background
+                loadDashboard(false).then(() => {
+                    // Also update activity log
+                    loadActivityLog();
+                    
+                    // Update last refresh time
+                    const now = new Date();
+                    document.getElementById('lastUpdated').innerText = formatTS(now);
+                    document.getElementById('lastUpdatedDetails').innerText = 'Dashboard data refreshed';
+                    
+                    console.log("✅ Dashboard data refreshed");
+                });
+            }
+        });
+    });
+    
+    // Add a refresh indicator to the dashboard page
+    if (!document.getElementById('refreshIndicator')) {
+        const indicator = document.createElement('div');
+        indicator.id = 'refreshIndicator';
+        indicator.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        `;
+        document.body.appendChild(indicator);
+    }
+}
+    
+    // Add a refresh indicator to the dashboard page
+    if (!document.getElementById('refreshIndicator')) {
+        const indicator = document.createElement('div');
+        indicator.id = 'refreshIndicator';
+        indicator.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        `;
+        document.body.appendChild(indicator);
+    }
+
 // Start session monitoring
 function startSessionMonitoring() {
     // Clear any existing interval
@@ -1190,25 +1277,38 @@ function startSessionMonitoring() {
         clearInterval(sessionMonitorInterval);
     }
     
-    // Check session every 10 seconds
+    // Check session every 30 seconds (increased from 10 to prevent spamming)
     sessionMonitorInterval = setInterval(async () => {
-        const isValid = await validateSession();
-        if (!isValid) {
-            // Session invalidated
-            stopSessionMonitoring();
-            alert("Your session has been terminated from another device. You have been logged out.");
-            enhancedLogout();
+        // Use sessionManager for better error handling
+        if (window.sessionManager && typeof window.sessionManager.validateSession === 'function') {
+            try {
+                const isValid = await window.sessionManager.validateSession();
+                if (!isValid) {
+                    // Session invalidated
+                    stopSessionMonitoring();
+                    // Use session manager's method instead of alert
+                    window.sessionManager.showSessionExpiredMessage();
+                    return;
+                }
+            } catch (error) {
+                console.log("Session monitoring error:", error);
+                // Don't logout on error, just continue
+            }
         }
-    }, 10000); // Check every 10 seconds
+    }, 30000); // Check every 30 seconds
     
     // Also check when page becomes visible
     document.addEventListener("visibilitychange", async () => {
-        if (!document.hidden) {
-            await validateSession();
+        if (!document.hidden && window.sessionManager) {
+            try {
+                await window.sessionManager.validateSession();
+            } catch (error) {
+                console.log("Visibility change validation error:", error);
+            }
         }
     });
     
-    console.log("Session monitoring started");
+    console.log("Session monitoring started (30s interval)");
 }
 
 // Stop session monitoring
@@ -1232,7 +1332,23 @@ async function enhancedSessionCheck() {
                             performance.getEntriesByType("navigation")[0]?.type === "reload";
         
         if (isPageRefresh) {
-            console.log("Page refresh detected, using cached session");
+            console.log("📱 Page refresh detected, using session manager validation");
+            
+            // Use sessionManager.validateSession() instead of validateSession()
+            // It has better error handling and no-cors mode
+            if (window.sessionManager && typeof window.sessionManager.validateSession === 'function') {
+                try {
+                    const isValid = await window.sessionManager.validateSession();
+                    if (!isValid) {
+                        console.log("Session invalidated during refresh");
+                        window.location.href = 'index.html?session=expired';
+                        return false;
+                    }
+                } catch (error) {
+                    console.log("Session validation error on refresh, continuing with local state:", error);
+                    // Continue with local state on error
+                }
+            }
             
             // Try to restore session from localStorage if sessionStorage was cleared
             if (!sessionId && localStorage.getItem("lastSessionId")) {
@@ -1253,32 +1369,21 @@ async function enhancedSessionCheck() {
             return false;
         }
         
-        // Validate with server (with timeout to prevent hanging on refresh)
-        try {
-            const isValid = await Promise.race([
-                validateSession(),
-                new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Timeout')), 5000)
-                )
-            ]);
-            
+        // For non-refresh loads, use the session manager
+        if (!isPageRefresh && window.sessionManager) {
+            const isValid = await window.sessionManager.validateSession();
             if (!isValid) {
                 console.log("Session invalidated by server");
-                sessionStorage.removeItem('authenticated');
-                localStorage.removeItem('loggedIn');
                 window.location.href = 'index.html?session=invalid';
                 return false;
             }
-        } catch (error) {
-            console.log("Session validation timeout/error during refresh, using cached state:", error);
-            // Allow continuation with cached state on refresh timeout
         }
         
         // Session is valid, set up UI
         document.getElementById('userName').innerText = userName;
         
         // Check admin status
-        const isAdmin = localStorage.getItem("userRole") === "admin";
+        const isAdmin = localStorage.getItem("userRole") === "Admin";
         const adminItems = document.querySelectorAll(".admin-only");
         adminItems.forEach(item => {
             item.style.display = isAdmin ? "block" : "none";
@@ -1292,7 +1397,7 @@ async function enhancedSessionCheck() {
             startSessionMonitoring();
         } else {
             // For refresh, start monitoring after a delay
-            setTimeout(() => startSessionMonitoring(), 3000);
+            setTimeout(() => startSessionMonitoring(), 5000);
         }
         
         return true;
@@ -2956,8 +3061,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     setupRealTimeActivityUpdates();
     loadActivityLog();
     
-    // Setup dashboard tab reload functionality
-    setupDashboardTabReload();
+    // Setup dashboard auto-load functionality when dashboard tab is clicked
+    setupDashboardAutoLoad();
     
     // STEP 1: Load cached dashboard data IMMEDIATELY (no loading screen)
     const hasCache = loadCachedDashboardData();
@@ -3082,6 +3187,5 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
 
 
