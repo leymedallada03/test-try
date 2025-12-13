@@ -654,23 +654,27 @@ function storeSessionData(user, pwHash, sessionId) {
     localStorage.clear();
     sessionStorage.clear();
     
-    // Store in sessionStorage (cleared on browser close)
+    // Store in sessionStorage
     sessionStorage.setItem('sessionId', sessionId);
     sessionStorage.setItem('sessionExpiry', (Date.now() + SESSION_TIMEOUT).toString());
     sessionStorage.setItem('authenticated', 'true');
     
-    // Store in localStorage (persists)
+    // NORMALIZE ROLE - ensure consistent case
+    const normalizedRole = user.Role ? user.Role.trim() : 'Staff';
+    
+    // Store in localStorage
     localStorage.setItem('loggedIn', 'true');
     localStorage.setItem('username', user.Username);
     localStorage.setItem('staffName', user.FullName);
-    localStorage.setItem('userRole', user.Role);
-    localStorage.setItem('role', user.Role);
+    localStorage.setItem('userRole', normalizedRole);
+    localStorage.setItem('role', normalizedRole);
     localStorage.setItem('assignedBarangay', user.AssignedBarangay || '');
     localStorage.setItem('pwHash', pwHash);
     localStorage.setItem('loginTime', Date.now().toString());
+    localStorage.setItem('lastActivity', Date.now().toString());
     localStorage.setItem('deviceInfo', JSON.stringify(getDeviceInfo()));
 
-    console.log("Session data stored successfully. Session ID:", sessionId);
+    console.log("Session data stored. Role:", normalizedRole, "Full Name:", user.FullName);
 }
 
 // --------------------------
