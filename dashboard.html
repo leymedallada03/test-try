@@ -10,6 +10,23 @@
 <title>Purok Kaligtasan — Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+.admin-only {
+    display: none !important;
+}
+
+/* Class to show admin elements - applied by JavaScript */
+.admin-only.admin-visible {
+    display: block !important;
+}
+
+/* For list items */
+li.admin-only {
+    display: none !important;
+}
+
+li.admin-only.admin-visible {
+    display: list-item !important;
+}
    :root{
     --bg:#f6f8f7;
     --card-bg:#fff;
@@ -3247,6 +3264,7 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
 
