@@ -2699,21 +2699,118 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
 
-window.addEventListener('storage', function(e) {
-  if (e.key === 'activityLog') {
-    console.log('Activity log updated from another tab');
-    loadActivityLog();
-  }
+/* Setup activity tracking for records/data entry pages */
+function setupActivityTrackingForPages() {
+    console.log('Setting up activity tracking for this page');
+    
+    // Listen for storage events (from other tabs/pages)
+    window.addEventListener('storage', function(e) {
+        console.log('Storage event detected on records page:', e.key);
+        
+        // Check if this is an activity-related update
+        if (e.key === 'activityLog' || e.key === 'recentActivity' || 
+            e.key === 'activityUpdateTrigger' || e.key?.startsWith('activityUpdate_')) {
+            
+            console.log('Activity update detected from another tab');
+            
+            // If we need to sync something on this page, do it here
+            // For example, refresh data if needed
+            if (e.key === 'activityUpdateTrigger' && typeof loadRecords === 'function') {
+                console.log('Refreshing records due to activity update');
+                setTimeout(() => {
+                    if (typeof loadRecords === 'function') {
+                        loadRecords();
+                    }
+                }, 1000);
+            }
+        }
+    });
+    
+    // Listen for BroadcastChannel messages if supported
+    if (typeof BroadcastChannel !== 'undefined') {
+        try {
+            const channel = new BroadcastChannel('dashboard_activities');
+            channel.onmessage = function(event) {
+                console.log('BroadcastChannel message received on records page:', event.data);
+                // Handle messages if needed
+            };
+        } catch(err) {
+            console.log('BroadcastChannel setup failed on records page:', err);
+        }
+    }
+    
+    // Listen for postMessage
+    window.addEventListener('message', function(event) {
+        // Check origin for security
+        // if (event.origin !== window.location.origin) return;
+        
+        if (event.data && event.data.type === 'activity') {
+            console.log('Activity message received on records page:', event.data);
+            // Handle if needed
+        }
+    });
+}
+
+/* Function to record activity when actions happen on this page */
+function recordPageActivity(action, details = '') {
+    console.log(`Recording page activity: ${action}`);
+    
+    // Use the function from activity-tracking-final.js
+    if (typeof recordActivityFromOtherPage === 'function') {
+        recordActivityFromOtherPage(action, details);
+    } else if (typeof window.recordActivityFromOtherPage === 'function') {
+        window.recordActivityFromOtherPage(action, details);
+    } else if (typeof recordUserActivity === 'function') {
+        recordUserActivity(action, details);
+    } else if (typeof window.recordUserActivity === 'function') {
+        window.recordUserActivity(action, details);
+    } else {
+        console.warn('No activity recording function available');
+        // Fallback: direct localStorage update
+        try {
+            const username = localStorage.getItem('staffName') || localStorage.getItem('username') || 'Unknown User';
+            const timestamp = new Date().toISOString();
+            
+            const activity = {
+                action: action,
+                actor: username,
+                details: details,
+                timestamp: timestamp
+            };
+            
+            const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+            activityLog.push(activity);
+            
+            if (activityLog.length > 20) {
+                activityLog.splice(0, activityLog.length - 20);
+            }
+            
+            localStorage.setItem('activityLog', JSON.stringify(activityLog));
+            localStorage.setItem('recentActivity', JSON.stringify(activity));
+            localStorage.setItem('activityUpdateTrigger', Date.now().toString());
+            
+            console.log('Activity recorded via fallback method');
+        } catch(err) {
+            console.error('Fallback activity recording failed:', err);
+        }
+    }
+}
+
+/* Initialize activity tracking when page loads */
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a moment for other scripts to load
+    setTimeout(() => {
+        setupActivityTrackingForPages();
+    }, 500);
 });
 
-/* Listen for messages from other pages */
-window.addEventListener('message', function(event) {
-  if (event.data && event.data.type === 'activity') {
-    const activity = event.data;
-    if (ALLOWED_ACTIONS.includes(activity.action)) {
-      recordUserActivity(activity.action, activity.details);
+// Also initialize when page becomes visible
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        setTimeout(() => {
+            setupActivityTrackingForPages();
+        }, 100);
     }
-  }
 });
 /* ============ STATE ============ */
 let header = [];
@@ -4944,4 +5041,5 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
