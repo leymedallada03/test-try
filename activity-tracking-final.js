@@ -1,7 +1,10 @@
 // activity-tracking-final.js - Enhanced for real-time dashboard updates
 
-// Define allowed actions for dashboard display
-const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
+// Check if ALLOWED_ACTIONS is already defined (from dashboard.html)
+if (typeof ALLOWED_ACTIONS === 'undefined') {
+    // Define allowed actions for dashboard display
+    var ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
+}
 
 // API URL for logging
 const ACTIVITY_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
@@ -12,7 +15,7 @@ function recordUserActivity(action, details = '') {
         console.log(`Attempting to record activity: ${action}, Details: ${details}`);
         
         // Only record allowed actions (for dashboard display)
-        if (!ALLOWED_ACTIONS.includes(action)) {
+        if (ALLOWED_ACTIONS && !ALLOWED_ACTIONS.includes(action)) {
             console.log(`Skipping activity recording for: ${action} (not in allowed actions)`);
             // Still log to API but don't update dashboard
             logActivityToAPIOnly(action, details);
@@ -244,7 +247,7 @@ function setupActivityCommunication() {
         
         if (event.data && event.data.type === 'activity') {
             console.log('postMessage activity received:', event.data);
-            if (ALLOWED_ACTIONS.includes(event.data.activity.action) && 
+            if (ALLOWED_ACTIONS && ALLOWED_ACTIONS.includes(event.data.activity.action) && 
                 window.location.pathname.includes('dashboard.html')) {
                 
                 if (window.recordUserActivity) {
@@ -317,7 +320,7 @@ function initializeActivityTracking() {
             const activity = JSON.parse(pendingActivity);
             console.log('Processing pending activity:', activity);
             
-            if (ALLOWED_ACTIONS.includes(activity.action)) {
+            if (ALLOWED_ACTIONS && ALLOWED_ACTIONS.includes(activity.action)) {
                 recordUserActivity(activity.action, activity.details);
             }
             
