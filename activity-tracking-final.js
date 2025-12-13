@@ -1,3 +1,9 @@
+// activity-tracking-final.js - Fixed version
+
+// API URL for logging - ADD THIS AT THE TOP
+const ACTIVITY_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+
+// Don't declare ALLOWED_ACTIONS here, just use a reference
 let ACTIVITY_ALLOWED_ACTIONS = null;
 
 /* Main function to record user activity - COMPATIBLE WITH DASHBOARD */
@@ -234,14 +240,18 @@ function setupActivityCommunication() {
         }
     }
     
-    // Listen for window.postMessage
+    // Listen for window.postMessage - FIXED THIS SECTION
     window.addEventListener('message', function(event) {
         // Check origin for security (adjust as needed)
         // if (event.origin !== 'https://your-domain.com') return;
         
         if (event.data && event.data.type === 'activity') {
             console.log('postMessage activity received:', event.data);
-            if (ALLOWED_ACTIONS && ALLOWED_ACTIONS.includes(event.data.activity.action) && 
+            
+            // Get allowed actions from window or use default
+            const allowedActions = window.ALLOWED_ACTIONS || ACTIVITY_ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
+            
+            if (allowedActions.includes(event.data.activity.action) && 
                 window.location.pathname.includes('dashboard.html')) {
                 
                 if (window.recordUserActivity) {
@@ -314,7 +324,10 @@ function initializeActivityTracking() {
             const activity = JSON.parse(pendingActivity);
             console.log('Processing pending activity:', activity);
             
-            if (ALLOWED_ACTIONS && ALLOWED_ACTIONS.includes(activity.action)) {
+            // Get allowed actions from window or use default
+            const allowedActions = window.ALLOWED_ACTIONS || ACTIVITY_ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
+            
+            if (allowedActions.includes(activity.action)) {
                 recordUserActivity(activity.action, activity.details);
             }
             
