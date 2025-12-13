@@ -2,28 +2,34 @@
 
 /* FIXED: Ensure user role is properly set before UI updates */
 function ensureUserRole() {
-    // Get user role with fallback
-    let role = localStorage.getItem('userRole');
-    
-    // If role is not set, try to get it from session manager
-    if (!role && window.sessionManager && window.sessionManager.getSessionInfo) {
-        const sessionInfo = window.sessionManager.getSessionInfo();
-        role = sessionInfo.role;
-        if (role) {
+    try {
+        // Get user role with fallback
+        let role = localStorage.getItem('userRole');
+        
+        // If role is not set, try to get it from session manager
+        if (!role && window.sessionManager && window.sessionManager.getSessionInfo) {
+            const sessionInfo = window.sessionManager.getSessionInfo();
+            role = sessionInfo.role;
+            if (role) {
+                localStorage.setItem('userRole', role);
+            }
+        }
+        
+        // If still no role, default to 'Staff'
+        if (!role || role === 'null' || role === 'undefined') {
+            role = 'Staff';
             localStorage.setItem('userRole', role);
         }
+        
+        console.log("Common Utils: User role ensured:", role);
+        return role;
+    } catch (error) {
+        console.error("Error ensuring user role:", error);
+        const defaultRole = 'Staff';
+        localStorage.setItem('userRole', defaultRole);
+        return defaultRole;
     }
-    
-    // If still no role, default to 'Staff'
-    if (!role) {
-        role = 'Staff';
-        localStorage.setItem('userRole', role);
-    }
-    
-    console.log("User role ensured:", role);
-    return role;
 }
-
 /* Common UI update for admin status - uses CSS classes to prevent flash */
 function updateAdminUI() {
     const role = localStorage.getItem('userRole') || 'Staff';
