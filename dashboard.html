@@ -26,6 +26,9 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+   .admin-only {
+    display: none !important;
+}
    body {
     background-color: var(--bg);
     margin: 0;
@@ -1200,18 +1203,33 @@ function setupDashboardAutoLoad() {
                 
                 console.log("🔄 Dashboard tab clicked, refreshing data...");
                 
+                // Create or show refresh indicator
+                let refreshIndicator = document.getElementById('refreshIndicator');
+                if (!refreshIndicator) {
+                    refreshIndicator = document.createElement('div');
+                    refreshIndicator.id = 'refreshIndicator';
+                    refreshIndicator.style.cssText = `
+                        position: fixed;
+                        top: 70px;
+                        right: 20px;
+                        background: #10b981;
+                        color: white;
+                        padding: 8px 15px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        display: none;
+                        z-index: 1000;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    `;
+                    document.body.appendChild(refreshIndicator);
+                }
+                
+                // Show refresh indicator
+                refreshIndicator.style.display = 'block';
+                refreshIndicator.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
+                
                 // Clear cache for fresh data
                 localStorage.removeItem('dashboardDataCache');
-                
-                // Show subtle loading indicator instead of full screen loader
-                const refreshIndicator = document.getElementById('refreshIndicator');
-                if (refreshIndicator) {
-                    refreshIndicator.style.display = 'block';
-                    refreshIndicator.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
-                    setTimeout(() => {
-                        refreshIndicator.style.display = 'none';
-                    }, 2000);
-                }
                 
                 // Load fresh data in background
                 loadDashboard(false).then(() => {
@@ -1220,14 +1238,38 @@ function setupDashboardAutoLoad() {
                     
                     // Update last refresh time
                     const now = new Date();
-                    document.getElementById('lastUpdated').innerText = formatTS(now);
-                    document.getElementById('lastUpdatedDetails').innerText = 'Dashboard data refreshed';
+                    const lastUpdatedElement = document.getElementById('lastUpdated');
+                    const lastUpdatedDetailsElement = document.getElementById('lastUpdatedDetails');
+                    
+                    if (lastUpdatedElement) {
+                        lastUpdatedElement.innerText = formatTS(now);
+                    }
+                    
+                    if (lastUpdatedDetailsElement) {
+                        lastUpdatedDetailsElement.innerText = 'Dashboard data refreshed';
+                    }
+                    
+                    // Hide indicator after success
+                    setTimeout(() => {
+                        refreshIndicator.style.display = 'none';
+                        refreshIndicator.innerHTML = '<i class="fas fa-check"></i> Updated!';
+                        setTimeout(() => {
+                            refreshIndicator.style.display = 'none';
+                        }, 1500);
+                    }, 1000);
                     
                     console.log("✅ Dashboard data refreshed");
+                }).catch(error => {
+                    console.error("Error refreshing dashboard:", error);
+                    refreshIndicator.innerHTML = '<i class="fas fa-exclamation-circle"></i> Update failed';
+                    setTimeout(() => {
+                        refreshIndicator.style.display = 'none';
+                    }, 2000);
                 });
             }
         });
     });
+}
     
     // Add a refresh indicator to the dashboard page
     if (!document.getElementById('refreshIndicator')) {
@@ -1248,7 +1290,6 @@ function setupDashboardAutoLoad() {
         `;
         document.body.appendChild(indicator);
     }
-}
     
     // Add a refresh indicator to the dashboard page
     if (!document.getElementById('refreshIndicator')) {
@@ -1382,12 +1423,30 @@ async function enhancedSessionCheck() {
         // Session is valid, set up UI
         document.getElementById('userName').innerText = userName;
         
-        // Check admin status
-        const isAdmin = localStorage.getItem("userRole") === "Admin";
-        const adminItems = document.querySelectorAll(".admin-only");
-        adminItems.forEach(item => {
-            item.style.display = isAdmin ? "block" : "none";
-        });
+        // FIXED: Check admin status with case-insensitive comparison
+        const userRole = localStorage.getItem("userRole") || "Staff";
+        const isAdmin = userRole.toLowerCase() === "admin";
+        
+        console.log("Dashboard: User role is", userRole, "Admin?", isAdmin);
+        
+        // Hide admin-only elements if not admin
+        if (!isAdmin) {
+            // Hide immediately to prevent flash
+            document.querySelectorAll('.admin-only').forEach(item => {
+                item.style.display = 'none';
+            });
+            
+            // Also hide any parent list items
+            const adminMenuItems = document.querySelectorAll('li.admin-only');
+            adminMenuItems.forEach(li => {
+                li.style.display = 'none';
+            });
+        } else {
+            // Show admin elements
+            document.querySelectorAll('.admin-only').forEach(item => {
+                item.style.display = '';
+            });
+        }
         
         // Set session flag
         sessionStorage.setItem('authenticated', 'true');
@@ -3043,6 +3102,9 @@ function notifyDataUpdated(action = 'Data Updated', details = 'Dashboard data re
 window.addEventListener('DOMContentLoaded', async () => {
     console.log("Dashboard initializing...");
     
+    // Ensure user role is set BEFORE session check
+    ensureUserRole();
+    
     // First check session with enhanced validation
     const isAuthenticated = await safeSessionCheck();
     
@@ -3182,6 +3244,7 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 </script>
+<script src="common-utils.js"></script>
 <script src="session-manager.js"></script>
 <script src="common-session.js"></script>
 <script src="activity-tracking-final.js"></script>
