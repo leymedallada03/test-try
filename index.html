@@ -175,7 +175,7 @@ width: 90px;
         .form-subtitle {
             color: var(--text-light);
             font-size: 0.85rem; /* Reduced from 0.95rem */
-            margin-bottom: 20px; /* Reduced from 28px */
+            margin-bottom: 9px; /* Reduced from 28px */
         }
 
         /* Form styling - compact */
@@ -521,7 +521,7 @@ width: 90px;
             <div class="badge">SECURE LOGIN</div>
             <div class="logo-container">
                 <div class="logo-circle">
-                    <img src="assets/MDRRMO Logo.png" alt="MDRRMO Logo">
+                    <img src="assets/MDRRMO-Logo.png" alt="MDRRMO Logo">
                 </div>
                 <h1 class="header-title">PUROK KALIGTASAN</h1>
                 <p class="header-subtitle">MDRRMO Alitagtag Household Records System</p>
@@ -597,7 +597,7 @@ width: 90px;
         <!-- Offline detection script -->
     <script>
 
-        document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const loggedIn = localStorage.getItem('loggedIn');
     const loginTime = localStorage.getItem('loginTime');
     const sessionId = sessionStorage.getItem('sessionId');
@@ -608,7 +608,16 @@ width: 90px;
         const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
         
         if (sessionAge < SESSION_TIMEOUT) {
-            // Redirect to dashboard if already logged in
+            // FIRST ensure user role is properly set
+            const userRole = localStorage.getItem('userRole');
+            if (!userRole || userRole === 'null' || userRole === 'undefined') {
+                // Clear and force fresh login
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log("User role not found, requiring fresh login");
+                return;
+            }
+            
             console.log("Already logged in, redirecting to dashboard...");
             window.location.href = 'dashboard.html';
         } else {
@@ -638,7 +647,3 @@ width: 90px;
     </script>
 </body>
 </html>
-
-
-
-
