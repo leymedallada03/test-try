@@ -270,9 +270,9 @@ async function checkSessionWithServer(username, sessionId) {
                 }
             }
             
-            // Session is still valid, redirect to dashboard
-            console.log("Valid session found, redirecting...");
-            window.location.href = "dashboard.html";
+// Session is still valid, redirect to main page
+console.log("Valid session found, redirecting...");
+window.location.href = "main.html";
         } else {
             // Session invalid, clear storage
             clearSessionData();
@@ -387,11 +387,11 @@ async function handleLogin(event) {
         // Start session management
         startSessionManagement(response.user.Username, response.sessionId);
         
-        // Redirect to dashboard
-        console.log("Redirecting to dashboard.html...");
-        setTimeout(() => {
-            window.location.replace("dashboard.html");
-        }, 1000);
+        // Redirect to main page
+console.log("Redirecting to main.html...");
+setTimeout(() => {
+    window.location.replace("main.html");
+}, 1000);
 
     } catch (err) {
         console.error("FETCH ERROR:", err);
