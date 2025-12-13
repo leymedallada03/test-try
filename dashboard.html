@@ -1129,10 +1129,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
- if (typeof ALLOWED_ACTIONS === 'undefined') {
-    // Define allowed actions for Last Activity display
-    const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
-}
+// Define allowed actions for Last Activity display - DECLARE AT TOP LEVEL
+const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
 /* CONFIG */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 let chart = null;
@@ -3087,4 +3085,5 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
