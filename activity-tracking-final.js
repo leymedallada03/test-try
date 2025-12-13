@@ -1,21 +1,15 @@
-// activity-tracking-final.js - Enhanced for real-time dashboard updates
-
-// Check if ALLOWED_ACTIONS is already defined (from dashboard.html)
-if (typeof ALLOWED_ACTIONS === 'undefined') {
-    // Define allowed actions for dashboard display
-    var ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
-}
-
-// API URL for logging
-const ACTIVITY_API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+let ACTIVITY_ALLOWED_ACTIONS = null;
 
 /* Main function to record user activity - COMPATIBLE WITH DASHBOARD */
 function recordUserActivity(action, details = '') {
     try {
         console.log(`Attempting to record activity: ${action}, Details: ${details}`);
         
+        // Get ALLOWED_ACTIONS from window or use default
+        const allowedActions = window.ALLOWED_ACTIONS || ACTIVITY_ALLOWED_ACTIONS || ['Update Household', 'Create Record', 'Delete Household'];
+        
         // Only record allowed actions (for dashboard display)
-        if (ALLOWED_ACTIONS && !ALLOWED_ACTIONS.includes(action)) {
+        if (!allowedActions.includes(action)) {
             console.log(`Skipping activity recording for: ${action} (not in allowed actions)`);
             // Still log to API but don't update dashboard
             logActivityToAPIOnly(action, details);
