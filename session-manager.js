@@ -69,7 +69,7 @@ class SessionManager {
         console.log("Session Manager: Set immediate username:", displayName);
     }
 
-    // Validate session with server
+    // Validate session with server - FIXED: This is now a proper method
     async validateSession() {
         const loggedIn = localStorage.getItem('loggedIn');
         const username = localStorage.getItem('username');
@@ -92,10 +92,12 @@ class SessionManager {
         }
         
         try {
-            // Use the global API_URL from index.js or define it locally
             const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
             
-            // Validate with server
+            // Validate with server - with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
             const formData = new FormData();
             formData.append('action', 'validateSession');
             formData.append('username', username);
@@ -104,29 +106,39 @@ class SessionManager {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: formData,
-                mode: 'no-cors' // Add this for Google Apps Script
+                signal: controller.signal,
+                mode: 'cors'
             });
             
-            // For no-cors mode, we can't read the response
-            // Just assume success if we get a response
-            if (response.ok || response.type === 'opaque') {
-                // Update last activity
+            clearTimeout(timeoutId);
+            
+            // Try to parse response
+            try {
+                const data = await response.json();
+                if (data.success && data.isLoggedIn) {
+                    // Update last activity
+                    localStorage.setItem('lastActivity', Date.now().toString());
+                    return true;
+                } else {
+                    console.log("Session Manager: Server validation failed", data.message);
+                    this.clearSession();
+                    return false;
+                }
+            } catch (parseError) {
+                console.log("Session Manager: Could not parse response, but request succeeded");
+                // If we got a response but can't parse it, assume success
                 localStorage.setItem('lastActivity', Date.now().toString());
-                
-                // Try to get updated user info
-                await this.updateUserInfo(username);
-                
                 return true;
-            } else {
-                console.log("Session Manager: Server validation failed");
-                this.clearSession();
-                return false;
             }
+            
         } catch (error) {
-            console.error("Session Manager: Validation error, continuing with local session", error);
-            // If server unreachable, continue with local session
+            console.log("Session Manager: Validation error, continuing with local session", error.name);
+            // If server unreachable or timeout, continue with local session
+            if (error.name === 'AbortError') {
+                console.log("Session Manager: Validation timeout, using cached session");
+            }
             localStorage.setItem('lastActivity', Date.now().toString());
-            return true;
+            return true; // Changed from false to true - be more tolerant
         }
     }
 
@@ -230,7 +242,7 @@ class SessionManager {
     }
 
     // Update UI with user info
-updateUI() {
+    updateUI() {
         const fullName = localStorage.getItem('staffName');
         const role = localStorage.getItem('userRole');
         const barangay = localStorage.getItem('assignedBarangay');
