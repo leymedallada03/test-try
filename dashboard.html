@@ -1138,9 +1138,6 @@ let lastUpdatedTime = null;
 let refreshInterval = null;
 let sessionMonitorInterval = null; // Added for session monitoring
 
-// FIXED: Define allowed actions for Last Activity display
-const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
-
 /* ENHANCED SESSION VALIDATION FUNCTIONS */
 // Validate session with server
 async function validateSession() {
@@ -3085,5 +3082,6 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
