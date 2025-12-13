@@ -12,39 +12,38 @@ class SessionManager {
     }
 
     // Initialize on page load (except index.html)
-async initialize() {
-    // Don't run on login page
-    if (window.location.pathname.includes('index.html') || 
-        window.location.pathname.includes('index')) {
-        return;
+    async initialize() {
+        // Don't run on login page
+        if (window.location.pathname.includes('index.html') || 
+            window.location.pathname.includes('index')) {
+            return;
+        }
+        
+        // Prevent double initialization
+        if (this.initialized) {
+            return;
+        }
+        
+        console.log("Session Manager: Checking session...");
+        
+        // SET USERNAME IMMEDIATELY before session validation
+        this.setUserNameImmediately();
+        
+        // User role is now handled by common-utils.js
+        
+        const isValid = await this.validateSession();
+        
+        if (!isValid) {
+            console.log("Session Manager: Invalid session, redirecting to login");
+            window.location.href = 'index.html?session=expired';
+            return;
+        }
+        
+        this.startSessionMonitoring();
+        this.updateUI();
+        this.initialized = true;
+        console.log("Session Manager: Session valid, user logged in");
     }
-    
-    // Prevent double initialization
-    if (this.initialized) {
-        return;
-    }
-    
-    console.log("Session Manager: Checking session...");
-    
-    // SET USERNAME IMMEDIATELY before session validation
-    this.setUserNameImmediately();
-    
-    // ENSURE USER ROLE IS SET BEFORE VALIDATION
-    this.ensureUserRole();
-    
-    const isValid = await this.validateSession();
-    
-    if (!isValid) {
-        console.log("Session Manager: Invalid session, redirecting to login");
-        window.location.href = 'index.html?session=expired';
-        return;
-    }
-    
-    this.startSessionMonitoring();
-    this.updateUI();
-    this.initialized = true;
-    console.log("Session Manager: Session valid, user logged in");
-}
 
     // NEW METHOD: Set user name immediately on page load
     setUserNameImmediately() {
@@ -244,57 +243,56 @@ async initialize() {
         }
     }
 
-// In session-manager.js updateUI() method
-updateUI() {
-    const fullName = localStorage.getItem('staffName');
-    const role = localStorage.getItem('userRole');
-    const barangay = localStorage.getItem('assignedBarangay');
-    const username = localStorage.getItem('username');
-    
-    console.log("Session Manager: Updating UI with", { fullName, role, barangay, username });
-    
-    // Update username display
-    const usernameElements = document.querySelectorAll('#userName, .username-display, [data-username]');
-    usernameElements.forEach(el => {
-        if (el) {
-            el.textContent = fullName || username || 'User';
-            el.style.display = 'inline';
+    // Update UI with user info
+    updateUI() {
+        const fullName = localStorage.getItem('staffName');
+        const role = localStorage.getItem('userRole');
+        const barangay = localStorage.getItem('assignedBarangay');
+        const username = localStorage.getItem('username');
+        
+        console.log("Session Manager: Updating UI with", { fullName, role, barangay, username });
+        
+        // Update username display
+        const usernameElements = document.querySelectorAll('#userName, .username-display, [data-username]');
+        usernameElements.forEach(el => {
+            if (el) {
+                el.textContent = fullName || username || 'User';
+                el.style.display = 'inline';
+            }
+        });
+        
+        // FIXED: Check for admin role with case-insensitive comparison
+        const isAdmin = role && role.toLowerCase() === 'admin';
+        
+        console.log("Session Manager: User is Admin?", isAdmin);
+        
+        // FIXED: Update admin elements using CSS classes (DO NOT remove admin-only class)
+        document.querySelectorAll('.admin-only').forEach(el => {
+            if (isAdmin) {
+                el.classList.add('admin-visible');  // Add visible class
+            } else {
+                el.classList.remove('admin-visible'); // Remove visible class
+            }
+        });
+        
+        // Update additional elements if they exist
+        const userFullNameElement = document.getElementById('userFullName');
+        if (userFullNameElement) {
+            userFullNameElement.textContent = fullName || username || 'User';
         }
-    });
-    
-    // FIXED: Check for admin role with case-insensitive comparison
-    const isAdmin = role && role.toLowerCase() === 'admin';
-    
-    console.log("Session Manager: User is Admin?", isAdmin);
-    
-    // Update admin elements using CSS classes (prevents flash)
-    document.querySelectorAll('.admin-only').forEach(el => {
-        if (isAdmin) {
-            el.classList.add('admin-visible');
-            el.classList.remove('admin-only'); // Remove the default hiding class
-        } else {
-            el.classList.remove('admin-visible');
+        
+        const userRoleElement = document.getElementById('userRole');
+        if (userRoleElement) {
+            userRoleElement.textContent = role || 'Staff';
+            userRoleElement.style.display = 'inline';
         }
-    });
-    
-    // Update additional elements if they exist
-    const userFullNameElement = document.getElementById('userFullName');
-    if (userFullNameElement) {
-        userFullNameElement.textContent = fullName || username || 'User';
+        
+        const userBarangayElement = document.getElementById('userBarangay');
+        if (userBarangayElement && barangay) {
+            userBarangayElement.textContent = `• ${barangay}`;
+            userBarangayElement.style.display = 'inline';
+        }
     }
-    
-    const userRoleElement = document.getElementById('userRole');
-    if (userRoleElement) {
-        userRoleElement.textContent = role || 'Staff';
-        userRoleElement.style.display = 'inline';
-    }
-    
-    const userBarangayElement = document.getElementById('userBarangay');
-    if (userBarangayElement && barangay) {
-        userBarangayElement.textContent = `• ${barangay}`;
-        userBarangayElement.style.display = 'inline';
-    }
-}
         
     // Show session expired message
     showSessionExpiredMessage() {
