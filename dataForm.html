@@ -1185,7 +1185,7 @@ li.admin-only.admin-visible {
      margin-bottom: 0;
    }
    
-   /* ============ MODAL STYLING ============ */
+   /* ============ SMALLER MODAL STYLING ============ */
    .modal {
      display: none;
      position: fixed;
@@ -1201,20 +1201,185 @@ li.admin-only.admin-visible {
    
    .modal-content {
      background: white;
-     padding: 24px;
+     padding: 20px;
      border-radius: var(--radius);
-     max-width: 500px;
-     width: 90%;
-     max-height: 80vh;
+     max-width: 420px; /* Reduced from 500px */
+     width: 85%; /* Reduced from 90% */
+     max-height: 70vh; /* Reduced from 80vh */
      overflow-y: auto;
+     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+     margin: 20px;
    }
    
    .modal-actions {
      display: flex;
-     gap: 12px;
+     gap: 10px;
      justify-content: flex-end;
-     margin-top: 20px;
+     margin-top: 16px;
    }
+   
+   /* Success Modal - Smaller */
+   .modal-success {
+     border-top: 4px solid var(--accent1);
+   }
+   
+   .modal-success .modal-header {
+     color: var(--accent1);
+     margin-top: 0;
+     font-size: 1.2rem; /* Smaller font */
+     margin-bottom: 10px;
+   }
+   
+   .modal-success .modal-icon {
+     color: var(--accent1);
+     font-size: 2rem; /* Reduced from 2.5rem */
+     text-align: center;
+     margin: 8px 0; /* Reduced margin */
+   }
+   
+   /* Warning Modal - Smaller */
+   .modal-warning {
+     border-top: 4px solid var(--accent3);
+   }
+   
+   .modal-warning .modal-header {
+     color: var(--accent3);
+     margin-top: 0;
+     font-size: 1.2rem; /* Smaller font */
+     margin-bottom: 10px;
+   }
+   
+   .modal-warning .modal-icon {
+     color: var(--accent3);
+     font-size: 2rem; /* Reduced from 2.5rem */
+     text-align: center;
+     margin: 8px 0; /* Reduced margin */
+   }
+   
+   /* Error Modal - Smaller */
+   .modal-error {
+     border-top: 4px solid var(--hazard-red);
+   }
+   
+   .modal-error .modal-header {
+     color: var(--hazard-red);
+     margin-top: 0;
+     font-size: 1.2rem; /* Smaller font */
+     margin-bottom: 10px;
+   }
+   
+   .modal-error .modal-icon {
+     color: var(--hazard-red);
+     font-size: 2rem; /* Reduced from 2.5rem */
+     text-align: center;
+     margin: 8px 0; /* Reduced margin */
+   }
+   
+   /* Info Modal - Smaller */
+   .modal-info {
+     border-top: 4px solid var(--accent2);
+   }
+   
+   .modal-info .modal-header {
+     color: var(--accent2);
+     margin-top: 0;
+     font-size: 1.2rem; /* Smaller font */
+     margin-bottom: 10px;
+   }
+   
+   .modal-info .modal-icon {
+     color: var(--accent2);
+     font-size: 2rem; /* Reduced from 2.5rem */
+     text-align: center;
+     margin: 8px 0; /* Reduced margin */
+   }
+   
+   /* Modal text styling */
+   .modal-content p {
+     margin: 0 0 12px 0;
+     line-height: 1.5;
+     font-size: 0.95rem; /* Smaller text */
+   }
+   
+   /* Smaller buttons in modals */
+   .modal-actions .btn {
+     padding: 7px 12px; /* Smaller padding */
+     font-size: 0.8rem; /* Smaller font */
+     min-height: 32px; /* Smaller height */
+   }
+   
+   /* ============ FIELD-LEVEL VALIDATION STYLES ============ */
+   /* Make these more specific than the general input styles */
+input[type="text"].validation-error,
+input[type="date"].validation-error,
+input[type="number"].validation-error,
+select.validation-error,
+textarea.validation-error {
+    border: 0.5px solid rgba(220, 38, 38, 0.3) !important;
+    background-color: rgba(220, 38, 38, 0.05) !important;
+}
+
+/* Override focus states for validation errors */
+input[type="text"].validation-error:focus,
+input[type="date"].validation-error:focus,
+input[type="number"].validation-error:focus,
+select.validation-error:focus,
+textarea.validation-error:focus {
+    border: 0.5px solid rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+   .validation-error{
+     border-color: #dc2626 !important;
+     border: 0.5px solid rgba(220, 38, 38, 0.3);
+     background-color: rgba(220, 38, 38, 0.05) !important;
+   }
+   
+   .validation-error-label {
+     color: #dc2626 !important;
+   }
+   
+   .validation-summary {
+     background-color: rgba(220, 38, 38, 0.1);
+     border: 0.5px solid rgba(220, 38, 38, 0.3);
+     border-radius: var(--radius-sm);
+     padding: 12px;
+     margin-bottom: 16px;
+     display: none;
+   }
+   
+   .validation-summary.show {
+     display: block;
+     animation: fadeIn 0.3s ease;
+   }
+   
+   .validation-summary h4 {
+     margin: 0 0 8px 0;
+     color: #dc2626;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     font-size: 0.9rem;
+   }
+   
+   .validation-summary ul {
+     margin: 0;
+     padding-left: 20px;
+   }
+   
+   .validation-summary li {
+     margin-bottom: 4px;
+     font-size: 0.8rem;
+   }
+   
+   /* Sex field specific styling - for red border removal */
+   .radio-line.validation-error {
+     border-radius: var(--radius-sm);
+     padding: 6px !important;
+   }
+   /* Make Sex label red when there's a validation error */
+.sex-label.validation-error-label {
+  color: #dc2626 !important;
+}
    
    /* ============ RESPONSIVE DESIGN ============ */
    /* Tablet-specific improvements */
@@ -1427,6 +1592,26 @@ li.admin-only.admin-visible {
          flex-direction: column;
          gap: 12px;
      }
+     
+     /* Smaller modals on mobile */
+     .modal-content {
+         max-width: 95%; /* Increased for mobile */
+         width: 95%;
+         padding: 16px; /* Less padding on mobile */
+         margin: 10px;
+     }
+     
+     .modal-header {
+         font-size: 1.1rem !important; /* Even smaller on mobile */
+     }
+     
+     .modal-icon {
+         font-size: 1.8rem !important; /* Even smaller on mobile */
+     }
+     
+     .modal-content p {
+         font-size: 0.9rem; /* Smaller text on mobile */
+     }
    }
    
    /* Small mobile devices */
@@ -1460,6 +1645,36 @@ li.admin-only.admin-visible {
      
      .card {
          padding: 12px;
+     }
+     
+     /* Even smaller modals on very small screens */
+     .modal-content {
+         max-width: 98%;
+         width: 98%;
+         padding: 14px;
+         margin: 8px;
+     }
+     
+     .modal-header {
+         font-size: 1rem !important;
+     }
+     
+     .modal-icon {
+         font-size: 1.6rem !important;
+     }
+     
+     .modal-content p {
+         font-size: 0.85rem;
+     }
+     
+     .modal-actions {
+         flex-direction: column;
+         gap: 8px;
+     }
+     
+     .modal-actions .btn {
+         width: 100%;
+         justify-content: center;
      }
    }
    
@@ -1559,6 +1774,12 @@ li.admin-only.admin-visible {
   </aside>
 
   <main class="content-area" tabindex="-1">
+    <!-- Validation Summary -->
+    <div id="validationSummaryHead" class="validation-summary">
+      <h4><i class="fas fa-exclamation-triangle"></i> Required Fields – The following information must be provided before submission:</h4>
+      <ul id="headValidationErrors"></ul>
+    </div>
+
     <div class="content-header">
       <h2><span style="color: var(--accent1);">📝</span> Household Information (Head)</h2>
     </div>
@@ -1612,7 +1833,7 @@ li.admin-only.admin-visible {
           <div style="grid-column: 1 / -1;">
             <label>Household Head Full Name<span class="required">*</span></label>
             <div class="head-name-container">
-              <input type="text" id="householdHead" required />
+              <input type="text" id="householdHead" required>
             </div>
             
             <!-- FIXED: FishR/RBIS Registered button moved inline -->
@@ -1625,7 +1846,7 @@ li.admin-only.admin-visible {
             
             <div id="headRegistrationField" class="conditional-field">
               <label>FishR Registered/RBIS Registered</label>
-              <select id="headRegistration" class="animated">
+              <select id="headRegistration">
                 <option value="">Select...</option>
                 <option value="FishR Registered">FishR Registered</option>
                 <option value="RBIS Registered">RBIS Registered</option>
@@ -1639,7 +1860,7 @@ li.admin-only.admin-visible {
             <input type="text" id="contactNo" placeholder="09XXXXXXXXX" required 
                    pattern="^(09|\+639)\d{9}$" 
                    title="Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)" />
-            <div class="error-message" id="contactError">Please enter a valid Philippine mobile number (09XXXXXXXXX)</div>
+            <div class="error-message animated" id="contactError">Please enter a valid Philippine mobile number (09XXXXXXXXX)</div>
           </div>
 
           <div>
@@ -1666,8 +1887,8 @@ li.admin-only.admin-visible {
           </div>
 
           <div>
-            <label>No. of Household Member/s <span class="required">*</span></label>
-            <input type="number" id="memberCount" min="0" value="0" required />
+            <label>No. of Household Member/s</label>
+            <input type="number" id="memberCount" min="0" value="0" >
             <div class="small-muted">Set to 0 if no other members.</div>
           </div>
         </div>
@@ -2053,22 +2274,22 @@ li.admin-only.admin-visible {
   <div class="loading-spinner"></div>
 </div>
 
-<!-- Hazard Hunter Modal -->
+<!-- Hazard Hunter Modal - Made smaller -->
 <div id="hazardHunterModal" class="modal" aria-hidden="true">
-  <div class="modal-content">
-    <h3 style="color: var(--accent1); margin-top: 0;">Pick Coordinates from Hazard Hunter</h3>
-    <div style="background: var(--light-green); padding: 16px; border-radius: var(--radius-sm); margin: 16px 0;">
-      <h4 style="color: var(--hazard-red); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+  <div class="modal-content modal-info">
+    <h3 class="modal-header">Pick Coordinates from Hazard Hunter</h3>
+    <div style="background: var(--light-green); padding: 14px; border-radius: var(--radius-sm); margin: 12px 0;">
+      <h4 style="color: var(--hazard-red); margin-top: 0; display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
         <i class="fas fa-map-marked-alt"></i> Instructions:
       </h4>
-      <ol style="margin: 12px 0 0 20px; line-height: 1.6;">
+      <ol style="margin: 10px 0 0 18px; line-height: 1.5; font-size: 0.9rem; padding-left: 0;">
         <li>Click the button below to open Hazard Hunter in a new tab</li>
         <li>Navigate to the desired location on the map</li>
         <li>Click on the map to get coordinates</li>
         <li>Copy the coordinates (latitude, longitude)</li>
         <li>Return to this tab and paste them in the coordinate field</li>
       </ol>
-      <div style="margin-top: 16px; padding: 12px; background: white; border-radius: var(--radius-sm); border-left: 3px solid var(--accent1);">
+      <div style="margin-top: 12px; padding: 10px; background: white; border-radius: var(--radius-sm); border-left: 3px solid var(--accent1); font-size: 0.85rem;">
         <strong>📋 Expected format:</strong> <code>14.123456, 121.123456</code>
       </div>
     </div>
@@ -2094,6 +2315,12 @@ li.admin-only.admin-visible {
   </div>
 
   <div class="panel-body">
+    <!-- Validation Summary for Member Form -->
+    <div id="validationSummaryMember" class="validation-summary">
+      <h4><i class="fas fa-exclamation-triangle"></i> Required Fields – The following information must be provided before submission:</h4>
+      <ul id="memberValidationErrors"></ul>
+    </div>
+    
     <form id="memberForm" onsubmit="return false;">
       
       <!-- Card 1: Basic Information -->
@@ -2464,6 +2691,93 @@ li.admin-only.admin-visible {
   </div>
 </div>
 
+<!-- NEW MODALS - ALL MADE SMALLER -->
+<!-- Reset Confirmation Modal - Smaller -->
+<div id="resetConfirmationModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-warning">
+    <div class="modal-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h3 class="modal-header">Reset Form</h3>
+    <p>Are you sure you want to reset the form? All entered data will be permanently lost.</p>
+    <div class="modal-actions">
+      <button id="cancelReset" class="btn secondary">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmReset" class="btn btn-reset">
+        <i class="fas fa-redo"></i> Reset Form
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Save Confirmation Modal - Smaller -->
+<div id="saveConfirmationModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-info">
+    <div class="modal-icon">
+      <i class="fas fa-save"></i>
+    </div>
+    <h3 class="modal-header">Save Data</h3>
+    <p>Are you ready to save the household data? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button id="cancelSave" class="btn secondary">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmSave" class="btn">
+        <i class="fas fa-check"></i> Save Data
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal - Smaller -->
+<div id="successModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-success">
+    <div class="modal-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h3 class="modal-header">Success!</h3>
+    <p id="successMessage">Operation completed successfully.</p>
+    <div class="modal-actions">
+      <button id="closeSuccess" class="btn">
+        <i class="fas fa-check"></i> OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal - Smaller -->
+<div id="errorModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-error">
+    <div class="modal-icon">
+      <i class="fas fa-exclamation-circle"></i>
+    </div>
+    <h3 class="modal-header">Error</h3>
+    <p id="errorMessage">An error occurred.</p>
+    <div class="modal-actions">
+      <button id="closeError" class="btn secondary">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Info Modal - Smaller -->
+<div id="infoModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-info">
+    <div class="modal-icon">
+      <i class="fas fa-info-circle"></i>
+    </div>
+    <h3 class="modal-header">Information</h3>
+    <p id="infoMessage">Information message.</p>
+    <div class="modal-actions">
+      <button id="closeInfo" class="btn">
+        <i class="fas fa-check"></i> OK
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
 const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
@@ -2479,6 +2793,606 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // FORM INITIALIZATION CONTINUES BELOW (your existing code after this block)
 });
+
+/* ============ MODAL MANAGEMENT FUNCTIONS ============ */
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function showSuccess(message) {
+    const messageEl = document.getElementById('successMessage');
+    if (messageEl) {
+        messageEl.textContent = message;
+    }
+    showModal('successModal');
+}
+
+function showError(message) {
+    const messageEl = document.getElementById('errorMessage');
+    if (messageEl) {
+        messageEl.textContent = message;
+    }
+    showModal('errorModal');
+}
+
+function showInfo(message) {
+    const messageEl = document.getElementById('infoMessage');
+    if (messageEl) {
+        messageEl.textContent = message;
+    }
+    showModal('infoModal');
+}
+
+/* ============ UPDATE VALIDATION SUMMARY FUNCTIONS ============ */
+function updateHeadValidationSummary() {
+    const errors = [];
+    let hasErrors = false;
+
+    // Check required fields
+    const requiredFields = [
+        { id: 'barangay', name: 'Barangay' },
+        { id: 'sitio', name: 'Sitio / Purok' },
+        { id: 'householdHead', name: 'Household Head Full Name' },
+        { id: 'contactNo', name: 'Contact no.' },
+        { id: 'householdBirthdate', name: 'Birthdate' },
+        { id: 'memberCount', name: 'No. of Household Member/s' }
+    ];
+
+    requiredFields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element && !element.value.trim()) {
+            errors.push(`${field.name} is required`);
+            hasErrors = true;
+        }
+    });
+
+    // Check sex selection
+    const sexRadios = document.querySelectorAll('input[name="head_sex"]:checked');
+    if (sexRadios.length === 0) {
+        errors.push('Sex is required');
+        hasErrors = true;
+    }
+
+    // Check contact number format if it exists
+    const contactInput = document.getElementById("contactNo");
+    if (contactInput && contactInput.value.trim() && !validatePhilippineMobileNumber(contactInput.value.trim())) {
+        errors.push('Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)');
+        hasErrors = true;
+    }
+
+    // Update the validation summary display
+    const validationSummary = document.getElementById('validationSummaryHead');
+    const errorsList = document.getElementById('headValidationErrors');
+    
+    if (errorsList) {
+        errorsList.innerHTML = '';
+        if (hasErrors) {
+            errors.forEach(error => {
+                const li = document.createElement('li');
+                li.textContent = error;
+                errorsList.appendChild(li);
+            });
+        }
+    }
+    
+    if (validationSummary) {
+        if (hasErrors) {
+            validationSummary.classList.add('show');
+        } else {
+            validationSummary.classList.remove('show');
+        }
+    }
+    
+    return !hasErrors;
+}
+
+
+function updateMemberValidationSummary() {
+    const errors = [];
+    let hasErrors = false;
+
+    // Check required fields
+    const requiredFields = [
+        { id: 'memberName', name: 'Household Member Full Name' },
+        { id: 'memberContact', name: 'Contact no.' },
+        { id: 'memberBirthdate', name: 'Birthdate' }
+    ];
+
+    requiredFields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element && !element.value.trim()) {
+            errors.push(`${field.name} is required`);
+            hasErrors = true;
+        }
+    });
+
+    // Check sex selection
+    const sexRadios = document.querySelectorAll('input[name="member_sex"]:checked');
+    if (sexRadios.length === 0) {
+        errors.push('Sex is required');
+        hasErrors = true;
+    }
+
+    // Check contact number format if it exists
+    const contactInput = document.getElementById("memberContact");
+    if (contactInput && contactInput.value.trim() && !validatePhilippineMobileNumber(contactInput.value.trim())) {
+        errors.push('Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)');
+        hasErrors = true;
+    }
+
+    // Update the validation summary display
+    const validationSummary = document.getElementById('validationSummaryMember');
+    const errorsList = document.getElementById('memberValidationErrors');
+    
+    if (errorsList) {
+        errorsList.innerHTML = '';
+        if (hasErrors) {
+            errors.forEach(error => {
+                const li = document.createElement('li');
+                li.textContent = error;
+                errorsList.appendChild(li);
+            });
+        }
+    }
+    
+    if (validationSummary) {
+        if (hasErrors) {
+            validationSummary.classList.add('show');
+        } else {
+            validationSummary.classList.remove('show');
+        }
+    }
+    
+    return !hasErrors;
+}
+
+
+/* ============ FIELD-LEVEL VALIDATION FUNCTIONS ============ */
+function validateHeadForm() {
+    // First, do a full validation to make sure all errors are captured
+    const requiredFields = [
+        { id: 'barangay', name: 'Barangay' },
+        { id: 'sitio', name: 'Sitio / Purok' },
+        { id: 'householdHead', name: 'Household Head Full Name' },
+        { id: 'contactNo', name: 'Contact no.' },
+        { id: 'householdBirthdate', name: 'Birthdate' },
+        { id: 'memberCount', name: 'No. of Household Member/s' }
+    ];
+
+    const sexRadios = document.querySelectorAll('input[name="head_sex"]:checked');
+    const contactInput = document.getElementById("contactNo");
+    const contactError = document.getElementById("contactError");
+    
+    let errors = [];
+    let hasErrors = false;
+
+    // Clear previous validation states
+    clearValidationErrors('headForm');
+
+    // Validate required fields
+    requiredFields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element) {
+            const value = element.value.trim();
+            if (!value) {
+                element.classList.add('validation-error');
+                const label = element.closest('div')?.querySelector('label');
+                if (label) label.classList.add('validation-error-label');
+                errors.push(`${field.name} is required`);
+                hasErrors = true;
+            }
+        }
+    });
+
+    // Validate sex selection
+    if (sexRadios.length === 0) {
+        // Get the Sex label - find it by looking for the label before the radio-line
+        const sexLabel = document.querySelector('label[for="head_sex"]') || 
+                         document.querySelector('.form-grid > div:has(.radio-line) label');
+        
+        if (sexLabel) {
+            sexLabel.classList.add('validation-error-label');
+        }
+        errors.push('Sex is required');
+        hasErrors = true;
+    }
+
+    // Validate contact number
+    if (contactInput && contactInput.value.trim()) {
+        if (!validateContactInput(contactInput, contactError)) {
+            errors.push('Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)');
+            hasErrors = true;
+        }
+    }
+
+    // Show/hide validation summary
+    const validationSummary = document.getElementById('validationSummaryHead');
+    const errorsList = document.getElementById('headValidationErrors');
+    
+    if (hasErrors) {
+        if (errorsList) {
+            errorsList.innerHTML = '';
+            errors.forEach(error => {
+                const li = document.createElement('li');
+                li.textContent = error;
+                errorsList.appendChild(li);
+            });
+        }
+        if (validationSummary) {
+            validationSummary.classList.add('show');
+            // Scroll to validation summary
+            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return false;
+    } else {
+        if (validationSummary) {
+            validationSummary.classList.remove('show');
+        }
+        return true;
+    }
+}
+function validateMemberForm() {
+    // First, do a full validation to make sure all errors are captured
+    const requiredFields = [
+        { id: 'memberName', name: 'Household Member Full Name' },
+        { id: 'memberContact', name: 'Contact no.' },
+        { id: 'memberBirthdate', name: 'Birthdate' }
+    ];
+
+    const sexRadios = document.querySelectorAll('input[name="member_sex"]:checked');
+    const contactInput = document.getElementById("memberContact");
+    const contactError = document.getElementById("memberContactError");
+    
+    let errors = [];
+    let hasErrors = false;
+
+    // Clear previous validation states
+    clearValidationErrors('memberForm');
+
+    // Validate required fields
+    requiredFields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element) {
+            const value = element.value.trim();
+            if (!value) {
+                element.classList.add('validation-error');
+                const label = element.closest('div')?.querySelector('label');
+                if (label) label.classList.add('validation-error-label');
+                errors.push(`${field.name} is required`);
+                hasErrors = true;
+            }
+        }
+    });
+
+    // Validate sex selection
+    if (sexRadios.length === 0) {
+        // Get the Sex label in member panel - it's in the first edit-card
+        const memberSexLabel = document.querySelector('#memberPanel label:has(+ .radio-line)') ||
+                               document.querySelector('#memberForm .form-grid > div:has(.radio-line) label');
+        
+        if (memberSexLabel) {
+            memberSexLabel.classList.add('validation-error-label');
+        }
+        errors.push('Sex is required');
+        hasErrors = true;
+    }
+
+    // Validate contact number
+    if (contactInput && contactInput.value.trim()) {
+        if (!validateContactInput(contactInput, contactError)) {
+            errors.push('Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)');
+            hasErrors = true;
+        }
+    }
+
+    // Show/hide validation summary
+    const validationSummary = document.getElementById('validationSummaryMember');
+    const errorsList = document.getElementById('memberValidationErrors');
+    
+    if (hasErrors) {
+        if (errorsList) {
+            errorsList.innerHTML = '';
+            errors.forEach(error => {
+                const li = document.createElement('li');
+                li.textContent = error;
+                errorsList.appendChild(li);
+            });
+        }
+        if (validationSummary) {
+            validationSummary.classList.add('show');
+            // Scroll to validation summary
+            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return false;
+    } else {
+        if (validationSummary) {
+            validationSummary.classList.remove('show');
+        }
+        return true;
+    }
+}
+/* ============ HELPER FUNCTIONS TO REMOVE SPECIFIC ERRORS ============ */
+function removeHeadErrorByFieldId(fieldId) {
+    const fieldNameMap = {
+        'barangay': 'Barangay',
+        'sitio': 'Sitio / Purok',
+        'householdHead': 'Household Head Full Name',
+        'contactNo': 'Contact number',
+        'householdBirthdate': 'Birthdate',
+        'memberCount': 'No. of Household Member(s)'
+    };
+    
+    if (fieldNameMap[fieldId]) {
+        removeHeadErrorByText(fieldNameMap[fieldId]);
+    }
+}
+
+function removeMemberErrorByFieldId(fieldId) {
+    const fieldNameMap = {
+        'memberName': 'Household Member Full Name is required',
+        'memberContact': 'Contact no. is required',
+        'memberBirthdate': 'Birthdate is required'
+    };
+    
+    if (fieldNameMap[fieldId]) {
+        removeMemberErrorByText(fieldNameMap[fieldId]);
+    }
+}
+
+function removeHeadErrorByText(errorText) {
+    const errorsList = document.getElementById('headValidationErrors');
+    if (!errorsList) return;
+    
+    const errors = Array.from(errorsList.querySelectorAll('li'));
+    let found = false;
+    
+    errors.forEach(li => {
+        if (li.textContent.includes(errorText)) {
+            li.remove();
+            found = true;
+        }
+    });
+    
+    // If we removed an error, check if there are any errors left
+    if (found) {
+        const remainingErrors = errorsList.querySelectorAll('li');
+        const validationSummary = document.getElementById('validationSummaryHead');
+        
+        if (remainingErrors.length === 0 && validationSummary) {
+            validationSummary.classList.remove('show');
+        }
+    }
+}
+
+function removeMemberErrorByText(errorText) {
+    const errorsList = document.getElementById('memberValidationErrors');
+    if (!errorsList) return;
+    
+    const errors = Array.from(errorsList.querySelectorAll('li'));
+    let found = false;
+    
+    errors.forEach(li => {
+        if (li.textContent.includes(errorText)) {
+            li.remove();
+            found = true;
+        }
+    });
+    
+    // If we removed an error, check if there are any errors left
+    if (found) {
+        const remainingErrors = errorsList.querySelectorAll('li');
+        const validationSummary = document.getElementById('validationSummaryMember');
+        
+        if (remainingErrors.length === 0 && validationSummary) {
+            validationSummary.classList.remove('show');
+        }
+    }
+}
+
+function clearValidationErrors(formId) {
+    let elements;
+    if (formId === 'headForm') {
+        elements = document.querySelectorAll('#headForm input, #headForm select, #headForm textarea');
+        // Clear sex container error
+        const sexContainer = document.querySelector('.radio-line');
+        if (sexContainer) {
+            sexContainer.classList.remove('validation-error');
+        }
+        // Clear sex label error
+        const sexLabel = document.querySelector('#headForm .form-grid > div:has(.radio-line) label');
+        if (sexLabel) {
+            sexLabel.classList.remove('validation-error-label');
+        }
+        document.querySelectorAll('#headForm label').forEach(label => {
+            label.classList.remove('validation-error-label');
+        });
+        
+        // Hide validation summary
+        const validationSummary = document.getElementById('validationSummaryHead');
+        if (validationSummary) {
+            validationSummary.classList.remove('show');
+        }
+    } else if (formId === 'memberForm') {
+        elements = document.querySelectorAll('#memberForm input, #memberForm select, #memberForm textarea');
+        // Clear sex container error
+        const sexContainer = document.querySelectorAll('.radio-line')[1];
+        if (sexContainer) {
+            sexContainer.classList.remove('validation-error');
+        }
+        // Clear sex label error
+        const memberSexLabel = document.querySelector('#memberForm .form-grid > div:has(.radio-line) label');
+        if (memberSexLabel) {
+            memberSexLabel.classList.remove('validation-error-label');
+        }
+        document.querySelectorAll('#memberForm label').forEach(label => {
+            label.classList.remove('validation-error-label');
+        });
+        
+        // Hide validation summary
+        const validationSummary = document.getElementById('validationSummaryMember');
+        if (validationSummary) {
+            validationSummary.classList.remove('show');
+        }
+    }
+    
+    elements.forEach(element => {
+        element.classList.remove('validation-error');
+    });
+}
+
+/* ============ REAL-TIME VALIDATION CLEARING ============ */
+function setupRealTimeValidation() {
+    // Head form fields
+    const headRequiredFields = ['barangay', 'sitio', 'householdHead', 'contactNo', 'householdBirthdate', 'memberCount'];
+    
+    headRequiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('validation-error');
+                    const label = this.closest('div')?.querySelector('label');
+                    if (label) label.classList.remove('validation-error-label');
+                    
+                    // Remove this specific field's error from the summary
+                    removeHeadErrorByFieldId(fieldId);
+                }
+            });
+            
+            // For select elements, use change event
+            if (field.tagName === 'SELECT') {
+                field.addEventListener('change', function() {
+                    if (this.value.trim()) {
+                        this.classList.remove('validation-error');
+                        const label = this.closest('div')?.querySelector('label');
+                        if (label) label.classList.remove('validation-error-label');
+                        
+                        // Remove this specific field's error from the summary
+                        removeHeadErrorByFieldId(fieldId);
+                    }
+                });
+            }
+        }
+    });
+    
+    // Head sex radio buttons
+    const headSexRadios = document.querySelectorAll('input[name="head_sex"]');
+    headSexRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const sexContainer = document.querySelector('.radio-line');
+            if (sexContainer) {
+                sexContainer.classList.remove('validation-error');
+            }
+            // Also clear the sex label error
+            const sexLabel = document.querySelector('#headForm .form-grid > div:has(.radio-line) label');
+            if (sexLabel) {
+                sexLabel.classList.remove('validation-error-label');
+            }
+            
+            // Remove sex error from the summary
+            removeHeadErrorByText('Sex is required');
+        });
+    });
+    
+    // Head contact number validation
+    const contactInput = document.getElementById('contactNo');
+    if (contactInput) {
+        contactInput.addEventListener('input', function() {
+            if (this.value.trim() && validatePhilippineMobileNumber(this.value.trim())) {
+                this.classList.remove('validation-error');
+                this.classList.remove('input-error');
+                const contactError = document.getElementById('contactError');
+                if (contactError) contactError.style.display = 'none';
+                
+                // Remove contact number format error from the summary
+                removeHeadErrorByText('Please enter a valid Philippine mobile number');
+            }
+        });
+    }
+    
+    // Member form fields (set up when panel opens)
+    setupMemberRealTimeValidation();
+}
+
+function setupMemberRealTimeValidation() {
+    // Member form fields
+    const memberRequiredFields = ['memberName', 'memberContact', 'memberBirthdate'];
+    
+    memberRequiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('validation-error');
+                    const label = this.closest('div')?.querySelector('label');
+                    if (label) label.classList.remove('validation-error-label');
+                    
+                    // Remove this specific field's error from the summary
+                    removeMemberErrorByFieldId(fieldId);
+                }
+            });
+            
+            // For date field
+            if (field.type === 'date') {
+                field.addEventListener('change', function() {
+                    if (this.value.trim()) {
+                        this.classList.remove('validation-error');
+                        const label = this.closest('div')?.querySelector('label');
+                        if (label) label.classList.remove('validation-error-label');
+                        
+                        // Remove this specific field's error from the summary
+                        removeMemberErrorByFieldId(fieldId);
+                    }
+                });
+            }
+        }
+    });
+    
+    // Member sex radio buttons
+    const memberSexRadios = document.querySelectorAll('input[name="member_sex"]');
+    memberSexRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const sexContainer = document.querySelectorAll('.radio-line')[1];
+            if (sexContainer) {
+                sexContainer.classList.remove('validation-error');
+            }
+            // Also clear the sex label error
+            const memberSexLabel = document.querySelector('#memberForm .form-grid > div:has(.radio-line) label');
+            if (memberSexLabel) {
+                memberSexLabel.classList.remove('validation-error-label');
+            }
+            
+            // Remove sex error from the summary
+            removeMemberErrorByText('Sex is required');
+        });
+    });
+    
+    // Member contact number validation
+    const memberContactInput = document.getElementById('memberContact');
+    if (memberContactInput) {
+        memberContactInput.addEventListener('input', function() {
+            if (this.value.trim() && validatePhilippineMobileNumber(this.value.trim())) {
+                this.classList.remove('validation-error');
+                this.classList.remove('input-error');
+                const contactError = document.getElementById('memberContactError');
+                if (contactError) contactError.style.display = 'none';
+                
+                // Remove contact number format error from the summary
+                removeMemberErrorByText('Please enter a valid Philippine mobile number');
+            }
+        });
+    }
+}
 
 /* ============ HAZARD HUNTER INTEGRATION ============ */
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
@@ -2529,11 +3443,13 @@ function validateContactInput(input, errorElement) {
     
     if (value && !isValid) {
         input.classList.add('input-error');
-        errorElement.style.display = 'block';
+        input.classList.add('validation-error');
+        if (errorElement) errorElement.style.display = 'block';
         return false;
     } else {
         input.classList.remove('input-error');
-        errorElement.style.display = 'none';
+        input.classList.remove('validation-error');
+        if (errorElement) errorElement.style.display = 'none';
         
         // Format the number if valid
         if (isValid) {
@@ -2680,14 +3596,13 @@ function openHazardHunterPicker() {
     sessionStorage.setItem('awaitingCoordinates', 'true');
     
     // Show modal with instructions
-    const modal = document.getElementById('hazardHunterModal');
-    modal.style.display = 'flex';
+    showModal('hazardHunterModal');
 }
 
 /* Get location using browser geolocation */
 function getCurrentLocation() {
     if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser.");
+        showError("Geolocation is not supported by your browser.");
         return;
     }
 
@@ -2703,13 +3618,11 @@ function getCurrentLocation() {
             loadingOverlay.style.display = "none";
             
             // Ask user if they want to verify on Hazard Hunter
-            if (confirm("Location captured successfully!\n\nWould you like to verify this location on Hazard Hunter to check for hazards?")) {
-                openHazardHunterVerification(lat, lng);
-            }
+            showInfo("Location captured successfully!\n\nWould you like to verify this location on Hazard Hunter to check for hazards?");
         },
         (err) => {
             loadingOverlay.style.display = "none";
-            alert("Unable to retrieve GPS location. Please allow location access or use the Hazard Hunter option.");
+            showError("Unable to retrieve GPS location. Please allow location access or use the Hazard Hunter option.");
             console.error("GPS Error:", err);
         },
         {
@@ -2732,7 +3645,7 @@ function openHazardHunterVerification(lat, lng) {
     // Open in new tab
     window.open(verificationUrl, '_blank');
     
-    alert("Hazard Hunter opened with your location.\n\nYou can check for hazards and update coordinates if needed.\n\nReturn to this tab and update the coordinates field if necessary.");
+    showInfo("Hazard Hunter opened with your location.\n\nYou can check for hazards and update coordinates if needed.\n\nReturn to this tab and update the coordinates field if necessary.");
 }
 
 /* Setup coordinate paste handler */
@@ -2750,101 +3663,240 @@ function setupCoordinatePasteHandler() {
             if (parsed) {
                 coordInput.value = parsed;
                 // Show success message
-                showToast("Coordinates parsed successfully!", "success");
+                showSuccess("Coordinates parsed successfully!");
             } else {
                 // Show format hint
-                showToast("Please ensure format is: latitude, longitude (e.g., 14.123456, 121.123456)", "warning");
+                showInfo("Please ensure format is: latitude, longitude (e.g., 14.123456, 121.123456)");
             }
         }, 100);
     });
 }
 
-/* Show toast notification */
-function showToast(message, type = "info") {
-    // Remove existing toast
-    const existingToast = document.querySelector('.toast-notification');
-    if (existingToast) {
-        existingToast.remove();
-    }
-    
-    // Create new toast
-    const toast = document.createElement('div');
-    toast.className = `toast-notification toast-${type}`;
-    toast.innerHTML = `
-        <span>${message}</span>
-        <button onclick="this.parentElement.remove()">×</button>
-    `;
-    
-    // Add styles
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
-        color: white;
-        padding: 12px 16px;
-        border-radius: var(--radius-sm);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        box-shadow: var(--shadow);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-    `;
-    
-    // Add close button styles
-    toast.querySelector('button').style.cssText = `
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.2rem;
-        cursor: pointer;
-        padding: 0 4px;
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (toast.parentElement) {
-            toast.remove();
-        }
-    }, 5000);
-}
-
 /* ============ MODAL HANDLING ============ */
 function setupModalHandlers() {
-    const modal = document.getElementById('hazardHunterModal');
-    const cancelBtn = document.getElementById('cancelHazardHunter');
-    const confirmBtn = document.getElementById('confirmHazardHunter');
+    // Hazard Hunter Modal
+    const hazardModal = document.getElementById('hazardHunterModal');
+    const cancelHazardBtn = document.getElementById('cancelHazardHunter');
+    const confirmHazardBtn = document.getElementById('confirmHazardHunter');
     
-    if (!modal || !cancelBtn || !confirmBtn) return;
-    
-    // Cancel button
-    cancelBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    // Confirm button
-    confirmBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        
-        // Open Hazard Hunter in new tab
-        window.open(HAZARD_HUNTER_URL, '_blank');
-        
-        // Show reminder message
-        showToast("Hazard Hunter opened in new tab. Copy coordinates and return to paste them.", "info");
-        
-        // Set flag that we're expecting coordinates
-        sessionStorage.setItem('awaitingCoordinates', 'true');
-    });
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
+    if (hazardModal) {
+        // Cancel button
+        if (cancelHazardBtn) {
+            cancelHazardBtn.addEventListener('click', () => {
+                hideModal('hazardHunterModal');
+            });
         }
-    });
+        
+        // Confirm button
+        if (confirmHazardBtn) {
+            confirmHazardBtn.addEventListener('click', () => {
+                hideModal('hazardHunterModal');
+                
+                // Open Hazard Hunter in new tab
+                window.open(HAZARD_HUNTER_URL, '_blank');
+                
+                // Show reminder message
+                showInfo("Hazard Hunter opened in new tab. Copy coordinates and return to paste them.");
+                
+                // Set flag that we're expecting coordinates
+                sessionStorage.setItem('awaitingCoordinates', 'true');
+            });
+        }
+        
+        // Close modal when clicking outside
+        hazardModal.addEventListener('click', (e) => {
+            if (e.target === hazardModal) {
+                hideModal('hazardHunterModal');
+            }
+        });
+    }
+    
+    // Reset Confirmation Modal
+    const resetModal = document.getElementById('resetConfirmationModal');
+    const cancelResetBtn = document.getElementById('cancelReset');
+    const confirmResetBtn = document.getElementById('confirmReset');
+    
+    if (resetModal) {
+        // Cancel button
+        if (cancelResetBtn) {
+            cancelResetBtn.addEventListener('click', () => {
+                hideModal('resetConfirmationModal');
+            });
+        }
+        
+        // Confirm button
+        if (confirmResetBtn) {
+            confirmResetBtn.addEventListener('click', () => {
+                hideModal('resetConfirmationModal');
+                resetForm();
+            });
+        }
+        
+        // Close modal when clicking outside
+        resetModal.addEventListener('click', (e) => {
+            if (e.target === resetModal) {
+                hideModal('resetConfirmationModal');
+            }
+        });
+    }
+    
+    // Save Confirmation Modal
+    const saveModal = document.getElementById('saveConfirmationModal');
+    const cancelSaveBtn = document.getElementById('cancelSave');
+    const confirmSaveBtn = document.getElementById('confirmSave');
+    
+    if (saveModal) {
+        // Cancel button
+        if (cancelSaveBtn) {
+            cancelSaveBtn.addEventListener('click', () => {
+                hideModal('saveConfirmationModal');
+            });
+        }
+        
+        // Confirm button
+        if (confirmSaveBtn) {
+            confirmSaveBtn.addEventListener('click', () => {
+                hideModal('saveConfirmationModal');
+                proceedToMemberPanel();
+            });
+        }
+        
+        // Close modal when clicking outside
+        saveModal.addEventListener('click', (e) => {
+            if (e.target === saveModal) {
+                hideModal('saveConfirmationModal');
+            }
+        });
+    }
+    
+    // Success Modal
+    const successModal = document.getElementById('successModal');
+    const closeSuccessBtn = document.getElementById('closeSuccess');
+    
+    if (successModal) {
+        // Close button
+        if (closeSuccessBtn) {
+            closeSuccessBtn.addEventListener('click', () => {
+                hideModal('successModal');
+            });
+        }
+        
+        // Close modal when clicking outside
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) {
+                hideModal('successModal');
+            }
+        });
+    }
+    
+    // Error Modal
+    const errorModal = document.getElementById('errorModal');
+    const closeErrorBtn = document.getElementById('closeError');
+    
+    if (errorModal) {
+        // Close button
+        if (closeErrorBtn) {
+            closeErrorBtn.addEventListener('click', () => {
+                hideModal('errorModal');
+            });
+        }
+        
+        // Close modal when clicking outside
+        errorModal.addEventListener('click', (e) => {
+            if (e.target === errorModal) {
+                hideModal('errorModal');
+            }
+        });
+    }
+    
+    // Info Modal
+    const infoModal = document.getElementById('infoModal');
+    const closeInfoBtn = document.getElementById('closeInfo');
+    
+    if (infoModal) {
+        // Close button
+        if (closeInfoBtn) {
+            closeInfoBtn.addEventListener('click', () => {
+                hideModal('infoModal');
+            });
+        }
+        
+        // Close modal when clicking outside
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) {
+                hideModal('infoModal');
+            }
+        });
+    }
+}
+
+/* ============ RESET FORM FUNCTION ============ */
+function resetForm() {
+    document.getElementById("headForm").reset();
+    collectedMembers = [];
+    updateMemberPreview();
+    document.getElementById("householdAge").value = "";
+    document.getElementById("householdStage").value = "";
+    
+    // Clear conditional fields
+    document.getElementById('collegeCourseField').classList.remove('show');
+    document.getElementById('jobTitleField').classList.remove('show');
+    document.getElementById('countryField').classList.remove('show');
+    document.getElementById('headRegistrationField').classList.remove('show');
+    
+    // Clear any error states
+    clearValidationErrors('headForm');
+    
+    const contactInput = document.getElementById("contactNo");
+    const contactError = document.getElementById("contactError");
+    if (contactInput) contactInput.classList.remove('input-error');
+    if (contactError) contactError.style.display = 'none';
+    
+    const memberContactInput = document.getElementById("memberContact");
+    const memberContactError = document.getElementById("memberContactError");
+    if (memberContactInput) memberContactInput.classList.remove('input-error');
+    if (memberContactError) memberContactError.style.display = 'none';
+    
+    showSuccess("Form has been reset successfully.");
+}
+
+/* ============ PROCEED TO MEMBER PANEL ============ */
+function proceedToMemberPanel() {
+    const barangay = document.getElementById("barangay").value.trim();
+    const sitio = document.getElementById("sitio").value.trim();
+    const headName = document.getElementById("householdHead").value.trim();
+    const headContact = document.getElementById("contactNo").value.trim();
+    
+    // Validate required fields
+    if(!barangay || !sitio || !headName || !headContact){ 
+        showError("Please fill Barangay, Sitio/Purok, Name of Household Head and Contact no."); 
+        return; 
+    }
+    
+    // Validate contact number
+    const contactInput = document.getElementById("contactNo");
+    const contactError = document.getElementById("contactError");
+    if (!validateContactInput(contactInput, contactError)) {
+        showError("Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)");
+        contactInput.focus();
+        return;
+    }
+
+    membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
+    collectedMembers = []; 
+    currentMemberIndex = 0;
+    updateMemberPreview();
+
+    if(membersToCollect === 0){
+        // no members -> submit head only
+        submitHeadAndMembers();
+        return;
+    }
+
+    // open member panel first
+    fillMemberPanel(0);
+    currentMemberIndex = 0;
+    openPanel();
 }
 
 /* ---------------- UI + state ---------------- */
@@ -3228,14 +4280,17 @@ document.addEventListener('DOMContentLoaded', function() {
     item.style.display = isAdmin ? "block" : "none";
   });
 
-  // Setup conditional fields
-  setupConditionalFields();
-
   // Setup modal handlers
   setupModalHandlers();
 
+  // Setup conditional fields
+  setupConditionalFields();
+
   // Setup coordinate paste handler
   setupCoordinatePasteHandler();
+
+  // Setup real-time validation clearing
+  setupRealTimeValidation();
 
   // Contact number validation
   const contactInput = document.getElementById("contactNo");
@@ -3249,7 +4304,8 @@ document.addEventListener('DOMContentLoaded', function() {
     contactInput.addEventListener('input', () => {
       // Clear error while typing
       contactInput.classList.remove('input-error');
-      contactError.style.display = 'none';
+      contactInput.classList.remove('validation-error');
+      if (contactError) contactError.style.display = 'none';
     });
   }
 
@@ -3264,7 +4320,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     memberContactInput.addEventListener('input', () => {
       memberContactInput.classList.remove('input-error');
-      memberContactError.style.display = 'none';
+      memberContactInput.classList.remove('validation-error');
+      if (memberContactError) memberContactError.style.display = 'none';
     });
   }
 
@@ -3272,67 +4329,25 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("getLocationBtn").addEventListener("click", getCurrentLocation);
   document.getElementById("hazardHunterBtn").addEventListener("click", openHazardHunterPicker);
 
-  // reset
+  // reset button - now shows confirmation modal
   document.getElementById("resetBtn").addEventListener('click', () => {
-    if (confirm("Are you sure you want to reset the form? All entered data will be lost.")) {
-      document.getElementById("headForm").reset();
-      collectedMembers = [];
-      updateMemberPreview();
-      document.getElementById("householdAge").value = "";
-      document.getElementById("householdStage").value = "";
-      
-      // Clear conditional fields
-      document.getElementById('collegeCourseField').classList.remove('show');
-      document.getElementById('jobTitleField').classList.remove('show');
-      document.getElementById('countryField').classList.remove('show');
-      document.getElementById('headRegistrationField').classList.remove('show');
-      
-      // Clear any error states
-      contactInput.classList.remove('input-error');
-      contactError.style.display = 'none';
-      
-      if (memberContactInput) {
-        memberContactInput.classList.remove('input-error');
-        memberContactError.style.display = 'none';
-      }
-    }
+    showModal('resetConfirmationModal');
   });
 
-  // next (head -> members)
+  // next (head -> members) - now shows save confirmation modal
   document.getElementById("nextToMembers").addEventListener('click', () => {
-    const barangay = document.getElementById("barangay").value.trim();
-    const sitio = document.getElementById("sitio").value.trim();
-    const headName = document.getElementById("householdHead").value.trim();
-    const headContact = document.getElementById("contactNo").value.trim();
-    
-    // Validate required fields
-    if(!barangay || !sitio || !headName || !headContact){ 
-      alert("Please fill Barangay, Sitio/Purok, Name of Household Head and Contact no."); 
-      return; 
+    // First validate the form
+    if (!validateHeadForm()) {
+        // Validation failed, scroll to top of validation summary
+        const validationSummary = document.getElementById('validationSummaryHead');
+        if (validationSummary && validationSummary.classList.contains('show')) {
+            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
     }
     
-    // Validate contact number
-    if (!validateContactInput(contactInput, contactError)) {
-      alert("Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)");
-      contactInput.focus();
-      return;
-    }
-
-    membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
-    collectedMembers = []; 
-    currentMemberIndex = 0;
-    updateMemberPreview();
-
-    if(membersToCollect === 0){
-      // no members -> submit head only
-      submitHeadAndMembers();
-      return;
-    }
-
-    // open member panel first
-    fillMemberPanel(0);
-    currentMemberIndex = 0;
-    openPanel();
+    // If validation passes, show save confirmation modal
+    showModal('saveConfirmationModal');
   });
 
   // panel close/back
@@ -3350,19 +4365,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // memberNext (save & next)
   document.getElementById("memberNext").addEventListener('click', () => {
-    const name = document.getElementById("memberName").value.trim();
-    const contact = document.getElementById("memberContact").value.trim();
-    
-    if(!name || !contact){ 
-      alert("Please enter member's name and contact no."); 
-      return; 
-    }
-    
-    // Validate member contact number
-    if (!validateContactInput(memberContactInput, memberContactError)) {
-      alert("Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)");
-      memberContactInput.focus();
-      return;
+    // First validate the member form
+    if (!validateMemberForm()) {
+        // Validation failed, scroll to top of validation summary
+        const validationSummary = document.getElementById('validationSummaryMember');
+        if (validationSummary && validationSummary.classList.contains('show')) {
+            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
     }
 
     collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
@@ -3413,6 +4423,17 @@ document.addEventListener('DOMContentLoaded', function() {
   // Check if returning from Hazard Hunter
   checkReturnFromHazardHunter();
 
+  // Initialize validation summaries as hidden
+  const headValidationSummary = document.getElementById('validationSummaryHead');
+  const memberValidationSummary = document.getElementById('validationSummaryMember');
+  
+  if (headValidationSummary) {
+    headValidationSummary.classList.remove('show');
+  }
+  if (memberValidationSummary) {
+    memberValidationSummary.classList.remove('show');
+  }
+
   updateMemberPreview();
 });
 
@@ -3424,7 +4445,7 @@ function checkReturnFromHazardHunter() {
             setTimeout(() => {
                 const coordInput = document.getElementById("coordinate");
                 if (coordInput && !coordInput.value.trim()) {
-                    showToast("Paste your Hazard Hunter coordinates (Ctrl+V) in the coordinate field.", "info");
+                    showInfo("Paste your Hazard Hunter coordinates (Ctrl+V) in the coordinate field.");
                 }
             }, 1000);
             sessionStorage.removeItem('awaitingCoordinates');
@@ -3492,67 +4513,67 @@ async function submitHeadAndMembers(){
     headRegistrationValue = document.getElementById("headRegistration").value || "";
   }
 
-  const head = {
-    "Coordinate": document.getElementById("coordinate").value || "",
-    "Coordinates": document.getElementById("coordinate").value || "", // Added for compatibility
-    "Barangay": document.getElementById("barangay").value || "",
-    "Sitio / Purok": document.getElementById("sitio").value || "",
-    "Name of Household Head": document.getElementById("householdHead").value || "",
-    "FishR Registered/RBIS Registered": headRegistrationValue,
-    "Contact no.": document.getElementById("contactNo").value || "",
-    "Sex": document.querySelector("input[name='head_sex']:checked")?.value || "",
-    "Birthdate": headBirthForSheet,
-    "Age": headAgeVal,
-    "No. of Household Member/s": document.getElementById("memberCount").value || "0",
-    "Name of Household Member/s": "", // head row has this empty
-    "PWD": document.querySelector("input[name='head_pwd']:checked")?.value || "No",
-    "Stage": headAgeInfo ? headAgeInfo.stage : "",
-    "Status": document.getElementById("head_status").value || "",
-    "Educational Attainment": document.getElementById("educationalAttainment").value || "",
-    "College Graduate Course": document.getElementById("collegeCourse").value || "",
-    "Employment": document.getElementById("employment").value || "",
-    "Job Title": document.getElementById("jobTitle").value || "",
-    "Overseas Filipino Worker(OFW)": document.querySelector("input[name='ofw_status']:checked")?.value || "No",
-    "Country": document.getElementById("country").value || "",
-    "Transportation": document.getElementById("head_transport").value || "",
-    "Designated Pick-Up Point": document.getElementById("pickup").value || "",
-    "Pick-Up Location": document.getElementById("pickup").value || "", // Added for compatibility
-    "Drop-Off Point": document.getElementById("dropoff").value || "",
-    "Drop-Off Location": document.getElementById("dropoff").value || "", // Added for compatibility
-    "Name of Camp": document.getElementById("campName").value || "",
-    "Evacuation Camp Name": document.getElementById("campName").value || "", // Added for compatibility
-    "Capacity": document.getElementById("capacity").value || "",
-    "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
-    "Individuals Currently in Camp": document.getElementById("insideCamp").value || "", // Added for compatibility
-    "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
-    "Individuals Outside Camp": document.getElementById("outsideCamp").value || "", // Added for compatibility
-    "Reasons for Displacement": document.getElementById("reasons").value || "",
-    "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
-    "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
-    "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
-    "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
-    "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
-    "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
-    "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
-    "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
-    "AICS": document.getElementById("ass_aics").value || "",
-    /* Domestic animals — store as separate fields matching your header */
-    "Dog": document.getElementById("dog_chk").checked ? "Yes" : "No",
-    "Dog Qty.": document.getElementById("dog_qty").value || "",
-    "Cat": document.getElementById("cat_chk").checked ? "Yes" : "No",
-    "Cat Qty.": document.getElementById("cat_qty").value || "",
-    "Pig": document.getElementById("pig_chk").checked ? "Yes" : "No",
-    "Pig Qty.": document.getElementById("pig_qty").value || "",
-    "Cow": document.getElementById("cow_chk").checked ? "Yes" : "No",
-    "Cow Qty.": document.getElementById("cow_qty").value || "",
-    "Carabao": document.getElementById("carabao_chk").checked ? "Yes" : "No",
-    "Carabao Qty.": document.getElementById("carabao_qty").value || "",
-    "Chicken": document.getElementById("chicken_chk").checked ? "Yes" : "No",
-    "Chicken Qty.": document.getElementById("chicken_qty").value || "",
-    "Others": document.getElementById("animals_others").value || "",
-    "Submitted By": currentUserFullName, // Use the full name instead of username
-    "Submitted On": new Date().toLocaleString()
-  };
+const head = {
+  "Coordinate": document.getElementById("coordinate").value || "",
+  "Coordinates": document.getElementById("coordinate").value || "", // Added for compatibility
+  "Barangay": document.getElementById("barangay").value || "",
+  "Sitio / Purok": document.getElementById("sitio").value || "",
+  "Name of Household Head": document.getElementById("householdHead").value || "",
+  "FishR Registered/RBIS Registered": headRegistrationValue,
+  "Contact no.": document.getElementById("contactNo").value || "",
+  "Sex": document.querySelector('input[name="head_sex"]:checked')?.value || "",
+  "Birthdate": headBirthForSheet,
+  "Age": headAgeVal,
+  "No. of Household Member/s": document.getElementById("memberCount").value || "0",
+  "Name of Household Member/s": "", // head row has this empty
+  "PWD": document.querySelector('input[name="head_pwd"]:checked')?.value || "No",
+  "Stage": headAgeInfo ? headAgeInfo.stage : "",
+  "Status": document.getElementById("head_status").value || "",
+  "Educational Attainment": document.getElementById("educationalAttainment").value || "",
+  "College Graduate Course": document.getElementById("collegeCourse").value || "",
+  "Employment": document.getElementById("employment").value || "",
+  "Job Title": document.getElementById("jobTitle").value || "",
+  "Overseas Filipino Worker(OFW)": document.querySelector('input[name="ofw_status"]:checked')?.value || "No",
+  "Country": document.getElementById("country").value || "",
+  "Transportation": document.getElementById("head_transport").value || "",
+  "Designated Pick-Up Point": document.getElementById("pickup").value || "",
+  "Pick-Up Location": document.getElementById("pickup").value || "", // Added for compatibility
+  "Drop-Off Point": document.getElementById("dropoff").value || "",
+  "Drop-Off Location": document.getElementById("dropoff").value || "", // Added for compatibility
+  "Name of Camp": document.getElementById("campName").value || "",
+  "Evacuation Camp Name": document.getElementById("campName").value || "", // Added for compatibility
+  "Capacity": document.getElementById("capacity").value || "",
+  "No. of Individuals Inside Camp": document.getElementById("insideCamp").value || "",
+  "Individuals Currently in Camp": document.getElementById("insideCamp").value || "", // Added for compatibility
+  "No. of Individuals Outside Camp": document.getElementById("outsideCamp").value || "",
+  "Individuals Outside Camp": document.getElementById("outsideCamp").value || "", // Added for compatibility
+  "Reasons for Displacement": document.getElementById("reasons").value || "",
+  "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
+  "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
+  "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
+  "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
+  "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
+  "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
+  "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
+  "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
+  "AICS": document.getElementById("ass_aics").value || "",
+  /* Domestic animals — store as separate fields matching your header */
+  "Dog": document.getElementById("dog_chk").checked ? "Yes" : "No",
+  "Dog Qty.": document.getElementById("dog_qty").value || "",
+  "Cat": document.getElementById("cat_chk").checked ? "Yes" : "No",
+  "Cat Qty.": document.getElementById("cat_qty").value || "",
+  "Pig": document.getElementById("pig_chk").checked ? "Yes" : "No",
+  "Pig Qty.": document.getElementById("pig_qty").value || "",
+  "Cow": document.getElementById("cow_chk").checked ? "Yes" : "No",
+  "Cow Qty.": document.getElementById("cow_qty").value || "",
+  "Carabao": document.getElementById("carabao_chk").checked ? "Yes" : "No",
+  "Carabao Qty.": document.getElementById("carabao_qty").value || "",
+  "Chicken": document.getElementById("chicken_chk").checked ? "Yes" : "No",
+  "Chicken Qty.": document.getElementById("chicken_qty").value || "",
+  "Others": document.getElementById("animals_others").value || "",
+  "Submitted By": currentUserFullName, // Use the full name instead of username
+  "Submitted On": new Date().toLocaleString()
+};
 
   // ensure members length matches selected
   const expected = parseInt(document.getElementById("memberCount").value || 0);
@@ -3638,15 +4659,18 @@ const currentUser = localStorage.getItem("username") ||
     }
 
     if(data.success){
-      alert("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
-      window.location.href = "records.html";
+      showSuccess("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
+      // Redirect to records page after a delay
+      setTimeout(() => {
+        window.location.href = "records.html";
+      }, 2000);
     } else {
-      alert("Save failed: " + (data.message || "Unknown error"));
+      showError("Save failed: " + (data.message || "Unknown error"));
       console.error("SAVE ERROR:", data);
     }
   }catch(err){
     console.error("SUBMIT ERROR:", err);
-    alert("Network / Server error: " + (err.message || err));
+    showError("Network / Server error: " + (err.message || err));
   }finally{
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<i class="fas fa-save"></i> Save & Continue to Members';
@@ -3763,12 +4787,3 @@ function handleLogout() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
