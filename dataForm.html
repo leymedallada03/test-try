@@ -1185,128 +1185,134 @@ li.admin-only.admin-visible {
      margin-bottom: 0;
    }
    
-   /* ============ SMALLER MODAL STYLING ============ */
-   .modal {
-     display: none;
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 100%;
-     height: 100%;
-     background: rgba(0,0,0,0.7);
-     z-index: 9999;
-     align-items: center;
-     justify-content: center;
-   }
-   
-   .modal-content {
-     background: white;
-     padding: 20px;
-     border-radius: var(--radius);
-     max-width: 420px; /* Reduced from 500px */
-     width: 85%; /* Reduced from 90% */
-     max-height: 70vh; /* Reduced from 80vh */
-     overflow-y: auto;
-     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-     margin: 20px;
-   }
-   
-   .modal-actions {
-     display: flex;
-     gap: 10px;
-     justify-content: flex-end;
-     margin-top: 16px;
-   }
-   
-   /* Success Modal - Smaller */
-   .modal-success {
-     border-top: 4px solid var(--accent1);
-   }
-   
-   .modal-success .modal-header {
-     color: var(--accent1);
-     margin-top: 0;
-     font-size: 1.2rem; /* Smaller font */
-     margin-bottom: 10px;
-   }
-   
-   .modal-success .modal-icon {
-     color: var(--accent1);
-     font-size: 2rem; /* Reduced from 2.5rem */
-     text-align: center;
-     margin: 8px 0; /* Reduced margin */
-   }
-   
-   /* Warning Modal - Smaller */
-   .modal-warning {
-     border-top: 4px solid var(--accent3);
-   }
-   
-   .modal-warning .modal-header {
-     color: var(--accent3);
-     margin-top: 0;
-     font-size: 1.2rem; /* Smaller font */
-     margin-bottom: 10px;
-   }
-   
-   .modal-warning .modal-icon {
-     color: var(--accent3);
-     font-size: 2rem; /* Reduced from 2.5rem */
-     text-align: center;
-     margin: 8px 0; /* Reduced margin */
-   }
-   
-   /* Error Modal - Smaller */
-   .modal-error {
-     border-top: 4px solid var(--hazard-red);
-   }
-   
-   .modal-error .modal-header {
-     color: var(--hazard-red);
-     margin-top: 0;
-     font-size: 1.2rem; /* Smaller font */
-     margin-bottom: 10px;
-   }
-   
-   .modal-error .modal-icon {
-     color: var(--hazard-red);
-     font-size: 2rem; /* Reduced from 2.5rem */
-     text-align: center;
-     margin: 8px 0; /* Reduced margin */
-   }
-   
-   /* Info Modal - Smaller */
-   .modal-info {
-     border-top: 4px solid var(--accent2);
-   }
-   
-   .modal-info .modal-header {
-     color: var(--accent2);
-     margin-top: 0;
-     font-size: 1.2rem; /* Smaller font */
-     margin-bottom: 10px;
-   }
-   
-   .modal-info .modal-icon {
-     color: var(--accent2);
-     font-size: 2rem; /* Reduced from 2.5rem */
-     text-align: center;
-     margin: 8px 0; /* Reduced margin */
-   }
-   
-   /* Modal text styling */
-   .modal-content p {
-     margin: 0 0 12px 0;
-     line-height: 1.5;
-     font-size: 0.95rem; /* Smaller text */
-   }
-   
-   /* Smaller buttons in modals */
-   .modal-actions .btn {
-     padding: 7px 12px; /* Smaller padding */
-     font-size: 0.8rem; /* Smaller font */
-     min-height: 32px; /* Smaller height */
-   }
+/* ============ SMALLER MODAL STYLING ============ */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 18px; /* Reduced from 20px */
+    border-radius: var(--radius);
+    max-width: 280px; /* Reduced from 420px */
+    width: 85%;
+    max-height: 65vh; /* Reduced from 70vh */
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18); /* Lighter shadow */
+    margin: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px; /* Reduced from 10px */
+    justify-content: flex-end;
+    margin-top: 14px; /* Reduced from 16px */
+}
+
+/* Success Modal - Even Smaller */
+.modal-success {
+    border-top: 3px solid var(--accent1); /* Thinner border */
+}
+
+.modal-success .modal-header {
+    color: var(--accent1);
+    margin-top: 0;
+    font-size: 1.1rem; /* Smaller font */
+    margin-bottom: 8px; /* Reduced */
+    font-weight: 600;
+}
+
+.modal-success .modal-icon {
+    color: var(--accent1);
+    font-size: 1.8rem; /* Reduced from 2rem */
+    text-align: center;
+    margin: 6px 0; /* Reduced margin */
+}
+
+/* Warning Modal - Smaller */
+.modal-warning {
+    border-top: 3px solid var(--accent3); /* Thinner border */
+}
+
+.modal-warning .modal-header {
+    color: var(--accent3);
+    margin-top: 0;
+    font-size: 1.1rem; /* Smaller font */
+    margin-bottom: 8px; /* Reduced */
+    font-weight: 600;
+}
+
+.modal-warning .modal-icon {
+    color: var(--accent3);
+    font-size: 1.8rem; /* Reduced from 2rem */
+    text-align: center;
+    margin: 6px 0; /* Reduced margin */
+}
+
+/* Error Modal - Smaller */
+.modal-error {
+    border-top: 3px solid var(--hazard-red); /* Thinner border */
+}
+
+.modal-error .modal-header {
+    color: var(--hazard-red);
+    margin-top: 0;
+    font-size: 1.1rem; /* Smaller font */
+    margin-bottom: 8px; /* Reduced */
+    font-weight: 600;
+}
+
+.modal-error .modal-icon {
+    color: var(--hazard-red);
+    font-size: 1.8rem; /* Reduced from 2rem */
+    text-align: center;
+    margin: 6px 0; /* Reduced margin */
+}
+
+/* Info Modal - Smaller */
+.modal-info {
+    border-top: 3px solid var(--accent2); /* Thinner border */
+}
+
+.modal-info .modal-header {
+    color: var(--accent2);
+    margin-top: 0;
+    font-size: 1.1rem; /* Smaller font */
+    margin-bottom: 8px; /* Reduced */
+    font-weight: 600;
+}
+
+.modal-info .modal-icon {
+    color: var(--accent2);
+    font-size: 1.8rem; /* Reduced from 2rem */
+    text-align: center;
+    margin: 6px 0; /* Reduced margin */
+}
+
+/* Modal text styling */
+.modal-content p {
+    margin: 0 0 10px 0; /* Reduced bottom margin */
+    line-height: 1.4; /* Tighter line height */
+    font-size: 0.9rem; /* Smaller text */
+}
+
+/* Smaller buttons in modals */
+.modal-actions .btn {
+    padding: 6px 10px; /* Smaller padding */
+    font-size: 0.78rem; /* Smaller font */
+    min-height: 30px; /* Smaller height */
+    gap: 6px; /* Reduced icon spacing */
+}
+
    
    /* ============ FIELD-LEVEL VALIDATION STYLES ============ */
    /* Make these more specific than the general input styles */
