@@ -589,18 +589,18 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    padding: 16px;
+    padding: 12px;
    }
 
    .modal-box {
     background: #fff;
-    padding: 20px;
+    padding: 16px; /* Reduced from 20px */
     border-radius: var(--radius);
-    max-width: 450px; /* Smaller width */
+    max-width: 420px; /* Smaller width */
     width: 100%;
     box-shadow: var(--shadow-dark);
     animation: modalSlideIn 0.3s ease;
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
    }
 
@@ -609,30 +609,30 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
+    margin-bottom: 12px; /* Reduced */
+    padding-bottom: 10px; /* Reduced */
     border-bottom: 1px solid var(--border);
    }
 
    .modal-header h3 {
     margin: 0;
     color: var(--accent1);
-    font-size: 1.2rem; /* Smaller font */
+    font-size: 1.1rem; /* Smaller font */
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px; /* Reduced */
    }
 
    .modal-body {
-    margin-bottom: 16px;
-    padding: 0 4px;
+    margin-bottom: 12px; /* Reduced */
+    padding: 0 2px; /* Reduced */
    }
 
    /* Delete confirmation modal */
    .modal-delete .modal-header {
     background: #ffeaea;
-    margin: -20px -20px 20px -20px;
-    padding: 16px 20px;
+    margin: -16px -16px 16px -16px; /* Reduced margins */
+    padding: 12px 16px; /* Reduced padding */
     border-radius: var(--radius) var(--radius) 0 0;
     border-bottom: 1px solid #ffcccc;
    }
@@ -642,54 +642,54 @@
    }
 
    .modal-delete .modal-body {
-    padding: 10px 0;
+    padding: 8px 0; /* Reduced */
    }
 
    .modal-delete .warning-icon {
-    font-size: 2.5rem; /* Smaller icon */
+    font-size: 2.2rem; /* Smaller icon */
     color: #ff7a00;
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px; /* Reduced */
    }
 
    .modal-delete .warning-text {
     text-align: center;
-    font-size: 0.95rem; /* Smaller font */
+    font-size: 0.9rem; /* Smaller font */
     color: var(--muted);
-    margin-bottom: 10px;
+    margin-bottom: 8px; /* Reduced */
     line-height: 1.4;
    }
 
    .modal-delete .user-details {
     background: var(--light-green);
-    padding: 12px;
+    padding: 10px; /* Reduced */
     border-radius: var(--radius-sm);
-    margin: 12px 0;
+    margin: 10px 0; /* Reduced */
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Smaller */
    }
 
    .modal-delete .user-details strong {
     color: var(--accent1);
-    font-size: 1rem;
+    font-size: 0.95rem; /* Smaller */
    }
 
    .modal-delete .info-note {
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.8rem; /* Smaller */
     color: #666;
-    margin-top: 10px;
+    margin-top: 8px; /* Reduced */
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px; /* Reduced */
    }
 
    /* Reset password modal */
    .modal-reset .modal-header {
     background: #fff8e1;
-    margin: -20px -20px 20px -20px;
-    padding: 16px 20px;
+    margin: -16px -16px 16px -16px; /* Reduced */
+    padding: 12px 16px; /* Reduced */
     border-radius: var(--radius) var(--radius) 0 0;
     border-bottom: 1px solid #ffecb3;
    }
@@ -699,45 +699,45 @@
    }
 
    .modal-reset .modal-body {
-    padding: 10px 0;
+    padding: 8px 0; /* Reduced */
    }
 
    .modal-reset .reset-icon {
-    font-size: 2.5rem; /* Smaller icon */
+    font-size: 2.2rem; /* Smaller icon */
     color: #ff9800;
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px; /* Reduced */
    }
 
    .modal-reset .reset-text {
     text-align: center;
-    font-size: 0.95rem; /* Smaller font */
+    font-size: 0.9rem; /* Smaller font */
     color: var(--muted);
-    margin-bottom: 10px;
+    margin-bottom: 8px; /* Reduced */
     line-height: 1.4;
    }
 
    .modal-reset .user-details {
     background: var(--light-green);
-    padding: 12px;
+    padding: 10px; /* Reduced */
     border-radius: var(--radius-sm);
-    margin: 12px 0;
+    margin: 10px 0; /* Reduced */
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Smaller */
    }
 
    .modal-reset .user-details strong {
     color: var(--accent1);
-    font-size: 1rem;
+    font-size: 0.95rem; /* Smaller */
    }
 
    .modal-reset .password-info {
     background: #e9f7f2;
-    padding: 10px;
+    padding: 8px; /* Reduced */
     border-radius: var(--radius-sm);
-    margin-top: 15px;
+    margin-top: 12px; /* Reduced */
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.8rem; /* Smaller */
     color: var(--accent1);
     border-left: 3px solid var(--accent1);
    }
@@ -747,26 +747,27 @@
     to { transform: translateY(0); opacity: 1; }
    }
 
-   /* Form styles - Smaller */
+   /* Form styles - Even Smaller */
    .form-group {
-    margin-bottom: 12px;
+    margin-bottom: 10px; /* Reduced */
    }
 
    .form-group label {
     display: block;
     margin-bottom: 4px;
-    font-size: 0.85rem; /* Smaller */
+    font-size: 0.82rem; /* Smaller */
     color: var(--muted);
     font-weight: 500;
    }
 
    .form-control {
     width: 100%;
-    padding: 8px 12px; /* Smaller padding */
+    padding: 7px 10px; /* Smaller padding */
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Smaller */
     box-sizing: border-box;
+    height: 36px; /* Fixed height for consistency */
    }
 
    .form-control:focus {
@@ -776,60 +777,87 @@
    }
 
    .form-hint {
-    font-size: 0.75rem; /* Smaller */
+    font-size: 0.72rem; /* Smaller */
     color: var(--muted);
-    margin-top: 4px;
+    margin-top: 3px; /* Reduced */
    }
 
    .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 20px;
-    padding-top: 16px;
+    margin-top: 16px; /* Reduced */
+    padding-top: 12px; /* Reduced */
     border-top: 1px solid var(--border);
    }
 
-   /* Password toggle in modal */
+   /* Adjust select elements to match height */
+   .form-control select {
+    height: 36px;
+    padding: 0 10px;
+   }
+
+   /* Password toggle in modal - adjusted for smaller size */
    .modal-body .input-with-icon {
     position: relative;
    }
 
    .modal-body .input-with-icon .password-toggle {
     position: absolute;
-    right: 10px;
+    right: 8px; /* Reduced */
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--muted);
     cursor: pointer;
-    font-size: 1rem;
-    padding: 4px;
+    font-size: 0.9rem; /* Smaller */
+    padding: 3px; /* Reduced */
    }
 
    .modal-body .input-with-icon input {
-    padding-right: 40px !important;
+    padding-right: 32px !important; /* Reduced */
    }
 
-   /* Toast notifications */
-   .toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: var(--accent1);
-    color: white;
-    padding: 12px 20px;
+   /* Make button heights consistent with inputs */
+   .btn {
+    border: 0;
+    padding: 7px 12px; /* Adjusted */
     border-radius: var(--radius-sm);
+    cursor: pointer;
     font-weight: 600;
-    box-shadow: var(--shadow-dark);
-    z-index: 10000;
-    animation: slideIn 0.3s ease;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-size: 0.82rem; /* Smaller */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 36px; /* Fixed height */
+    box-sizing: border-box;
+    position: relative;
    }
 
-   @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+   /* Adjust icon sizes in modals */
+   .modal-header .icon-btn {
+    font-size: 0.9rem; /* Smaller */
+    padding: 4px; /* Reduced */
+   }
+
+   /* Adjust logs modal size too */
+   #logsModal .modal-box {
+    max-width: 1100px; /* Reduced from 1200px */
+    max-height: 75vh;
+   }
+
+   #logsModal .modal-header {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+   }
+
+   #logsModal .modal-header h3 {
+    font-size: 1.1rem;
    }
 
    /* Tabs styling for logs modal */
@@ -974,25 +1002,66 @@
            max-width: 200px;
        }
 
-       /* Mobile modal adjustments */
+       /* Mobile modal adjustments - make even smaller on mobile */
+       .modal-overlay {
+           padding: 8px;
+       }
+       
        .modal-box {
-           max-width: 95%;
-           padding: 16px;
-           margin: 10px;
+           max-width: 92%;
+           padding: 12px;
+           margin: 8px;
+       }
+       
+       .modal-header {
+           margin-bottom: 10px;
+           padding-bottom: 8px;
        }
        
        .modal-header h3 {
-           font-size: 1.1rem;
+           font-size: 1rem;
+       }
+       
+       .modal-delete .modal-header,
+       .modal-reset .modal-header {
+           margin: -12px -12px 12px -12px;
+           padding: 10px 12px;
        }
        
        .modal-delete .warning-icon,
        .modal-reset .reset-icon {
-           font-size: 2rem;
+           font-size: 1.8rem;
        }
        
        .modal-delete .warning-text,
        .modal-reset .reset-text {
-           font-size: 0.9rem;
+           font-size: 0.85rem;
+       }
+       
+       .form-group {
+           margin-bottom: 8px;
+       }
+       
+       .form-control {
+           padding: 6px 8px;
+           height: 34px;
+           font-size: 0.82rem;
+       }
+       
+       .btn {
+           padding: 6px 10px;
+           height: 34px;
+           font-size: 0.8rem;
+       }
+       
+       /* Logs modal on mobile */
+       #logsModal .modal-box {
+           max-width: 98%;
+           max-height: 85vh;
+       }
+       
+       #logsModal .modal-header h3 {
+           font-size: 1rem;
        }
        
        .form-actions {
@@ -1400,7 +1469,7 @@
 
 <!-- Enhanced Logs Modal with User Activity -->
 <div id="logsModal" class="modal-overlay">
-  <div class="modal-box" style="max-width: 1200px; max-height: 80vh; overflow-y: auto;">
+  <div class="modal-box" style="max-width: 1100px; max-height: 75vh; overflow-y: auto;">
     <div class="modal-header">
       <h3><i class="fas fa-user-clock"></i> User Activity & Audit Logs</h3>
       <button id="closeLogsModal" class="icon-btn">
