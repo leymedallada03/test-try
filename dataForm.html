@@ -1005,42 +1005,39 @@ li.admin-only.admin-visible {
    }
    
    /* Buttons - Made Smaller */
-   .btn { 
-     border:0;
-     padding: 8px 14px;
-     border-radius:var(--radius-sm);
-     cursor:pointer;
-     font-weight:600;
-     background: linear-gradient(90deg, var(--accent1), var(--accent2));
-     color:#fff;
-     font-size: 0.85rem;
-     display: inline-flex;
-     align-items: center;
-     gap: 8px;
-     transition: all 0.2s ease;
-     white-space: nowrap;
-     min-height: 36px;
-     -webkit-tap-highlight-color: transparent;
-     touch-action: manipulation;
-   }
+.btn {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 36px;
+    box-sizing: border-box;
+    position: relative;
+}
    
    .btn:hover {
      transform: translateY(-2px);
      box-shadow: 0 4px 12px rgba(15,122,74,0.2);
    }
-   
    /* Secondary button - Made Smaller */
-   .btn.secondary { 
-     background: transparent; 
-     color: var(--accent1); 
-     border:2px solid var(--border);
-     padding: 6px 12px;
-   }
+ .btn.secondary { 
+    background: transparent; 
+    color: var(--accent1); 
+    border: 1px solid var(--accent1);
+    padding: 7px 12px; /* Match users.html padding */
+    height: 36px; /* Match users.html height */
+}
    
-   .btn.secondary:hover {
-     background: var(--light-green);
-     border-color: var(--accent1);
-   }
+
    
    /* Hazard Hunter Button Styling */
    .btn.hazard-hunter {
@@ -1185,132 +1182,271 @@ li.admin-only.admin-visible {
      margin-bottom: 0;
    }
    
-/* ============ SMALLER MODAL STYLING ============ */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 9999;
+/* ============ MODAL STYLING FROM USERS.HTML ============ */
+.icon-btn {
+    background: none;
+    border: 0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    color: var(--muted);
+    transition: all 0.2s ease;
 }
 
-.modal-content {
-    background: white;
-    padding: 18px; /* Reduced from 20px */
+.icon-btn:hover {
+    background: var(--light-green);
+    color: var(--accent1);
+    transform: translateY(-1px);
+}
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 12px;
+}
+
+.modal-box {
+    background: #fff;
+    padding: 16px; /* Reduced from 20px */
     border-radius: var(--radius);
-    max-width: 280px; /* Reduced from 420px */
-    width: 85%;
-    max-height: 65vh; /* Reduced from 70vh */
+    max-width: 420px; /* Smaller width */
+    width: 100%;
+    box-shadow: var(--shadow-dark);
+    animation: modalSlideIn 0.3s ease;
+    max-height: 85vh;
     overflow-y: auto;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18); /* Lighter shadow */
-    margin: 20px;
+}
+
+/* Smaller modal content */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px; /* Reduced */
+    padding-bottom: 10px; /* Reduced */
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--accent1);
+    font-size: 1.1rem; /* Smaller font */
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Reduced */
+}
+
+.modal-body {
+    margin-bottom: 12px; /* Reduced */
+    padding: 0 2px; /* Reduced */
 }
 
 .modal-actions {
     display: flex;
-    gap: 8px; /* Reduced from 10px */
+    gap: 8px;
     justify-content: flex-end;
-    margin-top: 14px; /* Reduced from 16px */
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
 }
 
-/* Success Modal - Even Smaller */
-.modal-success {
-    border-top: 3px solid var(--accent1); /* Thinner border */
+@keyframes modalSlideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Button styles to match users.html */
+.modal-actions .btn {
+    border: 0;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 36px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.modal-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+}
+
+.modal-actions .btn-secondary {
+    padding: 7px 12px; /* Ensure this matches */
+    height: 36px; /* Ensure this matches */
 }
 
 .modal-success .modal-header {
+    background: #e9f7f2;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid rgba(15,122,74,0.1);
+}
+
+.modal-success .modal-header h3 {
     color: var(--accent1);
-    margin-top: 0;
-    font-size: 1.1rem; /* Smaller font */
-    margin-bottom: 8px; /* Reduced */
-    font-weight: 600;
 }
 
 .modal-success .modal-icon {
+    font-size: 2.2rem; /* Smaller icon */
     color: var(--accent1);
-    font-size: 1.8rem; /* Reduced from 2rem */
     text-align: center;
-    margin: 6px 0; /* Reduced margin */
-}
-
-/* Warning Modal - Smaller */
-.modal-warning {
-    border-top: 3px solid var(--accent3); /* Thinner border */
+    margin-bottom: 10px; /* Reduced */
 }
 
 .modal-warning .modal-header {
+    background: #fff8e1;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid #ffecb3;
+}
+
+.modal-warning .modal-header h3 {
     color: var(--accent3);
-    margin-top: 0;
-    font-size: 1.1rem; /* Smaller font */
-    margin-bottom: 8px; /* Reduced */
-    font-weight: 600;
 }
 
 .modal-warning .modal-icon {
+    font-size: 2.2rem; /* Smaller icon */
     color: var(--accent3);
-    font-size: 1.8rem; /* Reduced from 2rem */
     text-align: center;
-    margin: 6px 0; /* Reduced margin */
-}
-
-/* Error Modal - Smaller */
-.modal-error {
-    border-top: 3px solid var(--hazard-red); /* Thinner border */
+    margin-bottom: 10px; /* Reduced */
 }
 
 .modal-error .modal-header {
+    background: #ffeaea;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid #ffcccc;
+}
+
+.modal-error .modal-header h3 {
     color: var(--hazard-red);
-    margin-top: 0;
-    font-size: 1.1rem; /* Smaller font */
-    margin-bottom: 8px; /* Reduced */
-    font-weight: 600;
 }
 
 .modal-error .modal-icon {
+    font-size: 2.2rem; /* Smaller icon */
     color: var(--hazard-red);
-    font-size: 1.8rem; /* Reduced from 2rem */
     text-align: center;
-    margin: 6px 0; /* Reduced margin */
+    margin-bottom: 10px; /* Reduced */
 }
 
-/* Info Modal - Smaller */
-.modal-info {
-    border-top: 3px solid var(--accent2); /* Thinner border */
-}
 
 .modal-info .modal-header {
+    background: #f0f9ff;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid #d1e9ff;
+}
+
+.modal-info .modal-header h3 {
     color: var(--accent2);
-    margin-top: 0;
-    font-size: 1.1rem; /* Smaller font */
-    margin-bottom: 8px; /* Reduced */
-    font-weight: 600;
 }
 
 .modal-info .modal-icon {
+    font-size: 2.2rem; /* Smaller icon */
     color: var(--accent2);
-    font-size: 1.8rem; /* Reduced from 2rem */
     text-align: center;
-    margin: 6px 0; /* Reduced margin */
+    margin-bottom: 10px; /* Reduced */
 }
 
 /* Modal text styling */
-.modal-content p {
+.modal-body p {
     margin: 0 0 10px 0; /* Reduced bottom margin */
     line-height: 1.4; /* Tighter line height */
     font-size: 0.9rem; /* Smaller text */
+    color: var(--muted);
 }
 
-/* Smaller buttons in modals */
-.modal-actions .btn {
-    padding: 6px 10px; /* Smaller padding */
-    font-size: 0.78rem; /* Smaller font */
-    min-height: 30px; /* Smaller height */
-    gap: 6px; /* Reduced icon spacing */
+/* For existing modals in dataForm.html - update classes */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+.modal-content {
+    background: white;
+    padding: 16px; /* Match users.html */
+    border-radius: var(--radius);
+    max-width: 420px; /* Match users.html */
+    width: 100%;
+    max-height: 85vh; /* Match users.html */
+    overflow-y: auto;
+    box-shadow: var(--shadow-dark); /* Match users.html */
+    animation: modalSlideIn 0.3s ease; /* Add animation */
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-overlay, .modal {
+        padding: 8px;
+    }
+    
+    .modal-box, .modal-content {
+        max-width: 92%;
+        padding: 12px;
+        margin: 8px;
+    }
+    
+    .modal-header {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+    
+    .modal-success .modal-header,
+    .modal-warning .modal-header,
+    .modal-error .modal-header,
+    .modal-info .modal-header {
+        margin: -12px -12px 12px -12px;
+        padding: 10px 12px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-box, .modal-content {
+        max-width: 98%;
+        width: 98%;
+        padding: 14px;
+        margin: 8px;
+    }
 }
 
    
@@ -1732,6 +1868,163 @@ textarea.validation-error:focus {
          break-inside: avoid;
      }
    }
+
+   /* ============ FIXED: COMPACT GOVERNMENT ASSISTANCE STYLES FOR BOTH HEAD AND MEMBER PANEL ============ */
+   /* Main container for checkbox + program + date */
+   .gov-checkbox-with-date {
+     display: flex;
+     flex-wrap: nowrap;
+     align-items: center;
+     gap: 8px;
+     margin: 4px 0;
+     padding: 6px 0;
+     min-height: 40px;
+     width: 100%;
+   }
+
+   /* Checkbox styling - GREEN WHEN CHECKED */
+   .gov-checkbox-with-date input[type="checkbox"] {
+     flex-shrink: 0;
+     width: 18px;
+     height: 18px;
+     margin: 0;
+     accent-color: var(--accent1);
+     cursor: pointer;
+     transform: scale(1.1);
+   }
+
+   /* Program label styling - GREEN WHEN CHECKED */
+   .gov-checkbox-with-date > label {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     font-weight: 600;
+     color: var(--accent1);
+     cursor: pointer;
+     flex: 0 0 180px; /* Fixed width for program names */
+     min-width: 180px;
+     margin: 0;
+     padding: 4px 0;
+     white-space: nowrap;
+   }
+
+   /* GREEN STYLING FOR CHECKED GOVERNMENT ASSISTANCE ITEMS */
+   .gov-checkbox-with-date input[type="checkbox"]:checked + label {
+     color: #0f7a4a;
+     font-weight: 700;
+   }
+
+   /* GREEN STYLING FOR CHECKED DOMESTIC ANIMALS */
+   .animal-card input[type="checkbox"]:checked + label {
+     color: #0f7a4a;
+     font-weight: 700;
+   }
+
+   /* Date field container - initially hidden */
+   .gov-date-field {
+     display: none;
+     flex: 1;
+     min-width: 200px;
+     animation: fadeIn 0.3s ease;
+     align-items: center;
+     gap: 8px;
+   }
+
+   /* When date field is shown */
+   .gov-date-field.show {
+     display: flex;
+   }
+
+   /* Date field label */
+   .gov-date-field label {
+     font-size: 0.8rem;
+    color: var(--accent1);
+     margin: 0;
+     white-space: nowrap;
+     flex-shrink: 0;
+   }
+
+   /* Date input styling */
+   .gov-date-field input[type="date"] {
+     width: 140px;
+     padding: 6px 8px;
+     border-radius: var(--radius-sm);
+     border: 2px solid var(--border);
+     font-size: 0.8rem;
+     min-height: 32px;
+     flex-shrink: 0;
+   }
+
+   /* Adjust grid for compact layout in both forms */
+   .gov-support-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+     gap: 8px 20px;
+     margin-top: 0px;
+   }
+
+   /* In main form - make it responsive */
+   .content-area .gov-support-grid {
+     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+   }
+
+   /* When sidebar is collapsed, the grid should adapt properly */
+   .page-container.collapsed .content-area .gov-support-grid {
+     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+   }
+
+   /* Adjust grid for compact layout in member panel */
+   .member-panel .gov-support-grid {
+     display: grid;
+     grid-template-columns: 1fr;
+     gap: 4px 0;
+     margin-top: 0;
+   }
+
+   /* Make checkboxes in member panel align properly */
+   .member-panel .gov-checkbox-with-date {
+     padding: 4px 0;
+     margin: 2px 0;
+   }
+
+   /* Remove border from last item */
+   .member-panel .gov-checkbox-with-date:last-child {
+     border-bottom: none;
+   }
+
+   /* Ensure date fields in member panel don't overflow */
+   .member-panel .gov-date-field {
+     min-width: 180px;
+     justify-content: flex-start;
+   }
+
+   .member-panel .gov-date-field input[type="date"] {
+     width: 130px;
+     padding: 6px;
+   }
+
+   /* Mobile adjustments for government assistance */
+   @media (max-width: 768px) {
+     .gov-support-grid {
+       grid-template-columns: 1fr !important;
+       gap: 8px !important;
+     }
+     
+     .gov-checkbox-with-date {
+       flex-wrap: wrap;
+     }
+     
+     .gov-checkbox-with-date > label {
+       flex: 1;
+       min-width: 160px;
+     }
+     
+     .gov-date-field {
+       min-width: 100%;
+       margin-top: 4px;
+       padding-left: 28px; /* Align with checkbox */
+     }
+   }
 </style>
 </head>
 <body>
@@ -1923,6 +2216,7 @@ textarea.validation-error:focus {
           <div id="collegeCourseField" class="conditional-field">
             <label>College Graduate Course</label>
             <input type="text" id="collegeCourse" placeholder="Enter course name" />
+            <div class="small-muted">Please input the official college course acronym only (e.g., BSIT, BSCS, BSA, BSEd–Math).</div>
           </div>
 
           <div>
@@ -2016,7 +2310,7 @@ textarea.validation-error:focus {
             <label>Overseas Filipino Worker (OFW)</label>
             <div class="radio-line">
               <label class="radio-item"><input type="radio" name="ofw_status" value="Yes"> Yes</label>
-              <label class="radio-item"><input type="radio" name="ofw_status" value="No" checked> No</label>
+              <label class="radio-item"><input type="radio" name="ofw_status" value="No"> No</label>
             </div>
           </div>
 
@@ -2205,54 +2499,107 @@ textarea.validation-error:focus {
         </div>
       </div>
 
-      <!-- GOVERNMENT SUPPORT - FIXED ALIGNMENT -->
+      <!-- GOVERNMENT SUPPORT - FIXED ALIGNMENT WITH GREEN CHECKED STYLING -->
       <div class="card">
         <div class="section-title1"><div class="chip">6</div><h3 style="margin-bottom: 0; margin-top: 0">Government Assistance Programs</h3></div>
         <div class="instruction-label">Please check (✓) all items that apply.</div>
 
         <div class="gov-support-grid">
-          <div class="checkbox-item">
+          <!-- TUPAD with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_tupad">
             <label for="ass_tupad">TUPAD</label>
+            <div id="ass_tupad_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_tupad_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Local 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_local4ps">
             <label for="ass_local4ps">Local 4Ps</label>
+            <div id="ass_local4ps_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_local4ps_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- National 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_intl4ps">
             <label for="ass_intl4ps">National 4Ps</label>
+            <div id="ass_intl4ps_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_intl4ps_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Local Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_locsp">
             <label for="ass_locsp">Local Social Pension</label>
+            <div id="ass_locsp_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_locsp_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- National Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_intlsp">
             <label for="ass_intlsp">National Social Pension</label>
+            <div id="ass_intlsp_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_intlsp_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Solo Parent Assistance with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_solo">
             <label for="ass_solo">Solo Parent Assistance</label>
+            <div id="ass_solo_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_solo_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Relief Goods with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_relief">
             <label for="ass_relief">Relief Goods</label>
+            <div id="ass_relief_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_relief_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Cash Subsidy with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="ass_cash">
             <label for="ass_cash">Cash Subsidy</label>
+            <div id="ass_cash_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="ass_cash_date_input">
+            </div>
           </div>
         </div>
 
         <div style="grid-column:1/-1;margin-top:16px">
           <label>AICS (if any)</label>
-          <select id="ass_aics" class="animated">
-            <option value="">None</option>
-            <option>Shelter Assistance</option>
-            <option>Burial</option>
-            <option>Scholarship</option>
-          </select>
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <select id="ass_aics" class="animated" style="flex: 1; min-width: 200px;">
+              <option value="">None</option>
+              <option>Shelter Assistance</option>
+              <option>Burial</option>
+              <option>Scholarship</option>
+            </select>
+            <div id="ass_aics_date" class="gov-date-field" style="margin-top: 0;">
+              <label>Received:</label>
+              <input type="date" id="ass_aics_date_input">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2279,37 +2626,6 @@ textarea.validation-error:focus {
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
 </div>
-
-<!-- Hazard Hunter Modal - Made smaller -->
-<div id="hazardHunterModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-info">
-    <h3 class="modal-header">Pick Coordinates from Hazard Hunter</h3>
-    <div style="background: var(--light-green); padding: 14px; border-radius: var(--radius-sm); margin: 12px 0;">
-      <h4 style="color: var(--hazard-red); margin-top: 0; display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
-        <i class="fas fa-map-marked-alt"></i> Instructions:
-      </h4>
-      <ol style="margin: 10px 0 0 18px; line-height: 1.5; font-size: 0.9rem; padding-left: 0;">
-        <li>Click the button below to open Hazard Hunter in a new tab</li>
-        <li>Navigate to the desired location on the map</li>
-        <li>Click on the map to get coordinates</li>
-        <li>Copy the coordinates (latitude, longitude)</li>
-        <li>Return to this tab and paste them in the coordinate field</li>
-      </ol>
-      <div style="margin-top: 12px; padding: 10px; background: white; border-radius: var(--radius-sm); border-left: 3px solid var(--accent1); font-size: 0.85rem;">
-        <strong>📋 Expected format:</strong> <code>14.123456, 121.123456</code>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button id="cancelHazardHunter" class="btn secondary">
-        <i class="fas fa-times"></i> Cancel
-      </button>
-      <button id="confirmHazardHunter" class="btn hazard-hunter">
-        <i class="fas fa-external-link-alt"></i> Open Hazard Hunter
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- Overlay + Member Panel -->
 <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
 
@@ -2414,6 +2730,7 @@ textarea.validation-error:focus {
           <div id="memberCollegeCourseField" class="conditional-field">
             <label>College Graduate Course</label>
             <input type="text" id="memberCollegeCourse" placeholder="Enter course name" />
+            <div class="small-muted">Please input the official college course acronym only (e.g., BSIT, BSCS, BSA, BSEd–Math).</div>
           </div>
 
           <div>
@@ -2631,54 +2948,107 @@ textarea.validation-error:focus {
         </div>
       </div>
 
-      <!-- Card 5: Government Assistance Programs -->
+      <!-- Card 5: Government Assistance Programs WITH DATES AND GREEN CHECKED STYLING -->
       <div class="edit-card">
         <div class="form-section">
           <h5>Government Assistance Programs</h5>
         </div>
         <div class="gov-support-grid">
-          <div class="checkbox-item">
+          <!-- TUPAD with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_tupad" class="member_tupad">
             <label for="member_tupad">TUPAD</label>
+            <div id="member_tupad_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_tupad_date_input" class="member_tupad_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Local 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_local4ps" class="member_local4ps">
             <label for="member_local4ps">Local 4Ps</label>
+            <div id="member_local4ps_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_local4ps_date_input" class="member_local4ps_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- National 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
             <label for="member_intl4ps">National 4Ps</label>
+            <div id="member_intl4ps_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_intl4ps_date_input" class="member_intl4ps_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Local Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_locsp" class="member_locsp">
             <label for="member_locsp">Local Social Pension</label>
+            <div id="member_locsp_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_locsp_date_input" class="member_locsp_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- National Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_intlsp" class="member_intlsp">
             <label for="member_intlsp">National Social Pension</label>
+            <div id="member_intlsp_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_intlsp_date_input" class="member_intlsp_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Solo Parent Assistance with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_solo" class="member_solo">
             <label for="member_solo">Solo Parent Assistance</label>
+            <div id="member_solo_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_solo_date_input" class="member_solo_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Relief Goods with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_relief" class="member_relief">
             <label for="member_relief">Relief Goods</label>
+            <div id="member_relief_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_relief_date_input" class="member_relief_date_input">
+            </div>
           </div>
-          <div class="checkbox-item">
+          
+          <!-- Cash Subsidy with Date -->
+          <div class="gov-checkbox-with-date">
             <input type="checkbox" id="member_cash" class="member_cash">
             <label for="member_cash">Cash Subsidy</label>
+            <div id="member_cash_date" class="gov-date-field">
+              <label>Received:</label>
+              <input type="date" id="member_cash_date_input" class="member_cash_date_input">
+            </div>
           </div>
         </div>
 
         <div style="margin-top:16px">
           <label>AICS (if any)</label>
-          <select id="memberAics" class="member_aics animated">
-            <option value="">None</option>
-            <option>Shelter Assistance</option>
-            <option>Burial</option>
-            <option>Scholarship</option>
-          </select>
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <select id="memberAics" class="member_aics animated" style="flex: 1; min-width: 200px;">
+              <option value="">None</option>
+              <option>Shelter Assistance</option>
+              <option>Burial</option>
+              <option>Scholarship</option>
+            </select>
+            <div id="member_aics_date" class="gov-date-field" style="margin-top: 0;">
+              <label>Received:</label>
+              <input type="date" id="member_aics_date_input" class="member_aics_date_input">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2697,36 +3067,116 @@ textarea.validation-error:focus {
   </div>
 </div>
 
-<!-- NEW MODALS - ALL MADE SMALLER -->
-<!-- Reset Confirmation Modal - Smaller -->
-<div id="resetConfirmationModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-warning">
-    <div class="modal-icon">
-      <i class="fas fa-exclamation-triangle"></i>
-    </div>
-    <h3 class="modal-header">Reset Form</h3>
-    <p>Are you sure you want to reset the form? All entered data will be permanently lost.</p>
-    <div class="modal-actions">
-      <button id="cancelReset" class="btn secondary">
-        <i class="fas fa-times"></i> Cancel
+<!-- Success Modal - Updated structure -->
+<div id="successModal" class="modal-overlay">
+  <div class="modal-box modal-success">
+    <div class="modal-header">
+      <h3><i class="fas fa-check-circle"></i> Success!</h3>
+      <button class="icon-btn" onclick="hideModal('successModal')">
+        <i class="fas fa-times"></i>
       </button>
-      <button id="confirmReset" class="btn btn-reset">
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <p id="successMessage">Operation completed successfully.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="closeSuccess" class="btn">
+        <i class="fas fa-check"></i> OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal - Updated structure -->
+<div id="errorModal" class="modal-overlay">
+  <div class="modal-box modal-error">
+    <div class="modal-header">
+      <h3><i class="fas fa-exclamation-circle"></i> Error</h3>
+      <button class="icon-btn" onclick="hideModal('errorModal')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <p id="errorMessage">An error occurred.</p>
+    </div>
+    <div class="modal-actions">
+<button id="closeError" class="btn secondary">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Info Modal - Updated structure -->
+<div id="infoModal" class="modal-overlay">
+  <div class="modal-box modal-info">
+    <div class="modal-header">
+      <h3><i class="fas fa-info-circle"></i> Information</h3>
+      <button class="icon-btn" onclick="hideModal('infoModal')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <p id="infoMessage">Information message.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="closeInfo" class="btn">
+        <i class="fas fa-check"></i> OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Confirmation Modal - Updated structure -->
+<div id="resetConfirmationModal" class="modal-overlay">
+  <div class="modal-box modal-warning">
+    <div class="modal-header">
+      <h3><i class="fas fa-exclamation-triangle"></i> Reset Form</h3>
+      <button id="closeResetModal" class="icon-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <p>Are you sure you want to reset the form? All entered data will be permanently lost.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelReset" class="btn btn secondary">Cancel</button>
+      <button id="confirmReset" class="btn" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">
         <i class="fas fa-redo"></i> Reset Form
       </button>
     </div>
   </div>
 </div>
 
-<!-- Save Confirmation Modal - Smaller -->
-<div id="saveConfirmationModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-info">
-    <div class="modal-icon">
-      <i class="fas fa-save"></i>
+<!-- Save Confirmation Modal - Updated structure -->
+<div id="saveConfirmationModal" class="modal-overlay">
+  <div class="modal-box modal-info">
+    <div class="modal-header">
+      <h3><i class="fas fa-save"></i> Save Data</h3>
+<button class="icon-btn" onclick="hideModal('saveConfirmationModal')">
+    <i class="fas fa-times"></i>
+</button>
     </div>
-    <h3 class="modal-header">Save Data</h3>
-    <p>Are you ready to save the household data? This action cannot be undone.</p>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-save"></i>
+      </div>
+      <p>Are you ready to save the household data? This action cannot be undone.</p>
+    </div>
     <div class="modal-actions">
-      <button id="cancelSave" class="btn secondary">
+<button id="cancelSave" class="btn btn secondary">
         <i class="fas fa-times"></i> Cancel
       </button>
       <button id="confirmSave" class="btn">
@@ -2736,49 +3186,38 @@ textarea.validation-error:focus {
   </div>
 </div>
 
-<!-- Success Modal - Smaller -->
-<div id="successModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-success">
-    <div class="modal-icon">
-      <i class="fas fa-check-circle"></i>
-    </div>
-    <h3 class="modal-header">Success!</h3>
-    <p id="successMessage">Operation completed successfully.</p>
-    <div class="modal-actions">
-      <button id="closeSuccess" class="btn">
-        <i class="fas fa-check"></i> OK
+<!-- Hazard Hunter Modal - Updated structure -->
+<div id="hazardHunterModal" class="modal-overlay">
+  <div class="modal-box modal-info">
+    <div class="modal-header">
+      <h3><i class="fas fa-map-marked-alt"></i> Pick Coordinates from Hazard Hunter</h3>
+      <button class="icon-btn" onclick="hideModal('hazardHunterModal')">
+        <i class="fas fa-times"></i>
       </button>
     </div>
-  </div>
-</div>
-
-<!-- Error Modal - Smaller -->
-<div id="errorModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-error">
-    <div class="modal-icon">
-      <i class="fas fa-exclamation-circle"></i>
+    <div class="modal-body">
+      <div style="background: var(--light-green); padding: 14px; border-radius: var(--radius-sm); margin: 12px 0;">
+        <h4 style="color: var(--hazard-red); margin-top: 0; display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
+          <i class="fas fa-map-marked-alt"></i> Instructions:
+        </h4>
+        <ol style="margin: 10px 0 0 18px; line-height: 1.5; font-size: 0.9rem; padding-left: 0;">
+          <li>Click the button below to open Hazard Hunter in a new tab</li>
+          <li>Navigate to the desired location on the map</li>
+          <li>Click on the map to get coordinates</li>
+          <li>Copy the coordinates (latitude, longitude)</li>
+          <li>Return to this tab and paste them in the coordinate field</li>
+        </ol>
+        <div style="margin-top: 12px; padding: 10px; background: white; border-radius: var(--radius-sm); border-left: 3px solid var(--accent1); font-size: 0.85rem;">
+          <strong>📋 Expected format:</strong> <code>14.123456, 121.123456</code>
+        </div>
+      </div>
     </div>
-    <h3 class="modal-header">Error</h3>
-    <p id="errorMessage">An error occurred.</p>
     <div class="modal-actions">
-      <button id="closeError" class="btn secondary">
-        <i class="fas fa-times"></i> Close
+<button id="cancelHazardHunter" class="btn secondary">
+        <i class="fas fa-times"></i> Cancel
       </button>
-    </div>
-  </div>
-</div>
-
-<!-- Info Modal - Smaller -->
-<div id="infoModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-info">
-    <div class="modal-icon">
-      <i class="fas fa-info-circle"></i>
-    </div>
-    <h3 class="modal-header">Information</h3>
-    <p id="infoMessage">Information message.</p>
-    <div class="modal-actions">
-      <button id="closeInfo" class="btn">
-        <i class="fas fa-check"></i> OK
+      <button id="confirmHazardHunter" class="btn hazard-hunter">
+        <i class="fas fa-external-link-alt"></i> Open Hazard Hunter
       </button>
     </div>
   </div>
@@ -2814,7 +3253,6 @@ function hideModal(modalId) {
         modal.style.display = 'none';
     }
 }
-
 function showSuccess(message) {
     const messageEl = document.getElementById('successMessage');
     if (messageEl) {
@@ -3466,34 +3904,60 @@ function validateContactInput(input, errorElement) {
 }
 
 /* ---------------- helpers ---------------- */
+/* ---------------- helpers ---------------- */
 function toSheetDateFormat(inputVal){
   if(!inputVal) return "";
-  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
-    const [y,m,d] = inputVal.split('-');
-    return `${d}/${m}/${y}`;
+  
+  // If it's already in mm/dd/yyyy format, return as is
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(inputVal)) {
+    // Validate if it's actually mm/dd/yyyy
+    const parts = inputVal.split('/');
+    const month = parseInt(parts[0]);
+    const day = parseInt(parts[1]);
+    
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return inputVal; // Already correct format
+    }
   }
+  
+  // yyyy-mm-dd format -> convert to mm/dd/yyyy
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
+    const [y, m, d] = inputVal.split('-');
+    return `${m}/${d}/${y}`;  // mm/dd/yyyy
+  }
+  
+  // Try to parse as date
   const dt = new Date(inputVal);
   if(!isNaN(dt)){
-    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const mm = String(dt.getMonth() + 1).padStart(2,'0');
     const dd = String(dt.getDate()).padStart(2,'0');
-    return `${dd}/${mm}/${dt.getFullYear()}`;
+    const yyyy = dt.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;  // mm/dd/yyyy
   }
+  
   return String(inputVal);
 }
 
 function toInputDate(val){
   if(!val) return "";
+  
+  // If it's already in yyyy-mm-dd format, return as is
   if(/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  
+  // If it's in mm/dd/yyyy format, convert to yyyy-mm-dd
   if(/^\d{2}\/\d{2}\/\d{4}$/.test(val)){
-    const [d,m,y] = val.split('/');
+    const [m, d, y] = val.split('/');
     return `${y}-${m}-${d}`;
   }
+  
+  // Try to parse as date
   const dt = new Date(val);
   if(!isNaN(dt)){
-    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const mm = String(dt.getMonth() + 1).padStart(2,'0');
     const dd = String(dt.getDate()).padStart(2,'0');
     return `${dt.getFullYear()}-${mm}-${dd}`;
   }
+  
   return "";
 }
 
@@ -3501,12 +3965,21 @@ function toInputDate(val){
 function computeAgeDetailed(inputDateValue){
   if(!inputDateValue) return null;
   let d;
+  
+  // Handle yyyy-mm-dd format
   if(/^\d{4}-\d{2}-\d{2}$/.test(inputDateValue)){
     const parts = inputDateValue.split('-');
     d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-  } else {
+  } 
+  // Handle mm/dd/yyyy format
+  else if (/^\d{2}\/\d{2}\/\d{4}$/.test(inputDateValue)) {
+    const parts = inputDateValue.split('/');
+    d = new Date(Number(parts[2]), Number(parts[0]) - 1, Number(parts[1]));
+  }
+  else {
     d = new Date(inputDateValue);
   }
+  
   if(isNaN(d)) return null;
 
   const now = new Date();
@@ -3684,7 +4157,12 @@ function setupModalHandlers() {
     const hazardModal = document.getElementById('hazardHunterModal');
     const cancelHazardBtn = document.getElementById('cancelHazardHunter');
     const confirmHazardBtn = document.getElementById('confirmHazardHunter');
-    
+    const closeSaveModalBtn = document.getElementById('closeSaveModal');
+if (closeSaveModalBtn) {
+    closeSaveModalBtn.addEventListener('click', () => {
+        hideModal('saveConfirmationModal');
+    });
+}
     if (hazardModal) {
         // Cancel button
         if (cancelHazardBtn) {
@@ -3721,6 +4199,7 @@ function setupModalHandlers() {
     const resetModal = document.getElementById('resetConfirmationModal');
     const cancelResetBtn = document.getElementById('cancelReset');
     const confirmResetBtn = document.getElementById('confirmReset');
+    const closeResetBtn = document.getElementById('closeResetModal');
     
     if (resetModal) {
         // Cancel button
@@ -3763,7 +4242,8 @@ function setupModalHandlers() {
         if (confirmSaveBtn) {
             confirmSaveBtn.addEventListener('click', () => {
                 hideModal('saveConfirmationModal');
-                proceedToMemberPanel();
+                // Submit the data that's already been collected
+                submitHeadAndMembers();
             });
         }
         
@@ -3834,6 +4314,29 @@ function setupModalHandlers() {
             }
         });
     }
+    
+    // Add close handlers for the new close (X) buttons in modal headers
+    const modalCloseButtons = document.querySelectorAll('.modal-header .icon-btn');
+    modalCloseButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Find the parent modal overlay
+            let modal = this.closest('.modal-overlay');
+            if (modal) {
+                hideModal(modal.id);
+            }
+        });
+    });
+    
+    // Also add ESC key to close modals
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            // Close any open modal
+            const openModals = document.querySelectorAll('.modal-overlay[style*="display: flex"]');
+            openModals.forEach(modal => {
+                hideModal(modal.id);
+            });
+        }
+    });
 }
 
 /* ============ RESET FORM FUNCTION ============ */
@@ -3849,6 +4352,14 @@ function resetForm() {
     document.getElementById('jobTitleField').classList.remove('show');
     document.getElementById('countryField').classList.remove('show');
     document.getElementById('headRegistrationField').classList.remove('show');
+    
+    // Clear government assistance date fields
+    document.querySelectorAll('.gov-date-field').forEach(field => {
+        field.classList.remove('show');
+    });
+    document.querySelectorAll('.gov-date-field input[type="date"]').forEach(input => {
+        input.value = '';
+    });
     
     // Clear any error states
     clearValidationErrors('headForm');
@@ -3866,7 +4377,7 @@ function resetForm() {
     showSuccess("Form has been reset successfully.");
 }
 
-/* ============ PROCEED TO MEMBER PANEL ============ */
+/* ============ MODIFIED: PROCEED TO MEMBER PANEL ============ */
 function proceedToMemberPanel() {
     const barangay = document.getElementById("barangay").value.trim();
     const sitio = document.getElementById("sitio").value.trim();
@@ -3894,12 +4405,13 @@ function proceedToMemberPanel() {
     updateMemberPreview();
 
     if(membersToCollect === 0){
-        // no members -> submit head only
+        // MODIFIED: When there are no members to add, submit head only directly
         submitHeadAndMembers();
         return;
     }
 
-    // open member panel first
+    // MODIFIED: Open member panel directly without showing save confirmation
+    // The save confirmation will appear later after entering at least one member
     fillMemberPanel(0);
     currentMemberIndex = 0;
     openPanel();
@@ -3928,11 +4440,11 @@ function updateMemberPreview(){
   }
 }
 
-/* fill member panel */
+/* ============ UPDATED: FILL MEMBER PANEL WITH DATE FIELD HANDLING ============ */
 function fillMemberPanel(idx){
   const mem = collectedMembers[idx] || {};
   
-  // Basic Information
+  // Basic Information (unchanged)
   document.getElementById("memberName").value = mem["Name of Household Member/s"] || "";
   
   // Set checkbox based on whether registration field has value
@@ -3955,7 +4467,7 @@ function fillMemberPanel(idx){
   document.getElementById("memberAge").value = mem["Age"] || "";
   document.getElementById("memberStage").value = mem["Stage"] || "";
   
-  // Educational & Economic Status
+  // Educational & Economic Status (unchanged)
   document.getElementById("memberEducationalAttainment").value = mem["Educational Attainment"] || "";
   document.getElementById("memberCollegeCourse").value = mem["College Graduate Course"] || "";
   document.getElementById("memberEmployment").value = mem["Employment"] || "";
@@ -3963,11 +4475,11 @@ function fillMemberPanel(idx){
   Array.from(document.getElementsByName("member_ofw_status")).forEach(r => r.checked = (r.value === (mem["Overseas Filipino Worker(OFW)"] || "")));
   document.getElementById("memberCountry").value = mem["Country"] || "";
   
-  // Health and Status
+  // Health and Status (unchanged)
   Array.from(document.getElementsByName("member_pwd")).forEach(r => r.checked = (r.value === (mem["PWD"] || "")));
   document.getElementById("memberStatus").value = mem["Status"] || "";
   
-  // Transportation & Evacuation Details
+  // Transportation & Evacuation Details (unchanged)
   document.getElementById("memberTransport").value = mem["Transportation"] || "";
   document.getElementById("memberPickup").value = mem["Designated Pick-Up Point"] || mem["Pick-Up Location"] || "";
   document.getElementById("memberDropoff").value = mem["Drop-Off Point"] || mem["Drop-Off Location"] || "";
@@ -3977,7 +4489,7 @@ function fillMemberPanel(idx){
   document.getElementById("memberOutside").value = mem["No. of Individuals Outside Camp"] || mem["Individuals Outside Camp"] || "";
   document.getElementById("memberReason").value = mem["Reasons for Displacement"] || "";
   
-  // Government Assistance Programs
+  // Government Assistance Programs WITH DATE FIELDS
   document.getElementById("member_tupad").checked = (mem["TUPAD"] === "Yes");
   document.getElementById("member_local4ps").checked = (mem["Local 4Ps"] === "Yes");
   document.getElementById("member_intl4ps").checked = (mem["National 4Ps"] === "Yes");
@@ -3988,15 +4500,58 @@ function fillMemberPanel(idx){
   document.getElementById("member_cash").checked = (mem["Cash Subsidy"] === "Yes");
   document.getElementById("memberAics").value = mem["AICS"] || "";
   
+  // Government Assistance Date Fields
+  document.getElementById("member_tupad_date_input").value = mem["TUPAD_Date"] ? toInputDate(mem["TUPAD_Date"]) : "";
+  document.getElementById("member_local4ps_date_input").value = mem["Local 4Ps_Date"] ? toInputDate(mem["Local 4Ps_Date"]) : "";
+  document.getElementById("member_intl4ps_date_input").value = mem["National 4Ps_Date"] ? toInputDate(mem["National 4Ps_Date"]) : "";
+  document.getElementById("member_locsp_date_input").value = mem["Local Social Pension_Date"] ? toInputDate(mem["Local Social Pension_Date"]) : "";
+  document.getElementById("member_intlsp_date_input").value = mem["National Social Pension_Date"] ? toInputDate(mem["National Social Pension_Date"]) : "";
+  document.getElementById("member_solo_date_input").value = mem["Solo Parent Assistance_Date"] ? toInputDate(mem["Solo Parent Assistance_Date"]) : "";
+  document.getElementById("member_relief_date_input").value = mem["Relief Goods_Date"] ? toInputDate(mem["Relief Goods_Date"]) : "";
+  document.getElementById("member_cash_date_input").value = mem["Cash Subsidy_Date"] ? toInputDate(mem["Cash Subsidy_Date"]) : "";
+  document.getElementById("member_aics_date_input").value = mem["AICS_Date"] ? toInputDate(mem["AICS_Date"]) : "";
+  
+  // Show/hide date fields based on checkbox state
+  if (document.getElementById("member_tupad").checked) {
+    document.getElementById("member_tupad_date").classList.add('show');
+  }
+  if (document.getElementById("member_local4ps").checked) {
+    document.getElementById("member_local4ps_date").classList.add('show');
+  }
+  if (document.getElementById("member_intl4ps").checked) {
+    document.getElementById("member_intl4ps_date").classList.add('show');
+  }
+  if (document.getElementById("member_locsp").checked) {
+    document.getElementById("member_locsp_date").classList.add('show');
+  }
+  if (document.getElementById("member_intlsp").checked) {
+    document.getElementById("member_intlsp_date").classList.add('show');
+  }
+  if (document.getElementById("member_solo").checked) {
+    document.getElementById("member_solo_date").classList.add('show');
+  }
+  if (document.getElementById("member_relief").checked) {
+    document.getElementById("member_relief_date").classList.add('show');
+  }
+  if (document.getElementById("member_cash").checked) {
+    document.getElementById("member_cash_date").classList.add('show');
+  }
+  if (document.getElementById("memberAics").value !== "") {
+    document.getElementById("member_aics_date").classList.add('show');
+  }
+  
   // Handle conditional fields
   setupMemberConditionalFields();
+  
+  // Setup member government assistance date handlers
+  setupMemberGovernmentAssistanceDateHandlers();
   
   // Update panel title
   const total = Math.max(1, membersToCollect);
   document.getElementById("panelTitle").textContent = `Member ${idx + 1} of ${total}`;
 }
 
-/* collect member data */
+/* ============ UPDATED: COLLECT MEMBER DATA WITH DATE FIELDS ============ */
 function collectMemberDataFromPanel(){
   const name = document.getElementById("memberName").value.trim();
   const birth_input = document.getElementById("memberBirthdate").value || "";
@@ -4029,26 +4584,35 @@ function collectMemberDataFromPanel(){
     "Country": document.getElementById("memberCountry").value || "",
     "Transportation": document.getElementById("memberTransport").value || "",
     "Designated Pick-Up Point": document.getElementById("memberPickup").value || "",
-    "Pick-Up Location": document.getElementById("memberPickup").value || "", // Compatibility field
+    "Pick-Up Location": document.getElementById("memberPickup").value || "",
     "Drop-Off Point": document.getElementById("memberDropoff").value || "",
-    "Drop-Off Location": document.getElementById("memberDropoff").value || "", // Compatibility field
+    "Drop-Off Location": document.getElementById("memberDropoff").value || "",
     "Name of Camp": document.getElementById("memberCamp").value || "",
-    "Evacuation Camp Name": document.getElementById("memberCamp").value || "", // Compatibility field
+    "Evacuation Camp Name": document.getElementById("memberCamp").value || "",
     "Capacity": document.getElementById("memberCampCap").value || "",
     "No. of Individuals Inside Camp": document.getElementById("memberInside").value || "",
-    "Individuals Currently in Camp": document.getElementById("memberInside").value || "", // Compatibility field
+    "Individuals Currently in Camp": document.getElementById("memberInside").value || "",
     "No. of Individuals Outside Camp": document.getElementById("memberOutside").value || "",
-    "Individuals Outside Camp": document.getElementById("memberOutside").value || "", // Compatibility field
+    "Individuals Outside Camp": document.getElementById("memberOutside").value || "",
     "Reasons for Displacement": document.getElementById("memberReason").value || "",
     "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
+    "TUPAD_Date": document.getElementById("member_tupad_date_input").value ? toSheetDateFormat(document.getElementById("member_tupad_date_input").value) : "",
     "Local 4Ps": document.getElementById("member_local4ps").checked ? "Yes" : "No",
+    "Local 4Ps_Date": document.getElementById("member_local4ps_date_input").value ? toSheetDateFormat(document.getElementById("member_local4ps_date_input").value) : "",
     "National 4Ps": document.getElementById("member_intl4ps").checked ? "Yes" : "No",
+    "National 4Ps_Date": document.getElementById("member_intl4ps_date_input").value ? toSheetDateFormat(document.getElementById("member_intl4ps_date_input").value) : "",
     "Local Social Pension": document.getElementById("member_locsp").checked ? "Yes" : "No",
+    "Local Social Pension_Date": document.getElementById("member_locsp_date_input").value ? toSheetDateFormat(document.getElementById("member_locsp_date_input").value) : "",
     "National Social Pension": document.getElementById("member_intlsp").checked ? "Yes" : "No",
+    "National Social Pension_Date": document.getElementById("member_intlsp_date_input").value ? toSheetDateFormat(document.getElementById("member_intlsp_date_input").value) : "",
     "Solo Parent Assistance": document.getElementById("member_solo").checked ? "Yes" : "No",
+    "Solo Parent Assistance_Date": document.getElementById("member_solo_date_input").value ? toSheetDateFormat(document.getElementById("member_solo_date_input").value) : "",
     "Relief Goods": document.getElementById("member_relief").checked ? "Yes" : "No",
+    "Relief Goods_Date": document.getElementById("member_relief_date_input").value ? toSheetDateFormat(document.getElementById("member_relief_date_input").value) : "",
     "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
-    "AICS": document.getElementById("memberAics").value || ""
+    "Cash Subsidy_Date": document.getElementById("member_cash_date_input").value ? toSheetDateFormat(document.getElementById("member_cash_date_input").value) : "",
+    "AICS": document.getElementById("memberAics").value || "",
+    "AICS_Date": document.getElementById("member_aics_date_input").value ? toSheetDateFormat(document.getElementById("member_aics_date_input").value) : ""
   };
 }
 
@@ -4255,6 +4819,126 @@ function setupMemberConditionalFields() {
     }
 }
 
+/* ============ GOVERNMENT ASSISTANCE DATE FIELD HANDLERS ============ */
+function setupGovernmentAssistanceDateHandlers() {
+    // Head government assistance checkboxes
+    const headGovCheckboxes = [
+        { checkboxId: 'ass_tupad', dateFieldId: 'ass_tupad_date' },
+        { checkboxId: 'ass_local4ps', dateFieldId: 'ass_local4ps_date' },
+        { checkboxId: 'ass_intl4ps', dateFieldId: 'ass_intl4ps_date' },
+        { checkboxId: 'ass_locsp', dateFieldId: 'ass_locsp_date' },
+        { checkboxId: 'ass_intlsp', dateFieldId: 'ass_intlsp_date' },
+        { checkboxId: 'ass_solo', dateFieldId: 'ass_solo_date' },
+        { checkboxId: 'ass_relief', dateFieldId: 'ass_relief_date' },
+        { checkboxId: 'ass_cash', dateFieldId: 'ass_cash_date' }
+    ];
+    
+    headGovCheckboxes.forEach(item => {
+        const checkbox = document.getElementById(item.checkboxId);
+        const dateField = document.getElementById(item.dateFieldId);
+        
+        if (checkbox && dateField) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    dateField.classList.add('show');
+                } else {
+                    dateField.classList.remove('show');
+                    // Clear date field when unchecked
+                    const dateInput = dateField.querySelector('input[type="date"]');
+                    if (dateInput) dateInput.value = '';
+                }
+            });
+            
+            // Initialize based on current state
+            if (checkbox.checked) {
+                dateField.classList.add('show');
+            }
+        }
+    });
+    
+    // Head AICS dropdown
+    const aicsSelect = document.getElementById('ass_aics');
+    const aicsDateField = document.getElementById('ass_aics_date');
+    
+    if (aicsSelect && aicsDateField) {
+        aicsSelect.addEventListener('change', function() {
+            if (this.value && this.value !== "") {
+                aicsDateField.classList.add('show');
+            } else {
+                aicsDateField.classList.remove('show');
+                // Clear date field when set to none
+                const dateInput = aicsDateField.querySelector('input[type="date"]');
+                if (dateInput) dateInput.value = '';
+            }
+        });
+        
+        // Initialize based on current state
+        if (aicsSelect.value && aicsSelect.value !== "") {
+            aicsDateField.classList.add('show');
+        }
+    }
+}
+
+/* ============ ADDED: SETUP MEMBER GOVERNMENT ASSISTANCE DATE HANDLERS ============ */
+function setupMemberGovernmentAssistanceDateHandlers() {
+    // Member government assistance checkboxes
+    const memberGovCheckboxes = [
+        { checkboxId: 'member_tupad', dateFieldId: 'member_tupad_date' },
+        { checkboxId: 'member_local4ps', dateFieldId: 'member_local4ps_date' },
+        { checkboxId: 'member_intl4ps', dateFieldId: 'member_intl4ps_date' },
+        { checkboxId: 'member_locsp', dateFieldId: 'member_locsp_date' },
+        { checkboxId: 'member_intlsp', dateFieldId: 'member_intlsp_date' },
+        { checkboxId: 'member_solo', dateFieldId: 'member_solo_date' },
+        { checkboxId: 'member_relief', dateFieldId: 'member_relief_date' },
+        { checkboxId: 'member_cash', dateFieldId: 'member_cash_date' }
+    ];
+    
+    memberGovCheckboxes.forEach(item => {
+        const checkbox = document.getElementById(item.checkboxId);
+        const dateField = document.getElementById(item.dateFieldId);
+        
+        if (checkbox && dateField) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    dateField.classList.add('show');
+                } else {
+                    dateField.classList.remove('show');
+                    // Clear date field when unchecked
+                    const dateInput = dateField.querySelector('input[type="date"]');
+                    if (dateInput) dateInput.value = '';
+                }
+            });
+            
+            // Initialize based on current state
+            if (checkbox.checked) {
+                dateField.classList.add('show');
+            }
+        }
+    });
+    
+    // Member AICS dropdown
+    const memberAicsSelect = document.getElementById('memberAics');
+    const memberAicsDateField = document.getElementById('member_aics_date');
+    
+    if (memberAicsSelect && memberAicsDateField) {
+        memberAicsSelect.addEventListener('change', function() {
+            if (this.value && this.value !== "") {
+                memberAicsDateField.classList.add('show');
+            } else {
+                memberAicsDateField.classList.remove('show');
+                // Clear date field when set to none
+                const dateInput = memberAicsDateField.querySelector('input[type="date"]');
+                if (dateInput) dateInput.value = '';
+            }
+        });
+        
+        // Initialize based on current state
+        if (memberAicsSelect.value && memberAicsSelect.value !== "") {
+            memberAicsDateField.classList.add('show');
+        }
+    }
+}
+
 /* live age update */
 document.addEventListener('input', (ev) => {
   if(ev.target && ev.target.id === "memberBirthdate"){
@@ -4292,11 +4976,17 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup conditional fields
   setupConditionalFields();
 
+  // Setup government assistance date handlers
+  setupGovernmentAssistanceDateHandlers();
+
   // Setup coordinate paste handler
   setupCoordinatePasteHandler();
 
   // Setup real-time validation clearing
   setupRealTimeValidation();
+
+  // Setup member government assistance date handlers
+  setupMemberGovernmentAssistanceDateHandlers();
 
   // Contact number validation
   const contactInput = document.getElementById("contactNo");
@@ -4352,8 +5042,16 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // If validation passes, show save confirmation modal
-    showModal('saveConfirmationModal');
+    // MODIFIED: If validation passes, check member count
+    const memberCount = parseInt(document.getElementById("memberCount").value || 0);
+    
+    if (memberCount === 0) {
+        // If there are no members, show save confirmation modal
+        showModal('saveConfirmationModal');
+    } else {
+        // If there are members, proceed directly to member panel (no save confirmation yet)
+        proceedToMemberPanel();
+    }
   });
 
   // panel close/back
@@ -4370,7 +5068,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // memberNext (save & next)
-  document.getElementById("memberNext").addEventListener('click', () => {
+document.getElementById("memberNext").addEventListener('click', () => {
     // First validate the member form
     if (!validateMemberForm()) {
         // Validation failed, scroll to top of validation summary
@@ -4381,18 +5079,27 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Save current member data
     collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
     updateMemberPreview();
 
     currentMemberIndex++;
     if(currentMemberIndex >= membersToCollect){
-      // done
-      closePanel();
-      submitHeadAndMembers();
-      return;
+        // Done with all members - save the last member and show confirmation
+        // IMPORTANT: Make sure data is saved before showing modal
+        updateMemberPreview(); // Ensure preview is updated
+        
+        // Close panel first
+        closePanel();
+        
+        // Show save confirmation modal with a slight delay to ensure data is saved
+        setTimeout(() => {
+            showModal('saveConfirmationModal');
+        }, 100);
+        return;
     }
     fillMemberPanel(currentMemberIndex);
-  });
+});
 
   document.getElementById("householdBirthdate").addEventListener('change', () => {
     const info = computeAgeDetailed(document.getElementById("householdBirthdate").value);
@@ -4400,6 +5107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("householdStage").value = info ? info.stage : "";
   });
 
+  // ============ FIX: ANIMAL CHECKBOX AND QUANTITY HANDLING ============
   // Animal quantity input handling
   document.querySelectorAll('.animal-card input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
@@ -4422,6 +5130,7 @@ document.addEventListener('DOMContentLoaded', function() {
       qtyInput.disabled = true;
     }
   });
+  // ============ END FIX ============
 
   // Add logout event listener
   document.getElementById('logoutBtn').addEventListener('click', handleLogout);
@@ -4555,14 +5264,23 @@ const head = {
   "Individuals Outside Camp": document.getElementById("outsideCamp").value || "", // Added for compatibility
   "Reasons for Displacement": document.getElementById("reasons").value || "",
   "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
+  "TUPAD_Date": document.getElementById("ass_tupad_date_input").value ? toSheetDateFormat(document.getElementById("ass_tupad_date_input").value) : "",
   "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
+  "Local 4Ps_Date": document.getElementById("ass_local4ps_date_input").value ? toSheetDateFormat(document.getElementById("ass_local4ps_date_input").value) : "",
   "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
+  "National 4Ps_Date": document.getElementById("ass_intl4ps_date_input").value ? toSheetDateFormat(document.getElementById("ass_intl4ps_date_input").value) : "",
   "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
+  "Local Social Pension_Date": document.getElementById("ass_locsp_date_input").value ? toSheetDateFormat(document.getElementById("ass_locsp_date_input").value) : "",
   "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
+  "National Social Pension_Date": document.getElementById("ass_intlsp_date_input").value ? toSheetDateFormat(document.getElementById("ass_intlsp_date_input").value) : "",
   "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
+  "Solo Parent Assistance_Date": document.getElementById("ass_solo_date_input").value ? toSheetDateFormat(document.getElementById("ass_solo_date_input").value) : "",
   "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
+  "Relief Goods_Date": document.getElementById("ass_relief_date_input").value ? toSheetDateFormat(document.getElementById("ass_relief_date_input").value) : "",
   "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
+  "Cash Subsidy_Date": document.getElementById("ass_cash_date_input").value ? toSheetDateFormat(document.getElementById("ass_cash_date_input").value) : "",
   "AICS": document.getElementById("ass_aics").value || "",
+  "AICS_Date": document.getElementById("ass_aics_date_input").value ? toSheetDateFormat(document.getElementById("ass_aics_date_input").value) : "",
   /* Domestic animals — store as separate fields matching your header */
   "Dog": document.getElementById("dog_chk").checked ? "Yes" : "No",
   "Dog Qty.": document.getElementById("dog_qty").value || "",
@@ -4616,20 +5334,38 @@ const head = {
         "Individuals Outside Camp": "", // Added for compatibility
         "Reasons for Displacement": "",
         "TUPAD": "No",
+        "TUPAD_Date": "",
         "Local 4Ps": "No",
+        "Local 4Ps_Date": "",
         "National 4Ps": "No",
+        "National 4Ps_Date": "",
         "Local Social Pension": "No",
+        "Local Social Pension_Date": "",
         "National Social Pension": "No",
+        "National Social Pension_Date": "",
         "Solo Parent Assistance": "No",
+        "Solo Parent Assistance_Date": "",
         "Relief Goods": "No",
+        "Relief Goods_Date": "",
         "Cash Subsidy": "No",
-        "AICS": ""
+        "Cash Subsidy_Date": "",
+        "AICS": "",
+        "AICS_Date": ""
       };
     }
     // ensure birthdate format DD/MM/YYYY
     if(members[i]["Birthdate"]){
       members[i]["Birthdate"] = (members[i]["Birthdate"].indexOf('/') === -1) ? toSheetDateFormat(members[i]["Birthdate"]) : members[i]["Birthdate"];
     }
+    // ensure government assistance date format
+    const dateFields = ["TUPAD_Date", "Local 4Ps_Date", "National 4Ps_Date", "Local Social Pension_Date", 
+                       "National Social Pension_Date", "Solo Parent Assistance_Date", "Relief Goods_Date", 
+                       "Cash Subsidy_Date", "AICS_Date"];
+    dateFields.forEach(field => {
+      if(members[i][field]){
+        members[i][field] = (members[i][field].indexOf('/') === -1) ? toSheetDateFormat(members[i][field]) : members[i][field];
+      }
+    });
   }
 
   // Build request
