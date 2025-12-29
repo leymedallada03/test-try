@@ -25,6 +25,449 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+/* ============ FIELD-LEVEL VALIDATION STYLES ============ */
+.validation-summary {
+    background-color: rgba(220, 38, 38, 0.1);
+    border: 0.5px solid rgba(220, 38, 38, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 16px;
+    display: none; /* Start with display: none */
+    animation: fadeIn 0.3s ease;
+}
+
+.validation-summary.show {
+    display: block; /* Only show when .show class is added */
+}
+
+.validation-summary h4 {
+    margin: 0 0 8px 0;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.validation-summary ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.validation-summary li {
+    margin-bottom: 4px;
+    font-size: 0.8rem;
+}
+   /* ============ MODAL STYLING FROM DATAFORM.HTML ============ */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+
+.modal-content {
+    background: white;
+    padding: 16px;
+    border-radius: var(--radius);
+    max-width: 420px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-dark);
+    animation: modalSlideIn 0.3s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--accent1);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-body {
+    margin-bottom: 12px;
+    padding: 0 2px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+@keyframes modalSlideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Button styles to match dataForm.html */
+.modal-actions .btn {
+    border: 0;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 36px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.modal-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(15,122,74,0.2);
+}
+
+.modal-actions .btn-secondary {
+    background: transparent;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+}
+
+/* Modal type styling */
+.modal-success .modal-header {
+    background: #e9f7f2;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid rgba(15,122,74,0.1);
+}
+
+.modal-success .modal-header h3 {
+    color: var(--accent1);
+}
+
+.modal-success .modal-icon {
+    font-size: 2.2rem;
+    color: var(--accent1);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.modal-warning .modal-header {
+    background: #fff8e1;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid #ffecb3;
+}
+
+.modal-warning .modal-header h3 {
+    color: var(--accent3);
+}
+
+.modal-warning .modal-icon {
+    font-size: 2.2rem;
+    color: var(--accent3);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.modal-error .modal-header {
+    background: #ffeaea;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid #ffcccc;
+}
+
+.modal-error .modal-header h3 {
+    color: var(--hazard-red);
+}
+
+.modal-error .modal-icon {
+    font-size: 2.2rem;
+    color: var(--hazard-red);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.modal-info .modal-header {
+    background: #f0f9ff;
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: 1px solid #d1e9ff;
+}
+
+.modal-info .modal-header h3 {
+    color: var(--accent2);
+}
+
+.modal-info .modal-icon {
+    font-size: 2.2rem;
+    color: var(--accent2);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.modal-body p {
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.btn-reset {
+    background: linear-gradient(90deg, var(--accent3), var(--accent4)) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.btn-reset:hover {
+    box-shadow: 0 4px 12px rgba(255,122,0,0.2) !important;
+}
+
+/* Remove Member Modal specific styles */
+#currentMembersList {
+    display: block;
+    max-height: 100px;
+    overflow-y: auto;
+    text-align: left;
+    margin: 8px 0;
+    padding: 8px;
+    background: var(--light-green);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+#currentMembersList span {
+    display: block;
+    padding: 2px 4px;
+    margin: 1px 0;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#currentMembersList span:hover {
+    background: rgba(15,122,74,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal {
+        padding: 8px;
+    }
+    
+    .modal-content {
+        max-width: 92%;
+        padding: 12px;
+        margin: 8px;
+    }
+    
+    .modal-header {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+    
+    .modal-success .modal-header,
+    .modal-warning .modal-header,
+    .modal-error .modal-header,
+    .modal-info .modal-header {
+        margin: -12px -12px 12px -12px;
+        padding: 10px 12px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        max-width: 98%;
+        width: 98%;
+        padding: 14px;
+        margin: 8px;
+    }
+}
+   /* Form styles for modals - matching users.html */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent1);
+  box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+   /* Government Assistance with Date Fields - Add to existing CSS */
+.gov-checkbox-with-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  padding: 6px 0;
+  min-height: 40px;
+  width: 100%;
+}
+
+.gov-checkbox-with-date input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent1);
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.gov-checkbox-with-date > label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--accent1);
+  cursor: pointer;
+  flex: 0 0 180px;
+  min-width: 180px;
+  margin: 0;
+  padding: 4px 0;
+  white-space: nowrap;
+}
+
+.gov-checkbox-with-date input[type="checkbox"]:checked + label {
+  color: #0f7a4a;
+  font-weight: 700;
+}
+
+.gov-date-field {
+  display: none;
+  flex: 1;
+  min-width: 200px;
+  animation: fadeIn 0.3s ease;
+  align-items: center;
+  gap: 8px;
+}
+
+.gov-date-field.show {
+  display: flex;
+}
+
+.gov-date-field label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.gov-date-field input[type="date"] {
+  width: 140px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  font-size: 0.8rem;
+  min-height: 32px;
+  flex-shrink: 0;
+}
+
+/* Adjust grid for compact layout in edit panel */
+.member-panel .gov-support-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px 0;
+  margin-top: 0;
+}
+/* Enhanced modal styling for remove/delete member modals */
+.modal-content input[type="number"] {
+  padding: 8px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.modal-content input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent1);
+  box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+}
+
+#currentMembersList {
+  display: block;
+  max-height: 100px;
+  overflow-y: auto;
+  text-align: left;
+  margin: 8px 0;
+  padding: 8px;
+  background: var(--light-green);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+#currentMembersList span {
+  display: block;
+  padding: 2px 4px;
+  margin: 1px 0;
+  border-radius: 3px;
+}
+
+#currentMembersList span:hover {
+  background: rgba(15,122,74,0.1);
+}
    .admin-only {
     display: none !important;
 }
@@ -422,11 +865,12 @@ li.admin-only.admin-visible {
    }
    
    .panel-body h4 {
-     margin: 20px 0 16px 0;
-     color: var(--accent1);
-     font-size: 16px;
-     border-bottom: 2px solid var(--light-green);
-     padding-bottom: 8px;
+  margin: 0 0 8px 0;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
    }
    
    /* Data ID display */
@@ -1802,6 +2246,12 @@ li.admin-only.admin-visible {
       Data ID: <span id="editDataIdDisplay">Loading...</span>
     </div>
     
+    <!-- ADD THIS VALIDATION SUMMARY CONTAINER -->
+    <div id="validationSummaryEdit" class="validation-summary" role="alert" aria-live="polite">
+      <h4><i class="fas fa-exclamation-triangle"></i> Required Fields – The following information must be provided before saving:</h4>
+      <ul id="editValidationErrors"></ul>
+    </div>
+    
     <form id="editForm" onsubmit="return false;">
       <!-- Head editing -->
 <!-- Card 1: Household Head Information -->
@@ -1938,6 +2388,7 @@ li.admin-only.admin-visible {
     <div id="edit_collegeCourseField" class="conditional-field">
       <label>College Graduate Course</label>
       <input type="text" id="edit_collegeCourse" placeholder="Enter course name" />
+      <div class="small-muted">Please input the official college course acronym only (e.g., BSIT, BSCS, BSA, BSEd–Math).</div>
     </div>
 
     <div>
@@ -2227,54 +2678,108 @@ li.admin-only.admin-visible {
   </div>
 </div>
 
-<!-- Card 6: Government Assistance Programs -->
+<!-- Card 6: Government Assistance Programs - UPDATED WITH DATE FIELDS -->
 <div class="edit-card">
   <div class="form-section">
     <h5>Government Assistance Programs</h5>
   </div>
+  
   <div class="gov-support-grid">
-    <div class="checkbox-item">
+    <!-- TUPAD with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_tupad">
       <label for="edit_ass_tupad">TUPAD</label>
+      <div id="edit_ass_tupad_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_tupad_date_input">
+      </div>
     </div>
-    <div class="checkbox-item">
+    
+    <!-- Local 4Ps with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_local4ps">
       <label for="edit_ass_local4ps">Local 4Ps</label>
+      <div id="edit_ass_local4ps_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_local4ps_date_input">
+      </div>
     </div>
-    <div class="checkbox-item">
+    
+    <!-- National 4Ps with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_intl4ps">
       <label for="edit_ass_intl4ps">National 4Ps</label>
+      <div id="edit_ass_intl4ps_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_intl4ps_date_input">
+      </div>
     </div>
-    <div class="checkbox-item">
+    
+    <!-- Local Social Pension with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_locsp">
       <label for="edit_ass_locsp">Local Social Pension</label>
+      <div id="edit_ass_locsp_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_locsp_date_input">
+      </div>
     </div>
-    <div class="checkbox-item">
+    
+    <!-- National Social Pension with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_intlsp">
       <label for="edit_ass_intlsp">National Social Pension</label>
+      <div id="edit_ass_intlsp_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_intlsp_date_input">
+      </div>
     </div>
-    <div class="checkbox-item">
+    
+    <!-- Solo Parent Assistance with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_solo">
       <label for="edit_ass_solo">Solo Parent Assistance</label>
+      <div id="edit_ass_solo_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_solo_date_input">
+      </div>
     </div>
-    <div class="checkbox-item">
+    
+    <!-- Relief Goods with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_relief">
       <label for="edit_ass_relief">Relief Goods</label>
+      <div id="edit_ass_relief_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_relief_date_input">
+      </div>
     </div>
-    <div class="checkbox-item">
+    
+    <!-- Cash Subsidy with Date -->
+    <div class="gov-checkbox-with-date">
       <input type="checkbox" id="edit_ass_cash">
       <label for="edit_ass_cash">Cash Subsidy</label>
+      <div id="edit_ass_cash_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_cash_date_input">
+      </div>
     </div>
   </div>
 
   <div style="margin-top:16px">
     <label>AICS (if any)</label>
-    <select id="edit_ass_aics" class="animated">
-      <option value="">None</option>
-      <option>Shelter Assistance</option>
-      <option>Burial</option>
-      <option>Scholarship</option>
-    </select>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <select id="edit_ass_aics" class="animated" style="flex: 1; min-width: 200px;">
+        <option value="">None</option>
+        <option>Shelter Assistance</option>
+        <option>Burial</option>
+        <option>Scholarship</option>
+      </select>
+      <div id="edit_ass_aics_date" class="gov-date-field" style="margin-top: 0;">
+        <label>Date:</label>
+        <input type="date" id="edit_ass_aics_date_input">
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2313,6 +2818,11 @@ li.admin-only.admin-visible {
   </div>
 
   <div class="panel-body">
+        <div id="validationSummaryMember" class="validation-summary" role="alert" aria-live="polite">
+      <h4><i class="fas fa-exclamation-triangle"></i> Required Fields – The following information must be provided before submission:</h4>
+      <ul id="memberValidationErrors"></ul>
+    </div>
+
     <form id="memberForm" onsubmit="return false;">
       <div class="edit-card">
         <div class="form-section">
@@ -2397,6 +2907,7 @@ li.admin-only.admin-visible {
           <div id="memberCollegeCourseField" class="conditional-field">
             <label>College Graduate Course</label>
             <input type="text" id="memberCollegeCourse" placeholder="Enter course name" />
+            <div class="small-muted">Please input the official college course acronym only (e.g., BSIT, BSCS, BSA, BSEd–Math).</div>
           </div>
 
           <div>
@@ -2612,60 +3123,118 @@ li.admin-only.admin-visible {
         </div>
       </div>
 
-      <div class="edit-card">
-        <div class="form-section">
-          <h5>Government Assistance Programs</h5>
-        </div>
-        <div class="gov-support-grid">
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_tupad" class="member_tupad">
-            <label for="member_tupad">TUPAD</label>
-          </div>
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_local4ps" class="member_local4ps">
-            <label for="member_local4ps">Local 4Ps</label>
-          </div>
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
-            <label for="member_intl4ps">National 4Ps</label>
-          </div>
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_locsp" class="member_locsp">
-            <label for="member_locsp">Local Social Pension</label>
-          </div>
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_intlsp" class="member_intlsp">
-            <label for="member_intlsp">National Social Pension</label>
-          </div>
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_solo" class="member_solo">
-            <label for="member_solo">Solo Parent Assistance</label>
-          </div>
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_relief" class="member_relief">
-            <label for="member_relief">Relief Goods</label>
-          </div>
-          <div class="checkbox-item">
-            <input type="checkbox" id="member_cash" class="member_cash">
-            <label for="member_cash">Cash Subsidy</label>
-          </div>
-        </div>
-
-        <div style="margin-top:16px">
-          <label>AICS (if any)</label>
-          <select id="memberAics" class="member_aics animated">
-            <option value="">None</option>
-            <option>Shelter Assistance</option>
-            <option>Burial</option>
-            <option>Scholarship</option>
-          </select>
-        </div>
+      <!-- Card 5: Government Assistance Programs WITH DATE FIELDS -->
+<div class="edit-card">
+  <div class="form-section">
+    <h5>Government Assistance Programs</h5>
+  </div>
+  <div class="gov-support-grid">
+    <!-- TUPAD with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_tupad" class="member_tupad">
+      <label for="member_tupad">TUPAD</label>
+      <div id="member_tupad_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_tupad_date_input" class="member_tupad_date_input">
       </div>
-
-      <div class="panel-actions" style="margin-top:20px;">
-        <button id="memberBack" class="btn secondary" type="button">Back</button>
-        <button id="memberNext" class="btn" type="button">Save & Next</button>
+    </div>
+    
+    <!-- Local 4Ps with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_local4ps" class="member_local4ps">
+      <label for="member_local4ps">Local 4Ps</label>
+      <div id="member_local4ps_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_local4ps_date_input" class="member_local4ps_date_input">
       </div>
+    </div>
+    
+    <!-- National 4Ps with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
+      <label for="member_intl4ps">National 4Ps</label>
+      <div id="member_intl4ps_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_intl4ps_date_input" class="member_intl4ps_date_input">
+      </div>
+    </div>
+    
+    <!-- Local Social Pension with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_locsp" class="member_locsp">
+      <label for="member_locsp">Local Social Pension</label>
+      <div id="member_locsp_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_locsp_date_input" class="member_locsp_date_input">
+      </div>
+    </div>
+    
+    <!-- National Social Pension with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_intlsp" class="member_intlsp">
+      <label for="member_intlsp">National Social Pension</label>
+      <div id="member_intlsp_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_intlsp_date_input" class="member_intlsp_date_input">
+      </div>
+    </div>
+    
+    <!-- Solo Parent Assistance with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_solo" class="member_solo">
+      <label for="member_solo">Solo Parent Assistance</label>
+      <div id="member_solo_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_solo_date_input" class="member_solo_date_input">
+      </div>
+    </div>
+    
+    <!-- Relief Goods with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_relief" class="member_relief">
+      <label for="member_relief">Relief Goods</label>
+      <div id="member_relief_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_relief_date_input" class="member_relief_date_input">
+      </div>
+    </div>
+    
+    <!-- Cash Subsidy with Date -->
+    <div class="gov-checkbox-with-date">
+      <input type="checkbox" id="member_cash" class="member_cash">
+      <label for="member_cash">Cash Subsidy</label>
+      <div id="member_cash_date" class="gov-date-field">
+        <label>Date:</label>
+        <input type="date" id="member_cash_date_input" class="member_cash_date_input">
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px">
+    <label>AICS (if any)</label>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <select id="memberAics" class="member_aics animated" style="flex: 1; min-width: 200px;">
+        <option value="">None</option>
+        <option>Shelter Assistance</option>
+        <option>Burial</option>
+        <option>Scholarship</option>
+      </select>
+      <div id="member_aics_date" class="gov-date-field" style="margin-top: 0;">
+        <label>Date:</label>
+        <input type="date" id="member_aics_date_input" class="member_aics_date_input">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel-actions" style="margin-top:20px;">
+  <button id="memberBack" class="btn secondary" type="button">Back</button>
+  <button id="memberCancel" class="btn secondary" type="button" 
+          style="background: linear-gradient(90deg, #dc2626, #ef4444) !important; color: white !important; border: none !important;">
+    Cancel
+  </button>
+  <button id="memberNext" class="btn" type="button">Save & Next</button>
+</div>
     </form>
   </div>
 </div>
@@ -2710,11 +3279,236 @@ li.admin-only.admin-visible {
     <div>Loading records…</div>
   </div>
 </div>
+<!-- MODALS FROM DATAFORM.HTML -->
+<!-- Reset Confirmation Modal - Updated Structure -->
+<div id="resetConfirmationModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-warning">
+    <div class="modal-header">
+      <h3><i class="fas fa-exclamation-triangle"></i> Reset Form</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <p>Are you sure you want to reset the edit form? All entered changes will be permanently lost.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelReset" class="btn btn-secondary">Cancel</button>
+      <button id="confirmReset" class="btn btn-reset">
+        <i class="fas fa-redo"></i> Reset Form
+      </button>
+    </div>
+  </div>
+</div>
 
+<!-- Save Confirmation Modal -->
+<div id="saveConfirmationModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-info">
+    <div class="modal-header">
+      <h3><i class="fas fa-save"></i> Save Data</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-save"></i>
+      </div>
+      <p>Are you ready to save the household data? This action cannot be undone.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelSave" class="btn btn-secondary">Cancel</button>
+      <button id="confirmSave" class="btn">
+        <i class="fas fa-check"></i> Save Data
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-success">
+    <div class="modal-header">
+      <h3><i class="fas fa-check-circle"></i> Success!</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <p id="successMessage">Operation completed successfully.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="closeSuccess" class="btn">
+        <i class="fas fa-check"></i> OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-error">
+    <div class="modal-header">
+      <h3><i class="fas fa-exclamation-circle"></i> Error</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <p id="errorMessage">An error occurred.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="closeError" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Info Modal -->
+<div id="infoModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-info">
+    <div class="modal-header">
+      <h3><i class="fas fa-info-circle"></i> Information</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <p id="infoMessage">Information message.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="closeInfo" class="btn">
+        <i class="fas fa-check"></i> OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Member Modal -->
+<div id="removeMemberModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-warning">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-minus"></i> Remove Member</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-user-minus"></i>
+      </div>
+      <p id="removeMemberMessage">Enter the number of the member to remove (1-<span id="memberTotalCount">0</span>):</p>
+      <input type="number" id="memberToRemove" class="search-box" style="width: 120px; text-align: center;" 
+             min="1" max="1" placeholder="Enter number" />
+      <div class="small-muted" style="margin-top: 8px;">Members:</div>
+      <div id="currentMembersList"></div>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelRemoveMember" class="btn btn-secondary">Cancel</button>
+      <button id="confirmRemoveMember" class="btn btn-reset">
+        <i class="fas fa-user-minus"></i> Remove Member
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Member Confirmation Modal -->
+<div id="deleteMemberConfirmationModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-error">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-times"></i> Delete Member</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-user-times"></i>
+      </div>
+      <p id="deleteMemberMessage">Are you sure you want to delete this member?</p>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelDeleteMember" class="btn btn-secondary">Cancel</button>
+      <button id="confirmDeleteMember" class="btn btn-reset">
+        <i class="fas fa-trash"></i> Delete Member
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Household Confirmation Modal -->
+<div id="deleteConfirmationModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-error">
+    <div class="modal-header">
+      <h3><i class="fas fa-trash-alt"></i> Delete Household</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <p id="deleteMessage">Are you sure you want to delete this household?</p>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
+      <button id="confirmDelete" class="btn btn-reset">
+        <i class="fas fa-trash"></i> Delete Household
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Confirmation Modal -->
+<div id="editConfirmationModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-warning">
+    <div class="modal-header">
+      <h3><i class="fas fa-exclamation-triangle"></i> Unsaved Changes</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <p id="editMessage">You have unsaved changes. Are you sure you want to close the edit panel?</p>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelEditClose" class="btn btn-secondary">Cancel</button>
+      <button id="confirmEditClose" class="btn btn-reset">
+        <i class="fas fa-times"></i> Discard Changes
+      </button>
+    </div>
+  </div>
+</div>
 <script>
 /* ============ CONFIG ============ */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
+
+/* ============ IMPROVED MODAL MANAGEMENT ============ */
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+        
+        // Add click-outside-to-close functionality
+        setTimeout(() => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideModal(modalId);
+                }
+            });
+        }, 10);
+    }
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+    }
+}
+
+// Also add ESC key to close modals
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const openModals = document.querySelectorAll('.modal[style*="display: flex"]');
+        openModals.forEach(modal => {
+            hideModal(modal.id);
+        });
+    }
+});
 
 /* Setup activity tracking for records/data entry pages */
 function setupActivityTrackingForPages() {
@@ -2813,22 +3607,643 @@ function recordPageActivity(action, details = '') {
     }
 }
 
-/* Initialize activity tracking when page loads */
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait a moment for other scripts to load
-    setTimeout(() => {
-        setupActivityTrackingForPages();
-    }, 500);
-});
+/* ============ MODAL HANDLERS SETUP ============ */
+function setupModalHandlers() {
+  console.log("Setting up modal handlers");
+  
+  // Delete Confirmation Modal
+  const deleteModal = document.getElementById('deleteConfirmationModal');
+  const cancelDeleteBtn = document.getElementById('cancelDelete');
+  const confirmDeleteBtn = document.getElementById('confirmDelete');
 
-// Also initialize when page becomes visible
-document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-        setTimeout(() => {
-            setupActivityTrackingForPages();
-        }, 100);
+  if (deleteModal) {
+    if (cancelDeleteBtn) {
+      cancelDeleteBtn.addEventListener('click', () => {
+        hideModal('deleteConfirmationModal');
+        deletePendingId = null;
+        deletePendingHeadName = '';
+        deletePendingBarangay = '';
+      });
     }
-});
+
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.addEventListener('click', () => {
+        performDelete();
+      });
+    }
+
+    deleteModal.addEventListener('click', (e) => {
+      if (e.target === deleteModal) {
+        hideModal('deleteConfirmationModal');
+        deletePendingId = null;
+        deletePendingHeadName = '';
+        deletePendingBarangay = '';
+      }
+    });
+  }
+
+  // Edit Confirmation Modal
+  const editModal = document.getElementById('editConfirmationModal');
+  const cancelEditCloseBtn = document.getElementById('cancelEditClose');
+  const confirmEditCloseBtn = document.getElementById('confirmEditClose');
+
+  if (editModal) {
+    if (cancelEditCloseBtn) {
+      cancelEditCloseBtn.addEventListener('click', cancelEditClose);
+    }
+
+    if (confirmEditCloseBtn) {
+      confirmEditCloseBtn.addEventListener('click', handleEditCloseConfirmation);
+    }
+
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) {
+        cancelEditClose();
+      }
+    });
+  }
+
+  // Success Modal
+  const successModal = document.getElementById('successModal');
+  const closeSuccessBtn = document.getElementById('closeSuccess');
+  
+  if (successModal) {
+    if (closeSuccessBtn) {
+      closeSuccessBtn.addEventListener('click', () => hideModal('successModal'));
+    }
+    
+    successModal.addEventListener('click', (e) => {
+      if (e.target === successModal) hideModal('successModal');
+    });
+  }
+  
+  // Error Modal
+  const errorModal = document.getElementById('errorModal');
+  const closeErrorBtn = document.getElementById('closeError');
+  
+  if (errorModal) {
+    if (closeErrorBtn) {
+      closeErrorBtn.addEventListener('click', () => hideModal('errorModal'));
+    }
+    
+    errorModal.addEventListener('click', (e) => {
+      if (e.target === errorModal) hideModal('errorModal');
+    });
+  }
+  
+  // Info Modal
+  const infoModal = document.getElementById('infoModal');
+  const closeInfoBtn = document.getElementById('closeInfo');
+  
+  if (infoModal) {
+    if (closeInfoBtn) {
+      closeInfoBtn.addEventListener('click', () => hideModal('infoModal'));
+    }
+    
+    infoModal.addEventListener('click', (e) => {
+      if (e.target === infoModal) hideModal('infoModal');
+    });
+  }
+
+  // Reset Confirmation Modal
+  const resetModal = document.getElementById('resetConfirmationModal');
+  const cancelResetBtn = document.getElementById('cancelReset');
+  const confirmResetBtn = document.getElementById('confirmReset');
+
+  if (resetModal) {
+    if (cancelResetBtn) {
+      cancelResetBtn.addEventListener('click', () => hideModal('resetConfirmationModal'));
+    }
+
+    if (confirmResetBtn) {
+      confirmResetBtn.addEventListener('click', handleResetConfirmation);
+    }
+
+    resetModal.addEventListener('click', (e) => {
+      if (e.target === resetModal) hideModal('resetConfirmationModal');
+    });
+  }
+
+  // Save Confirmation Modal
+  const saveModal = document.getElementById('saveConfirmationModal');
+  const cancelSaveBtn = document.getElementById('cancelSave');
+  const confirmSaveBtn = document.getElementById('confirmSave');
+
+  if (saveModal) {
+    if (cancelSaveBtn) {
+      cancelSaveBtn.addEventListener('click', () => hideModal('saveConfirmationModal'));
+    }
+
+    if (confirmSaveBtn) {
+      confirmSaveBtn.addEventListener('click', handleSaveConfirmation);
+    }
+
+    saveModal.addEventListener('click', (e) => {
+      if (e.target === saveModal) hideModal('saveConfirmationModal');
+    });
+  }
+
+  // Remove Member Modal
+  const removeMemberModal = document.getElementById('removeMemberModal');
+  const cancelRemoveMemberBtn = document.getElementById('cancelRemoveMember');
+  const confirmRemoveMemberBtn = document.getElementById('confirmRemoveMember');
+
+  if (removeMemberModal) {
+    if (cancelRemoveMemberBtn) {
+      cancelRemoveMemberBtn.addEventListener('click', () => {
+        hideModal('removeMemberModal');
+      });
+    }
+
+    if (confirmRemoveMemberBtn) {
+      confirmRemoveMemberBtn.addEventListener('click', handleRemoveMemberFromModal);
+    }
+
+    // Handle Enter key in the input field
+    const memberToRemoveInput = document.getElementById('memberToRemove');
+    if (memberToRemoveInput) {
+      memberToRemoveInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleRemoveMemberFromModal();
+        }
+      });
+    }
+
+    removeMemberModal.addEventListener('click', (e) => {
+      if (e.target === removeMemberModal) {
+        hideModal('removeMemberModal');
+      }
+    });
+  }
+
+  // Delete Member Confirmation Modal
+  const deleteMemberModal = document.getElementById('deleteMemberConfirmationModal');
+  const cancelDeleteMemberBtn = document.getElementById('cancelDeleteMember');
+  const confirmDeleteMemberBtn = document.getElementById('confirmDeleteMember');
+
+  if (deleteMemberModal) {
+    if (cancelDeleteMemberBtn) {
+      cancelDeleteMemberBtn.addEventListener('click', () => {
+        hideModal('deleteMemberConfirmationModal');
+        if (deleteMemberModal.dataset.memberIndex) {
+          delete deleteMemberModal.dataset.memberIndex;
+        }
+      });
+    }
+
+    if (confirmDeleteMemberBtn) {
+      confirmDeleteMemberBtn.addEventListener('click', performMemberDeletion);
+    }
+
+    deleteMemberModal.addEventListener('click', (e) => {
+      if (e.target === deleteMemberModal) {
+        hideModal('deleteMemberConfirmationModal');
+        if (deleteMemberModal.dataset.memberIndex) {
+          delete deleteMemberModal.dataset.memberIndex;
+        }
+      }
+    });
+  }
+}
+
+
+  // ============ RESET CONFIRMATION MODAL - WITH ACTUAL FUNCTIONALITY ============
+  const resetModal = document.getElementById('resetConfirmationModal');
+  const cancelResetBtn = document.getElementById('cancelReset');
+  const confirmResetBtn = document.getElementById('confirmReset');
+
+  if (resetModal) {
+    if (cancelResetBtn) {
+      cancelResetBtn.addEventListener('click', () => hideModal('resetConfirmationModal'));
+    }
+
+    if (confirmResetBtn) {
+      confirmResetBtn.addEventListener('click', handleResetConfirmation);
+    }
+
+    resetModal.addEventListener('click', (e) => {
+      if (e.target === resetModal) hideModal('resetConfirmationModal');
+    });
+  }
+
+  // ============ SAVE CONFIRMATION MODAL - WITH ACTUAL FUNCTIONALITY ============
+  const saveModal = document.getElementById('saveConfirmationModal');
+  const cancelSaveBtn = document.getElementById('cancelSave');
+  const confirmSaveBtn = document.getElementById('confirmSave');
+
+  if (saveModal) {
+    if (cancelSaveBtn) {
+      cancelSaveBtn.addEventListener('click', () => hideModal('saveConfirmationModal'));
+    }
+
+    if (confirmSaveBtn) {
+      confirmSaveBtn.addEventListener('click', handleSaveConfirmation);
+    }
+
+    saveModal.addEventListener('click', (e) => {
+      if (e.target === saveModal) hideModal('saveConfirmationModal');
+    });
+  }
+
+  /* ============ REMOVE MEMBER MODAL HANDLERS ============ */
+  const removeMemberModal = document.getElementById('removeMemberModal');
+  const cancelRemoveMemberBtn = document.getElementById('cancelRemoveMember');
+  const confirmRemoveMemberBtn = document.getElementById('confirmRemoveMember');
+
+  if (removeMemberModal) {
+    if (cancelRemoveMemberBtn) {
+      cancelRemoveMemberBtn.addEventListener('click', () => {
+        hideModal('removeMemberModal');
+      });
+    }
+
+    if (confirmRemoveMemberBtn) {
+      confirmRemoveMemberBtn.addEventListener('click', handleRemoveMemberFromModal);
+    }
+
+    // Handle Enter key in the input field
+    const memberToRemoveInput = document.getElementById('memberToRemove');
+    if (memberToRemoveInput) {
+      memberToRemoveInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleRemoveMemberFromModal();
+        }
+      });
+    }
+
+    removeMemberModal.addEventListener('click', (e) => {
+      if (e.target === removeMemberModal) {
+        hideModal('removeMemberModal');
+      }
+    });
+  }
+
+  // Delete Member Confirmation Modal
+  const deleteMemberModal = document.getElementById('deleteMemberConfirmationModal');
+  const cancelDeleteMemberBtn = document.getElementById('cancelDeleteMember');
+  const confirmDeleteMemberBtn = document.getElementById('confirmDeleteMember');
+
+  if (deleteMemberModal) {
+    if (cancelDeleteMemberBtn) {
+      cancelDeleteMemberBtn.addEventListener('click', () => {
+        hideModal('deleteMemberConfirmationModal');
+        if (deleteMemberModal.dataset.memberIndex) {
+          delete deleteMemberModal.dataset.memberIndex;
+        }
+      });
+    }
+
+    if (confirmDeleteMemberBtn) {
+      confirmDeleteMemberBtn.addEventListener('click', performMemberDeletion);
+    }
+
+    deleteMemberModal.addEventListener('click', (e) => {
+      if (e.target === deleteMemberModal) {
+        hideModal('deleteMemberConfirmationModal');
+        if (deleteMemberModal.dataset.memberIndex) {
+          delete deleteMemberModal.dataset.memberIndex;
+        }
+      }
+    });
+  }
+  
+  // ============ ADD ESC KEY SUPPORT FOR ALL MODALS ============
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const openModals = document.querySelectorAll('.modal[style*="display: flex"]');
+      openModals.forEach(modal => {
+        hideModal(modal.id);
+      });
+    }
+  });
+
+/* ============ MISSING MODAL FUNCTIONS - ADD THESE ============ */
+
+// Reset Confirmation Modal Handler
+function handleResetConfirmation() {
+  console.log('Resetting form...');
+  
+  const editForm = document.getElementById('editForm');
+  if (editForm) {
+    editForm.reset();
+    clearValidationErrors('editForm');
+    editMembers = [];
+    updateEditMembersPreview();
+    
+    const memberCountInput = document.getElementById('edit_memberCount');
+    if (memberCountInput) {
+      memberCountInput.value = 0;
+    }
+    
+    closeEditPanel();
+    showSuccess('Edit form has been reset successfully.');
+  }
+  
+  hideModal('resetConfirmationModal');
+}
+
+
+// Save Confirmation Modal Handler
+function handleSaveConfirmation() {
+  console.log('Saving changes...');
+  
+  const saveBtn = document.getElementById('saveEditBtn');
+  if (saveBtn) {
+    saveBtn.click();
+  }
+  
+  hideModal('saveConfirmationModal');
+}
+
+// Function to show reset confirmation (call this when reset button is clicked)
+function showResetConfirmation() {
+  if (hasUnsavedChanges()) {
+    showModal('resetConfirmationModal');
+  } else {
+    handleResetConfirmation();
+  }
+}
+
+// Function to show save confirmation (call this when save button is clicked)
+function showSaveConfirmation() {
+  if (!validateHeadFormForEdit()) {
+    return;
+  }
+  
+  if (editMembers.length > 0) {
+    const invalidMembers = [];
+    editMembers.forEach((member, index) => {
+      if (!member['Name of Household Member/s'] || !member['Name of Household Member/s'].trim()) {
+        invalidMembers.push(index + 1);
+      }
+    });
+    
+    if (invalidMembers.length > 0) {
+      if (confirm(`Members #${invalidMembers.join(', ')} are missing names. Save anyway?`)) {
+        handleSaveConfirmation();
+      }
+      return;
+    }
+  }
+  
+  showModal('saveConfirmationModal');
+}
+/* ============ MEMBER CANCEL FUNCTION ============ */
+function handleMemberCancel() {
+  const memberName = $('memberName')?.value?.trim();
+  const memberContact = $('memberContact')?.value?.trim();
+  const memberBirthdate = $('memberBirthdate')?.value;
+  
+  // Check if there are unsaved changes
+  if (memberName || memberContact || memberBirthdate) {
+    if(confirm('Cancel member entry? Unsaved changes will be lost.')) {
+      // Remove the current member from editMembers array if it's empty
+      removeEmptyMemberIfNeeded();
+      // Clear the form and close
+      clearMemberForm();
+      $('memberPanel')?.classList.remove('open');
+      // Update the preview
+      updateEditMembersPreview();
+    }
+  } else {
+    // No changes, just close - but still remove empty member
+    removeEmptyMemberIfNeeded();
+    clearMemberForm();
+    $('memberPanel')?.classList.remove('open');
+    updateEditMembersPreview();
+  }
+}
+/* ============ REMOVE EMPTY MEMBER FUNCTION ============ */
+function removeEmptyMemberIfNeeded() {
+  // If we're editing an existing member (not adding new), don't remove
+  if (memberEditIndex < editMembers.length - 1) {
+    return;
+  }
+  
+  // Get the current member being edited
+  const currentMember = editMembers[memberEditIndex] || {};
+  
+  // Check if this member is empty (no name, contact, or birthdate)
+  const isEmpty = !currentMember['Name of Household Member/s'] && 
+                  !currentMember['Contact no.'] && 
+                  !currentMember['Birthdate'];
+  
+  if (isEmpty) {
+    // Remove the empty member from array
+    editMembers.splice(memberEditIndex, 1);
+    
+    // Update member count input
+    const currentCount = parseInt($('edit_memberCount').value) || 0;
+    if (currentCount > 0) {
+      $('edit_memberCount').value = currentCount - 1;
+    }
+  }
+}
+/* ============ CLEAR MEMBER FORM FUNCTION ============ */
+function clearMemberForm() {
+  // Clear all member form fields
+  $('memberName').value = '';
+  $('memberRegisteredCheckbox').checked = false;
+  $('memberRegistrationField').classList.remove('show');
+  $('memberRegistration').value = '';
+  $('memberContact').value = '';
+  qAll("input[name='member_sex']").forEach(r => r.checked = false);
+  $('memberBirthdate').value = '';
+  $('memberAge').value = '';
+  $('memberStage').value = '';
+  $('memberEducationalAttainment').value = '';
+  $('memberCollegeCourseField').classList.remove('show');
+  $('memberCollegeCourse').value = '';
+  $('memberEmployment').value = '';
+  $('memberJobTitleField').classList.remove('show');
+  $('memberJobTitle').value = '';
+  qAll("input[name='member_ofw_status']").forEach(r => {
+    if (r.value === 'No') r.checked = true;
+  });
+  $('memberCountryField').classList.remove('show');
+  $('memberCountry').value = '';
+  qAll("input[name='member_pwd']").forEach(r => {
+    if (r.value === 'No') r.checked = true;
+  });
+  $('memberStatus').value = '';
+  $('memberTransport').value = '';
+  $('memberPickup').value = '';
+  $('memberDropoff').value = '';
+  $('memberCamp').value = '';
+  $('memberCampCap').value = '';
+  $('memberInside').value = '';
+  $('memberOutside').value = '';
+  $('memberReason').value = '';
+  
+  // Clear government assistance fields
+  const memberGovCheckboxes = [
+    'member_tupad', 'member_local4ps', 'member_intl4ps',
+    'member_locsp', 'member_intlsp', 'member_solo',
+    'member_relief', 'member_cash'
+  ];
+  
+  memberGovCheckboxes.forEach(checkboxId => {
+    const checkbox = $(checkboxId);
+    if (checkbox) checkbox.checked = false;
+    
+    const dateField = $(checkboxId + '_date');
+    if (dateField) dateField.classList.remove('show');
+    
+    const dateInput = $(checkboxId + '_date_input');
+    if (dateInput) dateInput.value = '';
+  });
+  
+  $('memberAics').value = '';
+  const memberAicsDateField = $('member_aics_date');
+  if (memberAicsDateField) memberAicsDateField.classList.remove('show');
+  
+  const memberAicsDateInput = $('member_aics_date_input');
+  if (memberAicsDateInput) memberAicsDateInput.value = '';
+  
+  // Clear validation
+  clearValidationErrors('memberForm');
+}
+/* ============ NEW: ENHANCED REMOVE MEMBER FUNCTIONS WITH MODAL ============ */
+function showRemoveMemberModal() {
+  if (editMembers.length === 0) {
+    showError('No members to remove.');
+    return;
+  }
+  
+  document.getElementById('memberTotalCount').textContent = editMembers.length;
+  document.getElementById('memberToRemove').max = editMembers.length;
+  document.getElementById('memberToRemove').min = 1;
+  document.getElementById('memberToRemove').value = '';
+  
+  const membersList = document.getElementById('currentMembersList');
+  membersList.innerHTML = '';
+  
+  editMembers.forEach((member, index) => {
+    const memberName = member['Name of Household Member/s'] || 'Unnamed Member';
+    const span = document.createElement('span');
+    span.textContent = `${index + 1}. ${memberName}`;
+    span.style.cursor = 'pointer';
+    span.onclick = () => {
+      document.getElementById('memberToRemove').value = index + 1;
+      highlightSelectedMember(index);
+    };
+    membersList.appendChild(span);
+  });
+  
+  setTimeout(() => {
+    const allSpans = membersList.querySelectorAll('span');
+    allSpans.forEach(span => {
+      span.style.background = 'transparent';
+      span.style.fontWeight = 'normal';
+    });
+  }, 100);
+  
+  showModal('removeMemberModal');
+  
+  setTimeout(() => {
+    document.getElementById('memberToRemove').focus();
+  }, 300);
+}
+
+function highlightSelectedMember(index) {
+  const membersList = document.getElementById('currentMembersList');
+  const allSpans = membersList.querySelectorAll('span');
+  
+  allSpans.forEach((span, i) => {
+    if (i === index) {
+      span.style.background = 'rgba(255,122,0,0.2)';
+      span.style.fontWeight = 'bold';
+    } else {
+      span.style.background = 'transparent';
+      span.style.fontWeight = 'normal';
+    }
+  });
+}
+
+function removeMemberByIndex(index) {
+  if (index < 0 || index >= editMembers.length) {
+    showError('Invalid member number.');
+    return;
+  }
+  
+  const memberName = editMembers[index]['Name of Household Member/s'] || 'Unnamed Member';
+  
+  // Set up the confirmation modal
+  document.getElementById('deleteMemberMessage').textContent = 
+    `Are you sure you want to delete member "${memberName}"? This action cannot be undone.`;
+  
+  showModal('deleteMemberConfirmationModal');
+  
+  // Store the index to be deleted
+  const modal = document.getElementById('deleteMemberConfirmationModal');
+  modal.dataset.memberIndex = index;
+}
+
+function performMemberDeletion() {
+  const modal = document.getElementById('deleteMemberConfirmationModal');
+  const index = parseInt(modal.dataset.memberIndex);
+  
+  if (isNaN(index) || index < 0 || index >= editMembers.length) {
+    showError('Invalid member index.');
+    hideModal('deleteMemberConfirmationModal');
+    return;
+  }
+  
+  const memberName = editMembers[index]['Name of Household Member/s'] || 'Unnamed Member';
+  editMembers.splice(index, 1);
+  
+  // Update member count
+  const currentCount = parseInt($('edit_memberCount').value) || 0;
+  if (currentCount > 0) {
+    $('edit_memberCount').value = currentCount - 1;
+  }
+  
+  updateEditMembersPreview();
+  
+  hideModal('deleteMemberConfirmationModal');
+  showSuccess(`Member "${memberName}" removed successfully.`);
+  
+  // Record activity
+  recordPageActivity('Member Removed', `Removed member "${memberName}" from household ${editDataID}`);
+}
+
+function handleRemoveMemberFromModal() {
+  const input = document.getElementById('memberToRemove');
+  const memberNumber = parseInt(input.value);
+  
+  if (isNaN(memberNumber) || memberNumber < 1 || memberNumber > editMembers.length) {
+    showError(`Please enter a valid number between 1 and ${editMembers.length}`);
+    input.focus();
+    return;
+  }
+  
+  hideModal('removeMemberModal');
+  
+  // Show confirmation modal for the specific member
+  removeMemberByIndex(memberNumber - 1);
+}
+
+// Update the existing removeMember function to use the modal
+function removeMember(index) {
+  removeMemberByIndex(index);
+}
+
+/* ============ KEYBOARD SHORTCUTS ============ */
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // Don't trigger if user is typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+      return;
+    }
+    
+    // Ctrl+Delete to open remove member modal when edit panel is open
+    if (e.ctrlKey && e.key === 'Delete' && $('editPanel')?.classList.contains('open')) {
+      e.preventDefault();
+      showRemoveMemberModal();
+    }
+  });
+}
+
 /* ============ STATE ============ */
 let header = [];
 let rawRows = [];
@@ -2932,6 +4347,213 @@ function openHazardHunterForModal() {
   window.open(HAZARD_HUNTER_URL, '_blank');
 }
 
+// Add these functions to records.html
+function setupRealTimeValidation() {
+  // Head form fields
+  const headRequiredFields = ['barangay', 'sitio', 'householdHead', 'contactNo', 'householdBirthdate', 'memberCount'];
+  
+  headRequiredFields.forEach(fieldId => {
+    const field = document.getElementById('edit_' + fieldId); // Note: edit_ prefix
+    if (field) {
+      const validationFn = debounce(() => {
+        if (field.value.trim()) {
+          field.classList.remove('validation-error');
+          const label = field.closest('div')?.querySelector('label');
+          if (label) label.classList.remove('validation-error-label');
+          removeHeadErrorByFieldId(fieldId);
+        }
+      }, 300);
+      
+      field.addEventListener('input', validationFn);
+      if (field.tagName === 'SELECT') {
+        field.addEventListener('change', validationFn);
+      }
+    }
+  });
+  
+  // Head sex radio buttons
+  const headSexRadios = document.querySelectorAll('input[name="edit_head_sex"]');
+  headSexRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      const sexContainer = document.querySelector('.radio-line');
+      if (sexContainer) sexContainer.classList.remove('validation-error');
+      
+      const sexLabel = document.querySelector('#editForm .form-grid > div:has(.radio-line) label');
+      if (sexLabel) sexLabel.classList.remove('validation-error-label');
+      
+      removeHeadErrorByText('Sex is required');
+    });
+  });
+  
+  // Head contact number
+  const contactInput = document.getElementById('edit_contactNo');
+  if (contactInput) {
+    contactInput.addEventListener('input', debounce(() => {
+      if (contactInput.value.trim() && validatePhilippineMobileNumber(contactInput.value.trim())) {
+        contactInput.classList.remove('validation-error', 'input-error');
+        const contactError = document.getElementById('edit_contactError');
+        if (contactError) contactError.style.display = 'none';
+        removeHeadErrorByText('Please enter a valid Philippine mobile number');
+      }
+    }, 300));
+  }
+}
+function setupEditGovernmentAssistanceDateHandlers() {
+  // Head government assistance checkboxes
+  const headGovCheckboxes = [
+    { checkboxId: 'edit_ass_tupad', dateFieldId: 'edit_ass_tupad_date' },
+    { checkboxId: 'edit_ass_local4ps', dateFieldId: 'edit_ass_local4ps_date' },
+    { checkboxId: 'edit_ass_intl4ps', dateFieldId: 'edit_ass_intl4ps_date' },
+    { checkboxId: 'edit_ass_locsp', dateFieldId: 'edit_ass_locsp_date' },
+    { checkboxId: 'edit_ass_intlsp', dateFieldId: 'edit_ass_intlsp_date' },
+    { checkboxId: 'edit_ass_solo', dateFieldId: 'edit_ass_solo_date' },
+    { checkboxId: 'edit_ass_relief', dateFieldId: 'edit_ass_relief_date' },
+    { checkboxId: 'edit_ass_cash', dateFieldId: 'edit_ass_cash_date' }
+  ];
+  
+  headGovCheckboxes.forEach(item => {
+    const checkbox = $(item.checkboxId);
+    const dateField = $(item.dateFieldId);
+    
+    if (checkbox && dateField) {
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          dateField.classList.add('show');
+        } else {
+          dateField.classList.remove('show');
+          // Clear date field when unchecked
+          const dateInput = dateField.querySelector('input[type="date"]');
+          if (dateInput) dateInput.value = '';
+        }
+      });
+      
+      // Initialize based on current state
+      if (checkbox.checked) {
+        dateField.classList.add('show');
+      }
+    }
+  });
+  
+  // Head AICS dropdown
+  const aicsSelect = $('edit_ass_aics');
+  const aicsDateField = $('edit_ass_aics_date');
+  
+  if (aicsSelect && aicsDateField) {
+    aicsSelect.addEventListener('change', function() {
+      if (this.value && this.value !== "") {
+        aicsDateField.classList.add('show');
+      } else {
+        aicsDateField.classList.remove('show');
+        // Clear date field when set to none
+        const dateInput = aicsDateField.querySelector('input[type="date"]');
+        if (dateInput) dateInput.value = '';
+      }
+    });
+    
+    // Initialize based on current state
+    if (aicsSelect.value && aicsSelect.value !== "") {
+      aicsDateField.classList.add('show');
+    }
+  }
+}
+
+function setupMemberGovernmentAssistanceDateHandlers() {
+  // Member government assistance checkboxes
+  const memberGovCheckboxes = [
+    { checkboxId: 'member_tupad', dateFieldId: 'member_tupad_date' },
+    { checkboxId: 'member_local4ps', dateFieldId: 'member_local4ps_date' },
+    { checkboxId: 'member_intl4ps', dateFieldId: 'member_intl4ps_date' },
+    { checkboxId: 'member_locsp', dateFieldId: 'member_locsp_date' },
+    { checkboxId: 'member_intlsp', dateFieldId: 'member_intlsp_date' },
+    { checkboxId: 'member_solo', dateFieldId: 'member_solo_date' },
+    { checkboxId: 'member_relief', dateFieldId: 'member_relief_date' },
+    { checkboxId: 'member_cash', dateFieldId: 'member_cash_date' }
+  ];
+  
+  memberGovCheckboxes.forEach(item => {
+    const checkbox = $(item.checkboxId);
+    const dateField = $(item.dateFieldId);
+    
+    if (checkbox && dateField) {
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          dateField.classList.add('show');
+        } else {
+          dateField.classList.remove('show');
+          // Clear date field when unchecked
+          const dateInput = dateField.querySelector('input[type="date"]');
+          if (dateInput) dateInput.value = '';
+        }
+      });
+      
+      // Initialize based on current state
+      if (checkbox.checked) {
+        dateField.classList.add('show');
+      }
+    }
+  });
+  
+  // Member AICS dropdown
+  const memberAicsSelect = $('memberAics');
+  const memberAicsDateField = $('member_aics_date');
+  
+  if (memberAicsSelect && memberAicsDateField) {
+    memberAicsSelect.addEventListener('change', function() {
+      if (this.value && this.value !== "") {
+        memberAicsDateField.classList.add('show');
+      } else {
+        memberAicsDateField.classList.remove('show');
+        // Clear date field when set to none
+        const dateInput = memberAicsDateField.querySelector('input[type="date"]');
+        if (dateInput) dateInput.value = '';
+      }
+    });
+    
+    // Initialize based on current state
+    if (memberAicsSelect.value && memberAicsSelect.value !== "") {
+      memberAicsDateField.classList.add('show');
+    }
+  }
+}
+function removeHeadErrorByText(errorText) {
+  // Implementation from dataForm.html
+  const errorsList = document.getElementById('headValidationErrors');
+  if (!errorsList) return;
+  
+  const errors = Array.from(errorsList.querySelectorAll('li'));
+  let found = false;
+  
+  errors.forEach(li => {
+    if (li.textContent.includes(errorText)) {
+      li.remove();
+      found = true;
+    }
+  });
+  
+  if (found) {
+    const remainingErrors = errorsList.querySelectorAll('li');
+    const validationSummary = document.getElementById('validationSummaryHead');
+    
+    if (remainingErrors.length === 0 && validationSummary) {
+      validationSummary.classList.remove('show');
+    }
+  }
+}
+
+function removeHeadErrorByFieldId(fieldId) {
+  const fieldNameMap = {
+    'barangay': 'Barangay',
+    'sitio': 'Sitio / Purok',
+    'householdHead': 'Household Head Full Name',
+    'contactNo': 'Contact number',
+    'householdBirthdate': 'Birthdate',
+    'memberCount': 'No. of Household Member(s)'
+  };
+  
+  if (fieldNameMap[fieldId]) {
+    removeHeadErrorByText(fieldNameMap[fieldId]);
+  }
+}
 /* ============ GET CURRENT LOCATION FUNCTION ============ */
 function getCurrentLocation() {
   if (!navigator.geolocation) {
@@ -2964,6 +4586,310 @@ function getCurrentLocation() {
       maximumAge: 0
     }
   );
+}
+/* ============ ENHANCED VALIDATION FUNCTIONS FROM DATAFORM.HTML ============ */
+function validateHeadFormForEdit() {
+  const requiredFields = [
+    { id: 'edit_barangay', name: 'Barangay' },
+    { id: 'edit_sitio', name: 'Sitio / Purok' },
+    { id: 'edit_householdHead', name: 'Household Head Full Name' },
+    { id: 'edit_contactNo', name: 'Contact no.' },
+    { id: 'edit_householdBirthdate', name: 'Birthdate' },
+    { id: 'edit_memberCount', name: 'No. of Household Member/s' }
+  ];
+
+  const sexRadios = document.querySelectorAll('input[name="edit_head_sex"]:checked');
+  const contactInput = document.getElementById("edit_contactNo");
+  const contactError = document.getElementById("edit_contactError");
+  
+  let errors = [];
+  let hasErrors = false;
+
+  clearValidationErrors('editForm');
+
+  requiredFields.forEach(field => {
+    const element = document.getElementById(field.id);
+    if (element) {
+      const value = element.value.trim();
+      if (!value) {
+        element.classList.add('validation-error');
+        const label = element.closest('div')?.querySelector('label');
+        if (label) label.classList.add('validation-error-label');
+        errors.push(`${field.name} is required`);
+        hasErrors = true;
+      }
+    }
+  });
+
+  if (sexRadios.length === 0) {
+    const sexLabel = document.querySelector('label[for="edit_head_sex"]') || 
+                     document.querySelector('.form-grid > div:has(.radio-line) label');
+    
+    if (sexLabel) {
+      sexLabel.classList.add('validation-error-label');
+    }
+    errors.push('Sex is required');
+    hasErrors = true;
+  }
+
+  if (contactInput && contactInput.value.trim()) {
+    if (!validateContactInput(contactInput, contactError)) {
+      errors.push('Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)');
+      hasErrors = true;
+    }
+  }
+
+  const validationSummary = document.getElementById('validationSummaryEdit');
+  const errorsList = document.getElementById('editValidationErrors');
+  
+  if (hasErrors) {
+    if (errorsList) {
+      errorsList.innerHTML = '';
+      errors.forEach(error => {
+        const li = document.createElement('li');
+        li.textContent = error;
+        errorsList.appendChild(li);
+      });
+    }
+    if (validationSummary) {
+      validationSummary.classList.add('show'); // USE classList ONLY
+      validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return false;
+  } else {
+    if (validationSummary) {
+      validationSummary.classList.remove('show'); // USE classList ONLY
+    }
+    return true;
+  }
+}
+
+function validateMemberFormForEdit() {
+  const requiredFields = [
+    { id: 'memberName', name: 'Household Member Full Name' },
+    { id: 'memberContact', name: 'Contact no.' },
+    { id: 'memberBirthdate', name: 'Birthdate' }
+  ];
+
+  const sexRadios = document.querySelectorAll('input[name="member_sex"]:checked');
+  const contactInput = document.getElementById("memberContact");
+  const contactError = document.getElementById("memberContactError");
+  
+  let errors = [];
+  let hasErrors = false;
+
+  clearValidationErrors('memberForm');
+
+  requiredFields.forEach(field => {
+    const element = document.getElementById(field.id);
+    if (element) {
+      const value = element.value.trim();
+      if (!value) {
+        element.classList.add('validation-error');
+        const label = element.closest('div')?.querySelector('label');
+        if (label) label.classList.add('validation-error-label');
+        errors.push(`${field.name} is required`);
+        hasErrors = true;
+      }
+    }
+  });
+
+  if (sexRadios.length === 0) {
+    const memberSexLabel = document.querySelector('#memberPanel label:has(+ .radio-line)') ||
+                           document.querySelector('#memberForm .form-grid > div:has(.radio-line) label');
+    
+    if (memberSexLabel) {
+      memberSexLabel.classList.add('validation-error-label');
+    }
+    errors.push('Sex is required');
+    hasErrors = true;
+  }
+
+  if (contactInput && contactInput.value.trim()) {
+    if (!validateContactInput(contactInput, contactError)) {
+      errors.push('Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)');
+      hasErrors = true;
+    }
+  }
+
+const validationSummary = document.getElementById('validationSummaryMember');
+const errorsList = document.getElementById('memberValidationErrors');
+
+if (hasErrors) {
+  if (errorsList) {
+    errorsList.innerHTML = '';
+    errors.forEach(error => {
+      const li = document.createElement('li');
+      li.textContent = error;
+      errorsList.appendChild(li);
+    });
+  }
+  if (validationSummary) {
+    validationSummary.classList.add('show');  // USE classList
+    validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  return false;
+} else {
+  if (validationSummary) {
+    validationSummary.classList.remove('show');  // USE classList
+  }
+  return true;
+}
+}
+function clearValidationErrors(formId) {
+  let elements;
+  if (formId === 'editForm') {
+    elements = document.querySelectorAll('#editForm input, #editForm select, #editForm textarea');
+    const sexContainer = document.querySelector('.radio-line');
+    if (sexContainer) sexContainer.classList.remove('validation-error');
+    
+    const sexLabel = document.querySelector('#editForm .form-grid > div:has(.radio-line) label');
+    if (sexLabel) sexLabel.classList.remove('validation-error-label');
+    
+    document.querySelectorAll('#editForm label').forEach(label => {
+      label.classList.remove('validation-error-label');
+    });
+    
+    // IMPORTANT: Hide the validation summary
+    const validationSummary = document.getElementById('validationSummaryEdit');
+    if (validationSummary) {
+      validationSummary.classList.remove('show');
+    }
+    
+  } else if (formId === 'memberForm') {
+    elements = document.querySelectorAll('#memberForm input, #memberForm select, #memberForm textarea');
+    const sexContainer = document.querySelectorAll('.radio-line')[1];
+    if (sexContainer) sexContainer.classList.remove('validation-error');
+    
+    const memberSexLabel = document.querySelector('#memberForm .form-grid > div:has(.radio-line) label');
+    if (memberSexLabel) memberSexLabel.classList.remove('validation-error-label');
+    
+    document.querySelectorAll('#memberForm label').forEach(label => {
+      label.classList.remove('validation-error-label');
+    });
+    
+    // IMPORTANT: Hide the member validation summary
+    const validationSummary = document.getElementById('validationSummaryMember');
+    if (validationSummary) {
+      validationSummary.classList.remove('show');
+    }
+  }
+  
+  elements.forEach(element => {
+    element.classList.remove('validation-error');
+  });
+}
+
+/* ============ SUCCESS/ERROR MODAL FUNCTIONS ============ */
+function showSuccess(message) {
+  const messageEl = document.getElementById('successMessage');
+  if (messageEl) messageEl.textContent = message;
+  showModal('successModal');
+}
+
+function showError(message) {
+  const messageEl = document.getElementById('errorMessage');
+  if (messageEl) messageEl.textContent = message;
+  showModal('errorModal');
+}
+
+function showInfo(message) {
+  const messageEl = document.getElementById('infoMessage');
+  if (messageEl) messageEl.textContent = message;
+  showModal('infoModal');
+}
+
+function setupRealTimeValidationForEdit() {
+  // Head form fields
+  const headRequiredFields = ['edit_barangay', 'edit_sitio', 'edit_householdHead', 'edit_contactNo', 'edit_householdBirthdate', 'edit_memberCount'];
+  
+  headRequiredFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      const validationFn = debounce(() => {
+        if (field.value.trim()) {
+          field.classList.remove('validation-error');
+          const label = field.closest('div')?.querySelector('label');
+          if (label) label.classList.remove('validation-error-label');
+          removeEditErrorByFieldId(fieldId);
+        }
+      }, 300);
+      
+      field.addEventListener('input', validationFn);
+      if (field.tagName === 'SELECT') {
+        field.addEventListener('change', validationFn);
+      }
+    }
+  });
+  
+  // Head sex radio buttons
+  const headSexRadios = document.querySelectorAll('input[name="edit_head_sex"]');
+  headSexRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      const sexContainer = document.querySelector('.radio-line');
+      if (sexContainer) sexContainer.classList.remove('validation-error');
+      
+      const sexLabel = document.querySelector('#editForm .form-grid > div:has(.radio-line) label');
+      if (sexLabel) sexLabel.classList.remove('validation-error-label');
+      
+      removeEditErrorByText('Sex is required');
+    });
+  });
+  
+  // Head contact number
+  const contactInput = document.getElementById('edit_contactNo');
+  if (contactInput) {
+    contactInput.addEventListener('input', debounce(() => {
+      if (contactInput.value.trim() && validatePhilippineMobileNumber(contactInput.value.trim())) {
+        contactInput.classList.remove('validation-error', 'input-error');
+        const contactError = document.getElementById('edit_contactError');
+        if (contactError) contactError.style.display = 'none';
+        removeEditErrorByText('Please enter a valid Philippine mobile number');
+      }
+    }, 300));
+  }
+}
+
+function removeEditErrorByFieldId(fieldId) {
+  const fieldNameMap = {
+    'edit_barangay': 'Barangay',
+    'edit_sitio': 'Sitio / Purok',
+    'edit_householdHead': 'Household Head Full Name',
+    'edit_contactNo': 'Contact number',
+    'edit_householdBirthdate': 'Birthdate',
+    'edit_memberCount': 'No. of Household Member(s)'
+  };
+  
+  if (fieldNameMap[fieldId]) {
+    removeEditErrorByText(fieldNameMap[fieldId]);
+  }
+}
+
+function removeEditErrorByText(errorText) {
+  const errorsList = document.getElementById('editValidationErrors');
+  if (!errorsList) return;
+  
+  const errors = Array.from(errorsList.querySelectorAll('li'));
+  let found = false;
+  
+  errors.forEach(li => {
+    if (li.textContent.includes(errorText)) {
+      li.remove();
+      found = true;
+    }
+  });
+  
+  if (found) {
+    const remainingErrors = errorsList.querySelectorAll('li');
+    const validationSummary = document.getElementById('validationSummaryEdit');
+    
+    // FIX: Only hide when no errors remain AND ensure we use classList
+    if (remainingErrors.length === 0) {
+      if (validationSummary) {
+        validationSummary.classList.remove('show'); // Use classList only
+      }
+    }
+  }
 }
 
 /* ============ HAZARD HUNTER FUNCTIONS ============ */
@@ -3005,53 +4931,125 @@ function openHazardHunterVerification(lat, lng) {
 function toInputDate(val){
   if(!val && val !== 0) return '';
   
-  // Already in yyyy-mm-dd format
-  if(typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  val = String(val).trim();
+  console.log("toInputDate() INPUT:", val);
   
-  // Handle dd/mm/yyyy format
-  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
+  // Handle dates like "2025-30-11" (yyyy-dd-mm)
+  if(/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    const [y, part1, part2] = val.split('-');
+    const p1 = parseInt(part1);
+    
+    // If first part > 12, it's yyyy-dd-mm
+    if(p1 > 12) {
+      // Swap to yyyy-mm-dd
+      const result = `${y}-${String(part2).padStart(2,'0')}-${String(part1).padStart(2,'0')}`;
+      console.log("FIXED yyyy-dd-mm to yyyy-mm-dd:", val, "->", result);
+      return result;
+    }
+    return val;
+  }
+  
+  // Handle slash-separated dates
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
     const parts = val.split('/');
-    const d = parts[0].padStart(2,'0');
-    const m = parts[1].padStart(2,'0');
+    const first = parseInt(parts[0]);
+    const second = parseInt(parts[1]);
+    
+    // FORCE CONVERSION to mm/dd/yyyy interpretation
+    // If first > 12, it's currently dd/mm/yyyy -> swap to mm/dd/yyyy
+    if(first > 12) {
+      // Currently dd/mm/yyyy, need mm/dd/yyyy -> swap parts
+      const m = parts[1].padStart(2,'0');  // Month is second part
+      const d = parts[0].padStart(2,'0');  // Day is first part  
+      const y = parts[2];
+      const result = `${y}-${m}-${d}`;
+      console.log("SWAPPED dd/mm/yyyy to mm/dd/yyyy (as yyyy-mm-dd):", val, "->", result);
+      return result;
+    }
+    
+    // Otherwise assume it's already mm/dd/yyyy
+    const m = parts[0].padStart(2,'0');
+    const d = parts[1].padStart(2,'0');
     const y = parts[2];
-    return `${y}-${m}-${d}`;
+    const result = `${y}-${m}-${d}`;
+    console.log("Already mm/dd/yyyy to yyyy-mm-dd:", val, "->", result);
+    return result;
   }
   
-  // Handle mm/dd/yyyy format
-  if(typeof val === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)){
-    const [m, d, y] = val.split('/');
-    const month = m.padStart(2,'0');
-    const day = d.padStart(2,'0');
-    return `${y}-${month}-${day}`;
-  }
-  
-  // Try parsing as Date
+  // Try Date object
   const dt = new Date(val);
   if(!isNaN(dt)){
     const y = dt.getFullYear();
     const m = String(dt.getMonth() + 1).padStart(2, '0');
     const d = String(dt.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    const result = `${y}-${m}-${d}`;
+    console.log("Parsed via Date object:", val, "->", result);
+    return result;
   }
   
+  console.warn("Could not parse date:", val);
   return '';
 }
 
 function toSheetDate(inputVal){
   if(!inputVal) return '';
-  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
-    const [y,m,d] = inputVal.split('-');
-    return `${d}/${m}/${y}`;
+  
+  console.log("toSheetDate() INPUT:", inputVal);
+  
+  // If it's already in mm/dd/yyyy format
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(inputVal)) {
+    // Verify it's actually mm/dd/yyyy (first part <= 12)
+    const parts = inputVal.split('/');
+    if(parseInt(parts[0]) <= 12) {
+      console.log("Already mm/dd/yyyy:", inputVal);
+      return inputVal;
+    }
   }
+  
+  // If it's in yyyy-mm-dd format (from HTML date input)
+  if(/^\d{4}-\d{2}-\d{2}$/.test(inputVal)){
+    const [y, m, d] = inputVal.split('-');
+    const result = `${m}/${d}/${y}`;  // Convert to mm/dd/yyyy
+    console.log("Converted yyyy-mm-dd to mm/dd/yyyy:", inputVal, "->", result);
+    return result;
+  }
+  
+  // Try parsing as Date
   const dt = new Date(inputVal);
   if(!isNaN(dt)){
-    const mm = String(dt.getMonth()+1).padStart(2,'0');
+    const mm = String(dt.getMonth() + 1).padStart(2,'0');
     const dd = String(dt.getDate()).padStart(2,'0');
-    return `${dd}/${mm}/${dt.getFullYear()}`;
+    const result = `${mm}/${dd}/${dt.getFullYear()}`;  // mm/dd/yyyy
+    console.log("Parsed Date to mm/dd/yyyy:", inputVal, "->", result);
+    return result;
   }
+  
+  console.warn("toSheetDate() could not parse:", inputVal);
   return '';
 }
-
+/* ============ CONTACT NUMBER FOR DISPLAY ============ */
+function formatContactForDisplay(contact) {
+  if (!contact) return '';
+  
+  // If already formatted, return as is
+  if (contact.includes(' ')) return contact;
+  
+  // Remove all non-digit characters
+  let cleaned = contact.replace(/\D/g, '');
+  
+  // Format: 09XX XXX XXXX
+  if (cleaned.length === 11 && cleaned.startsWith('09')) {
+    return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
+  }
+  
+  // Format: +63 XXX XXX XXXX
+  if (cleaned.length === 12 && cleaned.startsWith('63')) {
+    return '+63 ' + cleaned.substring(2).replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+  }
+  
+  // Return original if can't format
+  return contact;
+}
 function computeAgeDetailed(inputDateValue){
   if(!inputDateValue) return null;
   let d;
@@ -3099,7 +5097,182 @@ function computeAgeDetailed(inputDateValue){
 
   return { years, months, days, display, stage };
 }
-
+/* ============ INITIALIZE GOVERNMENT ASSISTANCE DATE FIELDS ============ */
+function initializeGovernmentAssistanceDateFields() {
+  console.log("Initializing government assistance date fields...");
+  
+  // Head government assistance date fields
+  const headGovCheckboxes = [
+    'edit_ass_tupad',
+    'edit_ass_local4ps', 
+    'edit_ass_intl4ps',
+    'edit_ass_locsp',
+    'edit_ass_intlsp',
+    'edit_ass_solo',
+    'edit_ass_relief',
+    'edit_ass_cash'
+  ];
+  
+  headGovCheckboxes.forEach(fieldId => {
+    const checkbox = $(fieldId);
+    const dateField = $(fieldId + '_date');
+    
+    if (checkbox && dateField) {
+      // Set initial state
+      if (checkbox.checked) {
+        dateField.classList.add('show');
+      }
+      
+      // Add event listener
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          dateField.classList.add('show');
+        } else {
+          dateField.classList.remove('show');
+          // Clear date field when unchecked
+          const dateInput = dateField.querySelector('input[type="date"]');
+          if (dateInput) dateInput.value = '';
+        }
+      });
+    }
+  });
+  
+  // Head AICS field
+  const aicsSelect = $('edit_ass_aics');
+  const aicsDateField = $('edit_ass_aics_date');
+  
+  if (aicsSelect && aicsDateField) {
+    // Set initial state
+    if (aicsSelect.value && aicsSelect.value !== "") {
+      aicsDateField.classList.add('show');
+    }
+    
+    // Add event listener
+    aicsSelect.addEventListener('change', function() {
+      if (this.value && this.value !== "") {
+        aicsDateField.classList.add('show');
+      } else {
+        aicsDateField.classList.remove('show');
+        const dateInput = aicsDateField.querySelector('input[type="date"]');
+        if (dateInput) dateInput.value = '';
+      }
+    });
+  }
+  
+  // Member government assistance date fields
+  const memberGovCheckboxes = [
+    'member_tupad',
+    'member_local4ps',
+    'member_intl4ps',
+    'member_locsp',
+    'member_intlsp',
+    'member_solo',
+    'member_relief',
+    'member_cash'
+  ];
+  
+  memberGovCheckboxes.forEach(fieldId => {
+    const checkbox = $(fieldId);
+    const dateField = $(fieldId + '_date');
+    
+    if (checkbox && dateField) {
+      // Set initial state
+      if (checkbox.checked) {
+        dateField.classList.add('show');
+      }
+      
+      // Add event listener
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          dateField.classList.add('show');
+        } else {
+          dateField.classList.remove('show');
+          const dateInput = dateField.querySelector('input[type="date"]');
+          if (dateInput) dateInput.value = '';
+        }
+      });
+    }
+  });
+  
+  // Member AICS field
+  const memberAicsSelect = $('memberAics');
+  const memberAicsDateField = $('member_aics_date');
+  
+  if (memberAicsSelect && memberAicsDateField) {
+    // Set initial state
+    if (memberAicsSelect.value && memberAicsSelect.value !== "") {
+      memberAicsDateField.classList.add('show');
+    }
+    
+    // Add event listener
+    memberAicsSelect.addEventListener('change', function() {
+      if (this.value && this.value !== "") {
+        memberAicsDateField.classList.add('show');
+      } else {
+        memberAicsDateField.classList.remove('show');
+        const dateInput = memberAicsDateField.querySelector('input[type="date"]');
+        if (dateInput) dateInput.value = '';
+      }
+    });
+  }
+}
+  
+  // Member government assistance date fields
+  const memberGovFields = [
+    'member_tupad',
+    'member_local4ps',
+    'member_intl4ps',
+    'member_locsp',
+    'member_intlsp',
+    'member_solo',
+    'member_relief',
+    'member_cash'
+  ];
+  
+  memberGovFields.forEach(fieldId => {
+    const checkbox = $(fieldId);
+    const dateField = $(fieldId + '_date');
+    
+    if (checkbox && dateField) {
+      // Set initial state
+      if (checkbox.checked) {
+        dateField.classList.add('show');
+      }
+      
+      // Add event listener
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          dateField.classList.add('show');
+        } else {
+          dateField.classList.remove('show');
+          const dateInput = dateField.querySelector('input[type="date"]');
+          if (dateInput) dateInput.value = '';
+        }
+      });
+    }
+  });
+  
+  // Member AICS field
+  const memberAicsSelect = $('memberAics');
+  const memberAicsDateField = $('member_aics_date');
+  
+  if (memberAicsSelect && memberAicsDateField) {
+    // Set initial state
+    if (memberAicsSelect.value && memberAicsSelect.value !== "") {
+      memberAicsDateField.classList.add('show');
+    }
+    
+    // Add event listener
+    memberAicsSelect.addEventListener('change', function() {
+      if (this.value && this.value !== "") {
+        memberAicsDateField.classList.add('show');
+      } else {
+        memberAicsDateField.classList.remove('show');
+        const dateInput = memberAicsDateField.querySelector('input[type="date"]');
+        if (dateInput) dateInput.value = '';
+      }
+    });
+  }
 /* ============ UPDATED DATE FORMATTING FUNCTION ============ */
 function formatDateForDisplay(dateValue) {
   if (!dateValue || dateValue === 'N/A') return 'N/A';
@@ -3154,7 +5327,7 @@ function validatePhilippineMobileNumber(number) {
 function validateContactInput(input, errorElement) {
     if (!input || !errorElement) return true;
     
-    const value = input.value.trim();
+    let value = input.value.trim();
     
     // Allow empty for optional fields (check if field is required)
     const isRequired = input.hasAttribute('required');
@@ -3169,6 +5342,13 @@ function validateContactInput(input, errorElement) {
         errorElement.style.display = 'block';
         errorElement.textContent = 'Contact number is required';
         return false;
+    }
+    
+    // Format the number as user types
+    const formattedValue = formatContactNumber(value);
+    if (formattedValue !== value) {
+        input.value = formattedValue;
+        value = formattedValue;
     }
     
     const isValid = validatePhilippineMobileNumber(value);
@@ -3232,6 +5412,7 @@ function handleLogout() {
 
 /* ============ LOAD RECORDS WITH CACHING ============ */
 async function loadRecords(){
+    console.log("loadRecords() called");
     showLoading(true);
     try{
         const cachedData = localStorage.getItem('recordsCache');
@@ -3253,9 +5434,12 @@ async function loadRecords(){
                 return; 
             }
             
+            // FIXED: Handle the response structure properly
+            // The server returns data.header and data.rows
             header = data.header || [];
             rawRows = data.rows || [];
             
+            // Cache the data
             localStorage.setItem('recordsCache', JSON.stringify(data));
             localStorage.setItem('recordsCacheTime', now.toString());
             console.log("Loaded fresh data from server");
@@ -3268,8 +5452,8 @@ async function loadRecords(){
         renderPagination();
         updateCounts();
     } catch(err){
-        console.error(err);
-        alert("Error loading records");
+        console.error("Load records error:", err);
+        alert("Error loading records: " + err.message);
     }
     showLoading(false);
 }
@@ -3399,10 +5583,10 @@ function renderTable(){
         const tdAct = document.createElement("td"); 
         tdAct.className = "actions-col";
         tdAct.innerHTML = `
-            <button class="icon-btn" title="Edit" onclick="onEdit('${g.dataID}')">
+            <button class="icon-btn edit-btn" title="Edit" onclick="onEdit('${g.dataID}')">
                 <i class="fas fa-edit"></i>
             </button>
-            <button class="icon-btn" title="Delete" onclick="onDelete('${g.dataID}')">
+            <button class="icon-btn delete-btn" title="Delete" onclick="onDelete('${g.dataID}', '${escapeHtml(head['Name of Household Head'] || '')}', '${escapeHtml(head['Barangay'] || '')}')">
                 <i class="fas fa-trash"></i>
             </button>
         `;
@@ -3474,7 +5658,18 @@ function renderTable(){
 
     updateCounts();
 }
-   
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+} 
+
 /* ============ TOGGLE MEMBERS ============ */
 function toggleMembers(id){
     const memberRows = document.querySelectorAll(`tr.member-row[data-parent="${id}"]`);
@@ -3565,13 +5760,24 @@ function syncAnimalCheckboxes() {
 /* ============ EDIT FUNCTION - MODIFIED FOR IN-PLACE EDITING ============ */
 function onEdit(id){
     resetEditState();
+    resetFormTracking(); // Reset tracking when starting new edit
     
     const group = groups.find(g => g.dataID === id) || filteredGroups.find(g => g.dataID === id);
     if(!group){ alert('Record not found'); return; }
 
     editDataID = id;
-    editHead = Object.assign({}, group.head || {});
-    editMembers = (group.members || []).map(m => Object.assign({}, m));
+    
+    // Deep copy head to avoid reference issues
+    editHead = JSON.parse(JSON.stringify(group.head || {}));
+    
+    // Deep copy members to avoid reference issues
+    editMembers = [];
+    if (group.members && group.members.length > 0) {
+      editMembers = JSON.parse(JSON.stringify(group.members));
+      console.log(`Loaded ${editMembers.length} members for editing`);
+    } else {
+      console.log("No members found for this household");
+    }
 
     // Show Data ID at the top of edit panel
     if ($('editDataIdDisplay')) {
@@ -3593,31 +5799,35 @@ function onEdit(id){
     $('edit_householdHead').value = editHead['Name of Household Head'] || '';
     
     // FishR/RBIS Registered - FIXED
-let headRegistrationValue = '';
+    let headRegistrationValue = '';
 
-// Try different possible field names
-if (editHead['FishR & RBIS'] && editHead['FishR & RBIS'] !== '') {
-  headRegistrationValue = editHead['FishR & RBIS'];
-} else if (editHead['FishR Registered/RBIS Registered'] && editHead['FishR Registered/RBIS Registered'] !== '') {
-  headRegistrationValue = editHead['FishR Registered/RBIS Registered'];
-}
+    // Try different possible field names
+    if (editHead['FishR & RBIS'] && editHead['FishR & RBIS'] !== '') {
+      headRegistrationValue = editHead['FishR & RBIS'];
+    } else if (editHead['FishR Registered/RBIS Registered'] && editHead['FishR Registered/RBIS Registered'] !== '') {
+      headRegistrationValue = editHead['FishR Registered/RBIS Registered'];
+    }
 
-$('edit_headRegisteredCheckbox').checked = headRegistrationValue !== '';
-if (headRegistrationValue !== '') {
-  $('edit_headRegistrationField').classList.add('show');
-  $('edit_headRegistration').value = headRegistrationValue;
-} else {
-  $('edit_headRegistrationField').classList.remove('show');
-  $('edit_headRegistration').value = '';
-}
+    $('edit_headRegisteredCheckbox').checked = headRegistrationValue !== '';
+    if (headRegistrationValue !== '') {
+      $('edit_headRegistrationField').classList.add('show');
+      $('edit_headRegistration').value = headRegistrationValue;
+    } else {
+      $('edit_headRegistrationField').classList.remove('show');
+      $('edit_headRegistration').value = '';
+    }
     
-    $('edit_contactNo').value = editHead['Contact no.'] || '';
+    $('edit_contactNo').value = formatContactForDisplay(editHead['Contact no.'] || '');
     
     // Set radio buttons - FIXED to use radio-line styling
     qAll("input[name='edit_head_sex']").forEach(r => r.checked = (r.value === (editHead['Sex'] || '')));
     $('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
     updateEditHeadAgeStage();
-    $('edit_memberCount').value = editHead['No. of Household Member/s'] || (editMembers.length || 0);
+    
+    // CRITICAL FIX: Use actual member count from the data, not from the head field
+    const actualMemberCount = editMembers.length;
+    $('edit_memberCount').value = actualMemberCount;
+    console.log("Setting member count to actual:", actualMemberCount, "from data (head field had:", editHead['No. of Household Member/s'] || 0, ")");
     
     // Educational & Economic Status
     $('edit_educationalAttainment').value = editHead['Educational Attainment'] || '';
@@ -3680,21 +5890,124 @@ if (headRegistrationValue !== '') {
     $('edit_outsideCamp').value = editHead['No. of Individuals Outside Camp'] || editHead['Individuals Outside Camp'] || '';
     $('edit_reasons').value = editHead['Reasons for Displacement'] || '';
     
-    // Government Assistance
-    $('edit_ass_tupad').checked = (editHead['TUPAD'] === 'Yes');
-    $('edit_ass_local4ps').checked = (editHead['Local 4Ps'] === 'Yes');
-    $('edit_ass_intl4ps').checked = (editHead['National 4Ps'] === 'Yes');
-    $('edit_ass_locsp').checked = (editHead['Local Social Pension'] === 'Yes');
-    $('edit_ass_intlsp').checked = (editHead['National Social Pension'] === 'Yes');
-    $('edit_ass_solo').checked = (editHead['Solo Parent Assistance'] === 'Yes');
-    $('edit_ass_relief').checked = (editHead['Relief Goods'] === 'Yes');
-    $('edit_ass_cash').checked = (editHead['Cash Subsidy'] === 'Yes');
+    /* ============ CRITICAL FIX: Government Assistance with Date Fields ============ */
+    // TUPAD
+    const hasTUPAD = editHead['TUPAD'] === 'Yes';
+    $('edit_ass_tupad').checked = hasTUPAD;
+    $('edit_ass_tupad_date_input').value = toInputDate(editHead['TUPAD_Date'] || '');
+    if (hasTUPAD) {
+      $('edit_ass_tupad_date').classList.add('show');
+    } else {
+      $('edit_ass_tupad_date').classList.remove('show');
+    }
+
+    // Local 4Ps
+    const hasLocal4Ps = editHead['Local 4Ps'] === 'Yes';
+    $('edit_ass_local4ps').checked = hasLocal4Ps;
+    $('edit_ass_local4ps_date_input').value = toInputDate(editHead['Local 4Ps_Date'] || '');
+    if (hasLocal4Ps) {
+      $('edit_ass_local4ps_date').classList.add('show');
+    } else {
+      $('edit_ass_local4ps_date').classList.remove('show');
+    }
+
+    // National 4Ps
+    const hasNational4Ps = editHead['National 4Ps'] === 'Yes';
+    $('edit_ass_intl4ps').checked = hasNational4Ps;
+    $('edit_ass_intl4ps_date_input').value = toInputDate(editHead['National 4Ps_Date'] || '');
+    if (hasNational4Ps) {
+      $('edit_ass_intl4ps_date').classList.add('show');
+    } else {
+      $('edit_ass_intl4ps_date').classList.remove('show');
+    }
+
+    // Local Social Pension
+    const hasLocalSP = editHead['Local Social Pension'] === 'Yes';
+    $('edit_ass_locsp').checked = hasLocalSP;
+    $('edit_ass_locsp_date_input').value = toInputDate(editHead['Local Social Pension_Date'] || '');
+    if (hasLocalSP) {
+      $('edit_ass_locsp_date').classList.add('show');
+    } else {
+      $('edit_ass_locsp_date').classList.remove('show');
+    }
+
+    // National Social Pension
+    const hasNationalSP = editHead['National Social Pension'] === 'Yes';
+    $('edit_ass_intlsp').checked = hasNationalSP;
+    $('edit_ass_intlsp_date_input').value = toInputDate(editHead['National Social Pension_Date'] || '');
+    if (hasNationalSP) {
+      $('edit_ass_intlsp_date').classList.add('show');
+    } else {
+      $('edit_ass_intlsp_date').classList.remove('show');
+    }
+
+    // Solo Parent Assistance
+    const hasSoloParent = editHead['Solo Parent Assistance'] === 'Yes';
+    $('edit_ass_solo').checked = hasSoloParent;
+    $('edit_ass_solo_date_input').value = toInputDate(editHead['Solo Parent Assistance_Date'] || '');
+    if (hasSoloParent) {
+      $('edit_ass_solo_date').classList.add('show');
+    } else {
+      $('edit_ass_solo_date').classList.remove('show');
+    }
+
+    // Relief Goods
+    const hasReliefGoods = editHead['Relief Goods'] === 'Yes';
+    $('edit_ass_relief').checked = hasReliefGoods;
+    $('edit_ass_relief_date_input').value = toInputDate(editHead['Relief Goods_Date'] || '');
+    if (hasReliefGoods) {
+      $('edit_ass_relief_date').classList.add('show');
+    } else {
+      $('edit_ass_relief_date').classList.remove('show');
+    }
+
+    // Cash Subsidy
+    const hasCashSubsidy = editHead['Cash Subsidy'] === 'Yes';
+    $('edit_ass_cash').checked = hasCashSubsidy;
+    $('edit_ass_cash_date_input').value = toInputDate(editHead['Cash Subsidy_Date'] || '');
+    if (hasCashSubsidy) {
+      $('edit_ass_cash_date').classList.add('show');
+    } else {
+      $('edit_ass_cash_date').classList.remove('show');
+    }
+
+    // AICS
+    const hasAICS = editHead['AICS'] && editHead['AICS'] !== '';
     $('edit_ass_aics').value = editHead['AICS'] || '';
+    $('edit_ass_aics_date_input').value = toInputDate(editHead['AICS_Date'] || '');
+    if (hasAICS) {
+      $('edit_ass_aics_date').classList.add('show');
+    } else {
+      $('edit_ass_aics_date').classList.remove('show');
+    }
 
     updateEditMembersPreview();
     openEditPanel();
     
+    // Capture original state AFTER prefill but before user makes changes
+    setTimeout(() => {
+      captureOriginalFormState();
+    }, 200);
+    
     setTimeout(()=> $('edit_householdHead')?.focus(), 120);
+    setTimeout(() => {
+        setupRealTimeValidationForEdit();
+        setupContactValidation();
+        setupEditGovernmentAssistanceDateHandlers();
+        
+        // CRITICAL: Manually trigger change events to ensure date fields show
+        setTimeout(() => {
+          if (hasTUPAD) $('edit_ass_tupad').dispatchEvent(new Event('change'));
+          if (hasLocal4Ps) $('edit_ass_local4ps').dispatchEvent(new Event('change'));
+          if (hasNational4Ps) $('edit_ass_intl4ps').dispatchEvent(new Event('change'));
+          if (hasLocalSP) $('edit_ass_locsp').dispatchEvent(new Event('change'));
+          if (hasNationalSP) $('edit_ass_intlsp').dispatchEvent(new Event('change'));
+          if (hasSoloParent) $('edit_ass_solo').dispatchEvent(new Event('change'));
+          if (hasReliefGoods) $('edit_ass_relief').dispatchEvent(new Event('change'));
+          if (hasCashSubsidy) $('edit_ass_cash').dispatchEvent(new Event('change'));
+          if (hasAICS) $('edit_ass_aics').dispatchEvent(new Event('change'));
+        }, 300);
+    }, 100);
 }
 
 function getUserFullName() {
@@ -3748,14 +6061,32 @@ function createEmptyMember(){
     'No. of Individuals Outside Camp':'',
     'Individuals Outside Camp':'',
     'Reasons for Displacement':'',
-    'TUPAD':'No','Local 4Ps':'No','National 4Ps':'No',
-    'Local Social Pension':'No','National Social Pension':'No','Solo Parent Assistance':'No',
-    'Cash Subsidy':'No','Relief Goods':'No','AICS':'',
+    
+    // Government Assistance with Date Fields - ADD THESE:
+    'TUPAD':'No',
+    'TUPAD_Date':'',
+    'Local 4Ps':'No',
+    'Local 4Ps_Date':'',
+    'National 4Ps':'No',
+    'National 4Ps_Date':'',
+    'Local Social Pension':'No',
+    'Local Social Pension_Date':'',
+    'National Social Pension':'No',
+    'National Social Pension_Date':'',
+    'Solo Parent Assistance':'No',
+    'Solo Parent Assistance_Date':'',
+    'Relief Goods':'No',
+    'Relief Goods_Date':'',
+    'Cash Subsidy':'No',
+    'Cash Subsidy_Date':'',
+    'AICS':'',
+    'AICS_Date':'',
+    
     'Submitted By': getUserFullName()
   };
 }
 
-/* ============ FIX 2 & 6: UPDATED updateEditMembersPreview FUNCTION ============ */
+/* ============ UPDATED updateEditMembersPreview FUNCTION WITH MODAL SUPPORT ============ */
 function updateEditMembersPreview(){
   const ul = $('edit_membersPreview');
   if(!ul) return;
@@ -3773,7 +6104,7 @@ function updateEditMembersPreview(){
           <button class="edit-btn" title="Edit this member" onclick="event.stopPropagation(); openMemberPanelForEdit(${i})">
             <i class="fas fa-edit"></i>
           </button>
-          <button class="remove-btn" title="Remove this member" onclick="event.stopPropagation(); removeMember(${i})">
+          <button class="remove-btn" title="Remove this member" onclick="event.stopPropagation(); removeMemberByIndex(${i})">
             <i class="fas fa-trash"></i>
           </button>
         </div>
@@ -3786,19 +6117,6 @@ function updateEditMembersPreview(){
 }
 
 function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
-
-function removeMember(index) {
-  if (confirm('Are you sure you want to remove this member?')) {
-    editMembers.splice(index, 1);
-    updateEditMembersPreview();
-    
-    // Update member count
-    const currentCount = parseInt($('edit_memberCount').value) || 0;
-    if (currentCount > 0) {
-      $('edit_memberCount').value = currentCount - 1;
-    }
-  }
-}
 
 /* ============ SETUP CONDITIONAL FIELDS ============ */
 function setupEditConditionalFields() {
@@ -3979,7 +6297,7 @@ function validateEditPanelForMemberEditing() {
   return true;
 }
 
-/* ============ FIX 2: UPDATED fillMemberPanelFromEdit FUNCTION ============ */
+/* ============ FIXED: fillMemberPanelFromEdit FUNCTION ============ */
 function fillMemberPanelFromEdit(idx){
   const m = editMembers[idx] || createEmptyMember();
   
@@ -4006,7 +6324,7 @@ function fillMemberPanelFromEdit(idx){
     $('memberRegistration').value = '';
   }
   
-  $('memberContact').value = m['Contact no.'] || '';
+  $('memberContact').value = formatContactForDisplay(m['Contact no.'] || '');
   
   // FIXED: Ensure sex radio buttons are properly set
   const memberSex = m['Sex'] || '';
@@ -4068,17 +6386,118 @@ function fillMemberPanelFromEdit(idx){
   $('memberOutside').value = m['No. of Individuals Outside Camp'] || m['Individuals Outside Camp'] || '';
   $('memberReason').value = m['Reasons for Displacement'] || '';
   
-  // Government Assistance Programs
-  $('member_tupad').checked = (m['TUPAD'] === 'Yes');
-  $('member_local4ps').checked = (m['Local 4Ps'] === 'Yes');
-  $('member_intl4ps').checked = (m['National 4Ps'] === 'Yes');
-  $('member_locsp').checked = (m['Local Social Pension'] === 'Yes');
-  $('member_intlsp').checked = (m['National Social Pension'] === 'Yes');
-  $('member_solo').checked = (m['Solo Parent Assistance'] === 'Yes');
-  $('member_relief').checked = (m['Relief Goods'] === 'Yes');
-  $('member_cash').checked = (m['Cash Subsidy'] === 'Yes');
+  /* ============ CRITICAL FIX: Government Assistance Programs WITH DATE FIELDS ============ */
+  // TUPAD
+  const hasMemberTUPAD = m['TUPAD'] === 'Yes';
+  $('member_tupad').checked = hasMemberTUPAD;
+  $('member_tupad_date_input').value = toInputDate(m['TUPAD_Date'] || '');
+  if (hasMemberTUPAD) {
+    $('member_tupad_date').classList.add('show');
+  } else {
+    $('member_tupad_date').classList.remove('show');
+  }
+
+  // Local 4Ps
+  const hasMemberLocal4Ps = m['Local 4Ps'] === 'Yes';
+  $('member_local4ps').checked = hasMemberLocal4Ps;
+  $('member_local4ps_date_input').value = toInputDate(m['Local 4Ps_Date'] || '');
+  if (hasMemberLocal4Ps) {
+    $('member_local4ps_date').classList.add('show');
+  } else {
+    $('member_local4ps_date').classList.remove('show');
+  }
+
+  // National 4Ps
+  const hasMemberNational4Ps = m['National 4Ps'] === 'Yes';
+  $('member_intl4ps').checked = hasMemberNational4Ps;
+  $('member_intl4ps_date_input').value = toInputDate(m['National 4Ps_Date'] || '');
+  if (hasMemberNational4Ps) {
+    $('member_intl4ps_date').classList.add('show');
+  } else {
+    $('member_intl4ps_date').classList.remove('show');
+  }
+
+  // Local Social Pension
+  const hasMemberLocalSP = m['Local Social Pension'] === 'Yes';
+  $('member_locsp').checked = hasMemberLocalSP;
+  $('member_locsp_date_input').value = toInputDate(m['Local Social Pension_Date'] || '');
+  if (hasMemberLocalSP) {
+    $('member_locsp_date').classList.add('show');
+  } else {
+    $('member_locsp_date').classList.remove('show');
+  }
+
+  // National Social Pension
+  const hasMemberNationalSP = m['National Social Pension'] === 'Yes';
+  $('member_intlsp').checked = hasMemberNationalSP;
+  $('member_intlsp_date_input').value = toInputDate(m['National Social Pension_Date'] || '');
+  if (hasMemberNationalSP) {
+    $('member_intlsp_date').classList.add('show');
+  } else {
+    $('member_intlsp_date').classList.remove('show');
+  }
+
+  // Solo Parent Assistance
+  const hasMemberSoloParent = m['Solo Parent Assistance'] === 'Yes';
+  $('member_solo').checked = hasMemberSoloParent;
+  $('member_solo_date_input').value = toInputDate(m['Solo Parent Assistance_Date'] || '');
+  if (hasMemberSoloParent) {
+    $('member_solo_date').classList.add('show');
+  } else {
+    $('member_solo_date').classList.remove('show');
+  }
+
+  // Relief Goods
+  const hasMemberReliefGoods = m['Relief Goods'] === 'Yes';
+  $('member_relief').checked = hasMemberReliefGoods;
+  $('member_relief_date_input').value = toInputDate(m['Relief Goods_Date'] || '');
+  if (hasMemberReliefGoods) {
+    $('member_relief_date').classList.add('show');
+  } else {
+    $('member_relief_date').classList.remove('show');
+  }
+
+  // Cash Subsidy
+  const hasMemberCashSubsidy = m['Cash Subsidy'] === 'Yes';
+  $('member_cash').checked = hasMemberCashSubsidy;
+  $('member_cash_date_input').value = toInputDate(m['Cash Subsidy_Date'] || '');
+  if (hasMemberCashSubsidy) {
+    $('member_cash_date').classList.add('show');
+  } else {
+    $('member_cash_date').classList.remove('show');
+  }
+
+  // AICS
+  const hasMemberAICS = m['AICS'] && m['AICS'] !== '';
   $('memberAics').value = m['AICS'] || '';
+  $('member_aics_date_input').value = toInputDate(m['AICS_Date'] || '');
+  if (hasMemberAICS) {
+    $('member_aics_date').classList.add('show');
+  } else {
+    $('member_aics_date').classList.remove('show');
+  }
+  
+  // Setup member government assistance date handlers
+  setupMemberGovernmentAssistanceDateHandlers();
+  
+  // Update panel title
+  const total = Math.max(1, editMembers.length);
+  $('memberPanelTitle').innerText = `Member ${idx+1} of ${total}`;
+  
+  // CRITICAL: Trigger change events to ensure date fields show
+  setTimeout(() => {
+    if (hasMemberTUPAD) $('member_tupad').dispatchEvent(new Event('change'));
+    if (hasMemberLocal4Ps) $('member_local4ps').dispatchEvent(new Event('change'));
+    if (hasMemberNational4Ps) $('member_intl4ps').dispatchEvent(new Event('change'));
+    if (hasMemberLocalSP) $('member_locsp').dispatchEvent(new Event('change'));
+    if (hasMemberNationalSP) $('member_intlsp').dispatchEvent(new Event('change'));
+    if (hasMemberSoloParent) $('member_solo').dispatchEvent(new Event('change'));
+    if (hasMemberReliefGoods) $('member_relief').dispatchEvent(new Event('change'));
+    if (hasMemberCashSubsidy) $('member_cash').dispatchEvent(new Event('change'));
+    if (hasMemberAICS) $('memberAics').dispatchEvent(new Event('change'));
+  }, 300);
 }
+
 
 function openMemberPanelForEdit(index){
   // Ensure we have valid head data first
@@ -4110,7 +6529,10 @@ function openMemberPanelForEdit(index){
   setTimeout(() => $('memberName')?.focus(), 100);
 }
 
+/* ============ FIXED: collectHeadFromEditForm() FUNCTION ============ */
 function collectHeadFromEditForm(){
+  console.log("Collecting head from edit form...");
+  
   const bd_input = $('edit_householdBirthdate').value || '';
   const headBirthForSheet = toSheetDate(bd_input);
   const headAgeInfo = computeAgeDetailed(bd_input);
@@ -4127,16 +6549,19 @@ function collectHeadFromEditForm(){
   // FIXED: Preserve original Submitted On date
   const originalSubmittedOn = editHead['Submitted On'] || '';
   
+  // FIXED: Preserve original Data ID to prevent duplication
+  const originalDataID = editHead['Data ID'] || editDataID;
+  
   editHead = {
-    'Data ID': editDataID,
+    'Data ID': originalDataID, // FIXED: Use preserved Data ID
     'Coordinate': $('edit_coordinate').value || '',
     'Coordinates': $('edit_coordinate').value || '',
     'Barangay': $('edit_barangay').value || '',
     'Sitio / Purok': $('edit_sitio').value || '',
     'Name of Household Head': ($('edit_householdHead').value || '').trim(),
-    'FishR & RBIS': headRegistrationValue, // This is the actual column name
-    'FishR Registered/RBIS Registered': headRegistrationValue, // Keep for compatibility
-    'Contact no.': $('edit_contactNo').value || '',
+    'FishR & RBIS': headRegistrationValue,
+    'FishR Registered/RBIS Registered': headRegistrationValue,
+    'Contact no.': formatContactNumber($('edit_contactNo').value || ''),
     'Sex': document.querySelector("input[name='edit_head_sex']:checked")?.value || '',
     'Birthdate': headBirthForSheet,
     'Age': headAgeVal,
@@ -4176,19 +6601,76 @@ function collectHeadFromEditForm(){
     'Chicken': $('edit_chicken_chk').checked ? 'Yes' : 'No',
     'Chicken Qty.': $('edit_chicken_qty').value || '',
     'Others': $('edit_animals_others').value || '',
+    
+    // Government Assistance Programs with Date Fields - FIXED: Properly check for date fields
     'TUPAD': $('edit_ass_tupad').checked ? 'Yes' : 'No',
+    'TUPAD_Date': $('edit_ass_tupad_date_input').value ? toSheetDate($('edit_ass_tupad_date_input').value) : '',
     'Local 4Ps': $('edit_ass_local4ps').checked ? 'Yes' : 'No',
+    'Local 4Ps_Date': $('edit_ass_local4ps_date_input').value ? toSheetDate($('edit_ass_local4ps_date_input').value) : '',
     'National 4Ps': $('edit_ass_intl4ps').checked ? 'Yes' : 'No',
+    'National 4Ps_Date': $('edit_ass_intl4ps_date_input').value ? toSheetDate($('edit_ass_intl4ps_date_input').value) : '',
     'Local Social Pension': $('edit_ass_locsp').checked ? 'Yes' : 'No',
+    'Local Social Pension_Date': $('edit_ass_locsp_date_input').value ? toSheetDate($('edit_ass_locsp_date_input').value) : '',
     'National Social Pension': $('edit_ass_intlsp').checked ? 'Yes' : 'No',
+    'National Social Pension_Date': $('edit_ass_intlsp_date_input').value ? toSheetDate($('edit_ass_intlsp_date_input').value) : '',
     'Solo Parent Assistance': $('edit_ass_solo').checked ? 'Yes' : 'No',
+    'Solo Parent Assistance_Date': $('edit_ass_solo_date_input').value ? toSheetDate($('edit_ass_solo_date_input').value) : '',
     'Relief Goods': $('edit_ass_relief').checked ? 'Yes' : 'No',
+    'Relief Goods_Date': $('edit_ass_relief_date_input').value ? toSheetDate($('edit_ass_relief_date_input').value) : '',
     'Cash Subsidy': $('edit_ass_cash').checked ? 'Yes' : 'No',
+    'Cash Subsidy_Date': $('edit_ass_cash_date_input').value ? toSheetDate($('edit_ass_cash_date_input').value) : '',
     'AICS': $('edit_ass_aics').value || '',
+    'AICS_Date': $('edit_ass_aics_date_input').value ? toSheetDate($('edit_ass_aics_date_input').value) : '',
+    
     // Preserve the Submitted By and Submitted On fields
     'Submitted By': originalSubmittedBy || getUserFullName(),
-    'Submitted On': originalSubmittedOn // FIXED: Preserve original Submitted On date
+    'Submitted On': originalSubmittedOn || formatTimestampPH_(new Date()),
+    
+    // FIXED: Preserve original row index to prevent duplication
+    '_originalRowIndex': editHead['_originalRowIndex'] || null
   };
+}
+
+/* ============ CONTACT NUMBER FORMATTING ============ */
+function formatContactNumber(phone) {
+  if (!phone) return '';
+  
+  // Remove all non-digit characters
+  let cleaned = phone.replace(/\D/g, '');
+  
+  // If it starts with 63, convert to 0 format
+  if (cleaned.startsWith('63') && cleaned.length === 11) {
+    cleaned = '0' + cleaned.substring(2);
+  }
+  
+  // Format as 09XX XXX XXXX or 09XXX XXX XXX
+  if (cleaned.length === 11 && cleaned.startsWith('09')) {
+    return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
+  } else if (cleaned.length === 10 && cleaned.startsWith('9')) {
+    return '0' + cleaned.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+  }
+  
+  // Return as is if doesn't match expected formats
+  return phone;
+}
+
+/* ============ FIXED: formatTimestampPH_() FUNCTION ============ */
+function formatTimestampPH_(date) {
+  const d = date || new Date();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getFullYear();
+  
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const seconds = String(d.getSeconds()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  hours = String(hours).padStart(2, '0');
+  
+  return `${month}/${day}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
 }
 
 function collectMemberPanelToEdit(){
@@ -4214,7 +6696,7 @@ function collectMemberPanelToEdit(){
     'Name of Household Member/s': name,
     'FishR & RBIS': registrationValue, // This is the actual column name
     'FishR Registered/RBIS Registered': registrationValue, // Keep both for compatibility
-    'Contact no.': $('memberContact').value || '',
+    'Contact no.': formatContactNumber($('memberContact').value || ''),
     'Sex': document.querySelector("input[name='member_sex']:checked")?.value || '',
     'Birthdate': birth_for_sheet,
     'Age': ageVal,
@@ -4240,15 +6722,27 @@ function collectMemberPanelToEdit(){
     'No. of Individuals Outside Camp': $('memberOutside').value || '',
     'Individuals Outside Camp': $('memberOutside').value || '',
     'Reasons for Displacement': $('memberReason').value || '',
+    
+    // Government Assistance with Date Fields
     'TUPAD': $('member_tupad').checked ? 'Yes' : 'No',
+    'TUPAD_Date': $('member_tupad_date_input').value ? toSheetDate($('member_tupad_date_input').value) : '',
     'Local 4Ps': $('member_local4ps').checked ? 'Yes' : 'No',
+    'Local 4Ps_Date': $('member_local4ps_date_input').value ? toSheetDate($('member_local4ps_date_input').value) : '',
     'National 4Ps': $('member_intl4ps').checked ? 'Yes' : 'No',
+    'National 4Ps_Date': $('member_intl4ps_date_input').value ? toSheetDate($('member_intl4ps_date_input').value) : '',
     'Local Social Pension': $('member_locsp').checked ? 'Yes' : 'No',
+    'Local Social Pension_Date': $('member_locsp_date_input').value ? toSheetDate($('member_locsp_date_input').value) : '',
     'National Social Pension': $('member_intlsp').checked ? 'Yes' : 'No',
+    'National Social Pension_Date': $('member_intlsp_date_input').value ? toSheetDate($('member_intlsp_date_input').value) : '',
     'Solo Parent Assistance': $('member_solo').checked ? 'Yes' : 'No',
+    'Solo Parent Assistance_Date': $('member_solo_date_input').value ? toSheetDate($('member_solo_date_input').value) : '',
     'Relief Goods': $('member_relief').checked ? 'Yes' : 'No',
+    'Relief Goods_Date': $('member_relief_date_input').value ? toSheetDate($('member_relief_date_input').value) : '',
     'Cash Subsidy': $('member_cash').checked ? 'Yes' : 'No',
+    'Cash Subsidy_Date': $('member_cash_date_input').value ? toSheetDate($('member_cash_date_input').value) : '',
     'AICS': $('memberAics').value || '',
+    'AICS_Date': $('member_aics_date_input').value ? toSheetDate($('member_aics_date_input').value) : '',
+    
     // Preserve existing submittedBy or use current user's full name
     'Submitted By': existingSubmittedBy || getUserFullName()
   };
@@ -4267,37 +6761,17 @@ function updateMemberAgeStage(){
   $('memberStage').value = ageObj.stage;
 }
 
+/* ============ UPDATED MEMBER PANEL NEXT FUNCTION ============ */
 function memberPanelNext() {
+    // Validate member form
+    if (!validateMemberFormForEdit()) {
+        return;
+    }
+    
     const name = $('memberName').value.trim();
     const contact = $('memberContact').value.trim();
     const birthdate = $('memberBirthdate').value;
     const sex = document.querySelector("input[name='member_sex']:checked")?.value;
-    
-    // Validate all required fields
-    if(!name){ 
-        alert('Please enter member name'); 
-        $('memberName').focus();
-        return; 
-    }
-    
-    if(!sex){
-        alert('Please select member sex');
-        qAll("input[name='member_sex']")[0]?.focus();
-        return;
-    }
-    
-    if(!birthdate){
-        alert('Please enter member birthdate');
-        $('memberBirthdate').focus();
-        return;
-    }
-    
-    // Validate contact number (if provided)
-    if (contact && !validateContactInput($('memberContact'), $('memberContactError'))) {
-        alert('Please enter a valid Philippine mobile number');
-        $('memberContact').focus();
-        return;
-    }
     
     collectMemberPanelToEdit();
     memberEditIndex++;
@@ -4329,47 +6803,56 @@ function memberPanelBack() {
     }
 }
 
-/* ============ FIXED SAVE EDITED HOUSEHOLD FUNCTION ============ */
-async function saveEditedHousehold(silentReload = false){
+/* ============ FIXED: saveEditedHousehold() FUNCTION WITH PREVENTION OF DUPLICATION ============ */
+async function saveEditedHousehold(silentReload = false) {
+  // Validate the form first
+  if (!validateHeadFormForEdit()) {
+    console.log("Head form validation failed");
+    return;
+  }
+
+  console.log("=== DEBUG: Starting save process ===");
+  console.log("Data ID:", editDataID);
+  
   const btn = $('saveEditBtn');
   const originalText = btn ? btn.innerText : 'Save changes';
-  
-  try {
-    // Validate required fields
-    const contactNo = $('edit_contactNo').value.trim();
-    if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
-        alert('Please enter a valid Philippine mobile number for the household head');
-        $('edit_contactNo').focus();
-        return;
-    }
-    
-    collectHeadFromEditForm();
 
+  try {
+    console.log("Collecting head data...");
+    collectHeadFromEditForm();
+    
+    console.log("Checking government assistance date fields in editHead:");
+    console.log("TUPAD_Date:", editHead['TUPAD_Date']);
+    console.log("Local 4Ps_Date:", editHead['Local 4Ps_Date']);
+    console.log("AICS_Date:", editHead['AICS_Date']);
+    
     const expected = Number($('edit_memberCount')?.value || 0);
-    while(editMembers.length < expected) editMembers.push(createEmptyMember());
-    if(editMembers.length > expected) editMembers = editMembers.slice(0, expected);
+    console.log("Expected members:", expected);
+    
+    while (editMembers.length < expected) editMembers.push(createEmptyMember());
+    if (editMembers.length > expected) editMembers = editMembers.slice(0, expected);
+
+    console.log("Number of members to save:", editMembers.length);
 
     const userFullName = getUserFullName();
 
     // Create properly formatted date for Philippines timezone
     const now = new Date();
-    const formattedDate = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}/${now.getFullYear()}, ` +
-                         `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} ` +
-                         `${now.getHours() >= 12 ? 'PM' : 'AM'}`;
+    const formattedDate = formatTimestampPH_(now);
 
     // Add "Last Edited By" field with formatted date
     editHead['Last Edited By'] = userFullName;
     editHead['Last Edit Date'] = formattedDate;
-    
+
     // Preserve original Submitted On date if it exists
     if (!editHead['Submitted On']) {
-        editHead['Submitted On'] = formattedDate;
+      editHead['Submitted On'] = formattedDate;
     }
-    
+
     // Add Updated By and Updated On fields for tracking
     editHead['Updated By'] = userFullName;
     editHead['Updated On'] = formattedDate;
-    
+
     // Ensure all members have the correct Data ID with formatted dates
     editMembers.forEach((member, index) => {
       member['Data ID'] = editDataID;
@@ -4377,112 +6860,262 @@ async function saveEditedHousehold(silentReload = false){
       member['Sitio / Purok'] = editHead['Sitio / Purok'];
       member['Coordinate'] = editHead['Coordinate'];
       member['Coordinates'] = editHead['Coordinates'];
-      
+
       if (!member['Submitted On']) {
-          member['Submitted On'] = formattedDate;
+        member['Submitted On'] = formattedDate;
       }
-      
+
       member['Last Edited By'] = userFullName;
       member['Last Edit Date'] = formattedDate;
       member['Updated By'] = userFullName;
       member['Updated On'] = formattedDate;
     });
 
-    // ADD DEBUG LOGGING HERE
-    console.log('=== DEBUG: Sending update to server ===');
-    console.log('Data ID:', editDataID);
-    console.log('Head:', editHead);
-    console.log('Members count:', editMembers.length);
-    console.log('Members:', editMembers);
-    console.log('=== END DEBUG ===');
+    // Clean data before sending - remove undefined, null, and empty objects
+    const cleanHead = {};
+    for (const key in editHead) {
+      if (editHead[key] !== undefined && editHead[key] !== null && editHead[key] !== '') {
+        cleanHead[key] = editHead[key];
+      }
+    }
+
+    const cleanMembers = editMembers.map(member => {
+      const cleanMember = {};
+      for (const key in member) {
+        if (member[key] !== undefined && member[key] !== null && member[key] !== '') {
+          cleanMember[key] = member[key];
+        }
+      }
+      return cleanMember;
+    });
+
+    console.log("Cleaned head data keys:", Object.keys(cleanHead));
+    console.log("Sample government assistance fields in cleanHead:", {
+      TUPAD: cleanHead['TUPAD'],
+      TUPAD_Date: cleanHead['TUPAD_Date'],
+      Local_4Ps: cleanHead['Local 4Ps'],
+      Local_4Ps_Date: cleanHead['Local 4Ps_Date']
+    });
+
+    console.log("Cleaned head data keys:", Object.keys(cleanHead));
+    console.log("Cleaned members count:", cleanMembers.length);
 
     const fd = new FormData();
-    fd.append('action','updateHousehold');
+    fd.append('action', 'updateHousehold');
     fd.append('dataID', editDataID);
     fd.append('actor', userFullName);
-    fd.append('head', JSON.stringify(editHead));
-    fd.append('members', JSON.stringify(editMembers || []));
-    fd.append('submittedBy', editHead['Submitted By'] || userFullName);
-    fd.append('barangay', editHead['Barangay']);
+    fd.append('preserveHeadRow', 'true'); // CRITICAL FIX: Prevent head duplication
+    fd.append('updateOnly', 'true'); // CRITICAL FIX: Update existing rows instead of creating new
     
+    // CRITICAL FIX: Use clean data instead of original
+    fd.append('head', JSON.stringify(cleanHead));
+    fd.append('members', JSON.stringify(cleanMembers || []));
+    
+    fd.append('submittedBy', cleanHead['Submitted By'] || userFullName);
+    fd.append('barangay', cleanHead['Barangay']);
+
     // CRITICAL: Add clearExisting flag to tell server to clear existing rows
     fd.append('clearExisting', 'true');
-    
-    // NEW: Add insertAtOriginalPosition flag to tell server to insert at correct position
-    fd.append('insertAtOriginalPosition', 'true');
 
     // Set loading state AFTER validation
-    if(btn){ btn.disabled = true; btn.innerText = 'Saving...'; }
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = 'Saving...';
+    }
 
-    const res = await fetch(SCRIPT_URL, { 
-      method: 'POST', 
+    console.log("Sending request to:", SCRIPT_URL);
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
       body: fd,
-      timeout: 30000
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
+
+    console.log("Response status:", res.status, res.statusText);
     
     if (!res.ok) {
-      throw new Error(`Server responded with status: ${res.status}`);
-    }
-    
-    const text = await res.text();
-    let json;
-    try { 
-      json = JSON.parse(text); 
-    } catch(e){ 
-      throw new Error('Invalid server response format'); 
-    }
-    
-    if(!json.success){ 
-      alert('Save failed: ' + (json.message || JSON.stringify(json))); 
-      console.error('Server error:', json); 
-    }
-    else {
-      if(!silentReload) alert('Household updated (Data ID: ' + (editDataID||'') + ')');
-      closeEditPanel();
+      const errorText = await res.text();
+      console.error("Server error response:", errorText);
       
+      // Try to parse as JSON first
+      try {
+        const errorJson = JSON.parse(errorText);
+        throw new Error(`Server error: ${errorJson.message || JSON.stringify(errorJson)}`);
+      } catch (parseError) {
+        // If not JSON, use raw text
+        throw new Error(`Server responded with status: ${res.status} - ${res.statusText}. Response: ${errorText.substring(0, 200)}`);
+      }
+    }
+
+    const text = await res.text();
+    console.log("Raw server response:", text);
+    
+    let json;
+    try {
+      json = JSON.parse(text);
+      console.log("Parsed server response:", json);
+    } catch (e) {
+      console.error("Failed to parse server response as JSON:", e);
+      console.error("Response text that failed to parse:", text);
+      throw new Error(`Server returned invalid JSON: ${e.message}. Response: ${text.substring(0, 200)}`);
+    }
+
+    if (!json.success) {
+      console.error("Server returned success=false:", json);
+      
+      // Check for specific error messages
+      let errorMessage = json.message || 'Unknown server error';
+      if (typeof errorMessage === 'object') {
+        errorMessage = JSON.stringify(errorMessage);
+      }
+      
+      showError(`Save failed: ${errorMessage}`);
+      
+      // If there's a specific error about serialization, provide more info
+      if (errorMessage.includes('JSON') || errorMessage.includes('serializ')) {
+        console.error("Possible data serialization issue. Data sent:", {
+          headKeys: Object.keys(cleanHead),
+          membersCount: cleanMembers.length,
+          headSample: Object.keys(cleanHead).slice(0, 5).map(key => `${key}: ${cleanHead[key]}`)
+        });
+      }
+    } else {
+      console.log("Save successful! Response:", json);
+      if (!silentReload) showSuccess(`Household updated (Data ID: ${editDataID || ''})`);
+      closeEditPanel();
+      resetFormTracking();
+
       // Clear cache and reload
       localStorage.removeItem('recordsCache');
       localStorage.removeItem('recordsCacheTime');
       loadRecords();
+      
+      // Record activity
+      recordPageActivity('Household Updated', `Updated household ${editDataID} (${editHead['Name of Household Head'] || 'Unknown'})`);
     }
-  } catch(err){
-    console.error('Save error', err);
-    alert('Error saving data: ' + err.message + '\nPlease check your connection and try again.');
+  } catch (err) {
+    console.error('Detailed save error:', {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      fullError: err
+    });
+    
+    if (err.name === 'AbortError') {
+      showError('Request timed out after 45 seconds. Please check your internet connection and try again.');
+    } else if (err.message.includes('JSON')) {
+      showError('Data format error. Please contact the administrator. Details: ' + err.message.substring(0, 100));
+    } else {
+      showError(`Error saving data: ${err.message}\nPlease try again.`);
+    }
   } finally {
-    if(btn){ 
-      btn.disabled = false; 
-      btn.innerText = originalText || 'Save changes'; 
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = originalText || 'Save changes';
     }
   }
 }
 
-/* ============ DELETE FUNCTION ============ */
-async function onDelete(id){
-    if(!confirm("Delete household " + id + "?")) return;
+/* ============ DELETE HOUSEHOLD WITH MODAL ============ */
+let deletePendingId = null;
+let deletePendingHeadName = '';
+let deletePendingBarangay = '';
+
+function showDeleteConfirmation(id, headName = '', barangay = '') {
+  deletePendingId = id;
+  deletePendingHeadName = headName;
+  deletePendingBarangay = barangay;
+  
+  const message = headName && barangay 
+    ? `Are you sure you want to delete household "${headName}" from ${barangay}? This action cannot be undone.`
+    : `Are you sure you want to delete household (ID: ${id})? This action cannot be undone.`;
+  
+  document.getElementById('deleteMessage').textContent = message;
+  showModal('deleteConfirmationModal');
+}
+
+// Update the current onDelete function to use the modal
+function onDelete(id, headName = '', barangay = ''){
+    showDeleteConfirmation(id, headName, barangay);
+}
+
+async function performDelete() {
+    if (!deletePendingId) return;
     
+    const id = deletePendingId;
     const currentUserFullName = getUserFullName();
 
-    const fd = new FormData();
-    fd.append("action", "deleteHousehold");
-    fd.append("dataID", id);
-    fd.append("actor", currentUserFullName);
+    // Set loading state
+    const loadingOverlay = document.getElementById('loading');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+    }
 
-    try{
-        const res = await fetch(SCRIPT_URL, { method: "POST", body: fd });
+    try {
+        const fd = new FormData();
+        fd.append("action", "deleteHousehold");
+        fd.append("dataID", id);
+        fd.append("actor", currentUserFullName);
+
+        const res = await fetch(SCRIPT_URL, { 
+            method: "POST", 
+            body: fd 
+        });
+        
+        if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`);
+        }
+        
         const json = await res.json();
 
         if(json.success){
-            alert(`Data has been deleted. Data ID: ${id} from Master and Barangay`);
+            showSuccess(`Household deleted successfully. Data ID: ${id}`);
+            
+            // Clear cache and reload
             localStorage.removeItem('recordsCache');
             localStorage.removeItem('recordsCacheTime');
-            await loadRecords();
+            
+            // Close modal first
+            hideModal('deleteConfirmationModal');
+            deletePendingId = null;
+            deletePendingHeadName = '';
+            deletePendingBarangay = '';
+            
+            // Reload records after a short delay
+            setTimeout(() => {
+                loadRecords();
+            }, 1000);
         } else {
-            alert("Delete failed: " + (json.message || JSON.stringify(json)));
+            showError("Delete failed: " + (json.message || JSON.stringify(json)));
         }
-    }catch(err){
+    } catch(err) {
         console.error("Delete error", err);
-        alert("Delete failed — see console");
+        showError("Delete failed. Please check your connection and try again.");
+    } finally {
+        // Hide loading overlay
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
     }
+}
+
+function setLoadingState(loading) {
+    const overlay = document.getElementById('loading');
+    if (overlay) {
+        overlay.style.display = loading ? 'flex' : 'none';
+    }
+    
+    // Disable/enable modal buttons during loading
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    
+    if (cancelDeleteBtn) cancelDeleteBtn.disabled = loading;
+    if (confirmDeleteBtn) confirmDeleteBtn.disabled = loading;
 }
 
 /* ============ SETUP CONTACT VALIDATION ============ */
@@ -4493,14 +7126,28 @@ function setupContactValidation() {
   
   if (editContactInput) {
     editContactInput.addEventListener('input', function() {
-      // Auto-format: remove non-numeric characters except + at the beginning
-      let value = this.value.replace(/[^\d+]/g, '');
+      // Auto-format as user types
+      let value = this.value.replace(/\D/g, '');
       
       // Ensure it starts with 09 or +639
-      if (value.startsWith('+639') && value.length > 13) {
-        value = value.substring(0, 13);
-      } else if (value.startsWith('09') && value.length > 11) {
-        value = value.substring(0, 11);
+      if (value.startsWith('63') && value.length <= 12) {
+        value = '0' + value.substring(2);
+      }
+      
+      // Format with spaces
+      if (value.length >= 4 && value.length <= 11) {
+        if (value.startsWith('09') && value.length === 11) {
+          value = value.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
+        } else if (value.length === 10) {
+          value = '0' + value.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+        } else if (value.length > 4) {
+          // Partial formatting
+          const parts = [];
+          if (value.length > 4) parts.push(value.substring(0, 4));
+          if (value.length > 7) parts.push(value.substring(4, 7));
+          if (value.length > 7) parts.push(value.substring(7));
+          value = parts.join(' ');
+        }
       }
       
       this.value = value;
@@ -4511,6 +7158,11 @@ function setupContactValidation() {
     });
     
     editContactInput.addEventListener('blur', function() {
+      // Final format on blur
+      const formatted = formatContactNumber(this.value);
+      if (formatted !== this.value) {
+        this.value = formatted;
+      }
       validateContactInput(this, editContactError);
     });
   }
@@ -4521,14 +7173,28 @@ function setupContactValidation() {
   
   if (memberContactInput) {
     memberContactInput.addEventListener('input', function() {
-      // Auto-format: remove non-numeric characters except + at the beginning
-      let value = this.value.replace(/[^\d+]/g, '');
+      // Auto-format as user types
+      let value = this.value.replace(/\D/g, '');
       
       // Ensure it starts with 09 or +639
-      if (value.startsWith('+639') && value.length > 13) {
-        value = value.substring(0, 13);
-      } else if (value.startsWith('09') && value.length > 11) {
-        value = value.substring(0, 11);
+      if (value.startsWith('63') && value.length <= 12) {
+        value = '0' + value.substring(2);
+      }
+      
+      // Format with spaces
+      if (value.length >= 4 && value.length <= 11) {
+        if (value.startsWith('09') && value.length === 11) {
+          value = value.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
+        } else if (value.length === 10) {
+          value = '0' + value.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+        } else if (value.length > 4) {
+          // Partial formatting
+          const parts = [];
+          if (value.length > 4) parts.push(value.substring(0, 4));
+          if (value.length > 7) parts.push(value.substring(4, 7));
+          if (value.length > 7) parts.push(value.substring(7));
+          value = parts.join(' ');
+        }
       }
       
       this.value = value;
@@ -4539,13 +7205,184 @@ function setupContactValidation() {
     });
     
     memberContactInput.addEventListener('blur', function() {
+      // Final format on blur
+      const formatted = formatContactNumber(this.value);
+      if (formatted !== this.value) {
+        this.value = formatted;
+      }
       validateContactInput(this, memberContactError);
     });
   }
 }
 
-/* ============ WIRE EDIT PANEL UI ============ */
+/* ============ TRACK UNSAVED CHANGES ============ */
+let originalEditFormData = null;
+let originalMemberFormData = null;
+
+function captureOriginalFormState() {
+  if ($('editPanel') && $('editPanel').classList.contains('open')) {
+    // Capture head form state
+    originalEditFormData = {
+      barangay: $('edit_barangay').value,
+      sitio: $('edit_sitio').value,
+      householdHead: $('edit_householdHead').value,
+      contactNo: $('edit_contactNo').value,
+      head_sex: document.querySelector("input[name='edit_head_sex']:checked")?.value,
+      householdBirthdate: $('edit_householdBirthdate').value,
+      memberCount: $('edit_memberCount').value,
+      coordinate: $('edit_coordinate').value,
+      educationalAttainment: $('edit_educationalAttainment').value,
+      employment: $('edit_employment').value,
+      headRegistered: $('edit_headRegisteredCheckbox').checked,
+      headRegistration: $('edit_headRegistration').value,
+      // Add more fields for better change detection
+      head_pwd: document.querySelector("input[name='edit_head_pwd']:checked")?.value,
+      head_status: $('edit_head_status').value,
+      head_transport: $('edit_head_transport').value,
+      ofw_status: document.querySelector("input[name='edit_ofw_status']:checked")?.value,
+      country: $('edit_country').value
+    };
+    
+    // Capture member form state if open
+    if ($('memberPanel') && $('memberPanel').classList.contains('open')) {
+      originalMemberFormData = {
+        memberName: $('memberName').value,
+        memberContact: $('memberContact').value,
+        member_sex: document.querySelector("input[name='member_sex']:checked")?.value,
+        memberBirthdate: $('memberBirthdate').value,
+        memberRegistered: $('memberRegisteredCheckbox').checked,
+        memberRegistration: $('memberRegistration').value
+      };
+    }
+  }
+}
+
+function hasUnsavedChanges() {
+  if (!$('editPanel') || !$('editPanel').classList.contains('open')) {
+    return false;
+  }
+  
+  // If no original data captured yet, check if any field has data
+  if (!originalEditFormData) {
+    // Check required fields
+    const requiredFields = [
+      $('edit_barangay').value,
+      $('edit_sitio').value,
+      $('edit_householdHead').value,
+      $('edit_contactNo').value,
+      document.querySelector("input[name='edit_head_sex']:checked")?.value,
+      $('edit_householdBirthdate').value
+    ];
+    
+    return requiredFields.some(field => field && field.trim() !== '');
+  }
+  
+  // Compare current form with original state
+  const currentState = {
+    barangay: $('edit_barangay').value,
+    sitio: $('edit_sitio').value,
+    householdHead: $('edit_householdHead').value,
+    contactNo: $('edit_contactNo').value,
+    head_sex: document.querySelector("input[name='edit_head_sex']:checked")?.value,
+    householdBirthdate: $('edit_householdBirthdate').value,
+    memberCount: $('edit_memberCount').value,
+    coordinate: $('edit_coordinate').value,
+    educationalAttainment: $('edit_educationalAttainment').value,
+    employment: $('edit_employment').value,
+    headRegistered: $('edit_headRegisteredCheckbox').checked,
+    headRegistration: $('edit_headRegistration').value,
+    head_pwd: document.querySelector("input[name='edit_head_pwd']:checked")?.value,
+    head_status: $('edit_head_status').value,
+    head_transport: $('edit_head_transport').value,
+    ofw_status: document.querySelector("input[name='edit_ofw_status']:checked")?.value,
+    country: $('edit_country').value
+  };
+  
+  // Check if any field has changed
+  for (const key in originalEditFormData) {
+    if (originalEditFormData[key] !== currentState[key]) {
+      return true;
+    }
+  }
+  
+  // Check member panel if open
+  if ($('memberPanel') && $('memberPanel').classList.contains('open') && originalMemberFormData) {
+    const currentMemberState = {
+      memberName: $('memberName').value,
+      memberContact: $('memberContact').value,
+      member_sex: document.querySelector("input[name='member_sex']:checked")?.value,
+      memberBirthdate: $('memberBirthdate').value,
+      memberRegistered: $('memberRegisteredCheckbox').checked,
+      memberRegistration: $('memberRegistration').value
+    };
+    
+    for (const key in originalMemberFormData) {
+      if (originalMemberFormData[key] !== currentMemberState[key]) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+function resetFormTracking() {
+  originalEditFormData = null;
+  originalMemberFormData = null;
+}
+
+/* ============ EDIT CONFIRMATION MODAL FUNCTIONS ============ */
+function showEditCloseConfirmation(source) {
+  // Update modal message based on source
+  let message = "You have unsaved changes. Are you sure you want to close the edit panel?";
+  
+  if (source === 'cancel') {
+    message = "Discard ALL changes and close? This includes both head and member changes.";
+  } else if (source === 'overlay') {
+    message = "Close edit panel? ALL unsaved changes will be lost.";
+  }
+  
+  document.getElementById('editMessage').textContent = message;
+  showModal('editConfirmationModal');
+  
+  // Store the action to perform on confirmation
+  const modal = document.getElementById('editConfirmationModal');
+  modal.dataset.action = source;
+}
+
+function handleEditCloseConfirmation() {
+  const modal = document.getElementById('editConfirmationModal');
+  const action = modal.dataset.action;
+  
+  hideModal('editConfirmationModal');
+  
+  // Clear form and close panel
+  clearValidationErrors('editForm');
+  closeEditPanel();
+  resetFormTracking();
+  
+  // If there's an action, we might want to do something specific
+  console.log('Edit panel closed via action:', action);
+  
+  // Clear the stored action
+  if (modal) {
+    delete modal.dataset.action;
+  }
+}
+
+function cancelEditClose() {
+  hideModal('editConfirmationModal');
+  // Reset the action data
+  const modal = document.getElementById('editConfirmationModal');
+  if (modal) {
+    delete modal.dataset.action;
+  }
+}
+
+/* ============ FIXED WIRE EDIT PANEL UI ============ */
 function wireEditPanelUI() {
+  console.log("wiring edit panel UI");
+  
   // Coordinate buttons
   if ($('edit_getLocationBtn')) {
     $('edit_getLocationBtn').addEventListener('click', getCurrentLocation);
@@ -4575,7 +7412,7 @@ function wireEditPanelUI() {
   // Setup contact validation
   setupContactValidation();
 
-  // Add/Edit Members button
+  // Add/Edit Members button - FIXED: Now properly adds members
   if($('edit_addMember')) $('edit_addMember').addEventListener('click', ()=>{
     // Validate the head information first
     if (!validateEditPanelForMemberEditing()) {
@@ -4585,12 +7422,11 @@ function wireEditPanelUI() {
     // Collect head data to ensure it's saved
     collectHeadFromEditForm();
     
-    // First, update the member count to reflect the new addition
-    const currentCount = editMembers.length || 0;
-    const newCount = currentCount + 1;
+    // Get current member count from input field
+    const currentCount = parseInt($('edit_memberCount').value) || 0;
     
     // Update the member count input
-    $('edit_memberCount').value = newCount;
+    $('edit_memberCount').value = currentCount + 1;
     
     // Create a new empty member and add it to the array
     const newMember = createEmptyMember();
@@ -4604,47 +7440,30 @@ function wireEditPanelUI() {
     openMemberPanelForEdit(memberEditIndex);
   });
 
-  // Remove Member button
-  if($('edit_removeMember')) $('edit_removeMember').addEventListener('click', ()=>{
-    if (editMembers.length === 0) {
-      alert('No members to remove.');
-      return;
-    }
-    
-    // Show a list of members to remove
-    const memberList = editMembers.map((m, i) => 
-      `${i+1}. ${m['Name of Household Member/s'] || 'Unnamed Member'}`
-    ).join('\n');
-    
-    const memberIndex = prompt(
-      `Enter the number of the member to remove (1-${editMembers.length}):\n\n${memberList}`
-    );
-    
-    const index = parseInt(memberIndex) - 1;
-    
-    if (index >= 0 && index < editMembers.length) {
-      if (confirm(`Remove member "${editMembers[index]['Name of Household Member/s'] || 'Unnamed Member'}"?`)) {
-        editMembers.splice(index, 1);
-        
-        // Update member count
-        $('edit_memberCount').value = editMembers.length;
-        
-        updateEditMembersPreview();
-        alert('Member removed.');
-      }
-    } else if (memberIndex !== null) {
-      alert('Invalid member number.');
-    }
-  });
+  // Remove Member button - NEW MODAL VERSION
+  if($('edit_removeMember')) $('edit_removeMember').addEventListener('click', showRemoveMemberModal);
 
   // Member panel navigation
   if($('memberNext')) $('memberNext').addEventListener('click', memberPanelNext);
   if($('memberBack')) $('memberBack').addEventListener('click', memberPanelBack);
   
+  // NEW: Member panel Cancel button
+  if($('memberCancel')) $('memberCancel').addEventListener('click', handleMemberCancel);
+  
+  // FIXED: Member panel close button - simple check for member panel
   if($('memberPanelClose')) $('memberPanelClose').addEventListener('click', ()=> {
-    if(confirm('Close member entry? Unsaved member edits will be kept in panel preview.')) { 
-        $('memberPanel')?.classList.remove('open'); 
-        updateEditMembersPreview(); 
+    const memberName = $('memberName')?.value?.trim();
+    const memberContact = $('memberContact')?.value?.trim();
+    const memberBirthdate = $('memberBirthdate')?.value;
+    
+    if (memberName || memberContact || memberBirthdate) {
+      if(confirm('Close member panel? Unsaved member changes will be lost.')) {
+        // Clear form and close
+        clearMemberForm();
+        $('memberPanel')?.classList.remove('open');
+      }
+    } else {
+      $('memberPanel')?.classList.remove('open');
     }
   });
   
@@ -4677,28 +7496,54 @@ function wireEditPanelUI() {
     });
   }
 
-  // Cancel buttons
+  // FIXED: Cancel button - check for unsaved changes with modal
   if($('cancelEditBtn')) $('cancelEditBtn').addEventListener('click', ()=> { 
-    if(confirm('Discard ALL changes and close? This includes both head and member changes.')) {
+    if(hasUnsavedChanges()) {
+      showEditCloseConfirmation('cancel');
+    } else {
+      clearValidationErrors('editForm');
       closeEditPanel();
+      resetFormTracking();
     }
   });
 
+  // FIXED: Panel close button - check for unsaved changes with modal
   if($('panelClose')) $('panelClose').addEventListener('click', ()=> { 
-    if(confirm('Discard ALL changes and close? This includes both head and member changes.')) {
+    if(hasUnsavedChanges()) {
+      showEditCloseConfirmation('close');
+    } else {
+      clearValidationErrors('editForm');
       closeEditPanel();
+      resetFormTracking();
     }
   });
 
+  // FIXED: Overlay click - separate logic for member panel vs edit panel with modal
   if($('panelOverlay')) $('panelOverlay').addEventListener('click', ()=>{
     if($('memberPanel')?.classList.contains('open')) {
-      if(confirm('Close member panel? Unsaved member changes will be lost.')) {
+      // For member panel, check if there are unsaved changes
+      const memberName = $('memberName')?.value?.trim();
+      const memberContact = $('memberContact')?.value?.trim();
+      const memberBirthdate = $('memberBirthdate')?.value;
+      
+      if (memberName || memberContact || memberBirthdate) {
+        if(confirm('Close member panel? Unsaved member changes will be lost.')) {
+          // Clear form and close
+          clearMemberForm();
+          $('memberPanel')?.classList.remove('open');
+        }
+      } else {
         $('memberPanel')?.classList.remove('open');
       }
       return;
     }
-    if(confirm('Close edit panel? ALL unsaved changes will be lost.')) {
+    
+    // For edit panel, check for unsaved changes with modal
+    if(hasUnsavedChanges()) {
+      showEditCloseConfirmation('overlay');
+    } else {
       closeEditPanel();
+      resetFormTracking();
     }
   });
 
@@ -4763,37 +7608,9 @@ function wireEditPanelUI() {
     const btn = $('saveEditBtn');
     const originalBtnText = btn ? btn.innerText : 'Save changes';
     
-    // Validate head data
-    const requiredFields = [
-      { id: 'edit_barangay', name: 'Barangay' },
-      { id: 'edit_sitio', name: 'Sitio/Purok' },
-      { id: 'edit_householdHead', name: 'Household Head Name' },
-      { id: 'edit_contactNo', name: 'Contact Number' },
-      { id: 'edit_householdBirthdate', name: 'Birthdate' }
-    ];
-    
-    for (const field of requiredFields) {
-      const element = $(field.id);
-      if (!element || !element.value.trim()) {
-        alert(`Please fill in ${field.name}`);
-        element?.focus();
-        return;
-      }
-    }
-    
-    // Validate contact number
-    if (!validateContactInput($('edit_contactNo'), $('edit_contactError'))) {
-      alert('Please enter a valid Philippine mobile number for the household head');
-      $('edit_contactNo').focus();
-      return;
-    }
-    
-    // Check if sex is selected
-    const headSex = document.querySelector("input[name='edit_head_sex']:checked")?.value;
-    if (!headSex) {
-      alert('Please select head sex');
-      qAll("input[name='edit_head_sex']")[0]?.focus();
-      return;
+    // Validate head data FIRST using the new function
+    if (!validateHeadFormForEdit()) {
+      return; // Stop if validation fails - validation summary will show automatically
     }
     
     // Validate all members if there are any
@@ -4831,6 +7648,39 @@ function wireEditPanelUI() {
         btn.disabled = false; 
         btn.innerText = originalBtnText; 
       }
+    }
+  });
+  
+  // Setup government assistance date field handlers for edit panel
+  setupEditGovernmentAssistanceDateHandlers();
+  
+  // Setup member government assistance date field handlers
+  setupMemberGovernmentAssistanceDateHandlers();
+  
+  // Initialize government assistance date fields based on current state
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize head government assistance date fields
+    const headGovCheckboxes = [
+      'edit_ass_tupad', 'edit_ass_local4ps', 'edit_ass_intl4ps', 
+      'edit_ass_locsp', 'edit_ass_intlsp', 'edit_ass_solo', 
+      'edit_ass_relief', 'edit_ass_cash'
+    ];
+    
+    headGovCheckboxes.forEach(checkboxId => {
+      const checkbox = $(checkboxId);
+      const dateFieldId = checkboxId + '_date';
+      const dateField = $(dateFieldId);
+      
+      if (checkbox && dateField && checkbox.checked) {
+        dateField.classList.add('show');
+      }
+    });
+    
+    // Initialize head AICS date field
+    const aicsSelect = $('edit_ass_aics');
+    const aicsDateField = $('edit_ass_aics_date');
+    if (aicsSelect && aicsDateField && aicsSelect.value && aicsSelect.value !== "") {
+      aicsDateField.classList.add('show');
     }
   });
 }
@@ -5009,12 +7859,30 @@ function checkReturnFromHazardHunter() {
     });
 }
 
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 /* ============ INIT ============ */
 window.addEventListener("DOMContentLoaded", async () => {
+  console.log("DOMContentLoaded fired - records page");
+  
   // First check session
   const isAuthenticated = await sessionCheck();
+  console.log("Session check result:", isAuthenticated);
   
   if (isAuthenticated) {
+    // Setup modal handlers BEFORE anything else
+    setupModalHandlers();
+    
     // Load data if authenticated
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
     // Remove 👤 emoji from user display
@@ -5038,6 +7906,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     
     // Wire edit panel UI
     wireEditPanelUI();
+
+    // Initialize government assistance date fields
+    initializeGovernmentAssistanceDateFields(); 
     
     // Setup coordinate modal close on overlay click
     $('coordinateModal').addEventListener('click', function(e) {
@@ -5046,10 +7917,22 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
     });
     
+    // Setup keyboard shortcuts
+    setupKeyboardShortcuts();
+    
     // Check if returning from Hazard Hunter
     checkReturnFromHazardHunter();
     
+    // CRITICAL: Load the records
+    console.log("Calling loadRecords()");
     loadRecords();
+    
+    // Setup activity tracking
+    setTimeout(() => {
+        setupActivityTrackingForPages();
+    }, 500);
+  } else {
+    console.log("User not authenticated, redirecting to login");
   }
 });
 </script>
@@ -5059,7 +7942,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
