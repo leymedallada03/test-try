@@ -1640,52 +1640,45 @@ async function loadActivityLog() {
     }
     
     // If no local activities, fetch from API
-    console.log("Fetching audit logs from API...");
-    const response = await fetch(`${API_URL}?action=logs`);
+    console.log("Fetching dashboard logs from API...");
+    
+    // Use the NEW endpoint for dashboard-specific logs
+    const response = await fetch(`${API_URL}?action=dashboardLogs`);
     const data = await response.json();
     
     if (data.success && data.logs && data.logs.length > 0) {
-      // Filter to only show allowed actions
-      const filteredLogs = data.logs.filter(log => 
-        ALLOWED_ACTIONS.includes(log.Action || log.action)
-      );
+      // Get the most recent log (already sorted newest first)
+      const latestLog = data.logs[0];
       
-      if (filteredLogs.length > 0) {
-        // Get the most recent log
-        const latestLog = filteredLogs[0];
-        
-        // Try to parse the timestamp
-        let timestamp = new Date();
-        if (latestLog.Timestamp) {
-          timestamp = new Date(latestLog.Timestamp);
-        } else if (latestLog.timestamp) {
-          timestamp = new Date(latestLog.timestamp);
-        }
-        
-        const activity = {
-          action: latestLog.Action || latestLog.action || "Unknown",
-          actor: latestLog.Actor || latestLog.actor || "Unknown",
-          details: latestLog.Details || latestLog.details || "",
-          timestamp: timestamp.toISOString()
-        };
-        
-        updateActivityDisplay(activity);
-        
-        // Also store in localStorage for next time
-        const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-        activityLog.push(activity);
-        
-        // Keep only last 10 activities
-        if (activityLog.length > 10) {
-          activityLog.splice(0, activityLog.length - 10);
-        }
-        
-        localStorage.setItem('activityLog', JSON.stringify(activityLog));
-        
-        console.log("Latest activity loaded from API:", activity);
-      } else {
-        showDefaultMessage();
+      // Parse the timestamp
+      let timestamp = new Date();
+      if (latestLog.Timestamp) {
+        timestamp = new Date(latestLog.Timestamp);
+      } else if (latestLog.timestamp) {
+        timestamp = new Date(latestLog.timestamp);
       }
+      
+      const activity = {
+        action: latestLog.Action || latestLog.action || "Unknown",
+        actor: latestLog.Actor || latestLog.actor || "Unknown",
+        details: latestLog.Details || latestLog.details || "",
+        timestamp: timestamp.toISOString()
+      };
+      
+      updateActivityDisplay(activity);
+      
+      // Also store in localStorage for next time
+      const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+      activityLog.push(activity);
+      
+      // Keep only last 10 activities
+      if (activityLog.length > 10) {
+        activityLog.splice(0, activityLog.length - 10);
+      }
+      
+      localStorage.setItem('activityLog', JSON.stringify(activityLog));
+      
+      console.log("Latest dashboard activity loaded from API:", activity);
     } else {
       showDefaultMessage();
     }
@@ -3264,7 +3257,6 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
 
 
 
