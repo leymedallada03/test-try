@@ -6984,20 +6984,59 @@ async function saveEditedHousehold(silentReload = false) {
           headSample: Object.keys(cleanHead).slice(0, 5).map(key => `${key}: ${cleanHead[key]}`)
         });
       }
-    } else {
-      console.log("Save successful! Response:", json);
-      if (!silentReload) showSuccess(`Household updated (Data ID: ${editDataID || ''})`);
-      closeEditPanel();
-      resetFormTracking();
+} else {
+  console.log("Save successful! Response:", json);
+  if (!silentReload) showSuccess(`Household updated (Data ID: ${editDataID || ''})`);
+  closeEditPanel();
+  resetFormTracking();
 
-      // Clear cache and reload
-      localStorage.removeItem('recordsCache');
-      localStorage.removeItem('recordsCacheTime');
-      loadRecords();
-      
-      // Record activity
-      recordPageActivity('Household Updated', `Updated household ${editDataID} (${editHead['Name of Household Head'] || 'Unknown'})`);
-    }
+  // Clear cache and reload
+  localStorage.removeItem('recordsCache');
+  localStorage.removeItem('recordsCacheTime');
+  loadRecords();
+  
+  // ============ CRITICAL: ADD THIS CODE FOR DASHBOARD NOTIFICATION ============
+  // Notify dashboard about the update
+  const headName = $('edit_householdHead')?.value?.trim() || editHead['Name of Household Head'] || 'Unknown';
+  const barangay = $('edit_barangay')?.value || editHead['Barangay'] || 'Unknown';
+  const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
+  
+  // Store activity for dashboard to pick up
+  const activity = {
+    action: 'Update Household',
+    actor: username,
+    details: `Updated household ${headName} in ${barangay} (ID: ${editDataID})`,
+    timestamp: new Date().toISOString()
+  };
+  
+  // Save to localStorage for dashboard
+  const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
+  activities.push(activity);
+  if (activities.length > 10) activities.shift(); // Keep only last 10
+  localStorage.setItem('crossTabActivities', JSON.stringify(activities));
+  
+  // Trigger dashboard refresh
+  localStorage.setItem('lastActivityTrigger', Date.now().toString());
+  localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
+  localStorage.removeItem('dashboardDataCache'); // Clear dashboard cache
+  
+  // Record activity to server audit trail
+  try {
+    const logFormData = new FormData();
+    logFormData.append("action", "logActivity");
+    logFormData.append("username", username);
+    logFormData.append("action", "Update Household");
+    logFormData.append("actor", username);
+    logFormData.append("details", `Updated household ID ${editDataID} for ${headName}`);
+    fetch(SCRIPT_URL, { method: "POST", body: logFormData }).catch(() => {});
+  } catch (err) {
+    console.log("Activity logging error:", err);
+  }
+  // ============ END OF ADDED CODE ============
+  
+  // Record activity for local tracking
+  recordPageActivity('Household Updated', `Updated household ${editDataID} (${editHead['Name of Household Head'] || 'Unknown'})`);
+}
   } catch (err) {
     console.error('Detailed save error:', {
       name: err.name,
@@ -7073,24 +7112,63 @@ async function performDelete() {
         
         const json = await res.json();
 
-        if(json.success){
-            showSuccess(`Household deleted successfully. Data ID: ${id}`);
-            
-            // Clear cache and reload
-            localStorage.removeItem('recordsCache');
-            localStorage.removeItem('recordsCacheTime');
-            
-            // Close modal first
-            hideModal('deleteConfirmationModal');
-            deletePendingId = null;
-            deletePendingHeadName = '';
-            deletePendingBarangay = '';
-            
-            // Reload records after a short delay
-            setTimeout(() => {
-                loadRecords();
-            }, 1000);
-        } else {
+if(json.success){
+    showSuccess(`Household deleted successfully. Data ID: ${id}`);
+    
+    // ============ ADD THIS CODE FOR DASHBOARD NOTIFICATION ============
+    // Notify dashboard about the deletion
+    const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
+    const headName = deletePendingHeadName || 'Unknown Household';
+    const barangay = deletePendingBarangay || 'Unknown Barangay';
+    
+    // Store activity for dashboard to pick up
+    const activity = {
+        action: 'Delete Household',
+        actor: username,
+        details: `Deleted household ${headName} from ${barangay} (ID: ${id})`,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Save to localStorage for dashboard
+    const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
+    activities.push(activity);
+    if (activities.length > 10) activities.shift(); // Keep only last 10
+    localStorage.setItem('crossTabActivities', JSON.stringify(activities));
+    
+    // Trigger dashboard refresh
+    localStorage.setItem('lastActivityTrigger', Date.now().toString());
+    localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
+    localStorage.removeItem('dashboardDataCache'); // Clear dashboard cache
+    
+    // Record activity to server audit trail
+    try {
+        const logFormData = new FormData();
+        logFormData.append("action", "logActivity");
+        logFormData.append("username", username);
+        logFormData.append("action", "Delete Household");
+        logFormData.append("actor", username);
+        logFormData.append("details", `Deleted household ID ${id} - ${headName}`);
+        fetch(SCRIPT_URL, { method: "POST", body: logFormData }).catch(() => {});
+    } catch (err) {
+        console.log("Activity logging error:", err);
+    }
+    // ============ END OF ADDED CODE ============
+    
+    // Clear cache and reload
+    localStorage.removeItem('recordsCache');
+    localStorage.removeItem('recordsCacheTime');
+    
+    // Close modal first
+    hideModal('deleteConfirmationModal');
+    deletePendingId = null;
+    deletePendingHeadName = '';
+    deletePendingBarangay = '';
+    
+    // Reload records after a short delay
+    setTimeout(() => {
+        loadRecords();
+    }, 1000);
+} else {
             showError("Delete failed: " + (json.message || JSON.stringify(json)));
         }
     } catch(err) {
@@ -7944,4 +8022,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
