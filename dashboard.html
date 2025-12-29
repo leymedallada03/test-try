@@ -1616,77 +1616,127 @@ function destroyChart(){
 function showLoading(yes){ 
   document.getElementById("loading").style.display = yes ? "flex" : "none"; 
 }
-
+// Add this to your dashboard.html initialization
+function setupDashboardRefresh() {
+    // Refresh when dashboard tab is clicked
+    const dashboardTab = document.querySelector('a[href*="dashboard.html"]');
+    if (dashboardTab) {
+        dashboardTab.addEventListener('click', function(e) {
+            if (window.location.pathname.includes('dashboard.html')) {
+                console.log('Dashboard tab clicked, refreshing...');
+                loadActivityLog();
+                loadDashboard(false);
+            }
+        });
+    }
+    
+    // Auto-refresh dashboard data every 30 seconds
+    setInterval(() => {
+        console.log('Auto-refreshing dashboard data...');
+        loadDashboard(false);
+    }, 30000);
+}
 /* FIXED: Load activity log from Google Sheets API */
 async function loadActivityLog() {
   try {
-    console.log("Loading activity log...");
+    console.log("Loading activity log from all sources...");
     
-    // First check localStorage (for backward compatibility)
-    const localActivityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-    
-    if (localActivityLog.length > 0) {
-      // Filter to only show allowed actions
-      const filteredLog = localActivityLog.filter(activity => 
-        ALLOWED_ACTIONS.includes(activity.action)
-      );
+    // SOURCE 1: Check cross-tab activities (REALTIME - NO SERVER CALL)
+    const crossTabActivities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
+    if (crossTabActivities.length > 0) {
+      const latestCrossTab = crossTabActivities[crossTabActivities.length - 1];
       
-      if (filteredLog.length > 0) {
-        const latestActivity = filteredLog[filteredLog.length - 1];
-        lastUpdatedTime = new Date(latestActivity.timestamp);
+      // Only show allowed actions
+      if (ALLOWED_ACTIONS.includes(latestCrossTab.action)) {
+        console.log("Found cross-tab activity:", latestCrossTab);
+        updateActivityDisplay(latestCrossTab);
+        return; // Use this first as it's real-time
+      }
+    }
+    
+    // SOURCE 2: Check localStorage cache
+    const localActivityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+    const filteredLog = localActivityLog.filter(activity => 
+      ALLOWED_ACTIONS.includes(activity.action)
+    );
+    
+    if (filteredLog.length > 0) {
+      const latestActivity = filteredLog[filteredLog.length - 1];
+      // Check if it's recent (last 5 minutes)
+      const activityTime = new Date(latestActivity.timestamp || 0);
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      
+      if (activityTime > fiveMinutesAgo) {
+        console.log("Using recent localStorage activity");
         updateActivityDisplay(latestActivity);
         return;
       }
     }
     
-    // If no local activities, fetch from API
-    console.log("Fetching dashboard logs from API...");
-    
-    // Use the NEW endpoint for dashboard-specific logs
-    const response = await fetch(`${API_URL}?action=dashboardLogs`);
+    // SOURCE 3: Fetch from server (fallback)
+    console.log("Fetching from server...");
+    const response = await fetch(`${API_URL}?action=dashboardLogs&nocache=${Date.now()}`);
     const data = await response.json();
     
     if (data.success && data.logs && data.logs.length > 0) {
-      // Get the most recent log (already sorted newest first)
       const latestLog = data.logs[0];
-      
-      // Parse the timestamp
-      let timestamp = new Date();
-      if (latestLog.Timestamp) {
-        timestamp = new Date(latestLog.Timestamp);
-      } else if (latestLog.timestamp) {
-        timestamp = new Date(latestLog.timestamp);
-      }
       
       const activity = {
         action: latestLog.Action || latestLog.action || "Unknown",
         actor: latestLog.Actor || latestLog.actor || "Unknown",
         details: latestLog.Details || latestLog.details || "",
-        timestamp: timestamp.toISOString()
+        timestamp: latestLog.Timestamp || latestLog.timestamp || new Date().toISOString()
       };
       
-      updateActivityDisplay(activity);
-      
-      // Also store in localStorage for next time
-      const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-      activityLog.push(activity);
-      
-      // Keep only last 10 activities
-      if (activityLog.length > 10) {
-        activityLog.splice(0, activityLog.length - 10);
+      // Only update if it's an allowed action
+      if (ALLOWED_ACTIONS.includes(activity.action)) {
+        updateActivityDisplay(activity);
+        
+        // Cache it
+        const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+        activityLog.push(activity);
+        if (activityLog.length > 10) activityLog.splice(0, activityLog.length - 10);
+        localStorage.setItem('activityLog', JSON.stringify(activityLog));
       }
-      
-      localStorage.setItem('activityLog', JSON.stringify(activityLog));
-      
-      console.log("Latest dashboard activity loaded from API:", activity);
     } else {
       showDefaultMessage();
     }
     
   } catch(err) {
     console.error('Error loading activity log:', err);
+    // Don't show error, just use default
     showDefaultMessage();
   }
+}
+
+/* Enhanced: Setup activity listener for REAL-TIME updates */
+function setupRealtimeActivityListener() {
+    // Listen for storage events
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'crossTabActivities' || e.key === 'lastActivityTrigger') {
+            console.log('📢 Activity detected from another tab/page');
+            loadActivityLog();
+            
+            // Also refresh dashboard data after a short delay
+            setTimeout(() => {
+                loadDashboard(false);
+            }, 1000);
+        }
+    });
+    
+    // Poll every 5 seconds for updates
+    setInterval(() => {
+        loadActivityLog();
+    }, 5000);
+    
+    // Also check when tab becomes visible
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            console.log('Tab became active, checking for updates...');
+            loadActivityLog();
+            loadDashboard(false);
+        }
+    });
 }
 
 function showDefaultMessage() {
@@ -3104,6 +3154,9 @@ function notifyDataUpdated(action = 'Data Updated', details = 'Dashboard data re
 }
 
 /* ENHANCED INITIALIZATION */
+// UNCOMMENT THIS LINE - CRITICAL!
+const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
+
 window.addEventListener('DOMContentLoaded', async () => {
     console.log("Dashboard initializing...");
     
@@ -3123,20 +3176,21 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Setup auto-logout for inactivity
     setupAutoLogout();
     
-    // Initialize activity monitoring with real-time updates
-    setupActivityMonitoring();
-    setupRealTimeActivityUpdates();
+    // Initialize REAL-TIME activity monitoring
+    setupRealtimeActivityListener(); // NEW: Use real-time listener
+    
+    // Load initial activity
     loadActivityLog();
     
-    // Setup dashboard auto-load functionality when dashboard tab is clicked
+    // Setup dashboard auto-load functionality
     setupDashboardAutoLoad();
     
-    // STEP 1: Load cached dashboard data IMMEDIATELY (no loading screen)
+    // STEP 1: Load cached dashboard data IMMEDIATELY
     const hasCache = loadCachedDashboardData();
     
     // STEP 2: Load fresh data from server in background
-    // Only show loading if there's NO cache (first visit)
     loadDashboard(!hasCache);
+    
     
     // Auto-refresh dashboard data every 30 seconds (no loading screen)
     if (refreshInterval) clearInterval(refreshInterval);
