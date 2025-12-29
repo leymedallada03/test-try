@@ -5400,16 +5400,59 @@ const currentUser = localStorage.getItem("username") ||
       throw new Error("Invalid response from server: " + text);
     }
 
-    if(data.success){
-      showSuccess("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
-      // Redirect to records page after a delay
-      setTimeout(() => {
-        window.location.href = "records.html";
-      }, 2000);
-    } else {
-      showError("Save failed: " + (data.message || "Unknown error"));
-      console.error("SAVE ERROR:", data);
+if(data.success){
+    showSuccess("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
+    
+    // ============ CRITICAL: ADD THIS CODE BLOCK ============
+    // Notify dashboard about the new record creation
+    const headName = document.getElementById("householdHead").value.trim() || "Unknown";
+    const barangay = document.getElementById("barangay").value.trim() || "Unknown";
+    const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
+    
+    // Store activity for dashboard to pick up
+    const activity = {
+        action: 'Create Record',
+        actor: username,
+        details: `Created record for ${headName} in ${barangay} (ID: ${data.dataID || "n/a"})`,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Save to localStorage for dashboard
+    const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
+    activities.push(activity);
+    if (activities.length > 10) activities.shift(); // Keep only last 10
+    localStorage.setItem('crossTabActivities', JSON.stringify(activities));
+    
+    // Also store in sessionStorage for immediate access
+    sessionStorage.setItem('lastActivity', JSON.stringify(activity));
+    
+    // Trigger dashboard refresh
+    localStorage.setItem('lastActivityTrigger', Date.now().toString());
+    localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
+    localStorage.removeItem('dashboardDataCache'); // Clear cache
+    
+    // Log to server audit trail
+    try {
+        const logFormData = new FormData();
+        logFormData.append("action", "logActivity");
+        logFormData.append("username", username);
+        logFormData.append("action", "Create Record");
+        logFormData.append("actor", username);
+        logFormData.append("details", `Created record ID ${data.dataID} for ${headName}`);
+        fetch(API_URL, { method: "POST", body: logFormData }).catch(() => {});
+    } catch (err) {
+        console.log("Activity logging error:", err);
     }
+    // ============ END OF ADDED CODE ============
+    
+    // Redirect to records page after a delay
+    setTimeout(() => {
+        window.location.href = "records.html";
+    }, 2000);
+} else {
+    showError("Save failed: " + (data.message || "Unknown error"));
+    console.error("SAVE ERROR:", data);
+}
   }catch(err){
     console.error("SUBMIT ERROR:", err);
     showError("Network / Server error: " + (err.message || err));
@@ -5531,4 +5574,3 @@ function handleLogout() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
