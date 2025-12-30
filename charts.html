@@ -272,10 +272,10 @@ li.admin-only.admin-visible {
     gap: 8px;
    }
 
-   /* Toolbar - UPDATED for right alignment */
+   /* Toolbar - FIXED: All buttons on the right side */
    .toolbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; /* Align everything to the right */
     align-items: center;
     margin-bottom: 20px;
     flex-wrap: wrap;
@@ -284,19 +284,18 @@ li.admin-only.admin-visible {
     box-shadow: 0 2px 8px rgba(6,30,20,0.04);
    }
 
+   /* REMOVE toolbar-left since all buttons are on the right */
    .toolbar-left {
-    display: flex;
-    gap: 12px;
-    align-items: center;
+    display: none; /* Hide left container */
    }
 
-   /* RIGHT-ALIGNED BUTTONS GROUP */
+   /* RIGHT-ALIGNED BUTTONS GROUP - All buttons here */
    .toolbar-right {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    margin-left: auto; /* Push to the right */
     justify-content: flex-end; /* Ensure alignment to right */
+    width: 100%; /* Take full width */
    }
 
    .btn {
@@ -722,12 +721,7 @@ li.admin-only.admin-visible {
         align-items: stretch;
         padding: 10px;
         gap: 15px;
-    }
-    
-    .toolbar-left {
-        flex-direction: row;
-        width: 100%;
-        justify-content: center; /* Center the left button */
+        justify-content: center; /* Center on mobile */
     }
     
     /* UPDATED: Right-aligned buttons become linear and centered on mobile */
@@ -735,8 +729,7 @@ li.admin-only.admin-visible {
         display: flex !important;
         flex-direction: row;
         width: 100%;
-        justify-content: center; /* Center the buttons */
-        margin-left: 0; /* Remove right alignment */
+        justify-content: center; /* Center the buttons on mobile */
         gap: 10px;
         flex-wrap: wrap;
     }
@@ -996,15 +989,13 @@ li.admin-only.admin-visible {
     
     <div id="disc">This section provides visual analytics and insights from household data. Interactive charts help identify patterns, distributions, and trends across barangays, age groups, disabilities, and government support programs for better decision-making.</div>
 
-    <!-- Toolbar -->
+    <!-- Toolbar - UPDATED: All buttons in toolbar-right -->
     <div class="toolbar">
-      <div class="toolbar-left">
+      <div class="toolbar-right">
         <button id="btnRefresh" class="btn btn-refresh">
           <i class="fas fa-redo"></i> Refresh Charts
         </button>
-      </div>
-      
-      <div class="toolbar-right">
+        
         <button id="btnPrint" class="btn btn-print">
           <i class="fas fa-print"></i> Print
         </button>
