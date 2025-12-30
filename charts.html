@@ -581,7 +581,7 @@ li.admin-only.admin-visible {
     display: block;
    }
 
-   /* Mobile Bottom Navigation - Fixed Position */
+   /* Mobile Bottom Navigation - Fixed Position - UPDATED to match users.html */
    .mobile-bottom-nav {
     display: none;
     position: fixed;
@@ -606,18 +606,18 @@ li.admin-only.admin-visible {
    }
 
    .mobile-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: var(--muted);
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    transition: all 0.3s ease;
-    min-width: 60px;
-    flex: 1;
-    height: 100%;
-    justify-content: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    color: var(--muted) !important;
+    padding: 8px 12px !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.3s ease !important;
+    min-width: 60px !important;
+    flex: 1 !important;
+    height: 100% !important;
+    justify-content: center !important;
    }
 
    .mobile-nav-item.active {
@@ -628,11 +628,17 @@ li.admin-only.admin-visible {
    .mobile-nav-icon {
     font-size: 1.2rem;
     margin-bottom: 4px;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
    }
 
    .mobile-nav-text {
     font-size: 0.7rem;
     font-weight: 500;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
    }
 
    /* Mobile Logout Item */
@@ -641,7 +647,7 @@ li.admin-only.admin-visible {
     background: rgba(231, 76, 60, 0.1) !important;
    }
 
-   /* Mobile Styles */
+   /* Mobile Styles - UPDATED to match users.html */
    @media (max-width: 768px) {
     body {
         padding-bottom: 70px; /* Space for fixed bottom nav */
@@ -1153,7 +1159,7 @@ li.admin-only.admin-visible {
   </main>
 </div>
 
-<!-- Mobile Bottom Navigation - Fixed -->
+<!-- Mobile Bottom Navigation - Fixed - UPDATED to match users.html structure -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
   <div class="mobile-nav-items">
     <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
@@ -2346,4 +2352,3 @@ window.addEventListener('beforeunload', function() {
 </script>
 </body>
 </html>
-
