@@ -28,6 +28,36 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+   /* ============ RED CANCEL BUTTONS FOR MODALS ============ */
+/* Target cancel buttons in modals by their IDs */
+#cancelDelete,
+#cancelEditClose,
+#cancelReset,
+#cancelSave,
+#cancelRemoveMember,
+#cancelDeleteMember,
+#cancelEditBtn,
+#modal_cancelBtn,
+.btn-secondary[type="button"] {
+    background: linear-gradient(90deg, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Hover state for red cancel buttons */
+#cancelDelete:hover,
+#cancelEditClose:hover,
+#cancelReset:hover,
+#cancelSave:hover,
+#cancelRemoveMember:hover,
+#cancelDeleteMember:hover,
+#cancelEditBtn:hover,
+#modal_cancelBtn:hover,
+.btn-secondary[type="button"]:hover {
+    background: linear-gradient(90deg, #b91c1c, #dc2626) !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2) !important;
+    transform: translateY(-1px);
+}
    .admin-only {
     display: none !important;
 }
@@ -2616,7 +2646,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_tupad">
             <label for="ass_tupad">TUPAD</label>
             <div id="ass_tupad_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_tupad_date_input">
             </div>
           </div>
@@ -2626,7 +2656,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_local4ps">
             <label for="ass_local4ps">Local 4Ps</label>
             <div id="ass_local4ps_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_local4ps_date_input">
             </div>
           </div>
@@ -2636,7 +2666,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_intl4ps">
             <label for="ass_intl4ps">National 4Ps</label>
             <div id="ass_intl4ps_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_intl4ps_date_input">
             </div>
           </div>
@@ -2646,7 +2676,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_locsp">
             <label for="ass_locsp">Local Social Pension</label>
             <div id="ass_locsp_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_locsp_date_input">
             </div>
           </div>
@@ -2656,7 +2686,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_intlsp">
             <label for="ass_intlsp">National Social Pension</label>
             <div id="ass_intlsp_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_intlsp_date_input">
             </div>
           </div>
@@ -2666,7 +2696,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_solo">
             <label for="ass_solo">Solo Parent Assistance</label>
             <div id="ass_solo_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_solo_date_input">
             </div>
           </div>
@@ -2676,7 +2706,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_relief">
             <label for="ass_relief">Relief Goods</label>
             <div id="ass_relief_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_relief_date_input">
             </div>
           </div>
@@ -2686,7 +2716,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="ass_cash">
             <label for="ass_cash">Cash Subsidy</label>
             <div id="ass_cash_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_cash_date_input">
             </div>
           </div>
@@ -2702,7 +2732,7 @@ textarea.validation-error:focus {
               <option>Scholarship</option>
             </select>
             <div id="ass_aics_date" class="gov-date-field" style="margin-top: 0;">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="ass_aics_date_input">
             </div>
           </div>
@@ -3091,7 +3121,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_tupad" class="member_tupad">
             <label for="member_tupad">TUPAD</label>
             <div id="member_tupad_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_tupad_date_input" class="member_tupad_date_input">
             </div>
           </div>
@@ -3101,7 +3131,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_local4ps" class="member_local4ps">
             <label for="member_local4ps">Local 4Ps</label>
             <div id="member_local4ps_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_local4ps_date_input" class="member_local4ps_date_input">
             </div>
           </div>
@@ -3111,7 +3141,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
             <label for="member_intl4ps">National 4Ps</label>
             <div id="member_intl4ps_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_intl4ps_date_input" class="member_intl4ps_date_input">
             </div>
           </div>
@@ -3121,7 +3151,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_locsp" class="member_locsp">
             <label for="member_locsp">Local Social Pension</label>
             <div id="member_locsp_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_locsp_date_input" class="member_locsp_date_input">
             </div>
           </div>
@@ -3131,7 +3161,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_intlsp" class="member_intlsp">
             <label for="member_intlsp">National Social Pension</label>
             <div id="member_intlsp_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_intlsp_date_input" class="member_intlsp_date_input">
             </div>
           </div>
@@ -3141,7 +3171,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_solo" class="member_solo">
             <label for="member_solo">Solo Parent Assistance</label>
             <div id="member_solo_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_solo_date_input" class="member_solo_date_input">
             </div>
           </div>
@@ -3151,7 +3181,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_relief" class="member_relief">
             <label for="member_relief">Relief Goods</label>
             <div id="member_relief_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_relief_date_input" class="member_relief_date_input">
             </div>
           </div>
@@ -3161,7 +3191,7 @@ textarea.validation-error:focus {
             <input type="checkbox" id="member_cash" class="member_cash">
             <label for="member_cash">Cash Subsidy</label>
             <div id="member_cash_date" class="gov-date-field">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_cash_date_input" class="member_cash_date_input">
             </div>
           </div>
@@ -3177,7 +3207,7 @@ textarea.validation-error:focus {
               <option>Scholarship</option>
             </select>
             <div id="member_aics_date" class="gov-date-field" style="margin-top: 0;">
-              <label>Received:</label>
+              <label>Date:</label>
               <input type="date" id="member_aics_date_input" class="member_aics_date_input">
             </div>
           </div>
@@ -3284,7 +3314,7 @@ textarea.validation-error:focus {
       <p>Are you sure you want to reset the form? All entered data will be permanently lost.</p>
     </div>
     <div class="modal-actions">
-      <button id="cancelReset" class="btn btn secondary">Cancel</button>
+      <button id="cancelReset" class="btn btn secondary ">Cancel</button>
       <button id="confirmReset" class="btn" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">
         <i class="fas fa-redo"></i> Reset Form
       </button>
