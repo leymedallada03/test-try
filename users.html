@@ -236,34 +236,9 @@ li.admin-only.admin-visible {
     overflow: hidden;
    }
 
-   /* Mobile Logout Button in Sidebar */
+   /* REMOVED: Mobile Logout Button in Sidebar */
    .mobile-logout-container {
-    display: none;
-    margin-top: auto;
-    padding: 12px;
-    border-top: 1px solid var(--border);
-   }
-
-   .mobile-logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    text-decoration: none;
-    color: #e74c3c;
-    border-radius: var(--radius-sm);
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 0.9rem;
-    background: rgba(231, 76, 60, 0.1);
-    border: 1px solid rgba(231, 76, 60, 0.2);
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-   }
-
-   .mobile-logout-btn:hover {
-    background: rgba(231, 76, 60, 0.2);
+    display: none !important; /* Remove logout button from sidebar */
    }
 
    /* Content Area */
@@ -297,7 +272,7 @@ li.admin-only.admin-visible {
     gap: 8px;
    }
 
-   /* Mobile Bottom Navigation - Fixed Position - UPDATED */
+   /* Mobile Bottom Navigation - Fixed Position - REMOVED LOGOUT */
    .mobile-bottom-nav {
     display: none;
     position: fixed;
@@ -352,11 +327,7 @@ li.admin-only.admin-visible {
     background: var(--light-green) !important;
 }
 
-/* Logout button styling */
-.mobile-nav-item.mobile-logout-item {
-    color: #e74c3c !important;
-    background: rgba(231, 76, 60, 0.1) !important;
-}
+/* REMOVED: Logout button styling */
 
 /* Icon and text for all tabs */
 .mobile-nav-icon {
@@ -375,11 +346,7 @@ li.admin-only.admin-visible {
     width: 100% !important;
 }
 
-   /* Mobile Logout Item */
-   .mobile-logout-item {
-    color: #e74c3c !important;
-    background: rgba(231, 76, 60, 0.1) !important;
-   }
+   /* REMOVED: Mobile Logout Item CSS */
 
    /* Mobile Styles */
    @media (max-width: 768px) {
@@ -414,7 +381,7 @@ li.admin-only.admin-visible {
     
     /* Show mobile logout button in sidebar when sidebar is forced to show */
     .mobile-logout-container {
-        display: block;
+        display: none !important; /* REMOVED: Hide logout in sidebar */
     }
     
     .content-area {
@@ -1426,13 +1393,7 @@ li.admin-only.admin-visible {
         <li class="admin-only"><a href="users.html" class="active" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
       </ul>
       
-      <!-- Mobile Logout Button in Sidebar -->
-      <div class="mobile-logout-container">
-        <button class="mobile-logout-btn" id="mobileLogoutBtn">
-          <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
-          <span class="menu-text">Logout</span>
-        </button>
-      </div>
+      <!-- REMOVED: Mobile Logout Button in Sidebar -->
     </div>
   </aside>
 
@@ -1507,7 +1468,7 @@ li.admin-only.admin-visible {
   </main>
 </div>
 
-<!-- Mobile Bottom Navigation - Fixed -->
+<!-- Mobile Bottom Navigation - Fixed - REMOVED LOGOUT BUTTON -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
   <div class="mobile-nav-items">
     <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
@@ -1530,11 +1491,7 @@ li.admin-only.admin-visible {
       <span class="mobile-nav-icon">👥</span>
       <span class="mobile-nav-text">Users</span>
     </a>
-    <!-- Logout button in mobile nav -->
-    <a href="#" class="mobile-nav-item mobile-logout-item" id="mobileNavLogoutBtn" title="Logout">
-      <span class="mobile-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
-      <span class="mobile-nav-text">Logout</span>
-    </a>
+    <!-- REMOVED: Logout button in mobile nav -->
   </div>
 </nav>
 
@@ -2608,11 +2565,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Event listeners
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-    document.getElementById('mobileLogoutBtn').addEventListener('click', handleLogout);
-    document.getElementById('mobileNavLogoutBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        handleLogout();
-    });
+    
+    // REMOVED: Mobile logout button event listeners
+    // document.getElementById('mobileLogoutBtn').addEventListener('click', handleLogout);
+    // document.getElementById('mobileNavLogoutBtn').addEventListener('click', function(e) {
+    //     e.preventDefault();
+    //     handleLogout();
+    // });
+    
     document.getElementById('openAddUser').addEventListener('click', () => openUserModal('add'));
     document.getElementById('viewLogsBtn').addEventListener('click', function() {
       document.getElementById('logsModal').style.display = 'flex';
