@@ -57,6 +57,7 @@ li.admin-only.admin-visible {
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-text-size-adjust: 100%;
+    padding-bottom: 70px; /* Space for fixed bottom nav */
    }
 
    .page-container{
@@ -550,7 +551,7 @@ li.admin-only.admin-visible {
     display: block;
    }
 
-   /* Mobile Bottom Navigation */
+   /* Mobile Bottom Navigation - Fixed Position */
    .mobile-bottom-nav {
     display: none;
     position: fixed;
@@ -562,12 +563,16 @@ li.admin-only.admin-visible {
     z-index: 1000;
     padding: 8px 0;
     box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    height: 70px;
+    box-sizing: border-box;
+    overflow: hidden;
    }
 
    .mobile-nav-items {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    height: 100%;
    }
 
    .mobile-nav-item {
@@ -580,6 +585,9 @@ li.admin-only.admin-visible {
     border-radius: var(--radius-sm);
     transition: all 0.3s ease;
     min-width: 60px;
+    flex: 1;
+    height: 100%;
+    justify-content: center;
    }
 
    .mobile-nav-item.active {
@@ -599,11 +607,15 @@ li.admin-only.admin-visible {
 
    /* Mobile Styles */
    @media (max-width: 768px) {
+    body {
+        padding-bottom: 70px; /* Space for fixed bottom nav */
+    }
+    
     .page-container {
         grid-template-columns: 1fr !important;
         padding: 8px;
         gap: 12px;
-        margin-bottom: 70px; /* Space for bottom nav */
+        margin-bottom: 0; /* Remove margin since we have body padding */
     }
     
     .page-container.collapsed {
@@ -615,27 +627,20 @@ li.admin-only.admin-visible {
     }
     
     .mobile-bottom-nav {
-        display: block !important;
+        display: flex !important; /* Show bottom nav on mobile */
+        flex-direction: column;
     }
     
+    /* Remove mobile menu toggle button */
     .mobile-menu-toggle {
-        display: flex !important;
-        background: linear-gradient(135deg, var(--accent1), var(--accent2));
-        color: white;
-        border: none;
-        border-radius: var(--radius-sm);
-        width: 40px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 1.2rem;
+        display: none !important;
     }
     
     .content-area {
         height: auto;
         min-height: calc(100vh - 140px);
         padding: 12px;
+        margin-bottom: 0;
     }
     
     .toolbar {
@@ -699,6 +704,11 @@ li.admin-only.admin-visible {
     /* Optimize charts for mobile */
     .chart-card canvas {
         max-height: 200px;
+    }
+    
+    /* Adjust content area for bottom nav */
+    .content-area {
+        margin-bottom: 70px;
     }
    }
 
@@ -829,9 +839,7 @@ li.admin-only.admin-visible {
     </div>
 
     <div class="user-info">
-      <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <i class="fas fa-bars"></i>
-      </button>
+      <!-- Hamburger menu removed for mobile -->
       <span id="userName"></span>
       <button id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -906,10 +914,8 @@ li.admin-only.admin-visible {
         <div class="chart-header">
           <h3 class="chart-title"><i class="fas fa-map-marker-alt"></i> Entries per Barangay</h3>
           <div class="chart-stats">
-            <span class="stat-badge" id="totalBarangays">Total: 0</span>
             <span class="stat-badge" id="headsBarangay">Heads: 0</span>
             <span class="stat-badge" id="membersBarangay">Members: 0</span>
-            <span class="stat-badge" id="combinedBarangay">Combined: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -924,7 +930,6 @@ li.admin-only.admin-visible {
           <div class="chart-stats">
             <span class="stat-badge" id="headsAge">Heads: 0</span>
             <span class="stat-badge" id="membersAge">Members: 0</span>
-            <span class="stat-badge" id="combinedAge">Combined: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -939,7 +944,6 @@ li.admin-only.admin-visible {
           <div class="chart-stats">
             <span class="stat-badge" id="headsStage">Heads: 0</span>
             <span class="stat-badge" id="membersStage">Members: 0</span>
-            <span class="stat-badge" id="combinedStage">Combined: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -1094,7 +1098,7 @@ li.admin-only.admin-visible {
   </main>
 </div>
 
-<!-- Mobile Bottom Navigation -->
+<!-- Mobile Bottom Navigation - Fixed -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
   <div class="mobile-nav-items">
     <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
@@ -1168,7 +1172,6 @@ function getField(r, key) {
     return "";
 }
 
-// ADDED MISSING FUNCTION
 function parseAnyDate(v){
     if(!v && v !== 0) return null;
     if (v instanceof Date) return v;
@@ -1212,8 +1215,20 @@ function normalizeRow(r){
     const status = String(getField(r,"Status") || "").trim() || "Unspecified";
     const birthRaw = getField(r,"Birthdate") || getField(r,"Birth Date") || "";
     const birth = birthRaw ? String(birthRaw).trim() : "";
-    const relationship = String(getField(r, "Relationship to Head") || "").toLowerCase().trim();
-    const isHead = relationship === "head" || relationship === "household head";
+    
+    // FIXED: Better relationship detection
+    const relationshipRaw = String(getField(r, "Relationship to Head") || "").toLowerCase().trim();
+    let isHead = false;
+    
+    // Check for various ways "head" might be represented
+    if (relationshipRaw.includes("head") || 
+        relationshipRaw === "head" || 
+        relationshipRaw === "household head" ||
+        relationshipRaw === "householdhead" ||
+        relationshipRaw === "h/h head" ||
+        relationshipRaw === "h/hhead") {
+        isHead = true;
+    }
     
     // New fields
     const fishR = String(getField(r, "FishR Registered") || "").trim();
@@ -1233,6 +1248,13 @@ function normalizeRow(r){
         if (y !== null) ageYears = y;
     }
 
+    // Assistance fields
+    const assist = {};
+    const assistKeys = ["TUPAD","Local 4Ps","National 4Ps","Local Social Pension","National Social Pension","Solo Parent Assistance","Cash Subsidy","Relief Goods","AICS"];
+    assistKeys.forEach(k => {
+        assist[k] = String(getField(r,k) || "").trim();
+    });
+
     return { 
         barangay, 
         stage, 
@@ -1247,7 +1269,8 @@ function normalizeRow(r){
         displacement,
         ofw,
         education,
-        employment
+        employment,
+        assist  // Added back missing assist object
     };
 }
 
@@ -1673,6 +1696,8 @@ async function buildCharts() {
         });
         const totalCombined = totalHeads + totalMembers;
 
+        console.log("Total Heads:", totalHeads, "Total Members:", totalMembers, "Total Combined:", totalCombined);
+
         // 1. Entries per Barangay (with head/member breakdown)
         const barangayCounts = {};
         const barangayHeads = {};
@@ -1692,11 +1717,9 @@ async function buildCharts() {
         const brgLabels = brgEntries.map(e => e[0]);
         const brgValues = brgEntries.map(e => e[1]);
         
-        // Update stats for barangay chart
-        document.getElementById('totalBarangays').textContent = `Total: ${totalCombined}`;
+        // Update stats for barangay chart - Only Heads and Members
         document.getElementById('headsBarangay').textContent = `Heads: ${totalHeads}`;
         document.getElementById('membersBarangay').textContent = `Members: ${totalMembers}`;
-        document.getElementById('combinedBarangay').textContent = `Combined: ${totalCombined}`;
         
         createBarChart('chartBarangay', brgLabels, brgValues, 'Households', 'rgba(52, 183, 143, 0.8)');
 
@@ -1730,9 +1753,12 @@ async function buildCharts() {
             ageMembersTotal += group.members;
         });
         
+        // Verify totals match
+        console.log("Age Heads Total:", ageHeadsTotal, "Age Members Total:", ageMembersTotal, "Should equal:", totalHeads, totalMembers);
+        
+        // Use the actual calculated totals
         document.getElementById('headsAge').textContent = `Heads: ${ageHeadsTotal}`;
         document.getElementById('membersAge').textContent = `Members: ${ageMembersTotal}`;
-        document.getElementById('combinedAge').textContent = `Combined: ${ageHeadsTotal + ageMembersTotal}`;
         
         createBarChart('chartAgeGroup', ageLabels, ageValues, 'Persons', 'rgba(70, 140, 240, 0.8)');
 
@@ -1761,9 +1787,11 @@ async function buildCharts() {
         Object.values(stageHeads).forEach(count => stageHeadsTotal += count);
         Object.values(stageMembers).forEach(count => stageMembersTotal += count);
         
+        console.log("Stage Heads Total:", stageHeadsTotal, "Stage Members Total:", stageMembersTotal);
+        
+        // Use the actual calculated totals
         document.getElementById('headsStage').textContent = `Heads: ${stageHeadsTotal}`;
         document.getElementById('membersStage').textContent = `Members: ${stageMembersTotal}`;
-        document.getElementById('combinedStage').textContent = `Combined: ${stageHeadsTotal + stageMembersTotal}`;
         
         createDoughnutChart('chartStage', stageLabels, stageValues, 'Stage Distribution');
 
@@ -1794,7 +1822,7 @@ async function buildCharts() {
         supportKeys.forEach(k => supportCounts[k] = 0);
         norm.forEach(n => {
             supportKeys.forEach(k => {
-                const v = (n.assist && n.assist[k]) ? String(n.assist[k]).trim().toLowerCase() : "";
+                const v = n.assist && n.assist[k] ? String(n.assist[k]).trim().toLowerCase() : "";
                 if (k === 'AICS') {
                     if (v) supportCounts[k]++;
                 } else {
@@ -2111,22 +2139,6 @@ function toggleSidebar() {
     }
 }
 
-function toggleMobileSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mobileToggle = document.getElementById('mobileMenuToggle');
-    const icon = mobileToggle.querySelector('i');
-    
-    sidebar.classList.toggle('mobile-open');
-    
-    if (sidebar.classList.contains('mobile-open')) {
-        icon.className = 'fas fa-times';
-        mobileToggle.title = "Close menu";
-    } else {
-        icon.className = 'fas fa-bars';
-        mobileToggle.title = "Open menu";
-    }
-}
-
 /* ============ EVENT LISTENERS ============ */
 document.addEventListener('DOMContentLoaded', async function() {
     // Session check
@@ -2168,24 +2180,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('btnExportCSV').addEventListener('click', exportCSV_AllRows);
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
-        document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileSidebar);
         
         // Handle window resize
         let resizeTimeout;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                if (window.innerWidth > 768) {
-                    const sidebar = document.getElementById('sidebar');
-                    const mobileToggle = document.getElementById('mobileMenuToggle');
-                    
-                    sidebar.classList.remove('mobile-open');
-                    if (mobileToggle) {
-                        mobileToggle.querySelector('i').className = 'fas fa-bars';
-                        mobileToggle.title = "Open menu";
-                    }
-                }
-                
                 // Rebuild charts on resize for better fit
                 Object.keys(CH).forEach(key => {
                     if (CH[key] && CH[key].resize) {
@@ -2206,24 +2206,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 startAutoRefresh();
             } else {
                 stopAutoRefresh();
-            }
-        });
-        
-        // Close mobile sidebar on click outside
-        document.addEventListener('click', function(event) {
-            if (window.innerWidth <= 768) {
-                const sidebar = document.getElementById('sidebar');
-                const mobileToggle = document.getElementById('mobileMenuToggle');
-                
-                if (sidebar && mobileToggle && 
-                    !sidebar.contains(event.target) && 
-                    !mobileToggle.contains(event.target) && 
-                    sidebar.classList.contains('mobile-open')) {
-                    
-                    sidebar.classList.remove('mobile-open');
-                    mobileToggle.querySelector('i').className = 'fas fa-bars';
-                    mobileToggle.title = "Open menu";
-                }
             }
         });
         
