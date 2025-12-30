@@ -10,6 +10,59 @@
 <title>Dashboard — Purok Kaligtasan</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+   :root{
+    --bg:#f6f8f7;
+    --card-bg:#fff;
+    --muted:#6b6f6b;
+    --accent1:#0f7a4a;
+    --accent2:#34b78f;
+    --accent3: #ff7a00;
+    --accent4: #ffa500;
+    --light-green: #e9f7f2;
+    --border: #e1e8e5;
+    --shadow: 0 6px 18px rgba(6,30,20,0.06);
+    --shadow-dark: 0 6px 20px rgba(5,40,25,0.12);
+    --radius:12px;
+    --radius-sm:8px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+   }
+      /* Background decorative elements */
+   .bg-pattern {
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     overflow: hidden;
+     z-index: -1;
+   }
+   
+   .bg-circle {
+     position: absolute;
+     border-radius: 50%;
+     background: rgba(15, 122, 74, 0.05);
+   }
+   
+   .circle-1 {
+     width: 300px;
+     height: 300px;
+     top: -150px;
+     right: -150px;
+   }
+   
+   .circle-2 {
+     width: 200px;
+     height: 200px;
+     bottom: -100px;
+     left: -100px;
+     background: rgba(255, 122, 0, 0.05);
+   }
+   
+   .circle-3 {
+     width: 150px;
+     height: 150px;
+     top: 50%;
+     left: 10%;
+     background: rgba(52, 183, 143, 0.05);
+   }
 .admin-only {
     display: none !important;
 }
@@ -27,22 +80,6 @@ li.admin-only {
 li.admin-only.admin-visible {
     display: list-item !important;
 }
-   :root{
-    --bg:#f6f8f7;
-    --card-bg:#fff;
-    --muted:#6b6f6b;
-    --accent1:#0f7a4a;
-    --accent2:#34b78f;
-    --accent3: #ff7a00;
-    --accent4: #ffa500;
-    --light-green: #e9f7f2;
-    --border: #e1e8e5;
-    --shadow: 0 6px 18px rgba(6,30,20,0.06);
-    --shadow-dark: 0 6px 20px rgba(5,40,25,0.12);
-    --radius:12px;
-    --radius-sm:8px;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-   }
    body {
     background-color: var(--bg);
     margin: 0;
@@ -802,6 +839,12 @@ li.admin-only.admin-visible {
 </head>
 
 <body>
+<!-- Background pattern -->
+    <div class="bg-pattern">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+    </div>
 <div class="page-container">
 
   <header class="topbar">
@@ -809,7 +852,7 @@ li.admin-only.admin-visible {
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
       <div class="brand-text">
         <h1>PUROK KALIGTASAN</h1>
-        <p>DRRMO Alitagtag – Household Records System</p>
+        <p>DRRMO Alitagtag – Household Records System/p>
       </div>
     </div>
 
@@ -3385,4 +3428,3 @@ document.addEventListener('visibilitychange', function() {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
