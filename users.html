@@ -321,7 +321,7 @@ li.admin-only.admin-visible {
     height: 100%;
    }
 
-   .mobile-nav-item {
+.mobile-nav-item {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -334,28 +334,46 @@ li.admin-only.admin-visible {
     flex: 1 !important;
     height: 100% !important;
     justify-content: center !important;
-   }
+}
 
-   .mobile-nav-item.active {
-    color: var(--accent1);
-    background: var(--light-green);
-   }
+/* Admin items - initially hidden */
+.mobile-nav-item.admin-only {
+    display: none !important;
+}
 
-   .mobile-nav-icon {
-    font-size: 1.2rem;
-    margin-bottom: 4px;
+/* Show admin items when user is admin */
+.mobile-nav-item.admin-only.admin-visible {
+    display: flex !important;
+}
+
+/* Active state for all tabs */
+.mobile-nav-item.active {
+    color: var(--accent1) !important;
+    background: var(--light-green) !important;
+}
+
+/* Logout button styling */
+.mobile-nav-item.mobile-logout-item {
+    color: #e74c3c !important;
+    background: rgba(231, 76, 60, 0.1) !important;
+}
+
+/* Icon and text for all tabs */
+.mobile-nav-icon {
+    font-size: 1.2rem !important;
+    margin-bottom: 4px !important;
     display: block !important;
     text-align: center !important;
     width: 100% !important;
-   }
+}
 
-   .mobile-nav-text {
-    font-size: 0.7rem;
-    font-weight: 500;
+.mobile-nav-text {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
     display: block !important;
     text-align: center !important;
     width: 100% !important;
-   }
+}
 
    /* Mobile Logout Item */
    .mobile-logout-item {
@@ -2677,4 +2695,3 @@ window.addEventListener('pageshow', function(event) {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
