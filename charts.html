@@ -459,6 +459,16 @@ li.admin-only.admin-visible {
     margin: 10px 0;
    }
 
+   /* Special size for specific charts - SAME AS COMPARISON CHART */
+   .chart-card.full-size {
+    grid-column: 1 / -1;
+    min-height: 400px;
+   }
+   
+   .full-size .chart-container {
+    height: 320px;
+   }
+
    canvas {
     width: 100% !important;
     height: 100% !important;
@@ -754,6 +764,10 @@ li.admin-only.admin-visible {
         height: 220px;
     }
     
+    .full-size .chart-container {
+        height: 280px;
+    }
+    
     .comparison-chart .chart-container {
         height: 280px;
     }
@@ -831,7 +845,8 @@ li.admin-only.admin-visible {
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .comparison-chart {
+    .comparison-chart,
+    .chart-card.full-size {
         grid-column: 1 / -1;
     }
     
@@ -909,6 +924,10 @@ li.admin-only.admin-visible {
     
     .chart-container {
         height: 300px !important;
+    }
+    
+    .full-size .chart-container {
+        height: 400px !important;
     }
     
     .comparison-chart .chart-container {
@@ -1020,10 +1039,10 @@ li.admin-only.admin-visible {
 
     <!-- Charts Grid -->
     <div class="charts-grid" id="chartsContainer">
-      <!-- Chart 1: Entries per Barangay -->
-      <div class="chart-card">
+      <!-- Chart 1: Barangay Entries (FULL SIZE) -->
+      <div class="chart-card full-size">
         <div class="chart-header">
-          <h3 class="chart-title"><i class="fas fa-map-marker-alt"></i> Entries per Barangay</h3>
+          <h3 class="chart-title"><i class="fas fa-map-marker-alt"></i>Barangay Entries</h3>
           <div class="chart-stats">
             <span class="stat-badge" id="headsBarangay">Heads: 0</span>
             <span class="stat-badge" id="membersBarangay">Members: 0</span>
@@ -1065,39 +1084,29 @@ li.admin-only.admin-visible {
         </div>
       </div>
 
-      <!-- Chart 4: PWD Gauge -->
-      <div class="chart-card">
+      <!-- Chart 4: PWD Distribution (FULL SIZE) -->
+      <div class="chart-card full-size">
         <div class="chart-header">
           <h3 class="chart-title"><i class="fas fa-wheelchair"></i> PWD Distribution</h3>
           <div class="chart-stats">
-            <span class="stat-badge">Gauge View</span>
+            <span class="stat-badge" id="headsPWD">Heads: 0</span>
+            <span class="stat-badge" id="membersPWD">Members: 0</span>
             <span class="stat-badge" id="totalPWD">Total: 0</span>
           </div>
         </div>
-        <div class="pwd-gauge-container">
-          <div class="pwd-canvas-wrapper">
-            <canvas id="chartPWD"></canvas>
-          </div>
-          <div class="pwd-stats">
-            <div class="pwd-stat-item" id="pwdYesStat">
-              <div class="pwd-stat-value" id="pwdYesCount">0</div>
-              <div class="pwd-stat-label">PWD (Yes)</div>
-            </div>
-            <div class="pwd-stat-item" id="pwdNoStat">
-              <div class="pwd-stat-value" id="pwdNoCount">0</div>
-              <div class="pwd-stat-label">Non-PWD (No)</div>
-            </div>
-          </div>
+        <div class="chart-container">
+          <canvas id="chartPWD"></canvas>
         </div>
       </div>
 
-      <!-- Chart 5: Status Distribution -->
-      <div class="chart-card">
+      <!-- Chart 5: Status Distribution (FULL SIZE) -->
+      <div class="chart-card full-size">
         <div class="chart-header">
           <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Status Distribution</h3>
           <div class="chart-stats">
-            <span class="stat-badge" id="totalStatuses">Statuses: 0</span>
-            <span class="stat-badge" id="totalStatusCount">Total: 0</span>
+            <span class="stat-badge" id="headsStatus">Heads: 0</span>
+            <span class="stat-badge" id="membersStatus">Members: 0</span>
+            <span class="stat-badge" id="totalStatus">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -1105,13 +1114,14 @@ li.admin-only.admin-visible {
         </div>
       </div>
 
-      <!-- Chart 6: Government Support -->
-      <div class="chart-card">
+      <!-- Chart 6: Government Support (FULL SIZE) -->
+      <div class="chart-card full-size">
         <div class="chart-header">
           <h3 class="chart-title"><i class="fas fa-hand-holding-heart"></i> Government Support</h3>
           <div class="chart-stats">
-            <span class="stat-badge" id="totalSupport">Programs: 9</span>
-            <span class="stat-badge" id="totalSupportCount">Total: 0</span>
+            <span class="stat-badge" id="headsSupport">Heads: 0</span>
+            <span class="stat-badge" id="membersSupport">Members: 0</span>
+            <span class="stat-badge" id="totalSupport">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -1119,14 +1129,14 @@ li.admin-only.admin-visible {
         </div>
       </div>
 
-      <!-- NEW CHARTS -->
-
-      <!-- Chart 7: FishR/RBIS Registration -->
-      <div class="chart-card">
+      <!-- Chart 7: Registration Status (FULL SIZE) -->
+      <div class="chart-card full-size">
         <div class="chart-header">
           <h3 class="chart-title"><i class="fas fa-id-card"></i> Registration Status</h3>
           <div class="chart-stats">
-            <span class="stat-badge" id="totalRegistrations">Registrations: 0</span>
+            <span class="stat-badge" id="headsRegistration">Heads: 0</span>
+            <span class="stat-badge" id="membersRegistration">Members: 0</span>
+            <span class="stat-badge" id="totalRegistration">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -1199,8 +1209,8 @@ li.admin-only.admin-visible {
         </div>
       </div>
 
-      <!-- Chart 13: Comparison Chart -->
-      <div class="chart-card comparison-chart">
+      <!-- Chart 13: Comparison Chart (FULL SIZE) -->
+      <div class="chart-card comparison-chart full-size">
         <div class="chart-header">
           <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Barangay vs Status Comparison</h3>
           <div class="chart-stats">
@@ -1334,20 +1344,12 @@ function normalizeRow(r){
     const birthRaw = getField(r,"Birthdate") || getField(r,"Birth Date") || "";
     const birth = birthRaw ? String(birthRaw).trim() : "";
     
-    // CORRECTED: Determine if this is a head based on "Name of Household Member/s" field
+    // Determine if this is a head based on "Name of Household Member/s" field
     const memberName = String(getField(r, "Name of Household Member/s") || "").trim();
     let isHead = false;
     
     // Heads have an empty "Name of Household Member/s" field
     if (!memberName || memberName === "") {
-        isHead = true;
-    }
-    // Additionally, check if there's a "Name of Household Head" field that matches the name
-    const headName = String(getField(r, "Name of Household Head") || "").trim();
-    const personName = String(getField(r, "Name") || "").trim();
-    
-    // If this row has the same name as the household head, it's likely the head
-    if (headName && personName && headName === personName) {
         isHead = true;
     }
     
@@ -1453,7 +1455,7 @@ function handleLogout() {
 }
 
 /* ============ DATA FETCHING ============ */
-async function fetchRecords(){
+async function fetchChartData() {
     try {
         const url = API_URL + "?action=getRecords&t=" + Date.now();
         const controller = new AbortController();
@@ -1478,65 +1480,122 @@ async function fetchRecords(){
 }
 
 /* ============ CHART FUNCTIONS ============ */
-function createBarChart(id, labels, values, title, color) {
+function createBarChart(id, labels, values, title, color, isStacked = false, datasets = null) {
     const ctx = document.getElementById(id).getContext('2d');
     if (CH[id]) CH[id].destroy();
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, color.replace('0.8', '0.4'));
-
-    CH[id] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: title,
-                data: values,
-                backgroundColor: gradient,
-                borderColor: color,
-                borderWidth: 1,
-                borderRadius: 6,
-                borderSkipped: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                duration: 1000,
-                easing: 'easeOutQuart'
+    if (datasets) {
+        // Multiple datasets for stacked chart
+        CH[id] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
             },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleFont: { size: 12 },
-                    bodyFont: { size: 12 },
-                    padding: 10,
-                    cornerRadius: 6
-                }
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { 
-                        font: { size: 10 },
-                        maxRotation: 45,
-                        minRotation: 0
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { size: 11 },
+                            padding: 10
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 12 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 6,
+                        mode: isStacked ? 'index' : 'nearest'
                     }
                 },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                    ticks: { 
-                        font: { size: 10 },
-                        precision: 0
+                scales: {
+                    x: {
+                        stacked: isStacked,
+                        grid: { display: false },
+                        ticks: { 
+                            font: { size: 10 },
+                            maxRotation: 45,
+                            minRotation: 0
+                        }
+                    },
+                    y: {
+                        stacked: isStacked,
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: { 
+                            font: { size: 10 },
+                            precision: 0
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    } else {
+        // Single dataset
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, color.replace('0.8', '0.4'));
+
+        CH[id] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: title,
+                    data: values,
+                    backgroundColor: gradient,
+                    borderColor: color,
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 12 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 6
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { 
+                            font: { size: 10 },
+                            maxRotation: 45,
+                            minRotation: 0
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: { 
+                            font: { size: 10 },
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
 
 function createDoughnutChart(id, labels, values, title) {
@@ -1575,10 +1634,10 @@ function createDoughnutChart(id, labels, values, title) {
             },
             plugins: {
                 legend: {
-                    position: 'bottom',
+                    position: 'right',
                     labels: {
                         padding: 15,
-                        font: { size: 10 },
+                        font: { size: 11 },
                         usePointStyle: true
                     }
                 },
@@ -1590,81 +1649,9 @@ function createDoughnutChart(id, labels, values, title) {
                     cornerRadius: 6
                 }
             },
-            cutout: '65%'
+            cutout: '60%'
         }
     });
-}
-
-function createPWDGauge(id, yesCount, noCount) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if (CH[id]) CH[id].destroy();
-
-    const total = yesCount + noCount;
-    const percent = total === 0 ? 0 : Math.round((yesCount/total) * 100);
-    
-    // Update stat displays
-    document.getElementById('pwdYesCount').textContent = yesCount;
-    document.getElementById('pwdNoCount').textContent = noCount;
-    document.getElementById('totalPWD').textContent = `Total: ${total}`;
-
-    CH[id] = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [percent, 100 - percent],
-                backgroundColor: ['rgba(52, 183, 143, 0.9)', 'rgba(220, 220, 220, 0.3)'],
-                borderWidth: 0,
-                circumference: 270,
-                rotation: 225
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                duration: 1000,
-                easing: 'easeOutQuart'
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false }
-            },
-            cutout: '75%'
-        }
-    });
-
-    // Draw center text
-    setTimeout(() => {
-        try {
-            const c = document.getElementById(id);
-            const ctx2 = c.getContext('2d');
-            const centerX = c.width / 2;
-            const centerY = c.height / 2;
-            
-            ctx2.save();
-            ctx2.clearRect(0, 0, c.width, c.height);
-            
-            // Redraw chart first
-            CH[id].draw();
-            
-            ctx2.textAlign = 'center';
-            ctx2.textBaseline = 'middle';
-            
-            // Draw percentage
-            ctx2.font = 'bold 28px Inter, system-ui';
-            ctx2.fillStyle = '#0f7a4a';
-            ctx2.fillText(`${percent}%`, centerX, centerY - 10);
-            
-            // Draw label
-            ctx2.font = '12px Inter, system-ui';
-            ctx2.fillStyle = '#6b6f6b';
-            ctx2.fillText('PWD', centerX, centerY + 15);
-            
-            ctx2.restore();
-        } catch(e) {
-            console.warn('Could not draw gauge text:', e);
-        }
-    }, 100);
 }
 
 function createHorizontalBarChart(id, labels, values, title) {
@@ -1764,7 +1751,7 @@ function createComparisonChart(labels, datasets) {
                     position: 'bottom',
                     labels: {
                         padding: 15,
-                        font: { size: 10 },
+                        font: { size: 11 },
                         usePointStyle: true
                     }
                 },
@@ -1807,7 +1794,7 @@ async function buildCharts() {
     showLoading(true);
     
     try {
-        const rawRows = await fetchRecords();
+        const rawRows = await fetchChartData();
         const norm = rawRows.map(normalizeRow);
         
         // Calculate totals for heads and members
@@ -1823,9 +1810,8 @@ async function buildCharts() {
         const totalCombined = totalHeads + totalMembers;
 
         console.log("Total Heads:", totalHeads, "Total Members:", totalMembers, "Total Combined:", totalCombined);
-        console.log("Sample normalized rows:", norm.slice(0, 3));
 
-        // 1. Entries per Barangay (with head/member breakdown)
+        // 1. Entries per Barangay (with head/member breakdown) - FULL SIZE
         const barangayCounts = {};
         const barangayHeads = {};
         const barangayMembers = {};
@@ -1842,14 +1828,34 @@ async function buildCharts() {
         
         const brgEntries = Object.entries(barangayCounts).sort((a, b) => b[1] - a[1]);
         const brgLabels = brgEntries.map(e => e[0]);
-        const brgValues = brgEntries.map(e => e[1]);
+        const brgHeadsValues = brgLabels.map(b => barangayHeads[b] || 0);
+        const brgMembersValues = brgLabels.map(b => barangayMembers[b] || 0);
+        const brgTotalValues = brgLabels.map(b => barangayCounts[b] || 0);
         
-        // Update stats for barangay chart - Only Heads and Members
+        // Update stats for barangay chart
         document.getElementById('headsBarangay').textContent = `Heads: ${totalHeads}`;
         document.getElementById('membersBarangay').textContent = `Members: ${totalMembers}`;
         document.getElementById('totalBarangay').textContent = `Total: ${totalCombined}`;
         
-        createBarChart('chartBarangay', brgLabels, brgValues, 'Households', 'rgba(52, 183, 143, 0.8)');
+        // Create stacked bar chart for barangay
+        const barangayDatasets = [
+            {
+                label: 'Heads',
+                data: brgHeadsValues,
+                backgroundColor: 'rgba(52, 183, 143, 0.8)',
+                borderColor: 'rgba(52, 183, 143, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Members',
+                data: brgMembersValues,
+                backgroundColor: 'rgba(70, 140, 240, 0.8)',
+                borderColor: 'rgba(70, 140, 240, 1)',
+                borderWidth: 1
+            }
+        ];
+        
+        createBarChart('chartBarangay', brgLabels, null, 'Households', null, true, barangayDatasets);
 
         // 2. Age Groups (with head/member breakdown)
         const ageBuckets = {
@@ -1881,10 +1887,7 @@ async function buildCharts() {
             ageMembersTotal += group.members;
         });
         
-        // Verify totals match
-        console.log("Age Heads Total:", ageHeadsTotal, "Age Members Total:", ageMembersTotal, "Should equal:", totalHeads, totalMembers);
-        
-        // Use the actual calculated totals
+        // Update stats
         document.getElementById('headsAge').textContent = `Heads: ${ageHeadsTotal}`;
         document.getElementById('membersAge').textContent = `Members: ${ageMembersTotal}`;
         document.getElementById('totalAge').textContent = `Total: ${totalCombined}`;
@@ -1916,58 +1919,187 @@ async function buildCharts() {
         Object.values(stageHeads).forEach(count => stageHeadsTotal += count);
         Object.values(stageMembers).forEach(count => stageMembersTotal += count);
         
-        console.log("Stage Heads Total:", stageHeadsTotal, "Stage Members Total:", stageMembersTotal);
-        
-        // Use the actual calculated totals
+        // Update stats
         document.getElementById('headsStage').textContent = `Heads: ${stageHeadsTotal}`;
         document.getElementById('membersStage').textContent = `Members: ${stageMembersTotal}`;
         document.getElementById('totalStage').textContent = `Total: ${totalCombined}`;
         
         createDoughnutChart('chartStage', stageLabels, stageValues, 'Stage Distribution');
 
-        // 4. PWD Distribution
-        let yesPWD = 0, noPWD = 0;
+        // 4. PWD Distribution - FULL SIZE
+        let pwdHeadsYes = 0, pwdHeadsNo = 0;
+        let pwdMembersYes = 0, pwdMembersNo = 0;
+        
         norm.forEach(n => {
-            if (String(n.pwd).toLowerCase() === 'yes') yesPWD++;
-            else noPWD++;
+            const isPWD = String(n.pwd).toLowerCase() === 'yes';
+            if (n.isHead) {
+                if (isPWD) pwdHeadsYes++;
+                else pwdHeadsNo++;
+            } else {
+                if (isPWD) pwdMembersYes++;
+                else pwdMembersNo++;
+            }
         });
-        createPWDGauge('chartPWD', yesPWD, noPWD);
+        
+        const pwdTotalYes = pwdHeadsYes + pwdMembersYes;
+        const pwdTotalNo = pwdHeadsNo + pwdMembersNo;
+        
+        // Update stats
+        document.getElementById('headsPWD').textContent = `Heads: ${pwdHeadsYes + pwdHeadsNo}`;
+        document.getElementById('membersPWD').textContent = `Members: ${pwdMembersYes + pwdMembersNo}`;
+        document.getElementById('totalPWD').textContent = `Total: ${totalCombined}`;
+        
+        // Create PWD chart as stacked bar
+        const pwdLabels = ['PWD Distribution'];
+        const pwdDatasets = [
+            {
+                label: 'Heads - PWD',
+                data: [pwdHeadsYes],
+                backgroundColor: 'rgba(52, 183, 143, 0.8)',
+                borderColor: 'rgba(52, 183, 143, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Heads - Non-PWD',
+                data: [pwdHeadsNo],
+                backgroundColor: 'rgba(52, 183, 143, 0.4)',
+                borderColor: 'rgba(52, 183, 143, 0.7)',
+                borderWidth: 1
+            },
+            {
+                label: 'Members - PWD',
+                data: [pwdMembersYes],
+                backgroundColor: 'rgba(70, 140, 240, 0.8)',
+                borderColor: 'rgba(70, 140, 240, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Members - Non-PWD',
+                data: [pwdMembersNo],
+                backgroundColor: 'rgba(70, 140, 240, 0.4)',
+                borderColor: 'rgba(70, 140, 240, 0.7)',
+                borderWidth: 1
+            }
+        ];
+        
+        createBarChart('chartPWD', pwdLabels, null, 'PWD Status', null, true, pwdDatasets);
 
-        // 5. Status Distribution
+        // 5. Status Distribution - FULL SIZE
         const statusCounts = {};
-        norm.forEach(n => statusCounts[n.status] = (statusCounts[n.status] || 0) + 1);
+        const statusHeads = {};
+        const statusMembers = {};
+        
+        norm.forEach(n => {
+            const status = n.status;
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+            if (n.isHead) {
+                statusHeads[status] = (statusHeads[status] || 0) + 1;
+            } else {
+                statusMembers[status] = (statusMembers[status] || 0) + 1;
+            }
+        });
+        
         const statusEntries = Object.entries(statusCounts).sort((a, b) => b[1] - a[1]);
         const statusLabels = statusEntries.map(e => e[0]);
-        const statusValues = statusEntries.map(e => e[1]);
-        document.getElementById('totalStatuses').textContent = `Statuses: ${statusLabels.length}`;
-        document.getElementById('totalStatusCount').textContent = `Total: ${totalCombined}`;
-        createDoughnutChart('chartStatus', statusLabels, statusValues, 'Status Distribution');
+        const statusHeadsValues = statusLabels.map(s => statusHeads[s] || 0);
+        const statusMembersValues = statusLabels.map(s => statusMembers[s] || 0);
+        const statusTotalValues = statusLabels.map(s => statusCounts[s] || 0);
+        
+        // Update stats
+        document.getElementById('headsStatus').textContent = `Heads: ${totalHeads}`;
+        document.getElementById('membersStatus').textContent = `Members: ${totalMembers}`;
+        document.getElementById('totalStatus').textContent = `Total: ${totalCombined}`;
+        
+        // Create stacked bar chart for status
+        const statusDatasets = [
+            {
+                label: 'Heads',
+                data: statusHeadsValues,
+                backgroundColor: 'rgba(52, 183, 143, 0.8)',
+                borderColor: 'rgba(52, 183, 143, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Members',
+                data: statusMembersValues,
+                backgroundColor: 'rgba(70, 140, 240, 0.8)',
+                borderColor: 'rgba(70, 140, 240, 1)',
+                borderWidth: 1
+            }
+        ];
+        
+        createBarChart('chartStatus', statusLabels, null, 'Status Distribution', null, true, statusDatasets);
 
-        // 6. Government Support
+        // 6. Government Support - FULL SIZE
         const supportKeys = [
             "TUPAD", "Local 4Ps", "National 4Ps", "Local Social Pension",
             "National Social Pension", "Solo Parent Assistance", "Cash Subsidy",
             "Relief Goods", "AICS"
         ];
-        const supportCounts = {};
-        supportKeys.forEach(k => supportCounts[k] = 0);
+        
+        const supportHeads = {};
+        const supportMembers = {};
+        supportKeys.forEach(k => {
+            supportHeads[k] = 0;
+            supportMembers[k] = 0;
+        });
+        
         norm.forEach(n => {
             supportKeys.forEach(k => {
                 const v = n.assist && n.assist[k] ? String(n.assist[k]).trim().toLowerCase() : "";
                 if (k === 'AICS') {
-                    if (v) supportCounts[k]++;
+                    if (v) {
+                        if (n.isHead) supportHeads[k]++;
+                        else supportMembers[k]++;
+                    }
                 } else {
-                    if (v === 'yes' || v === 'y' || v === 'true') supportCounts[k]++;
+                    if (v === 'yes' || v === 'y' || v === 'true') {
+                        if (n.isHead) supportHeads[k]++;
+                        else supportMembers[k]++;
+                    }
                 }
             });
         });
-        const supportLabels = Object.keys(supportCounts);
-        const supportValues = Object.values(supportCounts);
-        document.getElementById('totalSupportCount').textContent = `Total: ${totalCombined}`;
-        createHorizontalBarChart('chartSupport', supportLabels, supportValues, 'Recipients');
+        
+        const supportLabels = supportKeys;
+        const supportHeadsValues = supportLabels.map(k => supportHeads[k]);
+        const supportMembersValues = supportLabels.map(k => supportMembers[k]);
+        const supportTotalValues = supportLabels.map(k => supportHeads[k] + supportMembers[k]);
+        
+        // Update stats
+        document.getElementById('headsSupport').textContent = `Heads: ${totalHeads}`;
+        document.getElementById('membersSupport').textContent = `Members: ${totalMembers}`;
+        document.getElementById('totalSupport').textContent = `Total: ${totalCombined}`;
+        
+        // Create stacked bar chart for government support
+        const supportDatasets = [
+            {
+                label: 'Heads',
+                data: supportHeadsValues,
+                backgroundColor: 'rgba(52, 183, 143, 0.8)',
+                borderColor: 'rgba(52, 183, 143, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Members',
+                data: supportMembersValues,
+                backgroundColor: 'rgba(70, 140, 240, 0.8)',
+                borderColor: 'rgba(70, 140, 240, 1)',
+                borderWidth: 1
+            }
+        ];
+        
+        createBarChart('chartSupport', supportLabels, null, 'Government Support', null, true, supportDatasets);
 
-        // 7. Registration Status (FishR & RBIS)
-        const registrationCounts = {
+        // 7. Registration Status - FULL SIZE
+        const registrationHeads = {
+            "FishR Registered": 0,
+            "RBIS Registered": 0,
+            "Both Registered": 0,
+            "Non Registered": 0
+        };
+        
+        const registrationMembers = {
             "FishR Registered": 0,
             "RBIS Registered": 0,
             "Both Registered": 0,
@@ -1978,21 +2110,51 @@ async function buildCharts() {
             const hasFishR = n.fishR && (n.fishR.toLowerCase() === 'yes' || n.fishR.toLowerCase() === 'y' || n.fishR === 'true');
             const hasRBIS = n.rbis && (n.rbis.toLowerCase() === 'yes' || n.rbis.toLowerCase() === 'y' || n.rbis === 'true');
             
+            let regType = "Non Registered";
             if (hasFishR && hasRBIS) {
-                registrationCounts["Both Registered"]++;
+                regType = "Both Registered";
             } else if (hasFishR) {
-                registrationCounts["FishR Registered"]++;
+                regType = "FishR Registered";
             } else if (hasRBIS) {
-                registrationCounts["RBIS Registered"]++;
+                regType = "RBIS Registered";
+            }
+            
+            if (n.isHead) {
+                registrationHeads[regType]++;
             } else {
-                registrationCounts["Non Registered"]++;
+                registrationMembers[regType]++;
             }
         });
         
-        const registrationLabels = Object.keys(registrationCounts);
-        const registrationValues = Object.values(registrationCounts);
-        document.getElementById('totalRegistrations').textContent = `Registrations: ${norm.length}`;
-        createDoughnutChart('chartRegistration', registrationLabels, registrationValues, 'Registration Status');
+        const registrationLabels = Object.keys(registrationHeads);
+        const registrationHeadsValues = registrationLabels.map(k => registrationHeads[k]);
+        const registrationMembersValues = registrationLabels.map(k => registrationMembers[k]);
+        const registrationTotalValues = registrationLabels.map(k => registrationHeads[k] + registrationMembers[k]);
+        
+        // Update stats
+        document.getElementById('headsRegistration').textContent = `Heads: ${totalHeads}`;
+        document.getElementById('membersRegistration').textContent = `Members: ${totalMembers}`;
+        document.getElementById('totalRegistration').textContent = `Total: ${totalCombined}`;
+        
+        // Create stacked bar chart for registration
+        const registrationDatasets = [
+            {
+                label: 'Heads',
+                data: registrationHeadsValues,
+                backgroundColor: 'rgba(52, 183, 143, 0.8)',
+                borderColor: 'rgba(52, 183, 143, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Members',
+                data: registrationMembersValues,
+                backgroundColor: 'rgba(70, 140, 240, 0.8)',
+                borderColor: 'rgba(70, 140, 240, 1)',
+                borderWidth: 1
+            }
+        ];
+        
+        createBarChart('chartRegistration', registrationLabels, null, 'Registration Status', null, true, registrationDatasets);
 
         // 8. Domestic Livestock
         const livestockCounts = {};
@@ -2072,7 +2234,7 @@ async function buildCharts() {
         document.getElementById('totalEmployment').textContent = `Statuses: ${employmentLabels.length}`;
         createDoughnutChart('chartEmployment', employmentLabels, employmentValues, 'Employment Status');
 
-        // 13. Comparison Chart
+        // 13. Comparison Chart - FULL SIZE
         const comparisonMatrix = {};
         const statusSet = new Set();
         norm.forEach(n => {
@@ -2108,6 +2270,9 @@ async function buildCharts() {
 /* ============ EXPORT FUNCTIONS ============ */
 async function exportToPDF() {
     try {
+        // Close export dropdown after selection
+        document.getElementById('exportDropdown').classList.remove('show');
+        
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('landscape', 'mm', 'a4');
         
@@ -2167,6 +2332,9 @@ async function exportToPDF() {
 
 async function exportPNGsZip() {
     try {
+        // Close export dropdown after selection
+        document.getElementById('exportDropdown').classList.remove('show');
+        
         const zip = new JSZip();
         const chartIds = [
             'chartBarangay', 'chartAgeGroup', 'chartStage',
@@ -2207,7 +2375,10 @@ async function exportPNGsZip() {
 
 async function exportCSV_AllRows() {
     try {
-        const raw = await fetchRecords();
+        // Close export dropdown after selection
+        document.getElementById('exportDropdown').classList.remove('show');
+        
+        const raw = await fetchChartData();
         if(!Array.isArray(raw) || raw.length === 0){
             showError("No data to export");
             return;
@@ -2307,7 +2478,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             window.print();
         });
         
-        // Export dropdown functionality (similar to records.html)
+        // Export dropdown functionality - FIXED: Close after selection
         const exportBtn = document.getElementById('exportBtn');
         const exportDropdown = document.getElementById('exportDropdown');
         
@@ -2323,12 +2494,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                     exportDropdown.classList.remove('show');
                 }
             });
+            
+            // Close dropdown when clicking on export options (they already call functions that close it)
         }
         
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
-        
-        // REMOVED: Mobile logout button event listeners
         
         // Handle window resize
         let resizeTimeout;
