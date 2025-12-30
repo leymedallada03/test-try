@@ -1276,26 +1276,21 @@ function normalizeRow(r){
     const birthRaw = getField(r,"Birthdate") || getField(r,"Birth Date") || "";
     const birth = birthRaw ? String(birthRaw).trim() : "";
     
-    // FIXED: Better relationship detection - check if it's explicitly "Head"
-    const relationshipRaw = String(getField(r, "Relationship to Head") || getField(r, "Relationship") || "").toLowerCase().trim();
+    // CORRECTED: Determine if this is a head based on "Name of Household Member/s" field
+    const memberName = String(getField(r, "Name of Household Member/s") || "").trim();
     let isHead = false;
     
-    // Check for various ways "head" might be represented - exact match only
-    if (relationshipRaw === "head" || 
-        relationshipRaw === "household head" ||
-        relationshipRaw === "householdhead" ||
-        relationshipRaw === "h/h head" ||
-        relationshipRaw === "h/hhead" ||
-        relationshipRaw === "self" || // Sometimes heads are marked as "self"
-        relationshipRaw === "myself") {
+    // Heads have an empty "Name of Household Member/s" field
+    if (!memberName || memberName === "") {
         isHead = true;
     }
-    // If relationship field is empty or missing, check if there's a "Household Head" field
-    if (!relationshipRaw || relationshipRaw === "") {
-        const headField = String(getField(r, "Household Head") || "").toLowerCase().trim();
-        if (headField === "yes" || headField === "y" || headField === "true") {
-            isHead = true;
-        }
+    // Additionally, check if there's a "Name of Household Head" field that matches the name
+    const headName = String(getField(r, "Name of Household Head") || "").trim();
+    const personName = String(getField(r, "Name") || "").trim();
+    
+    // If this row has the same name as the household head, it's likely the head
+    if (headName && personName && headName === personName) {
+        isHead = true;
     }
     
     // New fields
@@ -2351,3 +2346,4 @@ window.addEventListener('beforeunload', function() {
 </script>
 </body>
 </html>
+
