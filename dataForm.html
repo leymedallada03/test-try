@@ -467,6 +467,124 @@ li.admin-only.admin-visible {
      border-top: 1px solid var(--border);
    }
    
+   /* ============ MOBILE BOTTOM NAVIGATION STYLES FROM MAIN.HTML ============ */
+   /* Mobile Bottom Navigation - Fixed Position */
+   .mobile-bottom-nav {
+     display: none;
+     position: fixed;
+     bottom: 0;
+     left: 0;
+     right: 0;
+     background: white;
+     border-top: 1px solid var(--border);
+     z-index: 1000;
+     padding: 8px 0;
+     box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+     height: 70px;
+     box-sizing: border-box;
+     overflow: hidden;
+   }
+   
+   .mobile-nav-items {
+     display: flex;
+     justify-content: space-around;
+     align-items: center;
+     height: 100%;
+   }
+   
+   .mobile-nav-item {
+     display: flex !important;
+     flex-direction: column !important;
+     align-items: center !important;
+     text-decoration: none !important;
+     color: var(--muted) !important;
+     padding: 8px 12px !important;
+     border-radius: var(--radius-sm) !important;
+     transition: all 0.3s ease !important;
+     min-width: 60px !important;
+     flex: 1 !important;
+     height: 100% !important;
+     justify-content: center !important;
+   }
+   
+   /* Admin items - initially hidden */
+   .mobile-nav-item.admin-only {
+     display: none !important;
+   }
+   
+   /* Show admin items when user is admin */
+   .mobile-nav-item.admin-only.admin-visible {
+     display: flex !important;
+   }
+   
+   /* Active state for all tabs */
+   .mobile-nav-item.active {
+     color: var(--accent1) !important;
+     background: var(--light-green) !important;
+   }
+   
+   /* Icon and text for all tabs */
+   .mobile-nav-icon {
+     font-size: 1.2rem !important;
+     margin-bottom: 4px !important;
+     display: block !important;
+     text-align: center !important;
+     width: 100% !important;
+   }
+   
+   .mobile-nav-text {
+     font-size: 0.7rem !important;
+     font-weight: 500 !important;
+     display: block !important;
+     text-align: center !important;
+     width: 100% !important;
+   }
+   
+   /* Mobile Styles */
+   @media (max-width: 768px) {
+     /* Apply bottom padding for mobile nav */
+     body {
+         padding-bottom: 70px; /* Space for fixed bottom nav */
+     }
+     
+     .page-container {
+         grid-template-columns: 1fr !important;
+         padding: 8px;
+         gap: 12px;
+         margin-bottom: 0; /* Remove margin since we have body padding */
+     }
+     
+     .page-container.collapsed {
+         grid-template-columns: 1fr !important;
+     }
+     
+     .sidebar {
+         display: none !important; /* Hide sidebar on mobile */
+     }
+     
+     .mobile-bottom-nav {
+         display: flex !important; /* Show bottom nav on mobile */
+         flex-direction: column;
+     }
+     
+     /* Remove mobile menu toggle button */
+     .mobile-menu-toggle {
+         display: none !important;
+     }
+     
+     .content-area {
+         height: auto;
+         min-height: auto;
+         padding: 20px;
+         margin-bottom: 0;
+     }
+     
+     /* Adjust content area for bottom nav */
+     .content-area {
+         margin-bottom: 70px;
+     }
+   }
+   
    /* ORIGINAL DATAFORM STYLES CONTINUE BELOW */
    /* Background decorative elements */
    .bg-pattern {
@@ -1596,19 +1714,7 @@ textarea.validation-error:focus {
      }
      
      .mobile-menu-toggle {
-         display: flex !important;
-         background: linear-gradient(135deg, var(--accent1), var(--accent2));
-         color: white;
-         border: none;
-         border-radius: var(--radius-sm);
-         width: 36px;
-         height: 36px;
-         align-items: center;
-         justify-content: center;
-         cursor: pointer;
-         font-size: 1rem;
-         -webkit-tap-highlight-color: transparent;
-         touch-action: manipulation;
+         display: none !important; /* Hide mobile menu toggle since we have bottom nav */
      }
      
      .content-area {
@@ -2621,6 +2727,32 @@ textarea.validation-error:focus {
     </form>
   </main>
 </div>
+
+<!-- ============ ADDED: MOBILE BOTTOM NAVIGATION FROM MAIN.HTML ============ -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <div class="mobile-nav-items">
+    <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
+      <span class="mobile-nav-icon">📊</span>
+      <span class="mobile-nav-text">Dashboard</span>
+    </a>
+    <a href="dataForm.html" class="mobile-nav-item active" title="Data Entry">
+      <span class="mobile-nav-icon">📝</span>
+      <span class="mobile-nav-text">Data Entry</span>
+    </a>
+    <a href="records.html" class="mobile-nav-item" title="Records">
+      <span class="mobile-nav-icon">📁</span>
+      <span class="mobile-nav-text">Records</span>
+    </a>
+    <a href="charts.html" class="mobile-nav-item" title="Charts">
+      <span class="mobile-nav-icon">📈</span>
+      <span class="mobile-nav-text">Charts</span>
+    </a>
+    <a href="users.html" class="mobile-nav-item admin-only" title="Users" id="mobileUsersNav">
+      <span class="mobile-nav-icon">👥</span>
+      <span class="mobile-nav-text">Users</span>
+    </a>
+  </div>
+</nav>
 
 <!-- Loading overlay -->
 <div class="loading-overlay" id="loadingOverlay">
