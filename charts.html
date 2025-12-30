@@ -236,34 +236,9 @@ li.admin-only.admin-visible {
     overflow: hidden;
    }
 
-   /* Mobile Logout Button in Sidebar */
+   /* REMOVED: Mobile Logout Button in Sidebar */
    .mobile-logout-container {
-    display: none;
-    margin-top: auto;
-    padding: 12px;
-    border-top: 1px solid var(--border);
-   }
-
-   .mobile-logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    text-decoration: none;
-    color: #e74c3c;
-    border-radius: var(--radius-sm);
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 0.9rem;
-    background: rgba(231, 76, 60, 0.1);
-    border: 1px solid rgba(231, 76, 60, 0.2);
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-   }
-
-   .mobile-logout-btn:hover {
-    background: rgba(231, 76, 60, 0.2);
+    display: none !important; /* Remove logout button from sidebar */
    }
 
    /* Content Area */
@@ -297,7 +272,7 @@ li.admin-only.admin-visible {
     gap: 8px;
    }
 
-   /* Toolbar */
+   /* Toolbar - UPDATED for right alignment */
    .toolbar {
     display: flex;
     justify-content: space-between;
@@ -313,6 +288,15 @@ li.admin-only.admin-visible {
     display: flex;
     gap: 12px;
     align-items: center;
+   }
+
+   /* RIGHT-ALIGNED BUTTONS GROUP */
+   .toolbar-right {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-left: auto; /* Push to the right */
+    justify-content: flex-end; /* Ensure alignment to right */
    }
 
    .btn {
@@ -615,7 +599,7 @@ li.admin-only.admin-visible {
     display: block;
    }
 
-   /* Mobile Bottom Navigation - Fixed Position - UPDATED to match users.html */
+   /* Mobile Bottom Navigation - Fixed Position - UPDATED: REMOVED LOGOUT */
    .mobile-bottom-nav {
     display: none;
     position: fixed;
@@ -670,11 +654,7 @@ li.admin-only.admin-visible {
     background: var(--light-green) !important;
 }
 
-/* Logout button styling */
-.mobile-nav-item.mobile-logout-item {
-    color: #e74c3c !important;
-    background: rgba(231, 76, 60, 0.1) !important;
-}
+/* REMOVED: Logout button styling - no longer needed */
 
 /* Icon and text for all tabs */
 .mobile-nav-icon {
@@ -692,13 +672,8 @@ li.admin-only.admin-visible {
     text-align: center !important;
     width: 100% !important;
 }
-   /* Mobile Logout Item */
-   .mobile-logout-item {
-    color: #e74c3c !important;
-    background: rgba(231, 76, 60, 0.1) !important;
-   }
 
-   /* Mobile Styles - UPDATED to match users.html */
+   /* Mobile Styles - UPDATED for linear and centered buttons */
    @media (max-width: 768px) {
     body {
         padding-bottom: 70px; /* Space for fixed bottom nav */
@@ -731,7 +706,7 @@ li.admin-only.admin-visible {
     
     /* Show mobile logout button in sidebar when sidebar is forced to show */
     .mobile-logout-container {
-        display: block;
+        display: none !important; /* REMOVED: Hide logout in sidebar */
     }
     
     .content-area {
@@ -741,15 +716,38 @@ li.admin-only.admin-visible {
         margin-bottom: 0;
     }
     
+    /* UPDATED: Toolbar for mobile - linear and centered */
     .toolbar {
         flex-direction: column;
         align-items: stretch;
         padding: 10px;
+        gap: 15px;
     }
     
     .toolbar-left {
-        flex-direction: column;
+        flex-direction: row;
         width: 100%;
+        justify-content: center; /* Center the left button */
+    }
+    
+    /* UPDATED: Right-aligned buttons become linear and centered on mobile */
+    .toolbar-right {
+        display: flex !important;
+        flex-direction: row;
+        width: 100%;
+        justify-content: center; /* Center the buttons */
+        margin-left: 0; /* Remove right alignment */
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    /* UPDATED: Ensure buttons are properly sized on mobile */
+    .toolbar-right .btn {
+        flex: 1; /* Make buttons take equal space */
+        min-width: 100px; /* Minimum width */
+        max-width: 120px; /* Maximum width */
+        justify-content: center;
+        text-align: center;
     }
     
     .charts-grid {
@@ -811,13 +809,17 @@ li.admin-only.admin-visible {
     
     /* Export dropdown positioning for mobile */
     .export-wrapper {
-        width: 100%;
+        width: auto;
+        flex: 1;
+        min-width: 100px;
+        max-width: 120px;
     }
     
     .export-dropdown {
-        left: 0;
+        left: 50%;
         right: auto;
-        width: 100%;
+        transform: translateX(-50%);
+        width: 140px;
     }
    }
 
@@ -979,13 +981,7 @@ li.admin-only.admin-visible {
         <li class="admin-only"><a href="users.html" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
       </ul>
       
-      <!-- Mobile Logout Button in Sidebar -->
-      <div class="mobile-logout-container">
-        <button class="mobile-logout-btn" id="mobileLogoutBtn">
-          <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
-          <span class="menu-text">Logout</span>
-        </button>
-      </div>
+      <!-- REMOVED: Mobile Logout Button in Sidebar -->
     </div>
   </aside>
 
@@ -1008,7 +1004,7 @@ li.admin-only.admin-visible {
         </button>
       </div>
       
-      <div class="toolbar-right" style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <div class="toolbar-right">
         <button id="btnPrint" class="btn btn-print">
           <i class="fas fa-print"></i> Print
         </button>
@@ -1230,7 +1226,7 @@ li.admin-only.admin-visible {
   </main>
 </div>
 
-<!-- Mobile Bottom Navigation - Fixed - UPDATED to match users.html structure -->
+<!-- Mobile Bottom Navigation - Fixed - REMOVED LOGOUT BUTTON -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
   <div class="mobile-nav-items">
     <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
@@ -1253,11 +1249,7 @@ li.admin-only.admin-visible {
       <span class="mobile-nav-icon">👥</span>
       <span class="mobile-nav-text">Users</span>
     </a>
-    <!-- Logout button in mobile nav -->
-    <a href="#" class="mobile-nav-item mobile-logout-item" id="mobileNavLogoutBtn" title="Logout">
-      <span class="mobile-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
-      <span class="mobile-nav-text">Logout</span>
-    </a>
+    <!-- REMOVED: Logout button in mobile nav -->
   </div>
 </nav>
 
@@ -2347,12 +2339,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
         
-        // Mobile logout buttons
-        document.getElementById('mobileLogoutBtn')?.addEventListener('click', handleLogout);
-        document.getElementById('mobileNavLogoutBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleLogout();
-        });
+        // REMOVED: Mobile logout button event listeners
         
         // Handle window resize
         let resizeTimeout;
