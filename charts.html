@@ -345,20 +345,61 @@ li.admin-only.admin-visible {
     background: linear-gradient(90deg, var(--accent1), var(--accent2));
    }
 
-   .btn-pdf {
-    background: linear-gradient(90deg, #1a73e8, #4285f4);
+   .btn-export {
+    background: linear-gradient(90deg, var(--accent3), var(--accent4));
    }
 
-   .btn-png {
-    background: linear-gradient(90deg, #ea4335, #fbbc05);
-   }
-
-   .btn-csv {
-    background: linear-gradient(90deg, #34a853, #0f9d58);
+   .btn-export:hover {
+    box-shadow: 0 4px 8px rgba(255,122,0,0.2);
    }
 
    .btn-refresh {
     background: linear-gradient(90deg, #6c757d, #adb5bd);
+   }
+
+   /* Export dropdown - From records.html */
+   .export-wrapper {
+    position: relative;
+   }
+
+   .export-dropdown {
+    font-size: 0.8rem;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    width: 140px;
+    box-shadow: var(--shadow);
+    z-index: 9999;
+    overflow: hidden;
+    display: none;
+   }
+
+   .export-dropdown.show {
+    display: block;
+   }
+
+   .export-dropdown div {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+   }
+
+   .export-dropdown div:hover {
+    background: #e9fff0;
+    color: var(--accent1);
+   }
+
+   .export-dropdown div i {
+    width: 14px;
+    text-align: center;
+    font-size: 0.85rem;
    }
 
    /* Charts Grid - Redesigned */
@@ -774,6 +815,17 @@ li.admin-only.admin-visible {
     .content-area {
         margin-bottom: 70px;
     }
+    
+    /* Export dropdown positioning for mobile */
+    .export-wrapper {
+        width: 100%;
+    }
+    
+    .export-dropdown {
+        left: 0;
+        right: auto;
+        width: 100%;
+    }
    }
 
    /* Tablet Styles */
@@ -967,15 +1019,24 @@ li.admin-only.admin-visible {
         <button id="btnPrint" class="btn btn-print">
           <i class="fas fa-print"></i> Print
         </button>
-        <button id="btnExportPDF" class="btn btn-pdf">
-          <i class="fas fa-file-pdf"></i> Export PDF
-        </button>
-        <button id="btnExportPNGs" class="btn btn-png">
-          <i class="fas fa-file-image"></i> Export PNGs
-        </button>
-        <button id="btnExportCSV" class="btn btn-csv">
-          <i class="fas fa-file-csv"></i> Export CSV
-        </button>
+        
+        <!-- Export Dropdown Button (Similar to records.html) -->
+        <div class="export-wrapper">
+          <button id="exportBtn" class="btn btn-export">
+            <i class="fas fa-file-export"></i> Export
+          </button>
+          <div id="exportDropdown" class="export-dropdown" role="menu" aria-hidden="true">
+            <div onclick="exportToPDF()">
+              <i class="fas fa-file-pdf"></i> PDF
+            </div>
+            <div onclick="exportPNGsZip()">
+              <i class="fas fa-file-image"></i> PNGs
+            </div>
+            <div onclick="exportCSV_AllRows()">
+              <i class="fas fa-file-csv"></i> CSV
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2272,9 +2333,24 @@ document.addEventListener('DOMContentLoaded', async function() {
             window.print();
         });
         
-        document.getElementById('btnExportPDF').addEventListener('click', exportToPDF);
-        document.getElementById('btnExportPNGs').addEventListener('click', exportPNGsZip);
-        document.getElementById('btnExportCSV').addEventListener('click', exportCSV_AllRows);
+        // Export dropdown functionality (similar to records.html)
+        const exportBtn = document.getElementById('exportBtn');
+        const exportDropdown = document.getElementById('exportDropdown');
+        
+        if (exportBtn && exportDropdown) {
+            exportBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                exportDropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!exportBtn.contains(e.target) && !exportDropdown.contains(e.target)) {
+                    exportDropdown.classList.remove('show');
+                }
+            });
+        }
+        
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
         
