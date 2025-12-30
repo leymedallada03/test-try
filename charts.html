@@ -236,6 +236,36 @@ li.admin-only.admin-visible {
     overflow: hidden;
    }
 
+   /* Mobile Logout Button in Sidebar */
+   .mobile-logout-container {
+    display: none;
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+   }
+
+   .mobile-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: #e74c3c;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.2);
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+   }
+
+   .mobile-logout-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+   }
+
    /* Content Area */
    .content-area{
     background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
@@ -605,6 +635,12 @@ li.admin-only.admin-visible {
     font-weight: 500;
    }
 
+   /* Mobile Logout Item */
+   .mobile-logout-item {
+    color: #e74c3c !important;
+    background: rgba(231, 76, 60, 0.1) !important;
+   }
+
    /* Mobile Styles */
    @media (max-width: 768px) {
     body {
@@ -634,6 +670,11 @@ li.admin-only.admin-visible {
     /* Remove mobile menu toggle button */
     .mobile-menu-toggle {
         display: none !important;
+    }
+    
+    /* Show mobile logout button in sidebar when sidebar is forced to show */
+    .mobile-logout-container {
+        display: block;
     }
     
     .content-area {
@@ -869,6 +910,14 @@ li.admin-only.admin-visible {
         <li><a href="charts.html" class="active" title="Charts"><span class="menu-icon">📈</span> <span class="menu-text">Charts & Analytics</span></a></li>
         <li class="admin-only"><a href="users.html" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
       </ul>
+      
+      <!-- Mobile Logout Button in Sidebar -->
+      <div class="mobile-logout-container">
+        <button class="mobile-logout-btn" id="mobileLogoutBtn">
+          <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
+          <span class="menu-text">Logout</span>
+        </button>
+      </div>
     </div>
   </aside>
 
@@ -916,6 +965,7 @@ li.admin-only.admin-visible {
           <div class="chart-stats">
             <span class="stat-badge" id="headsBarangay">Heads: 0</span>
             <span class="stat-badge" id="membersBarangay">Members: 0</span>
+            <span class="stat-badge" id="totalBarangay">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -930,6 +980,7 @@ li.admin-only.admin-visible {
           <div class="chart-stats">
             <span class="stat-badge" id="headsAge">Heads: 0</span>
             <span class="stat-badge" id="membersAge">Members: 0</span>
+            <span class="stat-badge" id="totalAge">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -944,6 +995,7 @@ li.admin-only.admin-visible {
           <div class="chart-stats">
             <span class="stat-badge" id="headsStage">Heads: 0</span>
             <span class="stat-badge" id="membersStage">Members: 0</span>
+            <span class="stat-badge" id="totalStage">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -957,6 +1009,7 @@ li.admin-only.admin-visible {
           <h3 class="chart-title"><i class="fas fa-wheelchair"></i> PWD Distribution</h3>
           <div class="chart-stats">
             <span class="stat-badge">Gauge View</span>
+            <span class="stat-badge" id="totalPWD">Total: 0</span>
           </div>
         </div>
         <div class="pwd-gauge-container">
@@ -982,6 +1035,7 @@ li.admin-only.admin-visible {
           <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Status Distribution</h3>
           <div class="chart-stats">
             <span class="stat-badge" id="totalStatuses">Statuses: 0</span>
+            <span class="stat-badge" id="totalStatusCount">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -995,6 +1049,7 @@ li.admin-only.admin-visible {
           <h3 class="chart-title"><i class="fas fa-hand-holding-heart"></i> Government Support</h3>
           <div class="chart-stats">
             <span class="stat-badge" id="totalSupport">Programs: 9</span>
+            <span class="stat-badge" id="totalSupportCount">Total: 0</span>
           </div>
         </div>
         <div class="chart-container">
@@ -1121,6 +1176,11 @@ li.admin-only.admin-visible {
       <span class="mobile-nav-icon">👥</span>
       <span class="mobile-nav-text">Users</span>
     </a>
+    <!-- Logout button in mobile nav -->
+    <a href="#" class="mobile-nav-item mobile-logout-item" id="mobileNavLogoutBtn" title="Logout">
+      <span class="mobile-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+      <span class="mobile-nav-text">Logout</span>
+    </a>
   </div>
 </nav>
 
@@ -1216,18 +1276,26 @@ function normalizeRow(r){
     const birthRaw = getField(r,"Birthdate") || getField(r,"Birth Date") || "";
     const birth = birthRaw ? String(birthRaw).trim() : "";
     
-    // FIXED: Better relationship detection
-    const relationshipRaw = String(getField(r, "Relationship to Head") || "").toLowerCase().trim();
+    // FIXED: Better relationship detection - check if it's explicitly "Head"
+    const relationshipRaw = String(getField(r, "Relationship to Head") || getField(r, "Relationship") || "").toLowerCase().trim();
     let isHead = false;
     
-    // Check for various ways "head" might be represented
-    if (relationshipRaw.includes("head") || 
-        relationshipRaw === "head" || 
+    // Check for various ways "head" might be represented - exact match only
+    if (relationshipRaw === "head" || 
         relationshipRaw === "household head" ||
         relationshipRaw === "householdhead" ||
         relationshipRaw === "h/h head" ||
-        relationshipRaw === "h/hhead") {
+        relationshipRaw === "h/hhead" ||
+        relationshipRaw === "self" || // Sometimes heads are marked as "self"
+        relationshipRaw === "myself") {
         isHead = true;
+    }
+    // If relationship field is empty or missing, check if there's a "Household Head" field
+    if (!relationshipRaw || relationshipRaw === "") {
+        const headField = String(getField(r, "Household Head") || "").toLowerCase().trim();
+        if (headField === "yes" || headField === "y" || headField === "true") {
+            isHead = true;
+        }
     }
     
     // New fields
@@ -1270,13 +1338,14 @@ function normalizeRow(r){
         ofw,
         education,
         employment,
-        assist  // Added back missing assist object
+        assist
     };
 }
 
 function bucketAge(norm){
     const y = norm.ageYears;
     if (y === null || y === undefined || y === "") return "Unknown";
+    if (y < 1) return "Infant (0-11 mos)";
     if (y <= 17) return "School Children (≤17)";
     if (y >= 60) return "Elderly (60+)";
     return "Adult (18-59)";
@@ -1293,7 +1362,7 @@ async function sessionCheck(){
             const isAdmin = localStorage.getItem("userRole") === "admin";
             const adminItems = document.querySelectorAll(".admin-only");
             adminItems.forEach(item => {
-                item.style.display = isAdmin ? "block" : "none";
+                item.classList.toggle("admin-visible", isAdmin);
             });
             
             // Handle mobile nav for admin
@@ -1483,6 +1552,7 @@ function createPWDGauge(id, yesCount, noCount) {
     // Update stat displays
     document.getElementById('pwdYesCount').textContent = yesCount;
     document.getElementById('pwdNoCount').textContent = noCount;
+    document.getElementById('totalPWD').textContent = `Total: ${total}`;
 
     CH[id] = new Chart(ctx, {
         type: 'doughnut',
@@ -1691,12 +1761,16 @@ async function buildCharts() {
         let totalHeads = 0;
         let totalMembers = 0;
         norm.forEach(n => {
-            if (n.isHead) totalHeads++;
-            else totalMembers++;
+            if (n.isHead) {
+                totalHeads++;
+            } else {
+                totalMembers++;
+            }
         });
         const totalCombined = totalHeads + totalMembers;
 
         console.log("Total Heads:", totalHeads, "Total Members:", totalMembers, "Total Combined:", totalCombined);
+        console.log("Sample normalized rows:", norm.slice(0, 3));
 
         // 1. Entries per Barangay (with head/member breakdown)
         const barangayCounts = {};
@@ -1720,6 +1794,7 @@ async function buildCharts() {
         // Update stats for barangay chart - Only Heads and Members
         document.getElementById('headsBarangay').textContent = `Heads: ${totalHeads}`;
         document.getElementById('membersBarangay').textContent = `Members: ${totalMembers}`;
+        document.getElementById('totalBarangay').textContent = `Total: ${totalCombined}`;
         
         createBarChart('chartBarangay', brgLabels, brgValues, 'Households', 'rgba(52, 183, 143, 0.8)');
 
@@ -1759,6 +1834,7 @@ async function buildCharts() {
         // Use the actual calculated totals
         document.getElementById('headsAge').textContent = `Heads: ${ageHeadsTotal}`;
         document.getElementById('membersAge').textContent = `Members: ${ageMembersTotal}`;
+        document.getElementById('totalAge').textContent = `Total: ${totalCombined}`;
         
         createBarChart('chartAgeGroup', ageLabels, ageValues, 'Persons', 'rgba(70, 140, 240, 0.8)');
 
@@ -1792,6 +1868,7 @@ async function buildCharts() {
         // Use the actual calculated totals
         document.getElementById('headsStage').textContent = `Heads: ${stageHeadsTotal}`;
         document.getElementById('membersStage').textContent = `Members: ${stageMembersTotal}`;
+        document.getElementById('totalStage').textContent = `Total: ${totalCombined}`;
         
         createDoughnutChart('chartStage', stageLabels, stageValues, 'Stage Distribution');
 
@@ -1810,6 +1887,7 @@ async function buildCharts() {
         const statusLabels = statusEntries.map(e => e[0]);
         const statusValues = statusEntries.map(e => e[1]);
         document.getElementById('totalStatuses').textContent = `Statuses: ${statusLabels.length}`;
+        document.getElementById('totalStatusCount').textContent = `Total: ${totalCombined}`;
         createDoughnutChart('chartStatus', statusLabels, statusValues, 'Status Distribution');
 
         // 6. Government Support
@@ -1832,6 +1910,7 @@ async function buildCharts() {
         });
         const supportLabels = Object.keys(supportCounts);
         const supportValues = Object.values(supportCounts);
+        document.getElementById('totalSupportCount').textContent = `Total: ${totalCombined}`;
         createHorizontalBarChart('chartSupport', supportLabels, supportValues, 'Recipients');
 
         // 7. Registration Status (FishR & RBIS)
@@ -2153,7 +2232,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const isAdmin = localStorage.getItem("userRole") === "admin";
         const adminItems = document.querySelectorAll(".admin-only");
         adminItems.forEach(item => {
-            item.style.display = isAdmin ? "block" : "none";
+            item.classList.toggle("admin-visible", isAdmin);
         });
         
         // Handle mobile nav for admin
@@ -2180,6 +2259,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('btnExportCSV').addEventListener('click', exportCSV_AllRows);
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+        
+        // Mobile logout buttons
+        document.getElementById('mobileLogoutBtn')?.addEventListener('click', handleLogout);
+        document.getElementById('mobileNavLogoutBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleLogout();
+        });
         
         // Handle window resize
         let resizeTimeout;
