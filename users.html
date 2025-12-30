@@ -297,7 +297,7 @@ li.admin-only.admin-visible {
     gap: 8px;
    }
 
-   /* Mobile Bottom Navigation - Fixed Position */
+   /* Mobile Bottom Navigation - Fixed Position - UPDATED */
    .mobile-bottom-nav {
     display: none;
     position: fixed;
@@ -322,18 +322,18 @@ li.admin-only.admin-visible {
    }
 
    .mobile-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: var(--muted);
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    transition: all 0.3s ease;
-    min-width: 60px;
-    flex: 1;
-    height: 100%;
-    justify-content: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    color: var(--muted) !important;
+    padding: 8px 12px !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.3s ease !important;
+    min-width: 60px !important;
+    flex: 1 !important;
+    height: 100% !important;
+    justify-content: center !important;
    }
 
    .mobile-nav-item.active {
@@ -344,11 +344,17 @@ li.admin-only.admin-visible {
    .mobile-nav-icon {
     font-size: 1.2rem;
     margin-bottom: 4px;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
    }
 
    .mobile-nav-text {
     font-size: 0.7rem;
     font-weight: 500;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
    }
 
    /* Mobile Logout Item */
