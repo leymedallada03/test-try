@@ -277,11 +277,9 @@ li.admin-only.admin-visible {
     display: flex;
     justify-content: flex-end; /* Align everything to the right */
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
     gap: 10px;
-    padding: 12px;
-    box-shadow: 0 2px 8px rgba(6,30,20,0.04);
    }
 
    /* REMOVE toolbar-left since all buttons are on the right */
@@ -1007,13 +1005,13 @@ li.admin-only.admin-visible {
           </button>
           <div id="exportDropdown" class="export-dropdown" role="menu" aria-hidden="true">
             <div onclick="exportToPDF()">
-              <i class="fas fa-file-pdf"></i> PDF
+              <i class="fas fa-file-pdf"></i> Export PDF
             </div>
             <div onclick="exportPNGsZip()">
-              <i class="fas fa-file-image"></i> PNGs
+              <i class="fas fa-file-image"></i> Export PNGs
             </div>
             <div onclick="exportCSV_AllRows()">
-              <i class="fas fa-file-csv"></i> CSV
+              <i class="fas fa-file-csv"></i> Export CSV
             </div>
           </div>
         </div>
