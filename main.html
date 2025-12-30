@@ -22,27 +22,30 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
-   .logo-circle {
-    width: 200px;
-    height: 200px;
-    margin: 0 auto 12px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
-}
-.logo-circle img {
-    width: 90px;
-    height: 90px;
-}
+   
+   .admin-only {
+    display: none !important;
+   }
+
+   /* Class to show admin elements - applied by JavaScript */
+   .admin-only.admin-visible {
+    display: block !important;
+   }
+
+   /* For list items */
+   li.admin-only {
+    display: none !important;
+   }
+
+   li.admin-only.admin-visible {
+    display: list-item !important;
+   }
    
    body {
     background-color: var(--bg);
     margin: 0;
     min-height: 100vh;
+    padding-bottom: 70px; /* Space for fixed bottom nav */
    }
 
    .page-container{
@@ -344,30 +347,89 @@
     line-height: 1.4;
    }
 
-   /* Content Header */
-   .content-header {
-    margin-top: 0;
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+   /* Mobile Bottom Navigation - Fixed Position */
+   .mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    z-index: 1000;
+    padding: 8px 0;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    height: 70px;
+    box-sizing: border-box;
+    overflow: hidden;
    }
 
-   .content-header h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    color: var(--accent1);
+   .mobile-nav-items {
     display: flex;
+    justify-content: space-around;
     align-items: center;
-    gap: 8px;
+    height: 100%;
+   }
+
+   .mobile-nav-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    color: var(--muted) !important;
+    padding: 8px 12px !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.3s ease !important;
+    min-width: 60px !important;
+    flex: 1 !important;
+    height: 100% !important;
+    justify-content: center !important;
+   }
+
+   /* Admin items - initially hidden */
+   .mobile-nav-item.admin-only {
+    display: none !important;
+   }
+
+   /* Show admin items when user is admin */
+   .mobile-nav-item.admin-only.admin-visible {
+    display: flex !important;
+   }
+
+   /* Active state for all tabs */
+   .mobile-nav-item.active {
+    color: var(--accent1) !important;
+    background: var(--light-green) !important;
+   }
+
+   /* Icon and text for all tabs */
+   .mobile-nav-icon {
+    font-size: 1.2rem !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+   }
+
+   .mobile-nav-text {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
    }
 
    /* Mobile Styles */
    @media (max-width: 768px) {
+    body {
+        padding-bottom: 70px; /* Space for fixed bottom nav */
+    }
+    
     .page-container {
         grid-template-columns: 1fr !important;
         padding: 8px;
         gap: 12px;
+        margin-bottom: 0; /* Remove margin since we have body padding */
     }
     
     .page-container.collapsed {
@@ -375,54 +437,24 @@
     }
     
     .sidebar {
-        position: fixed;
-        top: 72px;
-        left: 0;
-        right: 0;
-        height: auto;
-        max-height: 0;
-        overflow: hidden;
-        z-index: 1000;
-        margin: 0;
-        padding: 0;
-        border-radius: 0 0 var(--radius) var(--radius);
-        background: white;
-        box-shadow: var(--shadow);
-        transition: max-height 0.3s ease;
+        display: none !important; /* Hide sidebar on mobile */
     }
     
-    .sidebar.mobile-open {
-        max-height: 300px;
-        padding: 12px;
-        overflow-y: auto;
-    }
-    
-    .sidebar-container {
+    .mobile-bottom-nav {
+        display: flex !important; /* Show bottom nav on mobile */
         flex-direction: column;
     }
     
-    .sidebar-toggle {
-        display: none;
-    }
-    
+    /* Remove mobile menu toggle button */
     .mobile-menu-toggle {
-        display: flex !important;
-        background: linear-gradient(135deg, var(--accent1), var(--accent2));
-        color: white;
-        border: none;
-        border-radius: var(--radius-sm);
-        width: 40px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 1.2rem;
+        display: none !important;
     }
     
     .content-area {
         height: auto;
         min-height: auto;
         padding: 20px;
+        margin-bottom: 0;
     }
     
     .logo-header img {
@@ -465,6 +497,11 @@
         padding: 6px 12px;
         font-size: 0.85rem;
     }
+    
+    /* Adjust content area for bottom nav */
+    .content-area {
+        margin-bottom: 70px;
+    }
    }
 
    /* Tablet Styles */
@@ -488,11 +525,17 @@
     .module-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    
+    .mobile-bottom-nav {
+        display: none;
+    }
    }
 
-   /* Mobile menu toggle button */
-   .mobile-menu-toggle {
-    display: none;
+   /* Desktop Styles */
+   @media (min-width: 1025px) {
+    .mobile-bottom-nav {
+        display: none;
+    }
    }
 
    /* Print styles */
@@ -537,9 +580,7 @@
     </div>
 
     <div class="user-info">
-      <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <i class="fas fa-bars"></i>
-      </button>
+      <!-- Hamburger menu removed for mobile -->
       <span id="userName"></span>
       <button id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -615,6 +656,32 @@
   </main>
 </div>
 
+<!-- Mobile Bottom Navigation - Fixed -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <div class="mobile-nav-items">
+    <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
+      <span class="mobile-nav-icon">📊</span>
+      <span class="mobile-nav-text">Dashboard</span>
+    </a>
+    <a href="dataForm.html" class="mobile-nav-item" title="Data Entry">
+      <span class="mobile-nav-icon">📝</span>
+      <span class="mobile-nav-text">Data Entry</span>
+    </a>
+    <a href="records.html" class="mobile-nav-item" title="Records">
+      <span class="mobile-nav-icon">📁</span>
+      <span class="mobile-nav-text">Records</span>
+    </a>
+    <a href="charts.html" class="mobile-nav-item" title="Charts">
+      <span class="mobile-nav-icon">📈</span>
+      <span class="mobile-nav-text">Charts</span>
+    </a>
+    <a href="users.html" class="mobile-nav-item admin-only" title="Users" id="mobileUsersNav">
+      <span class="mobile-nav-icon">👥</span>
+      <span class="mobile-nav-text">Users</span>
+    </a>
+  </div>
+</nav>
+
 <!-- JavaScript Libraries -->
 <script>
 /* ============ SESSION MANAGEMENT ============ */
@@ -628,8 +695,18 @@ async function sessionCheck(){
             const isAdmin = localStorage.getItem("userRole") === "admin";
             const adminItems = document.querySelectorAll(".admin-only");
             adminItems.forEach(item => {
-                item.style.display = isAdmin ? "block" : "none";
+                item.classList.toggle("admin-visible", isAdmin);
             });
+            
+            // Handle mobile nav for admin
+            const mobileUsersNav = document.getElementById('mobileUsersNav');
+            if (mobileUsersNav) {
+                if (isAdmin) {
+                    mobileUsersNav.classList.add('admin-visible');
+                } else {
+                    mobileUsersNav.classList.remove('admin-visible');
+                }
+            }
             
             sessionStorage.setItem('authenticated', 'true');
             return true;
@@ -672,22 +749,6 @@ function toggleSidebar() {
     }
 }
 
-function toggleMobileSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mobileToggle = document.getElementById('mobileMenuToggle');
-    const icon = mobileToggle.querySelector('i');
-    
-    sidebar.classList.toggle('mobile-open');
-    
-    if (sidebar.classList.contains('mobile-open')) {
-        icon.className = 'fas fa-times';
-        mobileToggle.title = "Close menu";
-    } else {
-        icon.className = 'fas fa-bars';
-        mobileToggle.title = "Open menu";
-    }
-}
-
 /* ============ EVENT LISTENERS ============ */
 document.addEventListener('DOMContentLoaded', async function() {
     // Session check
@@ -702,37 +763,31 @@ document.addEventListener('DOMContentLoaded', async function() {
         const isAdmin = localStorage.getItem("userRole") === "admin";
         const adminItems = document.querySelectorAll(".admin-only");
         adminItems.forEach(item => {
-            item.style.display = isAdmin ? "block" : "none";
+            item.classList.toggle("admin-visible", isAdmin);
         });
+        
+        // Handle mobile nav for admin
+        const mobileUsersNav = document.getElementById('mobileUsersNav');
+        if (mobileUsersNav) {
+            if (isAdmin) {
+                mobileUsersNav.classList.add('admin-visible');
+            } else {
+                mobileUsersNav.classList.remove('admin-visible');
+            }
+        }
         
         // Bind event listeners
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
-        document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileSidebar);
         
         // Handle window resize
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
                 const sidebar = document.getElementById('sidebar');
-                const mobileToggle = document.getElementById('mobileMenuToggle');
-                
-                sidebar.classList.remove('mobile-open');
-                mobileToggle.querySelector('i').className = 'fas fa-bars';
-                mobileToggle.title = "Open menu";
-            }
-        });
-        
-        // Close mobile sidebar on click outside
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const mobileToggle = document.getElementById('mobileMenuToggle');
-            
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(event.target) && !mobileToggle.contains(event.target) && sidebar.classList.contains('mobile-open')) {
-                    sidebar.classList.remove('mobile-open');
-                    mobileToggle.querySelector('i').className = 'fas fa-bars';
-                    mobileToggle.title = "Open menu";
-                }
+                sidebar.style.display = 'block';
+            } else {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.style.display = 'none';
             }
         });
     }
@@ -751,11 +806,3 @@ window.addEventListener('pageshow', function(event) {
 <script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
