@@ -1168,6 +1168,42 @@ function getField(r, key) {
     return "";
 }
 
+// ADDED MISSING FUNCTION
+function parseAnyDate(v){
+    if(!v && v !== 0) return null;
+    if (v instanceof Date) return v;
+    v = String(v).trim();
+    if (!v) return null;
+    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v)){
+        const p = v.split('/');
+        return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+    }
+    if(/^\d{4}-\d{2}-\d{2}/.test(v)){
+        return new Date(v);
+    }
+    const d = new Date(v);
+    return isNaN(d) ? null : d;
+}
+
+function monthsBetween(d1, d2){
+    if(!d1 || !d2) return null;
+    let years = d2.getFullYear() - d1.getFullYear();
+    let months = d2.getMonth() - d1.getMonth();
+    let m = years*12 + months;
+    if(d2.getDate() < d1.getDate()) m--;
+    return m;
+}
+
+function ageInYearsFromBirth(bd){
+    const d = parseAnyDate(bd);
+    if(!d) return null;
+    const now = new Date();
+    let years = now.getFullYear() - d.getFullYear();
+    const m = now.getMonth() - d.getMonth();
+    if(m < 0 || (m === 0 && now.getDate() < d.getDate())) years--;
+    return years;
+}
+
 function normalizeRow(r){
     const barangay = String(getField(r,"Barangay") || "").trim() || "Unknown";
     const stage = String(getField(r,"Stage") || "").trim() || "Unspecified";
@@ -1193,14 +1229,8 @@ function normalizeRow(r){
     if (ageVal !== "" && ageVal !== null && ageVal !== undefined && !isNaN(Number(ageVal))) {
         ageYears = Number(ageVal);
     } else if (birth) {
-        const bd = parseAnyDate(birth);
-        if (bd) {
-            const now = new Date();
-            let years = now.getFullYear() - bd.getFullYear();
-            const m = now.getMonth() - bd.getMonth();
-            if (m < 0 || (m === 0 && now.getDate() < bd.getDate())) years--;
-            ageYears = years;
-        }
+        const y = ageInYearsFromBirth(birth);
+        if (y !== null) ageYears = y;
     }
 
     return { 
