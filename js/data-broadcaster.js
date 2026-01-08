@@ -4,7 +4,7 @@
     'use strict';
     
     const DATA_BROADCASTER_VERSION = '1.0.0';
-    const BROADCAST_ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
+    const BROADCAST_ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household', 'Force Refresh'];
     
     class DataBroadcaster {
         constructor() {
