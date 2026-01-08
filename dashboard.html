@@ -3306,7 +3306,7 @@ function notifyDataUpdated(action = 'Data Updated', details = 'Dashboard data re
 
 /* ENHANCED INITIALIZATION */
 // UNCOMMENT THIS LINE - CRITICAL!
-const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
+const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household', 'Force Refresh'];
 
 window.addEventListener('DOMContentLoaded', async () => {
     console.log("Dashboard initializing...");
@@ -3422,10 +3422,9 @@ document.addEventListener('visibilitychange', function() {
 </script>
 <script src="js/data-broadcaster.js"></script>
 <script src="js/dashboard-listener.js"></script>
-<script src="js/common-utils.js"></script>
-<script src="js/session-manager.js"></script>
-<script src="js/common-session.js"></script>
-<script src="js/activity-tracking-final.js"></script>
+<script src="common-utils.js"></script>
+<script src="session-manager.js"></script>
+<script src="common-session.js"></script>
+<script src="activity-tracking-final.js"></script>
 </body>
 </html>
-
