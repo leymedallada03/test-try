@@ -25,6 +25,41 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+   /* Add to your existing CSS */
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Make sure buttons with loading state have proper alignment */
+.btn .loading-spinner-small {
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+/* Disabled button styling */
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+      .btn.secondary {
+     background: transparent;
+     color: #fff;
+   }
+   
    /* Background decorative elements */
    .bg-pattern {
      position: absolute;
@@ -62,36 +97,6 @@
      left: 10%;
      background: rgba(52, 183, 143, 0.05);
    }
-   /* ============ RED CANCEL BUTTONS FOR MODALS ============ */
-/* Target cancel buttons in modals by their IDs */
-#cancelDelete,
-#cancelEditClose,
-#cancelReset,
-#cancelSave,
-#cancelRemoveMember,
-#cancelDeleteMember,
-#cancelEditBtn,
-#modal_cancelBtn,
-.btn-secondary[type="button"] {
-    background: linear-gradient(90deg, #dc2626, #ef4444) !important;
-    color: white !important;
-    border: none !important;
-}
-
-/* Hover state for red cancel buttons */
-#cancelDelete:hover,
-#cancelEditClose:hover,
-#cancelReset:hover,
-#cancelSave:hover,
-#cancelRemoveMember:hover,
-#cancelDeleteMember:hover,
-#cancelEditBtn:hover,
-#modal_cancelBtn:hover,
-.btn-secondary[type="button"]:hover {
-    background: linear-gradient(90deg, #b91c1c, #dc2626) !important;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2) !important;
-    transform: translateY(-1px);
-}
    /* Mobile Bottom Navigation - Fixed Position */
 .mobile-bottom-nav {
     display: none;
@@ -281,7 +286,7 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(15,122,74,0.2);
 }
-
+/*
 .modal-actions .btn-secondary {
     background: transparent;
     color: var(--accent1);
@@ -2916,7 +2921,7 @@ li.admin-only.admin-visible {
   <div style="display:flex;gap:8px;justify-content:flex-end;">
     <button id="startSequenceBtn" class="btn">Next → Members (Start sequence)</button>
     <button id="saveEditBtn" class="btn">Save changes</button>
-    <button id="cancelEditBtn" class="btn secondary" type="button">Cancel</button>
+    <button id="cancelEditBtn" class="btn secondary1" type="button">Cancel</button>
   </div>
 </div>
 
@@ -3570,9 +3575,11 @@ li.admin-only.admin-visible {
     </div>
     <div class="modal-actions">
       <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
-      <button id="confirmDelete" class="btn btn-reset">
-        <i class="fas fa-trash"></i> Delete Household
-      </button>
+<button id="confirmDelete" class="btn btn-reset">
+  <i class="fas fa-trash" id="deleteIcon"></i>
+  <span id="deleteText">Delete Household</span>
+  <div id="deleteSpinner" class="loading-spinner-small" style="display: none;"></div>
+</button>
     </div>
   </div>
 </div>
@@ -7258,10 +7265,22 @@ async function performDelete() {
     const id = deletePendingId;
     const currentUserFullName = getUserFullName();
 
-    // Set loading state
-    const loadingOverlay = document.getElementById('loading');
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'flex';
+    // Get the delete button and its elements
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    
+    // Store original button content
+    const originalBtnContent = confirmDeleteBtn ? confirmDeleteBtn.innerHTML : '';
+    
+    // Set loading state on the button itself
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.disabled = true;
+        // Replace button content with spinner and "Deleting..."
+        confirmDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+    }
+    
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.disabled = true; // Disable cancel button during deletion
     }
 
     try {
@@ -7281,72 +7300,92 @@ async function performDelete() {
         
         const json = await res.json();
 
-if(json.success){
-    showSuccess(`Household deleted successfully. Data ID: ${id}`);
-    
-    // ============ ADD THIS CODE FOR DASHBOARD NOTIFICATION ============
-    // Notify dashboard about the deletion
-    const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
-    const headName = deletePendingHeadName || 'Unknown Household';
-    const barangay = deletePendingBarangay || 'Unknown Barangay';
-    
-    // Store activity for dashboard to pick up
-    const activity = {
-        action: 'Delete Household',
-        actor: username,
-        details: `Deleted household ${headName} from ${barangay} (ID: ${id})`,
-        timestamp: new Date().toISOString()
-    };
-    
-    // Save to localStorage for dashboard
-    const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
-    activities.push(activity);
-    if (activities.length > 10) activities.shift(); // Keep only last 10
-    localStorage.setItem('crossTabActivities', JSON.stringify(activities));
-    
-    // Trigger dashboard refresh
-    localStorage.setItem('lastActivityTrigger', Date.now().toString());
-    localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
-    localStorage.removeItem('dashboardDataCache'); // Clear dashboard cache
-    
-    // Record activity to server audit trail
-    try {
-        const logFormData = new FormData();
-        logFormData.append("action", "logActivity");
-        logFormData.append("username", username);
-        logFormData.append("action", "Delete Household");
-        logFormData.append("actor", username);
-        logFormData.append("details", `Deleted household ID ${id} - ${headName}`);
-        fetch(SCRIPT_URL, { method: "POST", body: logFormData }).catch(() => {});
-    } catch (err) {
-        console.log("Activity logging error:", err);
-    }
-    // ============ END OF ADDED CODE ============
-    
-    // Clear cache and reload
-    localStorage.removeItem('recordsCache');
-    localStorage.removeItem('recordsCacheTime');
-    
-    // Close modal first
-    hideModal('deleteConfirmationModal');
-    deletePendingId = null;
-    deletePendingHeadName = '';
-    deletePendingBarangay = '';
-    
-    // Reload records after a short delay
-    setTimeout(() => {
-        loadRecords();
-    }, 1000);
-} else {
+        if(json.success){
+            showSuccess(`Household deleted successfully. Data ID: ${id}`);
+            
+            // ============ ADD THIS CODE FOR DASHBOARD NOTIFICATION ============
+            // Notify dashboard about the deletion
+            const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
+            const headName = deletePendingHeadName || 'Unknown Household';
+            const barangay = deletePendingBarangay || 'Unknown Barangay';
+            
+            // Store activity for dashboard to pick up
+            const activity = {
+                action: 'Delete Household',
+                actor: username,
+                details: `Deleted household ${headName} from ${barangay} (ID: ${id})`,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save to localStorage for dashboard
+            const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
+            activities.push(activity);
+            if (activities.length > 10) activities.shift(); // Keep only last 10
+            localStorage.setItem('crossTabActivities', JSON.stringify(activities));
+            
+            // Trigger dashboard refresh
+            localStorage.setItem('lastActivityTrigger', Date.now().toString());
+            localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
+            localStorage.removeItem('dashboardDataCache'); // Clear dashboard cache
+            
+            // Record activity to server audit trail
+            try {
+                const logFormData = new FormData();
+                logFormData.append("action", "logActivity");
+                logFormData.append("username", username);
+                logFormData.append("action", "Delete Household");
+                logFormData.append("actor", username);
+                logFormData.append("details", `Deleted household ID ${id} - ${headName}`);
+                fetch(SCRIPT_URL, { method: "POST", body: logFormData }).catch(() => {});
+            } catch (err) {
+                console.log("Activity logging error:", err);
+            }
+            // ============ END OF ADDED CODE ============
+            
+            // Clear cache and reload
+            localStorage.removeItem('recordsCache');
+            localStorage.removeItem('recordsCacheTime');
+            
+            // Close modal first
+            hideModal('deleteConfirmationModal');
+            deletePendingId = null;
+            deletePendingHeadName = '';
+            deletePendingBarangay = '';
+            
+            // Reset button state
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.innerHTML = originalBtnContent;
+            }
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.disabled = false;
+            }
+            
+            // Reload records after a short delay
+            setTimeout(() => {
+                loadRecords();
+            }, 1000);
+        } else {
             showError("Delete failed: " + (json.message || JSON.stringify(json)));
+            // Reset button state on error
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.innerHTML = originalBtnContent;
+            }
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.disabled = false;
+            }
         }
     } catch(err) {
         console.error("Delete error", err);
         showError("Delete failed. Please check your connection and try again.");
-    } finally {
-        // Hide loading overlay
-        if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
+        // Reset button state on error
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.innerHTML = originalBtnContent;
+        }
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.disabled = false;
         }
     }
 }
@@ -7365,39 +7404,58 @@ function setLoadingState(loading) {
     if (confirmDeleteBtn) confirmDeleteBtn.disabled = loading;
 }
 
-/* ============ SETUP CONTACT VALIDATION ============ */
+/* ============ FIXED CONTACT VALIDATION ============ */
 function setupContactValidation() {
   // Head contact validation
   const editContactInput = $('edit_contactNo');
   const editContactError = $('edit_contactError');
   
   if (editContactInput) {
+    let previousValue = '';
+    
     editContactInput.addEventListener('input', function() {
-      // Auto-format as user types
-      let value = this.value.replace(/\D/g, '');
+      const currentValue = this.value;
       
-      // Ensure it starts with 09 or +639
-      if (value.startsWith('63') && value.length <= 12) {
-        value = '0' + value.substring(2);
-      }
-      
-      // Format with spaces
-      if (value.length >= 4 && value.length <= 11) {
-        if (value.startsWith('09') && value.length === 11) {
-          value = value.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
-        } else if (value.length === 10) {
-          value = '0' + value.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-        } else if (value.length > 4) {
-          // Partial formatting
-          const parts = [];
-          if (value.length > 4) parts.push(value.substring(0, 4));
-          if (value.length > 7) parts.push(value.substring(4, 7));
-          if (value.length > 7) parts.push(value.substring(7));
-          value = parts.join(' ');
+      // Only format if user is typing (not pasting) and we have 4+ digits
+      if (currentValue.length > previousValue.length) { // User is adding characters
+        // Remove all non-digit characters
+        let digits = currentValue.replace(/\D/g, '');
+        
+        // Don't format until we have at least 4 digits
+        if (digits.length >= 4) {
+          // Apply formatting
+          if (digits.startsWith('09') && digits.length <= 11) {
+            // Format as 09XX XXX XXXX
+            if (digits.length <= 4) {
+              this.value = digits;
+            } else if (digits.length <= 7) {
+              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
+            } else {
+              this.value = digits.substring(0, 4) + ' ' + 
+                          digits.substring(4, 7) + ' ' + 
+                          digits.substring(7, 11);
+            }
+          } else if (digits.startsWith('9') && digits.length <= 10) {
+            // Format as 0XXX XXX XXXX
+            digits = '0' + digits;
+            if (digits.length <= 4) {
+              this.value = digits;
+            } else if (digits.length <= 7) {
+              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
+            } else {
+              this.value = digits.substring(0, 4) + ' ' + 
+                          digits.substring(4, 7) + ' ' + 
+                          digits.substring(7, 11);
+            }
+          } else {
+            this.value = digits.substring(0, 13); // Limit to max length
+          }
+        } else {
+          this.value = digits;
         }
       }
       
-      this.value = value;
+      previousValue = this.value;
       
       // Clear error on input
       this.classList.remove('input-error');
@@ -7414,37 +7472,56 @@ function setupContactValidation() {
     });
   }
   
-  // Member contact validation
+  // Member contact validation - apply same fix
   const memberContactInput = $('memberContact');
   const memberContactError = $('memberContactError');
   
   if (memberContactInput) {
+    let previousMemberValue = '';
+    
     memberContactInput.addEventListener('input', function() {
-      // Auto-format as user types
-      let value = this.value.replace(/\D/g, '');
+      const currentValue = this.value;
       
-      // Ensure it starts with 09 or +639
-      if (value.startsWith('63') && value.length <= 12) {
-        value = '0' + value.substring(2);
-      }
-      
-      // Format with spaces
-      if (value.length >= 4 && value.length <= 11) {
-        if (value.startsWith('09') && value.length === 11) {
-          value = value.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
-        } else if (value.length === 10) {
-          value = '0' + value.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-        } else if (value.length > 4) {
-          // Partial formatting
-          const parts = [];
-          if (value.length > 4) parts.push(value.substring(0, 4));
-          if (value.length > 7) parts.push(value.substring(4, 7));
-          if (value.length > 7) parts.push(value.substring(7));
-          value = parts.join(' ');
+      // Only format if user is typing (not pasting)
+      if (currentValue.length > previousMemberValue.length) {
+        // Remove all non-digit characters
+        let digits = currentValue.replace(/\D/g, '');
+        
+        // Don't format until we have at least 4 digits
+        if (digits.length >= 4) {
+          // Apply formatting
+          if (digits.startsWith('09') && digits.length <= 11) {
+            // Format as 09XX XXX XXXX
+            if (digits.length <= 4) {
+              this.value = digits;
+            } else if (digits.length <= 7) {
+              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
+            } else {
+              this.value = digits.substring(0, 4) + ' ' + 
+                          digits.substring(4, 7) + ' ' + 
+                          digits.substring(7, 11);
+            }
+          } else if (digits.startsWith('9') && digits.length <= 10) {
+            // Format as 0XXX XXX XXXX
+            digits = '0' + digits;
+            if (digits.length <= 4) {
+              this.value = digits;
+            } else if (digits.length <= 7) {
+              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
+            } else {
+              this.value = digits.substring(0, 4) + ' ' + 
+                          digits.substring(4, 7) + ' ' + 
+                          digits.substring(7, 11);
+            }
+          } else {
+            this.value = digits.substring(0, 13); // Limit to max length
+          }
+        } else {
+          this.value = digits;
         }
       }
       
-      this.value = value;
+      previousMemberValue = this.value;
       
       // Clear error on input
       this.classList.remove('input-error');
