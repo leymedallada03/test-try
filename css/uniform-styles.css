@@ -1,0 +1,436 @@
+/* =================================================================
+   UNIFORM STYLES FOR ALL PAGES - TOPBAR & CONTENT HEADER
+   Use this CSS file on ALL pages for consistency
+================================================================= */
+
+/* ============ CONSISTENT TOPBAR FOR ALL PAGES ============ */
+.topbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    box-shadow: var(--shadow-dark);
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 1200px;
+    margin: 20px auto 0;
+}
+
+.brand {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.brand .logo {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    object-fit: contain;
+}
+
+.brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.brand-text p {
+    font-size: 12px;
+    opacity: 0.95;
+    margin: 4px 0 0 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#userName {
+    font-weight: 600;
+    border-radius: 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#logoutBtn {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+#logoutBtn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+/* Mobile menu toggle button - hidden by default */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+}
+
+/* ============ CONSISTENT CONTENT HEADER FOR ALL PAGES ============ */
+.content-header {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.content-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--accent1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Optional: Action buttons in content header */
+.content-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ============ PAGE CONTAINER STRUCTURE ============ */
+.page-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 18px;
+    align-items: start;
+    transition: grid-template-columns 0.3s ease;
+}
+
+.page-container.collapsed {
+    grid-template-columns: 60px 1fr;
+}
+
+/* ============ CONTENT AREA BASE ============ */
+.content-area {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.6));
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: 0 8px 22px rgba(10, 20, 16, 0.06);
+    min-height: 72vh;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* ============ RESPONSIVE ADJUSTMENTS ============ */
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .page-container {
+        max-width: 95%;
+        padding: 10px;
+        gap: 16px;
+    }
+    
+    .topbar {
+        max-width: 95%;
+    }
+    
+    .brand-text h1 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+    .page-container {
+        grid-template-columns: 1fr !important;
+        padding: 8px;
+        gap: 12px;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .page-container.collapsed {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Mobile Topbar */
+    .topbar {
+        margin: 8px auto;
+        max-width: 100%;
+        padding: 10px 12px;
+    }
+    
+    .brand .logo {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .brand-text h1 {
+        font-size: 1rem;
+    }
+    
+    .brand-text p {
+        font-size: 0.7rem;
+    }
+    
+    .user-info {
+        gap: 8px;
+    }
+    
+    #userName {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    
+    #logoutBtn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    
+    /* Show mobile menu toggle on mobile */
+    .mobile-menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Mobile Content Header */
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .content-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .content-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    /* Content Area */
+    .content-area {
+        height: auto;
+        min-height: calc(100vh - 140px);
+        padding: 16px;
+    }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+    .topbar {
+        padding: 8px 10px;
+    }
+    
+    .brand {
+        gap: 8px;
+    }
+    
+    .brand .logo {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .brand-text h1 {
+        font-size: 0.95rem;
+    }
+    
+    #userName {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+    
+    #logoutBtn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .content-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .content-area {
+        padding: 12px;
+    }
+}
+
+/* ============ MOBILE BOTTOM NAVIGATION ============ */
+/* Mobile Bottom Navigation - Fixed Position */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    z-index: 1000;
+    padding: 8px 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    height: 70px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.mobile-nav-items {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+}
+
+.mobile-nav-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    color: var(--muted) !important;
+    padding: 8px 12px !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.3s ease !important;
+    min-width: 60px !important;
+    flex: 1 !important;
+    height: 100% !important;
+    justify-content: center !important;
+}
+
+.mobile-nav-item.active {
+    color: var(--accent1) !important;
+    background: var(--light-green) !important;
+}
+
+.mobile-nav-icon {
+    font-size: 1.2rem !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.mobile-nav-text {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+/* Show mobile nav on mobile only */
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex !important;
+        flex-direction: column;
+    }
+    
+    /* Apply bottom padding for mobile nav */
+    body {
+        padding-bottom: 70px;
+    }
+    
+    .content-area {
+        margin-bottom: 70px;
+    }
+}
+
+/* ============ ADMIN VISIBILITY ============ */
+.admin-only {
+    display: none !important;
+}
+
+.admin-only.admin-visible {
+    display: flex !important;
+}
+
+/* For list items */
+li.admin-only {
+    display: none !important;
+}
+
+li.admin-only.admin-visible {
+    display: list-item !important;
+}
+
+/* ============ UTILITY CLASSES ============ */
+/* Card styling for uniform look */
+.uniform-card {
+    padding: 16px;
+    border-radius: var(--radius);
+    background: var(--card-bg);
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+}
+
+/* Button styling for uniform look */
+.uniform-btn {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 36px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.uniform-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 122, 74, 0.2);
+}
+
+.uniform-btn.secondary {
+    background: transparent;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+}
+
+/* Form grid for uniform layout */
+.uniform-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .uniform-form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+}
