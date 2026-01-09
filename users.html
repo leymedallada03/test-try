@@ -22,6 +22,85 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+   
+   /* Enhanced tooltips for protected admin buttons */
+.actions-cell button[disabled] {
+  position: relative;
+}
+
+.actions-cell button[disabled]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 5px;
+}
+
+.actions-cell button[disabled]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333;
+  z-index: 1000;
+  margin-bottom: -5px;
+}
+
+/* Protected admin row styling */
+.users-table tbody tr:hover {
+  background: rgba(52,183,143,0.05);
+}
+
+/* Special styling for protected admin row */
+.users-table tbody tr:has(.actions-cell button[disabled]) {
+  background: rgba(255, 245, 204, 0.1); /* Light yellow background */
+}
+
+.users-table tbody tr:has(.actions-cell button[disabled]):hover {
+  background: rgba(255, 245, 204, 0.2);
+}
+   /* Tooltip for protected admin button */
+.actions-cell button[disabled] {
+  position: relative;
+}
+
+.actions-cell button[disabled]:hover::after {
+  content: "Protected admin account cannot be deleted";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 5px;
+}
+
+.actions-cell button[disabled]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333;
+  z-index: 1000;
+  margin-bottom: -5px;
+}
    /* Background decorative elements */
    .bg-pattern {
      position: absolute;
@@ -1660,7 +1739,7 @@ li.admin-only.admin-visible {
     </div>
     <div class="form-actions">
       <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
-      <button id="confirmDelete" class="btn" style="background: linear-gradient(90deg, #ff4444, #ff7a00);">
+      <button id="confirmDelete" class="btn" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">
         <i class="fas fa-trash"></i> Delete User
       </button>
     </div>
@@ -1814,6 +1893,15 @@ async function sessionCheck(){
   }
 }
 
+function isProtectedAdmin(user) {
+  // Check if it's the specific admin with username 'admin'
+  // You can also verify the password hash if available
+  return user && user.Username.toLowerCase() === 'admin';
+}
+
+// Also add a constant for the protected username
+const PROTECTED_ADMIN_USERNAME = 'admin';
+
 /* ============ LOGOUT ============ */
 function handleLogout() {
   const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
@@ -1905,16 +1993,24 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
   
   filtered.forEach(user => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${escapeHtml(user.Username)}</td>
-      <td>${escapeHtml(user.FullName)}</td>
-      <td>
-        <span style="padding: 4px 10px; border-radius: 12px; background: ${user.Role === 'Admin' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' ? '#0f7a4a' : '#666'}; display: inline-block;">
-          ${user.Role}
-        </span>
-      </td>
-      <td>${escapeHtml(user.AssignedBarangay || '')}</td>
-      <td class="actions-cell">
+    const isProtected = isProtectedAdmin(user);
+    
+    // Create action buttons - ALL disabled for protected admin
+    let actionButtonsHtml = '';
+    if (isProtected) {
+      actionButtonsHtml = `
+        <button class="icon-btn" disabled title="Protected admin cannot be edited" style="opacity: 0.5; cursor: not-allowed;">
+          <i class="fas fa-edit" style="color: #ccc;"></i>
+        </button>
+        <button class="icon-btn" disabled title="Protected admin password cannot be reset" style="opacity: 0.5; cursor: not-allowed;">
+          <i class="fas fa-key" style="color: #ccc;"></i>
+        </button>
+        <button class="icon-btn" disabled title="Protected admin cannot be deleted" style="opacity: 0.5; cursor: not-allowed;">
+          <i class="fas fa-trash" style="color: #ccc;"></i>
+        </button>
+      `;
+    } else {
+      actionButtonsHtml = `
         <button class="icon-btn" onclick="editUser('${escapeHtml(user.Username)}')" title="Edit">
           <i class="fas fa-edit"></i>
         </button>
@@ -1924,6 +2020,29 @@ function renderUsers(filter = "", roleFilter = CURRENT_ROLE_FILTER) {
         <button class="icon-btn" onclick="showDeleteModal('${escapeHtml(user.Username)}')" title="Delete" style="color: #ff4444;">
           <i class="fas fa-trash"></i>
         </button>
+      `;
+    }
+    
+    // Add a badge for protected admin
+    let protectedBadge = '';
+    if (isProtected) {
+      protectedBadge = '<span style="color: #0f7a4a; font-weight: bold; font-size: 0.8rem; background: #e9f7f2; padding: 2px 6px; border-radius: 10px; margin-left: 5px;">🔒 Protected</span>';
+    }
+    
+    tr.innerHTML = `
+      <td>
+        ${escapeHtml(user.Username)}
+        ${protectedBadge}
+      </td>
+      <td>${escapeHtml(user.FullName)}</td>
+      <td>
+        <span style="padding: 4px 10px; border-radius: 12px; background: ${user.Role === 'Admin' ? '#e9f7f2' : '#f0f0f0'}; color: ${user.Role === 'Admin' ? '#0f7a4a' : '#666'}; display: inline-block;">
+          ${user.Role}
+        </span>
+      </td>
+      <td>${escapeHtml(user.AssignedBarangay || '')}</td>
+      <td class="actions-cell">
+        ${actionButtonsHtml}
       </td>
     `;
     tbody.appendChild(tr);
@@ -2022,6 +2141,14 @@ function openUserModal(mode = 'add', username = null) {
 }
 
 function editUser(username) {
+  const user = ALL_USERS.find(u => u.Username === username);
+  
+  // Prevent editing username of protected admin
+  if (user && isProtectedAdmin(user)) {
+    showToast('The main admin account (username: admin) is protected. Username cannot be changed.', 'error');
+    return;
+  }
+  
   openUserModal('edit', username);
 }
 
@@ -2107,8 +2234,15 @@ async function saveUser() {
 
 /* ============ RESET PASSWORD WITH MODAL ============ */
 function showResetModal(username) {
-  RESET_TARGET_USER = username;
   const user = ALL_USERS.find(u => u.Username === username);
+  
+  // PROTECTION: Check if trying to reset password for protected admin
+  if (user && isProtectedAdmin(user)) {
+    showToast('The main admin account (username: admin) password cannot be reset from here. Please use the main admin panel.', 'error');
+    return;
+  }
+  
+  RESET_TARGET_USER = username;
   
   if (user) {
     document.getElementById('resetUserName').textContent = `${user.Username} (${user.FullName})`;
@@ -2121,6 +2255,14 @@ function showResetModal(username) {
 
 async function resetPassword() {
   if (!RESET_TARGET_USER) return;
+  
+  // Check if trying to reset protected admin password
+  const user = ALL_USERS.find(u => u.Username === RESET_TARGET_USER);
+  if (user && isProtectedAdmin(user)) {
+    showToast('Protected admin password cannot be reset', 'error');
+    closeResetModal();
+    return;
+  }
   
   const username = RESET_TARGET_USER;
   const currentUser = localStorage.getItem("username") || 
@@ -2176,8 +2318,15 @@ function closeResetModal() {
 
 /* ============ DELETE USER WITH MODAL ============ */
 function showDeleteModal(username) {
-  DELETE_TARGET_USER = username;
   const user = ALL_USERS.find(u => u.Username === username);
+  
+  // PROTECTION: Check if trying to delete the specific protected admin
+  if (user && isProtectedAdmin(user)) {
+    showToast('The main admin account (username: admin) is protected and cannot be deleted', 'error');
+    return;
+  }
+  
+  DELETE_TARGET_USER = username;
   
   if (user) {
     document.getElementById('deleteUserName').textContent = `${user.Username} (${user.FullName})`;
@@ -2190,6 +2339,14 @@ function showDeleteModal(username) {
 
 async function deleteUser() {
   if (!DELETE_TARGET_USER) return;
+  
+  // Double-check protection
+  const user = ALL_USERS.find(u => u.Username === DELETE_TARGET_USER);
+  if (user && isProtectedAdmin(user)) {
+    showToast('Protected admin account cannot be deleted', 'error');
+    closeDeleteModal();
+    return;
+  }
   
   const username = DELETE_TARGET_USER;
   const currentUser = localStorage.getItem("username") || 
