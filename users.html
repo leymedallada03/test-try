@@ -1485,12 +1485,17 @@ li.admin-only.admin-visible {
       </div>
     </div>
 
-    <div class="user-info">
-      <span id="userName"></span>
-      <button id="logoutBtn">
+<div class="user-info">
+    <!-- ADD THIS LINE: -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <span id="userName"></span>
+    <button id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
-      </button>
-    </div>
+    </button>
+</div>
   </header>
 
   <!-- Error Message (for consistency with charts.html) -->
@@ -2856,5 +2861,6 @@ window.addEventListener('pageshow', function(event) {
 <script src="js/activity-tracking-final.js"></script>
 </body>
 </html>
+
 
 
