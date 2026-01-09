@@ -1,134 +1,195 @@
-/* global-mobile.css - Mobile-only adjustments */
+/* =================================================================
+   MOBILE-STYLES.CSS
+   Apply this EXACTLY as in dataForm.html to ALL pages
+   Add this AFTER your existing styles
+================================================================= */
 
-/* ============ MOBILE ONLY (max-width: 768px) ============ */
+/* ============ MOBILE STYLES (max-width: 768px) ============ */
 @media (max-width: 768px) {
-    /* Page container */
+    /* Page container - MATCH dataForm.html */
     .page-container {
         grid-template-columns: 1fr !important;
-        padding: 8px;
-        gap: 12px;
+        padding: 8px !important;
+        gap: 12px !important;
+        margin-bottom: 0 !important;
     }
     
     .page-container.collapsed {
         grid-template-columns: 1fr !important;
     }
     
-    /* Topbar */
+    /* TOPBAR - MATCH dataForm.html EXACTLY */
     .topbar {
-        margin: 8px auto;
-        max-width: 100%;
-        padding: 10px 12px;
+        margin: 8px auto !important;
+        max-width: 100% !important;
+        padding: 10px 12px !important;
     }
     
     .brand .logo {
-        width: 50px;
-        height: 50px;
+        width: 50px !important;
+        height: 50px !important;
     }
     
     .brand-text h1 {
-        font-size: 1rem;
+        font-size: 1rem !important;
     }
     
     .brand-text p {
-        font-size: 0.7rem;
+        font-size: 0.7rem !important;
     }
     
     .user-info {
-        gap: 8px;
+        gap: 8px !important;
     }
     
     #userName {
-        font-size: 0.9rem;
-        padding: 6px 12px;
+        font-size: 0.9rem !important;
+        padding: 6px 12px !important;
     }
     
     #logoutBtn {
-        padding: 6px 12px;
-        font-size: 0.85rem;
+        padding: 6px 12px !important;
+        font-size: 0.85rem !important;
     }
     
-    /* Show mobile menu toggle */
+    /* Mobile menu toggle - SHOW exactly as dataForm.html */
     .mobile-menu-toggle {
         display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: none !important;
+        border: none !important;
+        color: white !important;
+        font-size: 1.2rem !important;
+        cursor: pointer !important;
+        padding: 8px !important;
+        border-radius: var(--radius-sm) !important;
     }
     
-    /* Content Header */
+    /* CONTENT HEADER - MATCH dataForm.html EXACTLY */
     .content-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        margin-bottom: 12px !important;
     }
     
     .content-header h2 {
-        font-size: 1.2rem;
+        font-size: 1.2rem !important;
     }
     
-    /* Content Area */
+    /* CONTENT AREA - MATCH dataForm.html EXACTLY */
     .content-area {
-        height: auto;
-        min-height: calc(100vh - 140px);
-        padding: 16px;
-        margin-bottom: 70px;
+        height: auto !important;
+        min-height: calc(100vh - 140px) !important;
+        padding: 16px !important;
+        margin-bottom: 70px !important;
     }
     
-    /* Hide sidebar, show mobile nav */
+    /* Sidebar - hide exactly as dataForm.html */
     .sidebar {
         display: none !important;
     }
     
+    /* Mobile bottom nav - SHOW exactly as dataForm.html */
     .mobile-bottom-nav {
         display: flex !important;
+        flex-direction: column !important;
     }
     
-    /* Body padding */
+    /* Body padding for mobile nav - MATCH dataForm.html */
     body {
-        padding-bottom: 70px;
+        padding-bottom: 70px !important;
     }
 }
 
 /* ============ SMALL MOBILE (max-width: 480px) ============ */
 @media (max-width: 480px) {
+    /* Even smaller topbar - MATCH dataForm.html */
     .topbar {
-        padding: 8px 10px;
+        padding: 8px 10px !important;
+    }
+    
+    .brand {
+        gap: 8px !important;
     }
     
     .brand .logo {
-        width: 45px;
-        height: 45px;
+        width: 45px !important;
+        height: 45px !important;
     }
     
     .brand-text h1 {
-        font-size: 0.95rem;
+        font-size: 0.95rem !important;
     }
     
     #userName {
-        font-size: 0.8rem;
-        padding: 4px 8px;
+        font-size: 0.8rem !important;
+        padding: 4px 8px !important;
     }
     
     #logoutBtn {
-        padding: 5px 10px;
-        font-size: 0.8rem;
+        padding: 5px 10px !important;
+        font-size: 0.8rem !important;
     }
     
+    /* Even smaller content header - MATCH dataForm.html */
     .content-header h2 {
-        font-size: 1.1rem;
+        font-size: 1.1rem !important;
     }
     
     .content-area {
-        padding: 12px;
+        padding: 12px !important;
     }
 }
 
-/* ============ TABLET (769px - 1024px) ============ */
+/* ============ TABLET STYLES (769px - 1024px) ============ */
 @media (min-width: 769px) and (max-width: 1024px) {
+    /* MATCH dataForm.html tablet styles */
     .page-container {
-        max-width: 95%;
-        padding: 10px;
-        gap: 16px;
+        max-width: 95% !important;
+        padding: 10px !important;
+        gap: 16px !important;
     }
     
     .topbar {
-        max-width: 95%;
+        max-width: 95% !important;
     }
+}
+
+/* ============ DESKTOP OVERRIDES TO MATCH dataForm.html ============ */
+/* Hide mobile elements on desktop */
+@media (min-width: 769px) {
+    .mobile-menu-toggle {
+        display: none !important;
+    }
+    
+    .mobile-bottom-nav {
+        display: none !important;
+    }
+}
+
+/* ============ FORCE VISIBILITY CLASSES (for admin items) ============ */
+.admin-only {
+    display: none !important;
+}
+
+.admin-only.admin-visible {
+    display: flex !important;
+}
+
+li.admin-only {
+    display: none !important;
+}
+
+li.admin-only.admin-visible {
+    display: list-item !important;
+}
+
+.mobile-nav-item.admin-only {
+    display: none !important;
+}
+
+.mobile-nav-item.admin-only.admin-visible {
+    display: flex !important;
 }
