@@ -2368,9 +2368,6 @@ li.admin-only.admin-visible {
   </main>
 </div>
 
-<!-- EDIT PANEL OVERLAY -->
-<div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
-
 <!-- EDIT SLIDE-IN PANEL -->
 <div id="editPanel" class="member-panel" aria-hidden="true" role="dialog" aria-label="Edit household panel">
   <div class="panel-header">
@@ -2390,559 +2387,691 @@ li.admin-only.admin-visible {
     </div>
     
     <form id="editForm" onsubmit="return false;">
-      <!-- Head editing -->
-<!-- Card 1: Household Head Information -->
-<div class="edit-card">
-  <div class="form-section">
-    <h5>Household Head Information</h5>
-  </div>
-  
-  <!-- Coordinate Field -->
-  <div style="grid-column: 1 / -1;">
-    <label>Coordinates (optional)</label>
-    <div class="coordinate-container">
-      <input type="text" id="edit_coordinate" placeholder="Latitude, Longitude" />
-      <button type="button" id="edit_getLocationBtn" class="btn secondary">
-        <i class="fas fa-map-marker-alt"></i> Get My Location
-      </button>
-      <button type="button" id="edit_hazardHunterBtn" class="btn hazard-hunter">
-        <i class="fas fa-map-marked-alt"></i> Pick from Hazard Hunter
-      </button>
-    </div>
-    <div class="small-muted">Optional — paste `lat, lng` if available, or use the buttons above.</div>
-  </div>
+      <!-- Card 1: Basic Information -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Basic Information</h5>
+        </div>
+        
+        <div class="form-grid">
+          <div>
+            <label>Coordinates (optional)</label>
+            <div class="coordinate-container">
+              <input type="text" id="edit_coordinate" placeholder="Latitude, Longitude" />
+              <button type="button" id="edit_getLocationBtn" class="btn secondary">
+                <i class="fas fa-map-marker-alt"></i> Get My Location
+              </button>
+              <button type="button" id="edit_hazardHunterBtn" class="btn hazard-hunter">
+                <i class="fas fa-map-marked-alt"></i> Pick from Hazard Hunter
+              </button>
+            </div>
+            <div class="small-muted">Optional — paste `lat, lng` if available, or use the buttons above.</div>
+          </div>
+          
+          <div>
+            <label>Barangay <span class="required">*</span></label>
+            <select id="edit_barangay" required class="animated">
+              <option value="">Select Barangay...</option>
+              <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
+              <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
+              <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
+              <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
+              <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
+              <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
+            </select>
+          </div>
 
-  <div class="form-grid">
-    <div>
-      <label>Barangay <span class="required">*</span></label>
-      <select id="edit_barangay" required class="animated">
-        <option value="">Select Barangay...</option>
-        <option>Balagbag</option><option>Concepcion</option><option>Concordia</option>
-        <option>Dalipit East</option><option>Dalipit West</option><option>Dominador East</option>
-        <option>Dominador West</option><option>Munlawin Sur</option><option>Munlawin Norte</option>
-        <option>Muzon Primero</option><option>Muzon Segundo</option><option>Pinagkurusan</option>
-        <option>Ping-As</option><option>Poblacion East</option><option>Poblacion West</option>
-        <option>San Jose</option><option>San Juan</option><option>Santa Cruz</option><option>Tadlac</option>
-      </select>
-    </div>
-    
-    <div>
-      <label>Sitio / Purok <span class="required">*</span></label>
-      <select id="edit_sitio" required class="animated">
-        <option value="">Select...</option>
-        <option>Purok I</option><option>Purok II</option><option>Purok III</option>
-        <option>Purok IV</option><option>Purok V</option><option>Purok VI</option>
-        <option>Purok VII</option>
-      </select>
-    </div>
+          <div>
+            <label>Sitio / Purok <span class="required">*</span></label>
+            <select id="edit_sitio" required class="animated">
+              <option value="">Select...</option>
+              <option>Purok I</option><option>Purok II</option><option>Purok III</option>
+              <option>Purok IV</option><option>Purok V</option><option>Purok VI</option>
+              <option>Purok VII</option>
+            </select>
+          </div>
 
-    <!-- Household Head Full Name section -->
-    <div style="grid-column: 1 / -1;">
-      <label>Household Head Full Name<span class="required">*</span></label>
-      <div class="head-name-container">
-        <input type="text" id="edit_householdHead" required/>
-      </div>
-      
-      <!-- FIXED: FishR/RBIS Registered button moved inline -->
-      <div class="head-registration-container">
-        <div class="checkbox-item1" style="margin-bottom: 0;">
-          <input type="checkbox" id="edit_headRegisteredCheckbox">
-          <label for="edit_headRegisteredCheckbox">FishR/RBIS Registered</label>
+          <!-- Household Head Full Name section -->
+          <div style="grid-column: 1 / -1;">
+            <label>Household Head Full Name<span class="required">*</span></label>
+            <div class="head-name-container">
+              <input type="text" id="edit_householdHead" required/>
+            </div>
+            
+            <!-- FIXED: FishR/RBIS Registered button moved inline -->
+            <div class="head-registration-container">
+              <div class="checkbox-item1" style="margin-bottom: 0;">
+                <input type="checkbox" id="edit_headRegisteredCheckbox">
+                <label for="edit_headRegisteredCheckbox">FishR/RBIS Registered</label>
+              </div>
+            </div>
+            
+            <div id="edit_headRegistrationField" class="conditional-field">
+              <label>FishR Registered/RBIS Registered</label>
+              <select id="edit_headRegistration" class="animated">
+                <option value="">Select...</option>
+                <option value="FishR Registered">FishR Registered</option>
+                <option value="RBIS Registered">RBIS Registered</option>
+                <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label>Contact no. <span class="required">*</span></label>
+            <input type="text" id="edit_contactNo" placeholder="09XXXXXXXXX" required 
+                   pattern="^(09|\+639)\d{9}$" />
+            <div class="error-message" id="edit_contactError"></div>
+          </div>
+
+          <div>
+            <label>Sex <span class="required">*</span></label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Male" required> Male</label>
+              <label class="radio-item"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
+            </div>
+          </div>
+
+          <div>
+            <label>Birthdate <span class="required">*</span></label>
+            <input type="date" id="edit_householdBirthdate" required/>
+          </div>
+
+          <div>
+            <label>Age</label>
+            <input type="text" id="edit_householdAge" readonly/>
+          </div>
+
+          <div>
+            <label>Age Category</label>
+            <input type="text" id="edit_householdStage" readonly/>
+          </div>
+
+          <div>
+            <label>No. of Household Member/s</label>
+            <input type="number" id="edit_memberCount" min="0" value="0" >
+            <div class="small-muted">Set to 0 if no other members.</div>
+          </div>
+
+          <!-- FIXED: Additional Information checkboxes -->
+          <div style="grid-column: 1 / -1;">
+            <label style="margin-bottom: 0;">Additional Information</label>
+            <div class="small-muted1">Please check (✓) all items that apply.</div>
+            <div class="additional-info-checkbox-container">
+              <div class="additional-info-checkbox-item">
+                <input type="checkbox" id="edit_soloParenting">
+                <label for="edit_soloParenting">Solo Parenting</label>
+              </div>
+              <div class="additional-info-checkbox-item">
+                <input type="checkbox" id="edit_lgbt">
+                <label for="edit_lgbt">LGBT</label>
+              </div>
+              <div class="additional-info-checkbox-item">
+                <input type="checkbox" id="edit_lactating">
+                <label for="edit_lactating">Lactating</label>
+              </div>
+              <div class="additional-info-checkbox-item">
+                <input type="checkbox" id="edit_pregnant">
+                <label for="edit_pregnant">Pregnant</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- MOVED: Persons with Disability (PWD) -->
+          <div>
+            <label>Persons with Disability (PWD)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="Yes" id="edit_pwdYes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="edit_head_pwd" value="No" id="edit_pwdNo" checked> No</label>
+            </div>
+          </div>
+
+          <!-- NEW: Type of Disability Dropdown -->
+          <div id="edit_disabilityTypeField" class="conditional-field" style="grid-column: 1 / -1;">
+            <label>Type of Disability</label>
+            <select id="edit_disabilityType" class="animated">
+              <option value="">Select type of disability...</option>
+              <option value="Physical Disability">Physical Disability</option>
+              <option value="Visual Disability">Visual Disability</option>
+              <option value="Hearing Disability">Hearing Disability</option>
+              <option value="Speech Impairment">Speech Impairment</option>
+              <option value="Intellectual Disability">Intellectual Disability</option>
+              <option value="Psychosocial Disability">Psychosocial Disability</option>
+              <option value="Learning Disability">Learning Disability</option>
+              <option value="Multiple Disabilities">Multiple Disabilities</option>
+            </select>
+          </div>
         </div>
       </div>
-      
-      <div id="edit_headRegistrationField" class="conditional-field">
-        <label>FishR Registered/RBIS Registered</label>
-        <select id="edit_headRegistration" class="animated">
-          <option value="">Select...</option>
-          <option value="FishR Registered">FishR Registered</option>
-          <option value="RBIS Registered">RBIS Registered</option>
-          <option value="FishR & RBIS Registered">FishR & RBIS Registered</option>
-        </select>
+
+      <!-- Card 2: Educational & Economic Status -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Educational & Economic Status</h5>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label>Educational Attainment</label>
+            <select id="edit_educationalAttainment" class="animated">
+              <option value="">Select...</option>
+              <option value="No Formal Education">No Formal Education</option>
+              <option value="Elementary Level">Elementary Level</option>
+              <option value="Elementary Graduate">Elementary Graduate</option>
+              <option value="High School Level">High School Level</option>
+              <option value="High School Graduate">High School Graduate</option>
+              <option value="Senior High School Level">Senior High School Level</option>
+              <option value="Senior High School Graduate">Senior High School Graduate</option>
+              <option value="College Level">College Level</option>
+              <option value="College Graduate">College Graduate</option>
+            </select>
+          </div>
+
+          <div id="edit_collegeCourseField" class="conditional-field">
+            <label>College Graduate Course</label>
+            <input type="text" id="edit_collegeCourse" placeholder="Enter course name" />
+            <div class="small-muted">Please input the official college course acronym only (e.g., BSIT, BSCS, BSA, BSEd–Math).</div>
+          </div>
+
+          <div>
+            <label>Employment</label>
+            <select id="edit_employment" class="animated">
+              <option value="">Select...</option>
+              <option value="Employed">Employed</option>
+              <option value="Unemployed">Unemployed</option>
+            </select>
+          </div>
+
+          <div id="edit_jobTitleField" class="conditional-field">
+            <label>Job Title</label>
+            <select id="edit_jobTitle" class="animated">
+              <option value="">Select...</option>
+              <optgroup label="Office & Administrative Jobs">
+                <option>Administrative Assistant / Admin Staff</option>
+                <option>Office Clerk</option>
+                <option>Secretary / Executive Assistant</option>
+              </optgroup>
+              <optgroup label="Business & Management">
+                <option>Project Manager</option>
+                <option>Operations Manager</option>
+                <option>HR Staff / HR Officer</option>
+                <option>Account Manager</option>
+              </optgroup>
+              <optgroup label="Accounting & Finance">
+                <option>Accounting Staff</option>
+                <option>Bookkeeper</option>
+                <option>Payroll Officer</option>
+                <option>Auditor</option>
+              </optgroup>
+              <optgroup label="IT & Tech">
+                <option>IT Support / IT Technician</option>
+                <option>Web Developer</option>
+                <option>Software Developer / Programmer</option>
+                <option>Data Analyst</option>
+                <option>System Administrator</option>
+              </optgroup>
+              <optgroup label="Healthcare">
+                <option>Nurse (Staff Nurse / Company Nurse)</option>
+                <option>Medical Technologist</option>
+                <option>Caregiver</option>
+                <option>Pharmacist</option>
+              </optgroup>
+              <optgroup label="Education">
+                <option>Teacher / Instructor</option>
+                <option>Tutor</option>
+                <option>School Administrator</option>
+              </optgroup>
+              <optgroup label="Sales & Customer Service">
+                <option>Customer Service Representative (CSR)</option>
+                <option>Sales Associate</option>
+                <option>Cashier</option>
+                <option>Store Supervisor</option>
+              </optgroup>
+              <optgroup label="Skilled Work & Labor">
+                <option>Electrician</option>
+                <option>Plumber</option>
+                <option>Welder</option>
+                <option>Construction Worker / Skilled Laborer</option>
+              </optgroup>
+              <optgroup label="Delivery & Logistics">
+                <option>Driver (Company Driver / Delivery Driver)</option>
+                <option>Logistics Staff</option>
+                <option>Rider / Motorcycle Delivery</option>
+              </optgroup>
+              <optgroup label="Food & Hospitality">
+                <option>Cook / Chef</option>
+                <option>Waiter / Service Crew</option>
+                <option>Barista</option>
+                <option>Housekeeping Staff</option>
+              </optgroup>
+              <optgroup label="Security & Public Service">
+                <option>Security Guard</option>
+                <option>Barangay Staff / Barangay Council Employee</option>
+                <option>Police Officer</option>
+                <option>Fire Officer</option>
+              </optgroup>
+              <optgroup label="Media, Design & Creative">
+                <option>Graphic Designer</option>
+                <option>Video Editor</option>
+                <option>Content Writer</option>
+                <option>Social Media Manager</option>
+              </optgroup>
+              <option>Others</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Overseas Filipino Worker (OFW)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="Yes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="edit_ofw_status" value="No"> No</label>
+            </div>
+          </div>
+
+          <div id="edit_countryField" class="conditional-field">
+            <label>Country</label>
+            <select id="edit_country" class="animated">
+              <option value="">Select...</option>
+              <option>Saudi Arabia</option>
+              <option>United Arab Emirates (UAE)</option>
+              <option>Qatar</option>
+              <option>Kuwait</option>
+              <option>Bahrain</option>
+              <option>Oman</option>
+              <option>Hong Kong</option>
+              <option>Singapore</option>
+              <option>Japan</option>
+              <option>Taiwan</option>
+              <option>Malaysia</option>
+              <option>Australia</option>
+              <option>New Zealand</option>
+              <option>Italy</option>
+              <option>United Kingdom (UK)</option>
+              <option>Germany</option>
+              <option>Cyprus</option>
+              <option>Canada</option>
+              <option>United States (USA)</option>
+              <option>Libya</option>
+              <option>Others</option>
+            </select>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div>
-      <label>Contact no. <span class="required">*</span></label>
-      <input type="text" id="edit_contactNo" placeholder="09XXXXXXXXX" required 
-             pattern="^(09|\+639)\d{9}$" />
-      <div class="error-message" id="edit_contactError"></div>
-    </div>
-
-    <div>
-      <label>Sex <span class="required">*</span></label>
-      <div class="radio-line">
-        <label class="radio-item"><input type="radio" name="edit_head_sex" value="Male" required> Male</label>
-        <label class="radio-item"><input type="radio" name="edit_head_sex" value="Female"> Female</label>
+      <!-- Card 3: UPDATED Health and Status (PWD removed) -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Health and Status</h5>
+        </div>
+        <div class="form-grid">
+          <div style="grid-column: 1 / -1;">
+            <label>Status</label>
+            <select id="edit_head_status" class="animated">
+              <option value="">Select...</option>
+              <optgroup label="Common Sickness">
+                <option value="Cough and colds">Cough and colds</option>
+                <option value="Fever">Fever</option>
+                <option value="Headache">Headache</option>
+                <option value="Diarrhea">Diarrhea</option>
+                <option value="Stomach ache / Hyperacidity">Stomach ache / Hyperacidity</option>
+                <option value="Skin disease (rashes, fungal infection)">Skin disease (rashes, fungal infection)</option>
+                <option value="Urinary Tract Infection (UTI)">Urinary Tract Infection (UTI)</option>
+              </optgroup>
+              <optgroup label="Severe Illness">
+                <option value="Hypertension">Hypertension</option>
+                <option value="Heart Disease">Heart Disease</option>
+                <option value="Stroke">Stroke</option>
+                <option value="Diabetes Mellitus">Diabetes Mellitus</option>
+                <option value="Cancer">Cancer</option>
+                <option value="Tuberculosis (TB)">Tuberculosis (TB)</option>
+                <option value="Chronic Kidney Disease">Chronic Kidney Disease</option>
+                <option value="Severe Asthma / COPD">Severe Asthma / COPD</option>
+                <option value="Others">Others</option>
+              </optgroup>
+            </select>
+          </div>
+          
+          <!-- Others textbox for Status field -->
+          <div id="edit_statusOthersField" class="conditional-field" style="grid-column: 1 / -1;">
+            <label>Specify Other Status</label>
+            <input type="text" id="edit_statusOthers" placeholder="Please specify the status..." />
+            <div class="small-muted">This value will be saved in the Status field instead of "Others".</div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div>
-      <label>Birthdate <span class="required">*</span></label>
-      <input type="date" id="edit_householdBirthdate" required/>
-    </div>
+      <!-- Card 4: Domestic Livestock -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Domestic Livestock</h5>
+        </div>
+        <div class="domestic-grid">
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item1"><input type="checkbox" id="edit_dog_chk"> <span style="font-size: 1.2rem;">🐕</span> Dog</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_dog_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
 
-    <div>
-      <label>Age</label>
-      <input type="text" id="edit_householdAge" readonly/>
-    </div>
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item1"><input type="checkbox" id="edit_cat_chk"> <span style="font-size: 1.2rem;">🐈</span> Cat</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_cat_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
 
-    <div>
-      <label>Age Category</label>
-      <input type="text" id="edit_householdStage" readonly/>
-    </div>
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item1"><input type="checkbox" id="edit_pig_chk"> <span style="font-size: 1.2rem;">🐖</span> Pig</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_pig_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
 
-    <div>
-      <label>No. of Household Member/s <span class="required">*</span></label>
-      <input type="number" id="edit_memberCount" min="0" value="0" required/>
-      <div class="small-muted">Set to 0 if no other members.</div>
-    </div>
-  </div>
-</div>
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item1"><input type="checkbox" id="edit_cow_chk"> <span style="font-size: 1.2rem;">🐄</span> Cow</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_cow_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
 
-<!-- Card 2: Educational & Economic Status -->
-<div class="edit-card">
-  <div class="form-section">
-    <h5>Educational & Economic Status</h5>
-  </div>
-  <div class="form-grid">
-    <div>
-      <label>Educational Attainment</label>
-      <select id="edit_educationalAttainment" class="animated">
-        <option value="">Select...</option>
-        <option value="No Formal Education">No Formal Education</option>
-        <option value="Elementary Level">Elementary Level</option>
-        <option value="Elementary Graduate">Elementary Graduate</option>
-        <option value="High School Level">High School Level</option>
-        <option value="High School Graduate">High School Graduate</option>
-        <option value="Senior High School Level">Senior High School Level</option>
-        <option value="Senior High School Graduate">Senior High School Graduate</option>
-        <option value="College Level">College Level</option>
-        <option value="College Graduate">College Graduate</option>
-      </select>
-    </div>
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item1"><input type="checkbox" id="edit_carabao_chk"> <span style="font-size: 1.2rem;">🐃</span> Carabao</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_carabao_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
 
-    <div id="edit_collegeCourseField" class="conditional-field">
-      <label>College Graduate Course</label>
-      <input type="text" id="edit_collegeCourse" placeholder="Enter course name" />
-      <div class="small-muted">Please input the official college course acronym only (e.g., BSIT, BSCS, BSA, BSEd–Math).</div>
-    </div>
+          <div class="animal-card">
+            <div class="animal-header">
+              <label class="checkbox-item1"><input type="checkbox" id="edit_chicken_chk"> <span style="font-size: 1.2rem;">🐔</span> Chicken</label>
+            </div>
+            <div class="animal-qty">
+              <label>Quantity:</label>
+              <input type="number" id="edit_chicken_qty" class="qty" min="0" placeholder="0" />
+            </div>
+          </div>
+        </div>
 
-    <div>
-      <label>Employment</label>
-      <select id="edit_employment" class="animated">
-        <option value="">Select...</option>
-        <option value="Employed">Employed</option>
-        <option value="Unemployed">Unemployed</option>
-      </select>
-    </div>
-
-    <div id="edit_jobTitleField" class="conditional-field">
-      <label>Job Title</label>
-      <select id="edit_jobTitle" class="animated">
-        <option value="">Select...</option>
-        <optgroup label="Office & Administrative Jobs">
-          <option>Administrative Assistant / Admin Staff</option>
-          <option>Office Clerk</option>
-          <option>Secretary / Executive Assistant</option>
-        </optgroup>
-        <optgroup label="Business & Management">
-          <option>Project Manager</option>
-          <option>Operations Manager</option>
-          <option>HR Staff / HR Officer</option>
-          <option>Account Manager</option>
-        </optgroup>
-        <optgroup label="Accounting & Finance">
-          <option>Accounting Staff</option>
-          <option>Bookkeeper</option>
-          <option>Payroll Officer</option>
-          <option>Auditor</option>
-        </optgroup>
-        <optgroup label="IT & Tech">
-          <option>IT Support / IT Technician</option>
-          <option>Web Developer</option>
-          <option>Software Developer / Programmer</option>
-          <option>Data Analyst</option>
-          <option>System Administrator</option>
-        </optgroup>
-        <optgroup label="Healthcare">
-          <option>Nurse (Staff Nurse / Company Nurse)</option>
-          <option>Medical Technologist</option>
-          <option>Caregiver</option>
-          <option>Pharmacist</option>
-        </optgroup>
-        <optgroup label="Education">
-          <option>Teacher / Instructor</option>
-          <option>Tutor</option>
-          <option>School Administrator</option>
-        </optgroup>
-        <optgroup label="Sales & Customer Service">
-          <option>Customer Service Representative (CSR)</option>
-          <option>Sales Associate</option>
-          <option>Cashier</option>
-          <option>Store Supervisor</option>
-        </optgroup>
-        <optgroup label="Skilled Work & Labor">
-          <option>Electrician</option>
-          <option>Plumber</option>
-          <option>Welder</option>
-          <option>Construction Worker / Skilled Laborer</option>
-        </optgroup>
-        <optgroup label="Delivery & Logistics">
-          <option>Driver (Company Driver / Delivery Driver)</option>
-          <option>Logistics Staff</option>
-          <option>Rider / Motorcycle Delivery</option>
-        </optgroup>
-        <optgroup label="Food & Hospitality">
-          <option>Cook / Chef</option>
-          <option>Waiter / Service Crew</option>
-          <option>Barista</option>
-          <option>Housekeeping Staff</option>
-        </optgroup>
-        <optgroup label="Security & Public Service">
-          <option>Security Guard</option>
-          <option>Barangay Staff / Barangay Council Employee</option>
-          <option>Police Officer</option>
-          <option>Fire Officer</option>
-        </optgroup>
-        <optgroup label="Media, Design & Creative">
-          <option>Graphic Designer</option>
-          <option>Video Editor</option>
-          <option>Content Writer</option>
-          <option>Social Media Manager</option>
-        </optgroup>
-        <option>Others</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Overseas Filipino Worker (OFW)</label>
-      <div class="radio-line">
-        <label class="radio-item"><input type="radio" name="edit_ofw_status" value="Yes"> Yes</label>
-        <label class="radio-item"><input type="radio" name="edit_ofw_status" value="No" checked> No</label>
+        <div style="margin-top: 12px;">
+          <label>Others</label>
+          <textarea id="edit_animals_others" class="others-box" placeholder="Use this field to describe other animals owned in a brief sentence (e.g., '5 goats and 2 ducks')."></textarea>
+        </div>
       </div>
-    </div>
 
-    <div id="edit_countryField" class="conditional-field">
-      <label>Country</label>
-      <select id="edit_country" class="animated">
-        <option value="">Select...</option>
-        <option>Saudi Arabia</option>
-        <option>United Arab Emirates (UAE)</option>
-        <option>Qatar</option>
-        <option>Kuwait</option>
-        <option>Bahrain</option>
-        <option>Oman</option>
-        <option>Hong Kong</option>
-        <option>Singapore</option>
-        <option>Japan</option>
-        <option>Taiwan</option>
-        <option>Malaysia</option>
-        <option>Australia</option>
-        <option>New Zealand</option>
-        <option>Italy</option>
-        <option>United Kingdom (UK)</option>
-        <option>Germany</option>
-        <option>Cyprus</option>
-        <option>Canada</option>
-        <option>United States (USA)</option>
-        <option>Libya</option>
-        <option>Others</option>
-      </select>
-    </div>
-  </div>
-</div>
+      <!-- Card 5: FIXED Transportation & Evacuation Details -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Transportation & Evacuation Details</h5>
+        </div>
+        <div class="form-grid">
+          <!-- FIXED: Reason for Displacement - Checkboxes -->
+          <div style="grid-column: 1 / -1;">
+            <label style="margin-bottom: 0;">Reason for Displacement</label>
+            <div class="small-muted1">Please check (✓) all items that apply.</div>
+            <div class="displacement-checkbox-container">
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_displacement_taal" class="edit_displacement-reason" value="Taal Volcano (Within 14-15 KM Danger Zone)">
+                <label for="edit_displacement_taal">Taal Volcano (Within 14-15 KM Danger Zone)</label>
+              </div>
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_displacement_typhoon" class="edit_displacement-reason" value="Typhoon">
+                <label for="edit_displacement_typhoon">Typhoon</label>
+              </div>
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_displacement_flood" class="edit_displacement-reason" value="Flood">
+                <label for="edit_displacement_flood">Flood</label>
+              </div>
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_displacement_landslide" class="edit_displacement-reason" value="Landslide">
+                <label for="edit_displacement_landslide">Landslide</label>
+              </div>
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_displacement_earthquake" class="edit_displacement-reason" value="Earthquake">
+                <label for="edit_displacement_earthquake">Earthquake</label>
+              </div>
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_displacement_fire" class="edit_displacement-reason" value="Fire">
+                <label for="edit_displacement_fire">Fire</label>
+              </div>
+            </div>
+            
+            <!-- FIXED: Other Reason checkbox -->
+            <div class="displacement-checkbox-item" style="margin-top: 12px;">
+              <input type="checkbox" id="edit_displacement_other_check">
+              <label for="edit_displacement_other_check">Other Reason</label>
+            </div>
+            
+            <div id="edit_displacementOtherField" class="conditional-field" style="margin-top: 8px;">
+              <input type="text" id="edit_displacement_other" placeholder="Please specify other reason for displacement..." />
+              <div class="small-muted">This will be used when none of the listed reasons apply.</div>
+            </div>
+          </div>
 
-<!-- Card 3: Health & Status -->
-<div class="edit-card">
-  <div class="form-section">
-    <h5>Health & Status</h5>
-  </div>
-  <div class="form-grid">
-    <div>
-      <label>Persons with Disability (PWD)</label>
-      <div class="radio-line">
-        <label class="radio-item"><input type="radio" name="edit_head_pwd" value="Yes"> Yes</label>
-        <label class="radio-item"><input type="radio" name="edit_head_pwd" value="No" checked> No</label>
-      </div>
-    </div>
-    <div>
-      <label>Status</label>
-      <select id="edit_head_status" class="animated">
-        <option value="">Select...</option>
-        <option>With Sickness</option>
-        <option>Pregnant</option>
-        <option>Solo Parent</option>
-        <option>Lactating</option>
-        <option>Severe Illness</option>
-        <option>HIV Positive</option>
-        <option>LGBTQ Plus</option>
-      </select>
-    </div>
-  </div>
-</div>
+          <!-- Assembly Area Options -->
+          <div id="edit_assemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; display: none;">
+            <label>Assembly Area</label>
+            <div style="display: flex; gap: 20px;">
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_inside_assembly" class="edit_assembly-option">
+                <label for="edit_inside_assembly">Inside Assembly Area</label>
+              </div>
+              <div class="displacement-checkbox-item">
+                <input type="checkbox" id="edit_outside_assembly" class="edit_assembly-option">
+                <label for="edit_outside_assembly">Outside Assembly Area</label>
+              </div>
+            </div>
+          </div>
 
-<!-- Card 4: Domestic Livestock -->
-<div class="edit-card">
-  <div class="form-section">
-    <h5>Domestic Livestock</h5>
-  </div>
-  <div class="domestic-grid">
-    <div class="animal-card">
-      <div class="animal-header">
-        <label class="checkbox-item1"><input type="checkbox" id="edit_dog_chk"> <span style="font-size: 1.2rem;">🐕</span> Dog</label>
-      </div>
-      <div class="animal-qty">
-        <label>Quantity:</label>
-        <input type="number" id="edit_dog_qty" class="qty" min="0" placeholder="0" />
-      </div>
-    </div>
+          <!-- Inside Assembly Area Fields -->
+          <div id="edit_insideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none;">
+            <div class="form-grid" style="margin-top: 12px;">
+              <div>
+                <label>Pick-Up Location</label>
+                <input type="text" id="edit_pickup" />
+              </div>
+              
+              <div>
+                <label>Assembly Area</label>
+                <input type="text" id="edit_assembly_area" placeholder="Replacement for Drop-Off Location" />
+              </div>
+              
+              <div>
+                <label>Transportation</label>
+                <select id="edit_head_transport" class="animated">
+                  <option value="">Select...</option>
+                  <option>Has Transportation</option>
+                  <option>Needs Transportation</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-    <div class="animal-card">
-      <div class="animal-header">
-        <label class="checkbox-item1"><input type="checkbox" id="edit_cat_chk"> <span style="font-size: 1.2rem;">🐈</span> Cat</label>
-      </div>
-      <div class="animal-qty">
-        <label>Quantity:</label>
-        <input type="number" id="edit_cat_qty" class="qty" min="0" placeholder="0" />
-      </div>
-    </div>
+          <!-- Outside Assembly Area Fields -->
+          <div id="edit_outsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none;">
+            <div class="form-grid" style="margin-top: 12px;">
+              <div>
+                <label>Family/Relative Host</label>
+                <input type="text" id="edit_family_host" />
+              </div>
+              
+              <div>
+                <label>Contact No.</label>
+                <input type="text" id="edit_host_contact" placeholder="Host contact number" />
+              </div>
+              
+              <div>
+                <label>Transportation</label>
+                <select id="edit_outside_transport" class="animated">
+                  <option value="">Select...</option>
+                  <option>Has Transportation</option>
+                  <option>Needs Transportation</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-    <div class="animal-card">
-      <div class="animal-header">
-        <label class="checkbox-item1"><input type="checkbox" id="edit_pig_chk"> <span style="font-size: 1.2rem;">🐖</span> Pig</label>
+          <!-- Old fields (hidden) -->
+          <div style="display: none;">
+            <input type="text" id="edit_dropoff" />
+            <input type="text" id="edit_campName" />
+            <input type="number" id="edit_capacity" min="0" />
+            <input type="number" id="edit_insideCamp" min="0" />
+            <input type="number" id="edit_outsideCamp" min="0"/>
+            <select id="edit_reasons" class="animated">
+              <option value="">Select...</option>
+              <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
+              <option>Typhoon</option>
+              <option>Flood</option>
+              <option>Landslide</option>
+              <option>Earthquake</option>
+              <option>Others</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="animal-qty">
-        <label>Quantity:</label>
-        <input type="number" id="edit_pig_qty" class="qty" min="0" placeholder="0" />
-      </div>
-    </div>
 
-    <div class="animal-card">
-      <div class="animal-header">
-        <label class="checkbox-item1"><input type="checkbox" id="edit_cow_chk"> <span style="font-size: 1.2rem;">🐄</span> Cow</label>
-      </div>
-      <div class="animal-qty">
-        <label>Quantity:</label>
-        <input type="number" id="edit_cow_qty" class="qty" min="0" placeholder="0" />
-      </div>
-    </div>
+      <!-- Card 6: Government Assistance Programs WITH DATE FIELDS -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Government Assistance Programs</h5>
+        </div>
+        
+        <div class="gov-support-grid">
+          <!-- TUPAD with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_tupad">
+            <label for="edit_ass_tupad">TUPAD</label>
+            <div id="edit_ass_tupad_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_tupad_date_input">
+            </div>
+          </div>
+          
+          <!-- Local 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_local4ps">
+            <label for="edit_ass_local4ps">Local 4Ps</label>
+            <div id="edit_ass_local4ps_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_local4ps_date_input">
+            </div>
+          </div>
+          
+          <!-- National 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_intl4ps">
+            <label for="edit_ass_intl4ps">National 4Ps</label>
+            <div id="edit_ass_intl4ps_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_intl4ps_date_input">
+            </div>
+          </div>
+          
+          <!-- Local Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_locsp">
+            <label for="edit_ass_locsp">Local Social Pension</label>
+            <div id="edit_ass_locsp_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_locsp_date_input">
+            </div>
+          </div>
+          
+          <!-- National Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_intlsp">
+            <label for="edit_ass_intlsp">National Social Pension</label>
+            <div id="edit_ass_intlsp_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_intlsp_date_input">
+            </div>
+          </div>
+          
+          <!-- Solo Parent Assistance with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_solo">
+            <label for="edit_ass_solo">Solo Parent Assistance</label>
+            <div id="edit_ass_solo_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_solo_date_input">
+            </div>
+          </div>
+          
+          <!-- Relief Goods with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_relief">
+            <label for="edit_ass_relief">Relief Goods</label>
+            <div id="edit_ass_relief_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_relief_date_input">
+            </div>
+          </div>
+          
+          <!-- Cash Subsidy with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="edit_ass_cash">
+            <label for="edit_ass_cash">Cash Subsidy</label>
+            <div id="edit_ass_cash_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_cash_date_input">
+            </div>
+          </div>
+        </div>
 
-    <div class="animal-card">
-      <div class="animal-header">
-        <label class="checkbox-item1"><input type="checkbox" id="edit_carabao_chk"> <span style="font-size: 1.2rem;">🐃</span> Carabao</label>
+        <div style="margin-top:16px">
+          <label>AICS (if any)</label>
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <select id="edit_ass_aics" class="animated" style="flex: 1; min-width: 200px;">
+              <option value="">None</option>
+              <option>Shelter Assistance</option>
+              <option>Burial</option>
+              <option>Scholarship</option>
+            </select>
+            <div id="edit_ass_aics_date" class="gov-date-field" style="margin-top: 0;">
+              <label>Date:</label>
+              <input type="date" id="edit_ass_aics_date_input">
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="animal-qty">
-        <label>Quantity:</label>
-        <input type="number" id="edit_carabao_qty" class="qty" min="0" placeholder="0" />
-      </div>
-    </div>
 
-    <div class="animal-card">
-      <div class="animal-header">
-        <label class="checkbox-item1"><input type="checkbox" id="edit_chicken_chk"> <span style="font-size: 1.2rem;">🐔</span> Chicken</label>
+      <!-- Card 7: Action Buttons -->
+      <div class="edit-card">
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button id="startSequenceBtn" class="btn">Next → Members (Start sequence)</button>
+          <button id="saveEditBtn" class="btn">Save changes</button>
+          <button id="cancelEditBtn" class="btn secondary1" type="button">Cancel</button>
+        </div>
       </div>
-      <div class="animal-qty">
-        <label>Quantity:</label>
-        <input type="number" id="edit_chicken_qty" class="qty" min="0" placeholder="0" />
-      </div>
-    </div>
-  </div>
 
-  <div style="margin-top: 12px;">
-    <label>Others</label>
-    <textarea id="edit_animals_others" class="others-box" placeholder="Use this field to describe other animals owned in a brief sentence (e.g., '5 goats and 2 ducks')."></textarea>
-  </div>
-</div>
-
-<!-- Card 5: Transportation & Evacuation Details -->
-<div class="edit-card">
-  <div class="form-section">
-    <h5>Transportation & Evacuation Details</h5>
-  </div>
-  <div class="form-grid">
-    <div>
-      <label>Transportation</label>
-      <select id="edit_head_transport" class="animated">
-        <option value="">Select...</option>
-        <option>Has Transportation</option>
-        <option>Needs Transportation</option>
-      </select>
-    </div>
-    
-    <div>
-      <label>Pick-Up Location</label>
-      <input type="text" id="edit_pickup"/>
-    </div>
-    
-    <div>
-      <label>Drop-Off Location</label>
-      <input type="text" id="edit_dropoff"/>
-    </div>
-    
-    <div>
-      <label>Evacuation Camp Name</label>
-      <input type="text" id="edit_campName"/>
-    </div>
-    
-    <div>
-      <label>Camp Capacity</label>
-      <input type="number" id="edit_capacity" min="0"/>
-    </div>
-    
-    <div>
-      <label>Individuals Currently in Camp</label>
-      <input type="number" id="edit_insideCamp" min="0"/>
-    </div>
-    
-    <div>
-      <label>Individuals Outside Camp</label>
-      <input type="number" id="edit_outsideCamp" min="0"/>
-    </div>
-
-    <div style="grid-column:1/-1;">
-      <label>Reason for Displacement</label>
-      <select id="edit_reasons" class="animated">
-        <option value="">Select...</option>
-        <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
-        <option>Typhoon</option>
-        <option>Flood</option>
-        <option>Landslide</option>
-        <option>Earthquake</option>
-        <option>Others</option>
-      </select>
-    </div>
-  </div>
-</div>
-
-<!-- Card 6: Government Assistance Programs - UPDATED WITH DATE FIELDS -->
-<div class="edit-card">
-  <div class="form-section">
-    <h5>Government Assistance Programs</h5>
-  </div>
-  
-  <div class="gov-support-grid">
-    <!-- TUPAD with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_tupad">
-      <label for="edit_ass_tupad">TUPAD</label>
-      <div id="edit_ass_tupad_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_tupad_date_input">
+      <!-- Card 8: Members Section -->
+      <div class="edit-card">
+        <h4>Members</h4>
+        <div class="small-muted">Count: <strong id="edit_previewCount">0</strong></div>
+        <ul id="edit_membersPreview" class="member-preview"></ul>
+        <div style="display:flex;gap:8px; margin-top:10px; justify-content:flex-end;">
+          <button id="edit_addMember" class="btn secondary" type="button">
+            <i class="fas fa-user-plus"></i> Add / Edit Members
+          </button>
+          <button id="edit_removeMember" class="btn secondary" type="button" style="background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
+            <i class="fas fa-user-minus"></i> Remove Member
+          </button>
+        </div>
       </div>
-    </div>
-    
-    <!-- Local 4Ps with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_local4ps">
-      <label for="edit_ass_local4ps">Local 4Ps</label>
-      <div id="edit_ass_local4ps_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_local4ps_date_input">
-      </div>
-    </div>
-    
-    <!-- National 4Ps with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_intl4ps">
-      <label for="edit_ass_intl4ps">National 4Ps</label>
-      <div id="edit_ass_intl4ps_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_intl4ps_date_input">
-      </div>
-    </div>
-    
-    <!-- Local Social Pension with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_locsp">
-      <label for="edit_ass_locsp">Local Social Pension</label>
-      <div id="edit_ass_locsp_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_locsp_date_input">
-      </div>
-    </div>
-    
-    <!-- National Social Pension with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_intlsp">
-      <label for="edit_ass_intlsp">National Social Pension</label>
-      <div id="edit_ass_intlsp_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_intlsp_date_input">
-      </div>
-    </div>
-    
-    <!-- Solo Parent Assistance with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_solo">
-      <label for="edit_ass_solo">Solo Parent Assistance</label>
-      <div id="edit_ass_solo_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_solo_date_input">
-      </div>
-    </div>
-    
-    <!-- Relief Goods with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_relief">
-      <label for="edit_ass_relief">Relief Goods</label>
-      <div id="edit_ass_relief_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_relief_date_input">
-      </div>
-    </div>
-    
-    <!-- Cash Subsidy with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="edit_ass_cash">
-      <label for="edit_ass_cash">Cash Subsidy</label>
-      <div id="edit_ass_cash_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_cash_date_input">
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-top:16px">
-    <label>AICS (if any)</label>
-    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <select id="edit_ass_aics" class="animated" style="flex: 1; min-width: 200px;">
-        <option value="">None</option>
-        <option>Shelter Assistance</option>
-        <option>Burial</option>
-        <option>Scholarship</option>
-      </select>
-      <div id="edit_ass_aics_date" class="gov-date-field" style="margin-top: 0;">
-        <label>Date:</label>
-        <input type="date" id="edit_ass_aics_date_input">
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Card 7: Action Buttons -->
-<div class="edit-card">
-  <div style="display:flex;gap:8px;justify-content:flex-end;">
-    <button id="startSequenceBtn" class="btn">Next → Members (Start sequence)</button>
-    <button id="saveEditBtn" class="btn">Save changes</button>
-    <button id="cancelEditBtn" class="btn secondary1" type="button">Cancel</button>
-  </div>
-</div>
-
-<!-- Card 8: Members Section -->
-<div class="edit-card">
-  <h4>Members</h4>
-  <div class="small-muted">Count: <strong id="edit_previewCount">0</strong></div>
-  <ul id="edit_membersPreview" class="member-preview"></ul>
-  <div style="display:flex;gap:8px; margin-top:10px; justify-content:flex-end;">
-    <button id="edit_addMember" class="btn secondary" type="button">
-      <i class="fas fa-user-plus"></i> Add / Edit Members
-    </button>
-    <button id="edit_removeMember" class="btn secondary" type="button" style="background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
-      <i class="fas fa-user-minus"></i> Remove Member
-    </button>
-  </div>
-</div>
     </form>
   </div>
 </div>
@@ -2955,12 +3084,13 @@ li.admin-only.admin-visible {
   </div>
 
   <div class="panel-body">
-        <div id="validationSummaryMember" class="validation-summary" role="alert" aria-live="polite">
+    <div id="validationSummaryMember" class="validation-summary" role="alert" aria-live="polite">
       <h4><i class="fas fa-exclamation-triangle"></i> Required Fields – The following information must be provided before submission:</h4>
       <ul id="memberValidationErrors"></ul>
     </div>
 
     <form id="memberForm" onsubmit="return false;">
+      <!-- Card 1: Basic Information -->
       <div class="edit-card">
         <div class="form-section">
           <h5>Basic Information</h5>
@@ -3017,9 +3147,59 @@ li.admin-only.admin-visible {
             <label>Age Category</label>
             <input type="text" id="memberStage" class="member-stage" readonly/>
           </div>
+
+          <!-- FIXED: Member Additional Information -->
+          <div style="grid-column: 1 / -1;">
+            <label>Additional Information</label>
+            <div class="small-muted" style="margin-bottom: 8px;">Please check (✓) all items that apply.</div>
+            <div class="member-additional-info-checkbox-container">
+              <div class="member-additional-info-checkbox-item">
+                <input type="checkbox" id="member_soloParenting" class="member-additional">
+                <label for="member_soloParenting">Solo Parenting</label>
+              </div>
+              <div class="member-additional-info-checkbox-item">
+                <input type="checkbox" id="member_lgbt" class="member-additional">
+                <label for="member_lgbt">LGBT</label>
+              </div>
+              <div class="member-additional-info-checkbox-item">
+                <input type="checkbox" id="member_lactating" class="member-additional">
+                <label for="member_lactating">Lactating</label>
+              </div>
+              <div class="member-additional-info-checkbox-item">
+                <input type="checkbox" id="member_pregnant" class="member-additional">
+                <label for="member_pregnant">Pregnant</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- MOVED: Member Persons with Disability (PWD) -->
+          <div>
+            <label>Persons with Disability (PWD)</label>
+            <div class="radio-line">
+              <label class="radio-item"><input type="radio" name="member_pwd" value="Yes" id="member_pwdYes"> Yes</label>
+              <label class="radio-item"><input type="radio" name="member_pwd" value="No" id="member_pwdNo" checked> No</label>
+            </div>
+          </div>
+
+          <!-- NEW: Member Type of Disability Dropdown -->
+          <div id="memberDisabilityTypeField" class="conditional-field" style="grid-column: 1 / -1;">
+            <label>Type of Disability</label>
+            <select id="memberDisabilityType" class="animated">
+              <option value="">Select type of disability...</option>
+              <option value="Physical Disability">Physical Disability</option>
+              <option value="Visual Disability">Visual Disability</option>
+              <option value="Hearing Disability">Hearing Disability</option>
+              <option value="Speech Impairment">Speech Impairment</option>
+              <option value="Intellectual Disability">Intellectual Disability</option>
+              <option value="Psychosocial Disability">Psychosocial Disability</option>
+              <option value="Learning Disability">Learning Disability</option>
+              <option value="Multiple Disabilities">Multiple Disabilities</option>
+            </select>
+          </div>
         </div>
       </div>
 
+      <!-- Card 2: Educational & Economic Status -->
       <div class="edit-card">
         <div class="form-section">
           <h5>Educational & Economic Status</h5>
@@ -3172,81 +3352,167 @@ li.admin-only.admin-visible {
         </div>
       </div>
 
+      <!-- Card 3: UPDATED Health and Status (PWD removed) -->
       <div class="edit-card">
         <div class="form-section">
           <h5>Health and Status</h5>
         </div>
         <div class="form-grid">
-          <div>
-            <label>Persons with Disability (PWD)</label>
-            <div class="radio-line">
-              <label class="radio-item"><input type="radio" name="member_pwd" value="Yes"> Yes</label>
-              <label class="radio-item"><input type="radio" name="member_pwd" value="No" checked> No</label>
-            </div>
-          </div>
-
-          <div>
+          <div style="grid-column: 1 / -1;">
             <label>Status</label>
             <select id="memberStatus" class="member-status animated">
               <option value="">Select...</option>
-              <option>With Sickness</option>
-              <option>Pregnant</option>
-              <option>Solo Parent</option>
-              <option>Lactating</option>
-              <option>Severe Illness</option>
-              <option>HIV Positive</option>
-              <option>LGBTQ Plus</option>
+              <optgroup label="Common Sickness">
+                <option value="Cough and colds">Cough and colds</option>
+                <option value="Fever">Fever</option>
+                <option value="Headache">Headache</option>
+                <option value="Diarrhea">Diarrhea</option>
+                <option value="Stomach ache / Hyperacidity">Stomach ache / Hyperacidity</option>
+                <option value="Skin disease (rashes, fungal infection)">Skin disease (rashes, fungal infection)</option>
+                <option value="Urinary Tract Infection (UTI)">Urinary Tract Infection (UTI)</option>
+              </optgroup>
+              <optgroup label="Severe Illness">
+                <option value="Hypertension">Hypertension</option>
+                <option value="Heart Disease">Heart Disease</option>
+                <option value="Stroke">Stroke</option>
+                <option value="Diabetes Mellitus">Diabetes Mellitus</option>
+                <option value="Cancer">Cancer</option>
+                <option value="Tuberculosis (TB)">Tuberculosis (TB)</option>
+                <option value="Chronic Kidney Disease">Chronic Kidney Disease</option>
+                <option value="Severe Asthma / COPD">Severe Asthma / COPD</option>
+                <option value="Others">Others</option>
+              </optgroup>
             </select>
+          </div>
+          
+          <!-- Others textbox for Member Status field -->
+          <div id="memberStatusOthersField" class="conditional-field" style="grid-column: 1 / -1;">
+            <label>Specify Other Status</label>
+            <input type="text" id="memberStatusOthers" placeholder="Please specify the status..." />
+            <div class="small-muted">This value will be saved in the Status field instead of "Others".</div>
           </div>
         </div>
       </div>
 
+      <!-- Card 4: FIXED Transportation & Evacuation Details -->
       <div class="edit-card">
         <div class="form-section">
           <h5>Transportation & Evacuation Details</h5>
         </div>
         <div class="form-grid">
-          <div>
-            <label>Transportation</label>
-            <select id="memberTransport" class="member-transport animated">
-              <option value="">Select...</option>
-              <option>Has Transportation</option>
-              <option>Needs Transportation</option>
-            </select>
-          </div>
-          
-          <div>
-            <label>Pick-Up Location</label>
-            <input id="memberPickup" class="member-pickup"/>
-          </div>
-          
-          <div>
-            <label>Drop-Off Location</label>
-            <input id="memberDropoff" class="member-dropoff"/>
-          </div>
-          
-          <div>
-            <label>Evacuation Camp Name</label>
-            <input id="memberCamp" class="member-camp"/>
-          </div>
-          
-          <div>
-            <label>Camp Capacity</label>
-            <input type="number" id="memberCampCap" class="member-cap" min="0"/>
-          </div>
-          
-          <div>
-            <label>Individuals Currently in Camp</label>
-            <input type="number" id="memberInside" class="member-inside" min="0"/>
-          </div>
-          
-          <div>
-            <label>Individuals Outside Camp</label>
-            <input type="number" id="memberOutside" class="member-outside" min="0"/>
+          <!-- FIXED: Member Reason for Displacement - Checkboxes -->
+          <div style="grid-column: 1 / -1;">
+            <label>Reason for Displacement</label>
+            <div class="small-muted" style="margin-bottom: 8px;">Please check (✓) all items that apply.</div>
+            <div class="member-displacement-checkbox-container">
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_displacement_taal" class="member-displacement-reason" value="Taal Volcano (Within 14-15 KM Danger Zone)">
+                <label for="member_displacement_taal">Taal Volcano (Within 14-15 KM Danger Zone)</label>
+              </div>
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_displacement_typhoon" class="member-displacement-reason" value="Typhoon">
+                <label for="member_displacement_typhoon">Typhoon</label>
+              </div>
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_displacement_flood" class="member-displacement-reason" value="Flood">
+                <label for="member_displacement_flood">Flood</label>
+              </div>
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_displacement_landslide" class="member-displacement-reason" value="Landslide">
+                <label for="member_displacement_landslide">Landslide</label>
+              </div>
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_displacement_earthquake" class="member-displacement-reason" value="Earthquake">
+                <label for="member_displacement_earthquake">Earthquake</label>
+              </div>
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_displacement_fire" class="member-displacement-reason" value="Fire">
+                <label for="member_displacement_fire">Fire</label>
+              </div>
+            </div>
+            
+            <!-- FIXED: Other Reason checkbox for member -->
+            <div class="member-displacement-checkbox-item" style="margin-top: 12px;">
+              <input type="checkbox" id="member_displacement_other_check">
+              <label for="member_displacement_other_check">Other Reason</label>
+            </div>
+            
+            <div id="memberDisplacementOtherField" class="conditional-field" style="margin-top: 8px;">
+              <input type="text" id="member_displacement_other" placeholder="Please specify other reason for displacement..." />
+              <div class="small-muted">This will be used when none of the listed reasons apply.</div>
+            </div>
           </div>
 
-          <div style="grid-column:1/-1;">
-            <label>Reason for Displacement</label>
+          <!-- Member Assembly Area Options -->
+          <div id="memberAssemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; margin-top: 16px; display: none;">
+            <label>Assembly Area</label>
+            <div style="display: flex; gap: 20px; margin-top: 8px;">
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_inside_assembly" class="member-assembly-option">
+                <label for="member_inside_assembly">Inside Assembly Area</label>
+              </div>
+              <div class="member-displacement-checkbox-item">
+                <input type="checkbox" id="member_outside_assembly" class="member-assembly-option">
+                <label for="member_outside_assembly">Outside Assembly Area</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member Inside Assembly Area Fields -->
+          <div id="memberInsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none;">
+            <div class="form-grid" style="margin-top: 12px;">
+              <div>
+                <label>Pick-Up Location</label>
+                <input id="memberPickup" class="member-pickup"/>
+              </div>
+              
+              <div>
+                <label>Assembly Area</label>
+                <input id="memberAssemblyArea" class="member-assembly-area" placeholder="Replacement for Drop-Off Location" />
+              </div>
+              
+              <div>
+                <label>Transportation</label>
+                <select id="memberTransport" class="member-transport animated">
+                  <option value="">Select...</option>
+                  <option>Has Transportation</option>
+                  <option>Needs Transportation</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member Outside Assembly Area Fields -->
+          <div id="memberOutsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none;">
+            <div class="form-grid" style="margin-top: 12px;">
+              <div>
+                <label>Family/Relative Host</label>
+                <input id="memberFamilyHost" class="member-family-host"/>
+              </div>
+              
+              <div>
+                <label>Contact No.</label>
+                <input id="memberHostContact" class="member-host-contact" placeholder="Host contact number" />
+              </div>
+              
+              <div>
+                <label>Transportation</label>
+                <select id="memberOutsideTransport" class="member-outside-transport animated">
+                  <option value="">Select...</option>
+                  <option>Has Transportation</option>
+                  <option>Needs Transportation</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Old member fields (initially hidden) -->
+          <div style="display: none;">
+            <input id="memberDropoff" class="member-dropoff"/>
+            <input id="memberCamp" class="member-camp"/>
+            <input type="number" id="memberCampCap" class="member-cap" min="0"/>
+            <input type="number" id="memberInside" class="member-inside" min="0"/>
+            <input type="number" id="memberOutside" class="member-outside" min="0"/>
             <select id="memberReason" class="member-reason animated">
               <option value="">Select...</option>
               <option>Taal Volcano (Within 14-15 KM Danger Zone)</option>
@@ -3260,115 +3526,115 @@ li.admin-only.admin-visible {
         </div>
       </div>
 
-      <!-- Card 5: Government Assistance Programs WITH DATE FIELDS -->
-<div class="edit-card">
-  <div class="form-section">
-    <h5>Government Assistance Programs</h5>
-  </div>
-  <div class="gov-support-grid">
-    <!-- TUPAD with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_tupad" class="member_tupad">
-      <label for="member_tupad">TUPAD</label>
-      <div id="member_tupad_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_tupad_date_input" class="member_tupad_date_input">
-      </div>
-    </div>
-    
-    <!-- Local 4Ps with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_local4ps" class="member_local4ps">
-      <label for="member_local4ps">Local 4Ps</label>
-      <div id="member_local4ps_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_local4ps_date_input" class="member_local4ps_date_input">
-      </div>
-    </div>
-    
-    <!-- National 4Ps with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
-      <label for="member_intl4ps">National 4Ps</label>
-      <div id="member_intl4ps_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_intl4ps_date_input" class="member_intl4ps_date_input">
-      </div>
-    </div>
-    
-    <!-- Local Social Pension with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_locsp" class="member_locsp">
-      <label for="member_locsp">Local Social Pension</label>
-      <div id="member_locsp_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_locsp_date_input" class="member_locsp_date_input">
-      </div>
-    </div>
-    
-    <!-- National Social Pension with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_intlsp" class="member_intlsp">
-      <label for="member_intlsp">National Social Pension</label>
-      <div id="member_intlsp_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_intlsp_date_input" class="member_intlsp_date_input">
-      </div>
-    </div>
-    
-    <!-- Solo Parent Assistance with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_solo" class="member_solo">
-      <label for="member_solo">Solo Parent Assistance</label>
-      <div id="member_solo_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_solo_date_input" class="member_solo_date_input">
-      </div>
-    </div>
-    
-    <!-- Relief Goods with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_relief" class="member_relief">
-      <label for="member_relief">Relief Goods</label>
-      <div id="member_relief_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_relief_date_input" class="member_relief_date_input">
-      </div>
-    </div>
-    
-    <!-- Cash Subsidy with Date -->
-    <div class="gov-checkbox-with-date">
-      <input type="checkbox" id="member_cash" class="member_cash">
-      <label for="member_cash">Cash Subsidy</label>
-      <div id="member_cash_date" class="gov-date-field">
-        <label>Date:</label>
-        <input type="date" id="member_cash_date_input" class="member_cash_date_input">
-      </div>
-    </div>
-  </div>
+      <!-- Card 5: Government Assistance Programs WITH DATES -->
+      <div class="edit-card">
+        <div class="form-section">
+          <h5>Government Assistance Programs</h5>
+        </div>
+        <div class="gov-support-grid">
+          <!-- TUPAD with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_tupad" class="member_tupad">
+            <label for="member_tupad">TUPAD</label>
+            <div id="member_tupad_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_tupad_date_input" class="member_tupad_date_input">
+            </div>
+          </div>
+          
+          <!-- Local 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_local4ps" class="member_local4ps">
+            <label for="member_local4ps">Local 4Ps</label>
+            <div id="member_local4ps_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_local4ps_date_input" class="member_local4ps_date_input">
+            </div>
+          </div>
+          
+          <!-- National 4Ps with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_intl4ps" class="member_intl4ps">
+            <label for="member_intl4ps">National 4Ps</label>
+            <div id="member_intl4ps_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_intl4ps_date_input" class="member_intl4ps_date_input">
+            </div>
+          </div>
+          
+          <!-- Local Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_locsp" class="member_locsp">
+            <label for="member_locsp">Local Social Pension</label>
+            <div id="member_locsp_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_locsp_date_input" class="member_locsp_date_input">
+            </div>
+          </div>
+          
+          <!-- National Social Pension with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_intlsp" class="member_intlsp">
+            <label for="member_intlsp">National Social Pension</label>
+            <div id="member_intlsp_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_intlsp_date_input" class="member_intlsp_date_input">
+            </div>
+          </div>
+          
+          <!-- Solo Parent Assistance with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_solo" class="member_solo">
+            <label for="member_solo">Solo Parent Assistance</label>
+            <div id="member_solo_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_solo_date_input" class="member_solo_date_input">
+            </div>
+          </div>
+          
+          <!-- Relief Goods with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_relief" class="member_relief">
+            <label for="member_relief">Relief Goods</label>
+            <div id="member_relief_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_relief_date_input" class="member_relief_date_input">
+            </div>
+          </div>
+          
+          <!-- Cash Subsidy with Date -->
+          <div class="gov-checkbox-with-date">
+            <input type="checkbox" id="member_cash" class="member_cash">
+            <label for="member_cash">Cash Subsidy</label>
+            <div id="member_cash_date" class="gov-date-field">
+              <label>Date:</label>
+              <input type="date" id="member_cash_date_input" class="member_cash_date_input">
+            </div>
+          </div>
+        </div>
 
-  <div style="margin-top:16px">
-    <label>AICS (if any)</label>
-    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <select id="memberAics" class="member_aics animated" style="flex: 1; min-width: 200px;">
-        <option value="">None</option>
-        <option>Shelter Assistance</option>
-        <option>Burial</option>
-        <option>Scholarship</option>
-      </select>
-      <div id="member_aics_date" class="gov-date-field" style="margin-top: 0;">
-        <label>Date:</label>
-        <input type="date" id="member_aics_date_input" class="member_aics_date_input">
+        <div style="margin-top:16px">
+          <label>AICS (if any)</label>
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <select id="memberAics" class="member_aics animated" style="flex: 1; min-width: 200px;">
+              <option value="">None</option>
+              <option>Shelter Assistance</option>
+              <option>Burial</option>
+              <option>Scholarship</option>
+            </select>
+            <div id="member_aics_date" class="gov-date-field" style="margin-top: 0;">
+              <label>Date:</label>
+              <input type="date" id="member_aics_date_input" class="member_aics_date_input">
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<div class="panel-actions" style="margin-top:20px;">
-  <button id="memberBack" class="btn btn secondary" type="button">Back</button>
-  <button id="memberCancel" class="btn" type="button">Cancel</button>
-  <button id="memberNext" class="btn" type="button">Save & Next</button>
-</div>
+      <div class="panel-actions" style="margin-top:20px;">
+        <button id="memberBack" class="btn btn secondary" type="button">Back</button>
+        <button id="memberCancel" class="btn" type="button">Cancel</button>
+        <button id="memberNext" class="btn" type="button">Save & Next</button>
+      </div>
     </form>
   </div>
 </div>
@@ -6031,11 +6297,72 @@ function onEdit(id){
         $('edit_country').value = '';
     }
     
-    // Health & Status - FIXED to use radio-line styling
-const pwdValue = editHead['PWD'] || editHead['Persons with Disability (PWD)'] || 'No';
+// Additional Information checkboxes
+$('edit_soloParenting').checked = editHead['Solo Parenting'] === 'Yes';
+$('edit_lgbt').checked = editHead['LGBT'] === 'Yes';
+$('edit_lactating').checked = editHead['Lactating'] === 'Yes';
+$('edit_pregnant').checked = editHead['Pregnant'] === 'Yes';
+
+// PWD and Disability Type
+const pwdValue = editHead['Persons with Disability (PWD)'] || editHead['PWD'] || 'No';
 qAll("input[name='edit_head_pwd']").forEach(r => {
-  r.checked = (r.value.toLowerCase() === String(pwdValue).toLowerCase());
+  r.checked = (r.value === pwdValue);
 });
+
+$('edit_disabilityType').value = editHead['Type of Disability'] || '';
+
+// Status field with Others option
+const statusValue = editHead['Status'] || '';
+if (statusValue === 'Others') {
+  $('edit_head_status').value = 'Others';
+  $('edit_statusOthersField').classList.add('show');
+  $('edit_statusOthers').value = editHead['Status Others'] || editHead['Status'] || '';
+} else {
+  $('edit_head_status').value = statusValue;
+}
+
+// Displacement reasons
+const displacementReasons = editHead['Reasons for Displacement'] || '';
+if (displacementReasons) {
+  const reasons = displacementReasons.split(';').map(r => r.trim());
+  
+  // Check individual checkboxes
+  $('edit_displacement_taal').checked = reasons.includes('Taal Volcano (Within 14-15 KM Danger Zone)');
+  $('edit_displacement_typhoon').checked = reasons.includes('Typhoon');
+  $('edit_displacement_flood').checked = reasons.includes('Flood');
+  $('edit_displacement_landslide').checked = reasons.includes('Landslide');
+  $('edit_displacement_earthquake').checked = reasons.includes('Earthquake');
+  $('edit_displacement_fire').checked = reasons.includes('Fire');
+  
+  // Check if there are other reasons
+  const otherReasons = reasons.filter(r => ![
+    'Taal Volcano (Within 14-15 KM Danger Zone)',
+    'Typhoon',
+    'Flood',
+    'Landslide',
+    'Earthquake',
+    'Fire'
+  ].includes(r));
+  
+  if (otherReasons.length > 0) {
+    $('edit_displacement_other_check').checked = true;
+    $('edit_displacementOtherField').classList.add('show');
+    $('edit_displacement_other').value = otherReasons.join('; ');
+  }
+}
+
+// Assembly area
+$('edit_inside_assembly').checked = editHead['Assembly Area'] === 'Inside';
+$('edit_outside_assembly').checked = editHead['Assembly Area'] === 'Outside';
+
+// Assembly area fields
+$('edit_pickup').value = editHead['Pick-Up Location'] || '';
+$('edit_assembly_area').value = editHead['Assembly Area Name'] || '';
+$('edit_head_transport').value = editHead['Transportation'] || '';
+$('edit_family_host').value = editHead['Family/Relative Host'] || '';
+$('edit_host_contact').value = editHead['Host Contact No.'] || '';
+$('edit_outside_transport').value = editHead['Outside Transportation'] || '';
+
     $('edit_head_status').value = editHead['Status'] || '';
     
     // Domestic Animals - FIXED with checkbox sync
@@ -6216,29 +6543,30 @@ function createEmptyMember(){
     'Birthdate':'',
     'Age':'',
     'Stage':'',
+    'Solo Parenting': 'No',
+    'LGBT': 'No',
+    'Lactating': 'No',
+    'Pregnant': 'No',
     'Persons with Disability (PWD)':'No',
+    'Type of Disability': '',
     'Status':'',
+    'Status Others': '',
     'Educational Attainment':'',
     'College Graduate Course':'',
     'Employment':'',
     'Job Title':'',
     'Overseas Filipino Worker(OFW)':'No',
     'Country':'',
-    'Transportation':'',
-    'Designated Pick-Up Point':'',
-    'Pick-Up Location':'',
-    'Drop-Off Point':'',
-    'Drop-Off Location':'',
-    'Name of Camp':'',
-    'Evacuation Camp Name':'',
-    'Capacity':'',
-    'No. of Individuals Inside Camp':'',
-    'Individuals Currently in Camp':'',
-    'No. of Individuals Outside Camp':'',
-    'Individuals Outside Camp':'',
     'Reasons for Displacement':'',
+    'Assembly Area': '',
+    'Pick-Up Location':'',
+    'Assembly Area Name': '',
+    'Transportation':'',
+    'Family/Relative Host': '',
+    'Host Contact No.': '',
+    'Outside Transportation': '',
     
-    // Government Assistance with Date Fields - ADD THESE:
+    // Government Assistance with Date Fields
     'TUPAD':'No',
     'TUPAD_Date':'',
     'Local 4Ps':'No',
@@ -6423,7 +6751,95 @@ function setupEditConditionalFields() {
             }
         });
     }
-    
+    // Member PWD to Disability Type
+const memberPwdRadios = document.querySelectorAll("input[name='member_pwd']");
+const memberDisabilityTypeField = $('memberDisabilityTypeField');
+
+memberPwdRadios.forEach(radio => {
+  radio.addEventListener('change', function() {
+    if (this.value === 'Yes') {
+      memberDisabilityTypeField.classList.add('show');
+      $('memberDisabilityType').required = true;
+    } else {
+      memberDisabilityTypeField.classList.remove('show');
+      $('memberDisabilityType').required = false;
+      $('memberDisabilityType').value = '';
+    }
+  });
+});
+
+// Member Status Others field
+const memberStatusSelect = $('memberStatus');
+const memberStatusOthersField = $('memberStatusOthersField');
+
+if (memberStatusSelect) {
+  memberStatusSelect.addEventListener('change', function() {
+    if (this.value === 'Others') {
+      memberStatusOthersField.classList.add('show');
+      $('memberStatusOthers').required = true;
+    } else {
+      memberStatusOthersField.classList.remove('show');
+      $('memberStatusOthers').required = false;
+      $('memberStatusOthers').value = '';
+    }
+  });
+}
+
+// Member Displacement other field
+const memberDisplacementOtherCheck = $('member_displacement_other_check');
+const memberDisplacementOtherField = $('memberDisplacementOtherField');
+
+if (memberDisplacementOtherCheck) {
+  memberDisplacementOtherCheck.addEventListener('change', function() {
+    if (this.checked) {
+      memberDisplacementOtherField.classList.add('show');
+      $('member_displacement_other').required = true;
+    } else {
+      memberDisplacementOtherField.classList.remove('show');
+      $('member_displacement_other').required = false;
+      $('member_displacement_other').value = '';
+    }
+  });
+}
+
+// Member Assembly area options
+const memberAssemblyOptions = document.querySelectorAll('.member-assembly-option');
+const memberAssemblyAreaOptions = $('memberAssemblyAreaOptions');
+const memberInsideAssemblyFields = $('memberInsideAssemblyFields');
+const memberOutsideAssemblyFields = $('memberOutsideAssemblyFields');
+
+// Check if any member displacement reason is selected
+const memberDisplacementCheckboxes = document.querySelectorAll('.member-displacement-reason, #member_displacement_other_check');
+memberDisplacementCheckboxes.forEach(cb => {
+  cb.addEventListener('change', function() {
+    const anyChecked = Array.from(memberDisplacementCheckboxes).some(cb => cb.checked);
+    if (anyChecked) {
+      memberAssemblyAreaOptions.style.display = 'block';
+    } else {
+      memberAssemblyAreaOptions.style.display = 'none';
+      memberInsideAssemblyFields.style.display = 'none';
+      memberOutsideAssemblyFields.style.display = 'none';
+    }
+  });
+});
+
+// Member Inside/Outside assembly area toggle
+if (memberAssemblyOptions.length > 0) {
+  memberAssemblyOptions.forEach(option => {
+    option.addEventListener('change', function() {
+      if (this.id === 'member_inside_assembly' && this.checked) {
+        memberInsideAssemblyFields.style.display = 'block';
+        memberOutsideAssemblyFields.style.display = 'none';
+      } else if (this.id === 'member_outside_assembly' && this.checked) {
+        memberInsideAssemblyFields.style.display = 'none';
+        memberOutsideAssemblyFields.style.display = 'block';
+      } else {
+        memberInsideAssemblyFields.style.display = 'none';
+        memberOutsideAssemblyFields.style.display = 'none';
+      }
+    });
+  });
+}
     // Member OFW Status -> Country
     const memberOfwRadios = document.querySelectorAll('input[name="member_ofw_status"]');
     const memberCountryField = $('memberCountryField');
@@ -6674,6 +7090,61 @@ qAll("input[name='member_pwd']").forEach(r => {
   }, 300);
 }
 
+function getDisplacementReasons() {
+    const reasons = [];
+    const checkboxes = [
+        { id: 'displacement_taal', value: 'Taal Volcano (Within 14-15 KM Danger Zone)' },
+        { id: 'displacement_typhoon', value: 'Typhoon' },
+        { id: 'displacement_flood', value: 'Flood' },
+        { id: 'displacement_landslide', value: 'Landslide' },
+        { id: 'displacement_earthquake', value: 'Earthquake' },
+        { id: 'displacement_fire', value: 'Fire' }
+    ];
+    
+    checkboxes.forEach(cb => {
+        const element = $(cb.id);
+        if (element && element.checked) {
+            reasons.push(cb.value);
+        }
+    });
+    
+    // Check for "Other" reason
+    const otherCheck = $('displacement_other_check');
+    const otherText = $('displacement_other');
+    if (otherCheck && otherCheck.checked && otherText && otherText.value.trim()) {
+        reasons.push(otherText.value.trim());
+    }
+    
+    return reasons.join('; ');
+}
+
+function getMemberDisplacementReasons() {
+    const reasons = [];
+    const checkboxes = [
+        { id: 'member_displacement_taal', value: 'Taal Volcano (Within 14-15 KM Danger Zone)' },
+        { id: 'member_displacement_typhoon', value: 'Typhoon' },
+        { id: 'member_displacement_flood', value: 'Flood' },
+        { id: 'member_displacement_landslide', value: 'Landslide' },
+        { id: 'member_displacement_earthquake', value: 'Earthquake' },
+        { id: 'member_displacement_fire', value: 'Fire' }
+    ];
+    
+    checkboxes.forEach(cb => {
+        const element = $(cb.id);
+        if (element && element.checked) {
+            reasons.push(cb.value);
+        }
+    });
+    
+    // Check for "Other" reason
+    const otherCheck = $('member_displacement_other_check');
+    const otherText = $('member_displacement_other');
+    if (otherCheck && otherCheck.checked && otherText && otherText.value.trim()) {
+        reasons.push(otherText.value.trim());
+    }
+    
+    return reasons.join('; ');
+}
 
 function openMemberPanelForEdit(index){
   // Ensure we have valid head data first
@@ -6706,7 +7177,7 @@ function openMemberPanelForEdit(index){
 }
 
 /* ============ FIXED: collectHeadFromEditForm() FUNCTION ============ */
-function collectHeadFromEditForm(){
+function collectHeadFromEditForm() {
   console.log("Collecting head from edit form...");
   
   const bd_input = $('edit_householdBirthdate').value || '';
@@ -6743,15 +7214,39 @@ function collectHeadFromEditForm(){
     'Age': headAgeVal,
     'Stage': headAgeInfo ? headAgeInfo.stage : '',
     'No. of Household Member/s': String($('edit_memberCount').value || '0'),
-'Persons with Disability (PWD)': document.querySelector("input[name='edit_head_pwd']:checked")?.value || '',
-'PWD': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
+    
+    // NEW: Additional Information fields
+    'Solo Parenting': $('edit_soloParenting')?.checked ? 'Yes' : 'No',
+    'LGBT': $('edit_lgbt')?.checked ? 'Yes' : 'No',
+    'Lactating': $('edit_lactating')?.checked ? 'Yes' : 'No',
+    'Pregnant': $('edit_pregnant')?.checked ? 'Yes' : 'No',
+    
+    // MOVED: PWD to Basic Information
+    'Persons with Disability (PWD)': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
+    'PWD': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
+    'Type of Disability': $('edit_disabilityType')?.value || '',
+    
     'Status': $('edit_head_status').value || '',
+    'Status Others': $('edit_statusOthers')?.value || '',
     'Educational Attainment': $('edit_educationalAttainment').value || '',
     'College Graduate Course': $('edit_collegeCourse').value || '',
     'Employment': $('edit_employment').value || '',
     'Job Title': $('edit_jobTitle').value || '',
     'Overseas Filipino Worker(OFW)': document.querySelector("input[name='edit_ofw_status']:checked")?.value || 'No',
     'Country': $('edit_country').value || '',
+    
+    // NEW: Transportation & Evacuation structure
+    'Displacement Reasons': getDisplacementReasons(),
+    'Inside Assembly Area': $('edit_inside_assembly')?.checked ? 'Yes' : 'No',
+    'Outside Assembly Area': $('edit_outside_assembly')?.checked ? 'Yes' : 'No',
+    'Pick-Up Location': $('edit_pickup').value || '',
+    'Assembly Area': $('edit_assembly_area').value || '',
+    'Transportation': $('edit_head_transport').value || '',
+    'Family/Relative Host': $('edit_family_host').value || '',
+    'Host Contact': $('edit_host_contact').value || '',
+    'Outside Transportation': $('edit_outside_transport').value || '',
+    
+    // Old fields for backward compatibility
     'Transportation': $('edit_head_transport').value || '',
     'Designated Pick-Up Point': $('edit_pickup').value || '',
     'Pick-Up Location': $('edit_pickup').value || '',
@@ -6765,6 +7260,8 @@ function collectHeadFromEditForm(){
     'No. of Individuals Outside Camp': $('edit_outsideCamp').value || '',
     'Individuals Outside Camp': $('edit_outsideCamp').value || '',
     'Reasons for Displacement': $('edit_reasons').value || '',
+    
+    // Domestic Animals
     'Dog': $('edit_dog_chk').checked ? 'Yes' : 'No',
     'Dog Qty.': $('edit_dog_qty').value || '',
     'Cat': $('edit_cat_chk').checked ? 'Yes' : 'No',
@@ -6779,7 +7276,7 @@ function collectHeadFromEditForm(){
     'Chicken Qty.': $('edit_chicken_qty').value || '',
     'Others': $('edit_animals_others').value || '',
     
-    // Government Assistance Programs with Date Fields - FIXED: Properly check for date fields
+    // Government Assistance Programs with Date Fields
     'TUPAD': $('edit_ass_tupad').checked ? 'Yes' : 'No',
     'TUPAD_Date': $('edit_ass_tupad_date_input').value ? toSheetDate($('edit_ass_tupad_date_input').value) : '',
     'Local 4Ps': $('edit_ass_local4ps').checked ? 'Yes' : 'No',
@@ -6871,34 +7368,57 @@ function collectMemberPanelToEdit(){
   const obj = {
     'Data ID': editDataID,
     'Name of Household Member/s': name,
-    'FishR & RBIS': registrationValue, // This is the actual column name
-    'FishR Registered/RBIS Registered': registrationValue, // Keep both for compatibility
+    'FishR & RBIS': registrationValue,
+    'FishR Registered/RBIS Registered': registrationValue,
     'Contact no.': formatContactNumber($('memberContact').value || ''),
     'Sex': document.querySelector("input[name='member_sex']:checked")?.value || '',
     'Birthdate': birth_for_sheet,
     'Age': ageVal,
     'Stage': stageVal,
+    
+    // Additional Information
+    'Solo Parenting': $('member_soloParenting').checked ? 'Yes' : 'No',
+    'LGBT': $('member_lgbt').checked ? 'Yes' : 'No',
+    'Lactating': $('member_lactating').checked ? 'Yes' : 'No',
+    'Pregnant': $('member_pregnant').checked ? 'Yes' : 'No',
+    
+    // PWD and Disability Type
     'Persons with Disability (PWD)': document.querySelector("input[name='member_pwd']:checked")?.value || 'No',
-    'Status': $('memberStatus').value || '',
+    'Type of Disability': $('memberDisabilityType').value || '',
+    
+    // Status with Others option
+    'Status': $('memberStatus').value === 'Others' ? $('memberStatusOthers').value || '' : $('memberStatus').value || '',
+    
     'Educational Attainment': $('memberEducationalAttainment').value || '',
     'College Graduate Course': $('memberCollegeCourse').value || '',
     'Employment': $('memberEmployment').value || '',
     'Job Title': $('memberJobTitle').value || '',
     'Overseas Filipino Worker(OFW)': document.querySelector("input[name='member_ofw_status']:checked")?.value || 'No',
     'Country': $('memberCountry').value || '',
-    'Transportation': $('memberTransport').value || '',
-    'Designated Pick-Up Point': $('memberPickup').value || '',
+    
+    // Displacement reasons
+    'Reasons for Displacement': (() => {
+      const reasons = [];
+      if ($('member_displacement_taal').checked) reasons.push('Taal Volcano (Within 14-15 KM Danger Zone)');
+      if ($('member_displacement_typhoon').checked) reasons.push('Typhoon');
+      if ($('member_displacement_flood').checked) reasons.push('Flood');
+      if ($('member_displacement_landslide').checked) reasons.push('Landslide');
+      if ($('member_displacement_earthquake').checked) reasons.push('Earthquake');
+      if ($('member_displacement_fire').checked) reasons.push('Fire');
+      if ($('member_displacement_other_check').checked && $('member_displacement_other').value.trim()) {
+        reasons.push($('member_displacement_other').value.trim());
+      }
+      return reasons.join('; ');
+    })(),
+    
+    // Assembly area
+    'Assembly Area': $('member_inside_assembly').checked ? 'Inside' : $('member_outside_assembly').checked ? 'Outside' : '',
     'Pick-Up Location': $('memberPickup').value || '',
-    'Drop-Off Point': $('memberDropoff').value || '',
-    'Drop-Off Location': $('memberDropoff').value || '',
-    'Name of Camp': $('memberCamp').value || '',
-    'Evacuation Camp Name': $('memberCamp').value || '',
-    'Capacity': $('memberCampCap').value || '',
-    'No. of Individuals Inside Camp': $('memberInside').value || '',
-    'Individuals Currently in Camp': $('memberInside').value || '',
-    'No. of Individuals Outside Camp': $('memberOutside').value || '',
-    'Individuals Outside Camp': $('memberOutside').value || '',
-    'Reasons for Displacement': $('memberReason').value || '',
+    'Assembly Area Name': $('memberAssemblyArea').value || '',
+    'Transportation': $('memberTransport').value || '',
+    'Family/Relative Host': $('memberFamilyHost').value || '',
+    'Host Contact No.': $('memberHostContact').value || '',
+    'Outside Transportation': $('memberOutsideTransport').value || '',
     
     // Government Assistance with Date Fields
     'TUPAD': $('member_tupad').checked ? 'Yes' : 'No',
@@ -8263,7 +8783,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="js/activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
