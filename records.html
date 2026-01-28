@@ -2821,7 +2821,7 @@ li.admin-only.admin-visible {
           <!-- FIXED: Reason for Displacement - Checkboxes -->
           <div style="grid-column: 1 / -1;">
             <label style="margin-bottom: 0;">Reason for Displacement</label>
-            <div class="small-muted1">Please check (✓) all items that apply.</div>
+            <div class="small-muted">Please check (✓) all items that apply.</div>
             <div class="displacement-checkbox-container">
               <div class="displacement-checkbox-item">
                 <input type="checkbox" id="edit_displacement_taal" class="edit_displacement-reason" value="Taal Volcano (Within 14-15 KM Danger Zone)">
@@ -6399,7 +6399,7 @@ function onEdit(id){
     $('edit_host_contact').value = editHead['Host_Contact'] || '';
     $('edit_pickup').value = editHead['Pick-Up Location'] || '';
     $('edit_assembly_area').value = editHead['Assembly Area'] || '';
-    $('edit_head_transport').value = editHead['Transportation'] || '';
+    $('edit_head_transport').value = editHead['Transportation'] || editHead['outside_transport'] || '';
     /* ============ END DISPLACEMENT FIX ============ */
 
     $('edit_head_status').value = editHead['Status'] || '';
