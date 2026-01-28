@@ -6751,6 +6751,48 @@ function setupEditConditionalFields() {
         });
     }
     
+    // Head PWD to Disability Type - ADDED THIS SECTION
+    const headPwdRadios = document.querySelectorAll("input[name='edit_head_pwd']");
+    const disabilityTypeField = $('edit_disabilityTypeField');
+    
+    if (headPwdRadios.length > 0) {
+        headPwdRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'Yes') {
+                    disabilityTypeField.classList.add('show');
+                    $('edit_disabilityType').required = true;
+                } else {
+                    disabilityTypeField.classList.remove('show');
+                    $('edit_disabilityType').required = false;
+                    $('edit_disabilityType').value = '';
+                }
+            });
+        });
+        
+        // Initialize based on current state
+        const headPwdChecked = document.querySelector("input[name='edit_head_pwd']:checked");
+        if (headPwdChecked && headPwdChecked.value === 'Yes') {
+            disabilityTypeField.classList.add('show');
+        }
+    }
+    
+    // Head Status Others field
+    const headStatusSelect = $('edit_head_status');
+    const statusOthersField = $('edit_statusOthersField');
+    
+    if (headStatusSelect) {
+        headStatusSelect.addEventListener('change', function() {
+            if (this.value === 'Others') {
+                statusOthersField.classList.add('show');
+                $('edit_statusOthers').required = true;
+            } else {
+                statusOthersField.classList.remove('show');
+                $('edit_statusOthers').required = false;
+                $('edit_statusOthers').value = '';
+            }
+        });
+    }
+    
     // Member Registered Checkbox
     const memberRegisteredCheckbox = $('memberRegisteredCheckbox');
     const memberRegistrationField = $('memberRegistrationField');
@@ -6804,95 +6846,111 @@ function setupEditConditionalFields() {
             }
         });
     }
+    
     // Member PWD to Disability Type
-const memberPwdRadios = document.querySelectorAll("input[name='member_pwd']");
-const memberDisabilityTypeField = $('memberDisabilityTypeField');
-
-memberPwdRadios.forEach(radio => {
-  radio.addEventListener('change', function() {
-    if (this.value === 'Yes') {
-      memberDisabilityTypeField.classList.add('show');
-      $('memberDisabilityType').required = true;
-    } else {
-      memberDisabilityTypeField.classList.remove('show');
-      $('memberDisabilityType').required = false;
-      $('memberDisabilityType').value = '';
+    const memberPwdRadios = document.querySelectorAll("input[name='member_pwd']");
+    const memberDisabilityTypeField = $('memberDisabilityTypeField');
+    
+    if (memberPwdRadios.length > 0) {
+        memberPwdRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'Yes') {
+                    memberDisabilityTypeField.classList.add('show');
+                    $('memberDisabilityType').required = true;
+                } else {
+                    memberDisabilityTypeField.classList.remove('show');
+                    $('memberDisabilityType').required = false;
+                    $('memberDisabilityType').value = '';
+                }
+            });
+        });
     }
-  });
-});
-
-// Member Status Others field
-const memberStatusSelect = $('memberStatus');
-const memberStatusOthersField = $('memberStatusOthersField');
-
-if (memberStatusSelect) {
-  memberStatusSelect.addEventListener('change', function() {
-    if (this.value === 'Others') {
-      memberStatusOthersField.classList.add('show');
-      $('memberStatusOthers').required = true;
-    } else {
-      memberStatusOthersField.classList.remove('show');
-      $('memberStatusOthers').required = false;
-      $('memberStatusOthers').value = '';
+    
+    // Member Status Others field
+    const memberStatusSelect = $('memberStatus');
+    const memberStatusOthersField = $('memberStatusOthersField');
+    
+    if (memberStatusSelect) {
+        memberStatusSelect.addEventListener('change', function() {
+            if (this.value === 'Others') {
+                memberStatusOthersField.classList.add('show');
+                $('memberStatusOthers').required = true;
+            } else {
+                memberStatusOthersField.classList.remove('show');
+                $('memberStatusOthers').required = false;
+                $('memberStatusOthers').value = '';
+            }
+        });
     }
-  });
-}
-
-// Member Displacement other field
-const memberDisplacementOtherCheck = $('member_displacement_other_check');
-const memberDisplacementOtherField = $('memberDisplacementOtherField');
-
-if (memberDisplacementOtherCheck) {
-  memberDisplacementOtherCheck.addEventListener('change', function() {
-    if (this.checked) {
-      memberDisplacementOtherField.classList.add('show');
-      $('member_displacement_other').required = true;
-    } else {
-      memberDisplacementOtherField.classList.remove('show');
-      $('member_displacement_other').required = false;
-      $('member_displacement_other').value = '';
+    
+    // Member Displacement other field
+    const memberDisplacementOtherCheck = $('member_displacement_other_check');
+    const memberDisplacementOtherField = $('memberDisplacementOtherField');
+    
+    if (memberDisplacementOtherCheck) {
+        memberDisplacementOtherCheck.addEventListener('change', function() {
+            if (this.checked) {
+                memberDisplacementOtherField.classList.add('show');
+                $('member_displacement_other').required = true;
+            } else {
+                memberDisplacementOtherField.classList.remove('show');
+                $('member_displacement_other').required = false;
+                $('member_displacement_other').value = '';
+            }
+        });
     }
-  });
-}
-
-// Member Assembly area options
-const memberAssemblyOptions = document.querySelectorAll('.member-assembly-option');
-const memberAssemblyAreaOptions = $('memberAssemblyAreaOptions');
-const memberInsideAssemblyFields = $('memberInsideAssemblyFields');
-const memberOutsideAssemblyFields = $('memberOutsideAssemblyFields');
-
-// Check if any member displacement reason is selected
-const memberDisplacementCheckboxes = document.querySelectorAll('.member-displacement-reason, #member_displacement_other_check');
-memberDisplacementCheckboxes.forEach(cb => {
-  cb.addEventListener('change', function() {
-    const anyChecked = Array.from(memberDisplacementCheckboxes).some(cb => cb.checked);
-    if (anyChecked) {
-      memberAssemblyAreaOptions.style.display = 'block';
-    } else {
-      memberAssemblyAreaOptions.style.display = 'none';
-      memberInsideAssemblyFields.style.display = 'none';
-      memberOutsideAssemblyFields.style.display = 'none';
-    }
-  });
-});
-
-// Member Inside/Outside assembly area toggle
-if (memberAssemblyOptions.length > 0) {
-  memberAssemblyOptions.forEach(option => {
-    option.addEventListener('change', function() {
-      if (this.id === 'member_inside_assembly' && this.checked) {
-        memberInsideAssemblyFields.style.display = 'block';
-        memberOutsideAssemblyFields.style.display = 'none';
-      } else if (this.id === 'member_outside_assembly' && this.checked) {
-        memberInsideAssemblyFields.style.display = 'none';
-        memberOutsideAssemblyFields.style.display = 'block';
-      } else {
-        memberInsideAssemblyFields.style.display = 'none';
-        memberOutsideAssemblyFields.style.display = 'none';
-      }
+    
+    // Member Assembly area options
+    const memberAssemblyOptions = document.querySelectorAll('.member-assembly-option');
+    const memberAssemblyAreaOptions = $('memberAssemblyAreaOptions');
+    const memberInsideAssemblyFields = $('memberInsideAssemblyFields');
+    const memberOutsideAssemblyFields = $('memberOutsideAssemblyFields');
+    
+    // Check if any member displacement reason is selected
+    const memberDisplacementCheckboxes = document.querySelectorAll('.member-displacement-reason, #member_displacement_other_check');
+    memberDisplacementCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const anyChecked = Array.from(memberDisplacementCheckboxes).some(cb => cb.checked);
+            if (anyChecked) {
+                memberAssemblyAreaOptions.style.display = 'block';
+            } else {
+                memberAssemblyAreaOptions.style.display = 'none';
+                memberInsideAssemblyFields.style.display = 'none';
+                memberOutsideAssemblyFields.style.display = 'none';
+                // Clear all assembly area fields
+                $('memberPickup').value = '';
+                $('memberAssemblyArea').value = '';
+                $('memberTransport').value = '';
+                $('memberFamilyHost').value = '';
+                $('memberHostContact').value = '';
+                $('memberOutsideTransport').value = '';
+            }
+        });
     });
-  });
-}
+    
+    // Member Inside/Outside assembly area toggle
+    if (memberAssemblyOptions.length > 0) {
+        memberAssemblyOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                if (this.id === 'member_inside_assembly' && this.checked) {
+                    memberInsideAssemblyFields.style.display = 'block';
+                    memberOutsideAssemblyFields.style.display = 'none';
+                    // Clear outside assembly fields
+                    $('memberFamilyHost').value = '';
+                    $('memberHostContact').value = '';
+                    $('memberOutsideTransport').value = '';
+                } else if (this.id === 'member_outside_assembly' && this.checked) {
+                    memberInsideAssemblyFields.style.display = 'none';
+                    memberOutsideAssemblyFields.style.display = 'block';
+                    // Clear inside assembly fields
+                    $('memberPickup').value = '';
+                    $('memberAssemblyArea').value = '';
+                    $('memberTransport').value = '';
+                }
+            });
+        });
+    }
+    
     // Member OFW Status -> Country
     const memberOfwRadios = document.querySelectorAll('input[name="member_ofw_status"]');
     const memberCountryField = $('memberCountryField');
@@ -6980,6 +7038,26 @@ function fillMemberPanelFromEdit(idx){
   $('memberBirthdate').value = toInputDate(m['Birthdate'] || '');
   updateMemberAgeStage();
   
+  // Additional Information checkboxes - FIXED: Set checkbox values
+  $('member_soloParenting').checked = m['Solo Parenting'] === 'Yes';
+  $('member_lgbt').checked = m['LGBT'] === 'Yes';
+  $('member_lactating').checked = m['Lactating'] === 'Yes';
+  $('member_pregnant').checked = m['Pregnant'] === 'Yes';
+  
+  // PWD and Disability Type - FIXED: Set PWD radio and disability type
+  const memberPWD = m['Persons with Disability (PWD)'] || m['PWD'] || 'No';
+  qAll("input[name='member_pwd']").forEach(r => {
+    r.checked = (r.value === memberPWD);
+  });
+  
+  if (memberPWD === 'Yes') {
+    $('memberDisabilityTypeField').classList.add('show');
+    $('memberDisabilityType').value = m['Type of Disability'] || '';
+  } else {
+    $('memberDisabilityTypeField').classList.remove('show');
+    $('memberDisabilityType').value = '';
+  }
+  
   // Educational & Economic Status - FIXED: Added missing fields
   $('memberEducationalAttainment').value = m['Educational Attainment'] || '';
   if (m['Educational Attainment'] === 'College Graduate') {
@@ -7005,7 +7083,7 @@ function fillMemberPanelFromEdit(idx){
     r.checked = (r.value === memberOFW);
   });
   
-  if (m['Overseas Filipino Worker(OFW)'] === 'Yes') {
+  if (memberOFW === 'Yes') {
     $('memberCountryField').classList.add('show');
     $('memberCountry').value = m['Country'] || '';
   } else {
@@ -7013,114 +7091,148 @@ function fillMemberPanelFromEdit(idx){
     $('memberCountry').value = '';
   }
   
-  // Health and Status - FIXED: Ensure PWD radio buttons are properly set
-const memberPWD = m['Persons with Disability (PWD)'] || m['PWD'] || 'No';
-qAll("input[name='member_pwd']").forEach(r => {
-  r.checked = (r.value.toLowerCase() === String(memberPWD).toLowerCase());
-});
+  // Health and Status - FIXED: Set status field
+  const memberStatus = m['Status'] || '';
+  if (memberStatus && ['Hypertension', 'Heart Disease', 'Stroke', 'Diabetes Mellitus', 'Cancer', 'Tuberculosis (TB)', 'Chronic Kidney Disease', 'Severe Asthma / COPD', 'Cough and colds', 'Fever', 'Headache', 'Diarrhea', 'Stomach ache / Hyperacidity', 'Skin disease (rashes, fungal infection)', 'Urinary Tract Infection (UTI)'].includes(memberStatus)) {
+    $('memberStatus').value = memberStatus;
+    $('memberStatusOthersField').classList.remove('show');
+    $('memberStatusOthers').value = '';
+  } else if (memberStatus) {
+    $('memberStatus').value = 'Others';
+    $('memberStatusOthersField').classList.add('show');
+    $('memberStatusOthers').value = memberStatus;
+  } else {
+    $('memberStatus').value = '';
+    $('memberStatusOthersField').classList.remove('show');
+    $('memberStatusOthers').value = '';
+  }
   
-  $('memberStatus').value = m['Status'] || '';
+  /* ============ CRITICAL FIX: Displacement & Evacuation Fields ============ */
+  // Displacement reasons - INDIVIDUAL COLUMNS
+  $('member_displacement_taal').checked = m['Taal Volcano (Within 14-15 KM Danger Zone)'] === 'Yes';
+  $('member_displacement_typhoon').checked = m['Typhoon'] === 'Yes';
+  $('member_displacement_flood').checked = m['Flood'] === 'Yes';
+  $('member_displacement_landslide').checked = m['Landslide'] === 'Yes';
+  $('member_displacement_earthquake').checked = m['Earthquake'] === 'Yes';
+  $('member_displacement_fire').checked = m['Fire'] === 'Yes';
   
-  // Transportation & Evacuation Details
-  $('memberTransport').value = m['Transportation'] || '';
-  $('memberPickup').value = m['Designated Pick-Up Point'] || m['Pick-Up Location'] || '';
-  $('memberDropoff').value = m['Drop-Off Point'] || m['Drop-Off Location'] || '';
-  $('memberCamp').value = m['Name of Camp'] || m['Evacuation Camp Name'] || '';
-  $('memberCampCap').value = m['Capacity'] || '';
-  $('memberInside').value = m['No. of Individuals Inside Camp'] || m['Individuals Currently in Camp'] || '';
-  $('memberOutside').value = m['No. of Individuals Outside Camp'] || m['Individuals Outside Camp'] || '';
-  $('memberReason').value = m['Reasons for Displacement'] || '';
+  // Check for "Other Reasons" 
+  const otherReasons = m['Other Reasons'] || '';
+  if (otherReasons && otherReasons.trim() !== '') {
+    $('member_displacement_other_check').checked = true;
+    $('memberDisplacementOtherField').classList.add('show');
+    $('member_displacement_other').value = otherReasons;
+  } else {
+    $('member_displacement_other_check').checked = false;
+    $('memberDisplacementOtherField').classList.remove('show');
+    $('member_displacement_other').value = '';
+  }
   
-  /* ============ CRITICAL FIX: Government Assistance Programs WITH DATE FIELDS ============ */
+  // Check if any displacement reason is checked
+  const anyDisplacementChecked = 
+    $('member_displacement_taal').checked ||
+    $('member_displacement_typhoon').checked ||
+    $('member_displacement_flood').checked ||
+    $('member_displacement_landslide').checked ||
+    $('member_displacement_earthquake').checked ||
+    $('member_displacement_fire').checked ||
+    $('member_displacement_other_check').checked;
+  
+  // Show assembly area options if any displacement reason is checked
+  if (anyDisplacementChecked) {
+    $('memberAssemblyAreaOptions').style.display = 'block';
+  } else {
+    $('memberAssemblyAreaOptions').style.display = 'none';
+  }
+  
+  // Assembly area - check both Inside and Outside columns
+  const insideAssembly = m['Inside Assembly Area'] === 'Yes';
+  const outsideAssembly = m['Outside Assembly Area'] === 'Yes';
+  
+  if (insideAssembly) {
+    $('member_inside_assembly').checked = true;
+    $('member_outside_assembly').checked = false;
+    // Make sure the container is visible
+    if (anyDisplacementChecked) {
+      $('memberAssemblyAreaOptions').style.display = 'block';
+    }
+    // Show the inside fields
+    $('memberInsideAssemblyFields').style.display = 'block';
+    $('memberOutsideAssemblyFields').style.display = 'none';
+    // Populate inside assembly fields
+    $('memberPickup').value = m['Pick-Up Location'] || '';
+    $('memberAssemblyArea').value = m['Assembly Area'] || '';
+    $('memberTransport').value = m['Transportation'] || '';
+  } else if (outsideAssembly) {
+    $('member_inside_assembly').checked = false;
+    $('member_outside_assembly').checked = true;
+    // Make sure the container is visible
+    if (anyDisplacementChecked) {
+      $('memberAssemblyAreaOptions').style.display = 'block';
+    }
+    // Show the outside fields
+    $('memberInsideAssemblyFields').style.display = 'none';
+    $('memberOutsideAssemblyFields').style.display = 'block';
+    // Populate outside assembly fields
+    $('memberFamilyHost').value = m['Family/Relative Host'] || '';
+    $('memberHostContact').value = m['Host_Contact'] || '';
+    $('memberOutsideTransport').value = m['Transportation'] || '';
+  } else {
+    $('member_inside_assembly').checked = false;
+    $('member_outside_assembly').checked = false;
+    // Hide the container if no displacement reasons
+    if (!anyDisplacementChecked) {
+      $('memberAssemblyAreaOptions').style.display = 'none';
+    }
+    $('memberInsideAssemblyFields').style.display = 'none';
+    $('memberOutsideAssemblyFields').style.display = 'none';
+  }
+  
+  // Government Assistance Programs WITH DATE FIELDS - FIXED: Populate all fields
   // TUPAD
   const hasMemberTUPAD = m['TUPAD'] === 'Yes';
   $('member_tupad').checked = hasMemberTUPAD;
   $('member_tupad_date_input').value = toInputDate(m['TUPAD_Date'] || '');
-  if (hasMemberTUPAD) {
-    $('member_tupad_date').classList.add('show');
-  } else {
-    $('member_tupad_date').classList.remove('show');
-  }
-
+  
   // Local 4Ps
   const hasMemberLocal4Ps = m['Local 4Ps'] === 'Yes';
   $('member_local4ps').checked = hasMemberLocal4Ps;
   $('member_local4ps_date_input').value = toInputDate(m['Local 4Ps_Date'] || '');
-  if (hasMemberLocal4Ps) {
-    $('member_local4ps_date').classList.add('show');
-  } else {
-    $('member_local4ps_date').classList.remove('show');
-  }
-
+  
   // National 4Ps
   const hasMemberNational4Ps = m['National 4Ps'] === 'Yes';
   $('member_intl4ps').checked = hasMemberNational4Ps;
   $('member_intl4ps_date_input').value = toInputDate(m['National 4Ps_Date'] || '');
-  if (hasMemberNational4Ps) {
-    $('member_intl4ps_date').classList.add('show');
-  } else {
-    $('member_intl4ps_date').classList.remove('show');
-  }
-
+  
   // Local Social Pension
   const hasMemberLocalSP = m['Local Social Pension'] === 'Yes';
   $('member_locsp').checked = hasMemberLocalSP;
   $('member_locsp_date_input').value = toInputDate(m['Local Social Pension_Date'] || '');
-  if (hasMemberLocalSP) {
-    $('member_locsp_date').classList.add('show');
-  } else {
-    $('member_locsp_date').classList.remove('show');
-  }
-
+  
   // National Social Pension
   const hasMemberNationalSP = m['National Social Pension'] === 'Yes';
   $('member_intlsp').checked = hasMemberNationalSP;
   $('member_intlsp_date_input').value = toInputDate(m['National Social Pension_Date'] || '');
-  if (hasMemberNationalSP) {
-    $('member_intlsp_date').classList.add('show');
-  } else {
-    $('member_intlsp_date').classList.remove('show');
-  }
-
+  
   // Solo Parent Assistance
   const hasMemberSoloParent = m['Solo Parent Assistance'] === 'Yes';
   $('member_solo').checked = hasMemberSoloParent;
   $('member_solo_date_input').value = toInputDate(m['Solo Parent Assistance_Date'] || '');
-  if (hasMemberSoloParent) {
-    $('member_solo_date').classList.add('show');
-  } else {
-    $('member_solo_date').classList.remove('show');
-  }
-
+  
   // Relief Goods
   const hasMemberReliefGoods = m['Relief Goods'] === 'Yes';
   $('member_relief').checked = hasMemberReliefGoods;
   $('member_relief_date_input').value = toInputDate(m['Relief Goods_Date'] || '');
-  if (hasMemberReliefGoods) {
-    $('member_relief_date').classList.add('show');
-  } else {
-    $('member_relief_date').classList.remove('show');
-  }
-
+  
   // Cash Subsidy
   const hasMemberCashSubsidy = m['Cash Subsidy'] === 'Yes';
   $('member_cash').checked = hasMemberCashSubsidy;
   $('member_cash_date_input').value = toInputDate(m['Cash Subsidy_Date'] || '');
-  if (hasMemberCashSubsidy) {
-    $('member_cash_date').classList.add('show');
-  } else {
-    $('member_cash_date').classList.remove('show');
-  }
-
+  
   // AICS
   const hasMemberAICS = m['AICS'] && m['AICS'] !== '';
   $('memberAics').value = m['AICS'] || '';
   $('member_aics_date_input').value = toInputDate(m['AICS_Date'] || '');
-  if (hasMemberAICS) {
-    $('member_aics_date').classList.add('show');
-  } else {
-    $('member_aics_date').classList.remove('show');
-  }
   
   // Setup member government assistance date handlers
   setupMemberGovernmentAssistanceDateHandlers();
@@ -7140,9 +7252,25 @@ qAll("input[name='member_pwd']").forEach(r => {
     if (hasMemberReliefGoods) $('member_relief').dispatchEvent(new Event('change'));
     if (hasMemberCashSubsidy) $('member_cash').dispatchEvent(new Event('change'));
     if (hasMemberAICS) $('memberAics').dispatchEvent(new Event('change'));
+    
+    // Trigger change events for displacement and assembly fields
+    if (anyDisplacementChecked) {
+      $('memberAssemblyAreaOptions').style.display = 'block';
+    }
+    
+    // Trigger change events for assembly area checkboxes
+    if (insideAssembly) {
+      $('member_inside_assembly').dispatchEvent(new Event('change'));
+    } else if (outsideAssembly) {
+      $('member_outside_assembly').dispatchEvent(new Event('change'));
+    }
+    
+    // Trigger change event for other reason checkbox
+    if ($('member_displacement_other_check').checked) {
+      $('member_displacement_other_check').dispatchEvent(new Event('change'));
+    }
   }, 300);
 }
-
 function getDisplacementReasons() {
     const reasons = [];
     const checkboxes = [
@@ -7253,7 +7381,7 @@ function collectHeadFromEditForm() {
   const originalDataID = editHead['Data ID'] || editDataID;
   
   editHead = {
-    'Data ID': originalDataID, // FIXED: Use preserved Data ID
+    'Data ID': originalDataID,
     'Coordinate': $('edit_coordinate').value || '',
     'Coordinates': $('edit_coordinate').value || '',
     'Barangay': $('edit_barangay').value || '',
@@ -7268,7 +7396,7 @@ function collectHeadFromEditForm() {
     'Stage': headAgeInfo ? headAgeInfo.stage : '',
     'No. of Household Member/s': String($('edit_memberCount').value || '0'),
     
-    // Additional Information fields
+    // Additional Information fields - FIXED: Properly collect checkbox values
     'Solo Parenting': $('edit_soloParenting')?.checked ? 'Yes' : 'No',
     'LGBT': $('edit_lgbt')?.checked ? 'Yes' : 'No',
     'Lactating': $('edit_lactating')?.checked ? 'Yes' : 'No',
@@ -7289,7 +7417,7 @@ function collectHeadFromEditForm() {
     'Country': $('edit_country').value || '',
     
     /* ============ DISPLACEMENT & EVACUATION FIELDS ============ */
-    // Displacement reasons - INDIVIDUAL COLUMNS
+    // Displacement reasons - INDIVIDUAL COLUMNS - FIXED: Ensure all checkboxes are collected
     'Taal Volcano (Within 14-15 KM Danger Zone)': $('edit_displacement_taal').checked ? 'Yes' : '',
     'Typhoon': $('edit_displacement_typhoon').checked ? 'Yes' : '',
     'Flood': $('edit_displacement_flood').checked ? 'Yes' : '',
@@ -7305,7 +7433,8 @@ function collectHeadFromEditForm() {
     'Host_Contact': $('edit_host_contact').value || '',
     'Pick-Up Location': $('edit_pickup').value || '',
     'Assembly Area': $('edit_assembly_area').value || '',
-    'Transportation': $('edit_head_transport').value || '',
+    'Transportation': $('edit_inside_assembly').checked ? $('edit_head_transport').value || '' : 
+                     ($('edit_outside_assembly').checked ? $('edit_outside_transport').value || '' : ''),
     /* ============ END DISPLACEMENT FIELDS ============ */
     
     // Old fields for backward compatibility (keep these for now)
@@ -7440,7 +7569,7 @@ function collectMemberPanelToEdit(){
     'Age': ageVal,
     'Stage': stageVal,
     
-    // Additional Information
+    // Additional Information - FIXED: Properly set checkbox values
     'Solo Parenting': $('member_soloParenting').checked ? 'Yes' : 'No',
     'LGBT': $('member_lgbt').checked ? 'Yes' : 'No',
     'Lactating': $('member_lactating').checked ? 'Yes' : 'No',
@@ -7460,29 +7589,26 @@ function collectMemberPanelToEdit(){
     'Overseas Filipino Worker(OFW)': document.querySelector("input[name='member_ofw_status']:checked")?.value || 'No',
     'Country': $('memberCountry').value || '',
     
-    // Displacement reasons
-    'Reasons for Displacement': (() => {
-      const reasons = [];
-      if ($('member_displacement_taal').checked) reasons.push('Taal Volcano (Within 14-15 KM Danger Zone)');
-      if ($('member_displacement_typhoon').checked) reasons.push('Typhoon');
-      if ($('member_displacement_flood').checked) reasons.push('Flood');
-      if ($('member_displacement_landslide').checked) reasons.push('Landslide');
-      if ($('member_displacement_earthquake').checked) reasons.push('Earthquake');
-      if ($('member_displacement_fire').checked) reasons.push('Fire');
-      if ($('member_displacement_other_check').checked && $('member_displacement_other').value.trim()) {
-        reasons.push($('member_displacement_other').value.trim());
-      }
-      return reasons.join('; ');
-    })(),
+    // Displacement reasons - FIXED: Include all checkbox values as separate columns
+    'Taal Volcano (Within 14-15 KM Danger Zone)': $('member_displacement_taal').checked ? 'Yes' : '',
+    'Typhoon': $('member_displacement_typhoon').checked ? 'Yes' : '',
+    'Flood': $('member_displacement_flood').checked ? 'Yes' : '',
+    'Landslide': $('member_displacement_landslide').checked ? 'Yes' : '',
+    'Earthquake': $('member_displacement_earthquake').checked ? 'Yes' : '',
+    'Fire': $('member_displacement_fire').checked ? 'Yes' : '',
+    'Other Reasons': $('member_displacement_other_check').checked ? $('member_displacement_other').value || '' : '',
     
-    // Assembly area
-    'Assembly Area': $('member_inside_assembly').checked ? 'Inside' : $('member_outside_assembly').checked ? 'Outside' : '',
+    // Assembly area - FIXED: Set proper values
+    'Inside Assembly Area': $('member_inside_assembly').checked ? 'Yes' : '',
+    'Outside Assembly Area': $('member_outside_assembly').checked ? 'Yes' : '',
     'Pick-Up Location': $('memberPickup').value || '',
-    'Assembly Area Name': $('memberAssemblyArea').value || '',
-    'Transportation': $('memberTransport').value || '',
+    'Assembly Area': $('memberAssemblyArea').value || '',
     'Family/Relative Host': $('memberFamilyHost').value || '',
-    'Host Contact No.': $('memberHostContact').value || '',
-    'Outside Transportation': $('memberOutsideTransport').value || '',
+    'Host_Contact': $('memberHostContact').value || '',
+    
+    // Transportation - FIXED: Use correct field based on assembly area
+    'Transportation': $('member_inside_assembly').checked ? $('memberTransport').value || '' : 
+                     ($('member_outside_assembly').checked ? $('memberOutsideTransport').value || '' : ''),
     
     // Government Assistance with Date Fields
     'TUPAD': $('member_tupad').checked ? 'Yes' : 'No',
@@ -8323,71 +8449,86 @@ function wireEditPanelUI() {
 
   /* ============ DISPLACEMENT & EVACUATION EVENT LISTENERS ============ */
   // Add event listeners for displacement checkboxes to show assembly area options
-  const displacementCheckboxes = document.querySelectorAll('.edit_displacement-reason, #edit_displacement_other_check');
-  displacementCheckboxes.forEach(cb => {
-    cb.addEventListener('change', function() {
-      const anyChecked = Array.from(displacementCheckboxes).some(cb => cb.checked);
-      if (anyChecked) {
-        $('edit_assemblyAreaOptions').style.display = 'block';
-      } else {
-        $('edit_assemblyAreaOptions').style.display = 'none';
-        $('edit_insideAssemblyFields').style.display = 'none';
-        $('edit_outsideAssemblyFields').style.display = 'none';
-        // Also uncheck assembly area checkboxes
-        $('edit_inside_assembly').checked = false;
-        $('edit_outside_assembly').checked = false;
-      }
-    });
+const displacementCheckboxes = document.querySelectorAll('.edit_displacement-reason, #edit_displacement_other_check');
+displacementCheckboxes.forEach(cb => {
+  cb.addEventListener('change', function() {
+    const anyChecked = Array.from(displacementCheckboxes).some(cb => cb.checked);
+    if (anyChecked) {
+      $('edit_assemblyAreaOptions').style.display = 'block';
+    } else {
+      $('edit_assemblyAreaOptions').style.display = 'none';
+      $('edit_insideAssemblyFields').style.display = 'none';
+      $('edit_outsideAssemblyFields').style.display = 'none';
+      // Also uncheck assembly area checkboxes
+      $('edit_inside_assembly').checked = false;
+      $('edit_outside_assembly').checked = false;
+      // Clear all assembly area fields
+      $('edit_family_host').value = '';
+      $('edit_host_contact').value = '';
+      $('edit_pickup').value = '';
+      $('edit_assembly_area').value = '';
+      $('edit_head_transport').value = '';
+      $('edit_outside_transport').value = '';
+    }
   });
+});
 
-  // Add event listeners for inside/outside assembly area checkboxes
-  const assemblyOptions = document.querySelectorAll('.edit_assembly-option');
-  assemblyOptions.forEach(option => {
-    option.addEventListener('change', function() {
-      // Make these checkboxes mutually exclusive
-      if (this.id === 'edit_inside_assembly' && this.checked) {
-        $('edit_outside_assembly').checked = false;
-        $('edit_insideAssemblyFields').style.display = 'block';
-        $('edit_outsideAssemblyFields').style.display = 'none';
-      } else if (this.id === 'edit_outside_assembly' && this.checked) {
-        $('edit_inside_assembly').checked = false;
-        $('edit_insideAssemblyFields').style.display = 'none';
-        $('edit_outsideAssemblyFields').style.display = 'block';
-      }
-    });
+// Add event listeners for inside/outside assembly area checkboxes
+const assemblyOptions = document.querySelectorAll('.edit_assembly-option');
+assemblyOptions.forEach(option => {
+  option.addEventListener('change', function() {
+    // Make these checkboxes mutually exclusive
+    if (this.id === 'edit_inside_assembly' && this.checked) {
+      $('edit_outside_assembly').checked = false;
+      $('edit_insideAssemblyFields').style.display = 'block';
+      $('edit_outsideAssemblyFields').style.display = 'none';
+      // Clear outside assembly fields
+      $('edit_family_host').value = '';
+      $('edit_host_contact').value = '';
+      $('edit_outside_transport').value = '';
+    } else if (this.id === 'edit_outside_assembly' && this.checked) {
+      $('edit_inside_assembly').checked = false;
+      $('edit_insideAssemblyFields').style.display = 'none';
+      $('edit_outsideAssemblyFields').style.display = 'block';
+      // Clear inside assembly fields
+      $('edit_pickup').value = '';
+      $('edit_assembly_area').value = '';
+      $('edit_head_transport').value = '';
+    }
   });
+});
 
-  // Make inside/outside checkboxes mutually exclusive by default
-  if ($('edit_inside_assembly')) {
-    $('edit_inside_assembly').addEventListener('click', function() {
-      if (this.checked) {
-        $('edit_outside_assembly').checked = false;
-      }
-    });
-  }
-  
-  if ($('edit_outside_assembly')) {
-    $('edit_outside_assembly').addEventListener('click', function() {
-      if (this.checked) {
-        $('edit_inside_assembly').checked = false;
-      }
-    });
-  }
+// Make inside/outside checkboxes mutually exclusive by default
+if ($('edit_inside_assembly')) {
+  $('edit_inside_assembly').addEventListener('click', function() {
+    if (this.checked) {
+      $('edit_outside_assembly').checked = false;
+    }
+  });
+}
 
-  // Add event listener for "Other Reason" checkbox
-  const displacementOtherCheck = $('edit_displacement_other_check');
-  if (displacementOtherCheck) {
-    displacementOtherCheck.addEventListener('change', function() {
-      if (this.checked) {
-        $('edit_displacementOtherField').classList.add('show');
-        $('edit_displacement_other').required = true;
-      } else {
-        $('edit_displacementOtherField').classList.remove('show');
-        $('edit_displacement_other').required = false;
-        $('edit_displacement_other').value = '';
-      }
-    });
-  }
+if ($('edit_outside_assembly')) {
+  $('edit_outside_assembly').addEventListener('click', function() {
+    if (this.checked) {
+      $('edit_inside_assembly').checked = false;
+    }
+  });
+}
+
+// Add event listener for "Other Reason" checkbox
+const displacementOtherCheck = $('edit_displacement_other_check');
+if (displacementOtherCheck) {
+  displacementOtherCheck.addEventListener('change', function() {
+    if (this.checked) {
+      $('edit_displacementOtherField').classList.add('show');
+      $('edit_displacement_other').required = true;
+    } else {
+      $('edit_displacementOtherField').classList.remove('show');
+      $('edit_displacement_other').required = false;
+      $('edit_displacement_other').value = '';
+    }
+  });
+}
   /* ============ END DISPLACEMENT EVENT LISTENERS ============ */
 
   // Add/Edit Members button - FIXED: Now properly adds members
