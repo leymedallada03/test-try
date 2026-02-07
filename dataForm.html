@@ -60,7 +60,7 @@ li.admin-only.admin-visible {
      transform: translateX(110%);
      transition: transform 280ms cubic-bezier(.2,.9,.3,1);
      z-index: 6000;
-     padding: 18px;
+     padding: 10px;
      overflow-y: auto;
    }
    
@@ -80,11 +80,7 @@ li.admin-only.admin-visible {
      font-size: 18px;
      color: var(--accent1);
    }
-   
-   .member-panel .panel-body {
-     margin-top: 8px;
-   }
-   
+     
    .member-panel .panel-actions {
      display: flex;
      gap: 8px;
@@ -470,7 +466,7 @@ li.admin-only.admin-visible {
      gap: 8px;
      justify-content: flex-end;
      margin-top: 20px;
-     padding: 16px 0;
+     padding: 10px 0;
      border-top: 1px solid var(--border);
    }
    
@@ -3164,8 +3160,8 @@ textarea.validation-error:focus {
           <!-- FIXED: Member Additional Information -->
           <div style="grid-column: 1 / -1;">
             <label>Additional Information</label>
-            <div class="small-muted" style="margin-bottom: 8px;">Please check (✓) all items that apply.</div>
-            <div class="member-additional-info-checkbox-container">
+            <div class="small-muted" style="margin-bottom: 0px;">Please check (✓) all items that apply.</div>
+            <div class="member-additional-info-checkbox-container" style="margin-top: 0px;">
               <div class="member-additional-info-checkbox-item">
                 <input type="checkbox" id="member_soloParenting" class="member-additional">
                 <label for="member_soloParenting">Solo Parenting</label>
@@ -3450,16 +3446,16 @@ textarea.validation-error:focus {
               <label for="member_displacement_other_check">Other Reason</label>
             </div>
             
-            <div id="memberDisplacementOtherField" class="conditional-field" style="margin-top: 8px;">
-              <input type="text" id="member_displacement_other" placeholder="Please specify other reason for displacement..." />
-              <div class="small-muted">This will be used when none of the listed reasons apply.</div>
+            <div id="memberDisplacementOtherField" class="conditional-field" style="margin-top: 8px; margin-bottom: 0;">
+              <input type="text" id="member_displacement_other" style="margin-top: 0;" placeholder="Please specify other reason for displacement..." />
+              <div class="small-muted" style="margin-top: 0;">This will be used when none of the listed reasons apply.</div>
             </div>
           </div>
 
           <!-- Member Assembly Area Options -->
-          <div id="memberAssemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; margin-top: 16px; display: none;">
+          <div id="memberAssemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; display: none;">
             <label>Assembly Area</label>
-            <div style="display: flex; gap: 20px; margin-top: 8px;">
+            <div style="display: flex; gap: 20px;">
               <div class="member-displacement-checkbox-item">
                 <input type="checkbox" id="member_inside_assembly" class="member-assembly-option">
                 <label for="member_inside_assembly">Inside Assembly Area</label>
@@ -3473,7 +3469,7 @@ textarea.validation-error:focus {
 
           <!-- Member Inside Assembly Area Fields -->
           <div id="memberInsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none;">
-            <div class="form-grid" style="margin-top: 12px;">
+            <div class="form-grid">
               <div>
                 <label>Pick-Up Location</label>
                 <input id="memberPickup" class="member-pickup"/>
@@ -5313,7 +5309,15 @@ function collectMemberDataFromPanel(){
     "Pick-Up Location": insideAssembly === "Yes" ? document.getElementById("memberPickup").value || "" : "",
     "Assembly Area": insideAssembly === "Yes" ? document.getElementById("memberAssemblyArea").value || "" : "",
     "Family/Relative Host": outsideAssembly === "Yes" ? document.getElementById("memberFamilyHost").value || "" : "",
-    "Host_Contact": outsideAssembly === "Yes" ? document.getElementById("memberHostContact").value || "" : "",
+    "Host_Contact": outsideAssembly === "Yes" ? 
+    (function() {
+        const value = document.getElementById("memberHostContact").value || "";
+        // Format the phone number if valid
+        if (value && validatePhilippineMobileNumber(value)) {
+            return formatPhilippineMobileNumber(value);
+        }
+        return value;
+    })() : "",
     "Transportation": document.getElementById("memberTransport").value || document.getElementById("memberOutsideTransport").value || "",
     // Government Assistance
     "TUPAD": document.getElementById("member_tupad").checked ? "Yes" : "No",
@@ -5958,6 +5962,54 @@ document.addEventListener('input', (ev) => {
   }
 });
 
+/* ============ HOST CONTACT VALIDATION FUNCTIONS ============ */
+function formatHostContactNumber() {
+    const hostContactInput = document.getElementById("host_contact");
+    if (!hostContactInput) return;
+    
+    const value = hostContactInput.value.trim();
+    
+    // Only format if there's a value
+    if (value) {
+        // Validate the phone number
+        const isValid = validatePhilippineMobileNumber(value);
+        
+        if (isValid) {
+            // Format the number
+            hostContactInput.value = formatPhilippineMobileNumber(value);
+            hostContactInput.classList.remove('input-error');
+            hostContactInput.classList.remove('validation-error');
+        } else {
+            // Show error
+            hostContactInput.classList.add('input-error');
+            hostContactInput.classList.add('validation-error');
+        }
+    }
+}
+
+function formatMemberHostContactNumber() {
+    const memberHostContactInput = document.getElementById("memberHostContact");
+    if (!memberHostContactInput) return;
+    
+    const value = memberHostContactInput.value.trim();
+    
+    // Only format if there's a value
+    if (value) {
+        // Validate the phone number
+        const isValid = validatePhilippineMobileNumber(value);
+        
+        if (isValid) {
+            // Format the number
+            memberHostContactInput.value = formatPhilippineMobileNumber(value);
+            memberHostContactInput.classList.remove('input-error');
+            memberHostContactInput.classList.remove('validation-error');
+        } else {
+            // Show error
+            memberHostContactInput.classList.add('input-error');
+            memberHostContactInput.classList.add('validation-error');
+        }
+    }
+}
 /* ---------------- DOM loaded bindings ---------------- */
 document.addEventListener('DOMContentLoaded', function() {
   // SESSION IS HANDLED BY session-manager.js
@@ -6024,6 +6076,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // ============ ADDED: Host Contact Validation ============
+  // Head host contact validation
+  const hostContactInput = document.getElementById("host_contact");
+  if (hostContactInput) {
+    hostContactInput.addEventListener('blur', () => {
+      formatHostContactNumber();
+    });
+    
+    hostContactInput.addEventListener('input', () => {
+      // Clear error while typing
+      hostContactInput.classList.remove('input-error');
+      hostContactInput.classList.remove('validation-error');
+    });
+  }
+
+  // Member host contact validation (will be set up when panel opens)
+  // We'll add this to the memberNext event listener below
+  // ============ END ADDED ============
+
   // Coordinate buttons
   document.getElementById("getLocationBtn").addEventListener("click", getCurrentLocation);
   document.getElementById("hazardHunterBtn").addEventListener("click", openHazardHunterPicker);
@@ -6081,6 +6152,16 @@ document.getElementById("memberNext").addEventListener('click', () => {
         }
         return;
     }
+
+    // ============ ADDED: Format member host contact before saving ============
+    const memberHostContactInput = document.getElementById("memberHostContact");
+    if (memberHostContactInput && memberHostContactInput.value.trim()) {
+        const value = memberHostContactInput.value.trim();
+        if (validatePhilippineMobileNumber(value)) {
+            memberHostContactInput.value = formatPhilippineMobileNumber(value);
+        }
+    }
+    // ============ END ADDED ============
 
     // Save current member data
     collectedMembers[currentMemberIndex] = collectMemberDataFromPanel();
@@ -6209,6 +6290,51 @@ function closePanel(){
   document.getElementById("panelOverlay").classList.remove("show"); 
 }
 
+/* ============ ADD PHONE VALIDATION FOR HOST_CONTACT FIELD ============ */
+function setupHostContactValidation() {
+    const hostContactInput = document.getElementById("host_contact");
+    if (hostContactInput) {
+        // Add blur event for validation
+        hostContactInput.addEventListener('blur', () => {
+            formatHostContactNumber();
+        });
+        
+        // Add input event for real-time formatting
+        hostContactInput.addEventListener('input', () => {
+            // Clear error state while typing
+            hostContactInput.classList.remove('input-error');
+            hostContactInput.classList.remove('validation-error');
+        });
+    }
+}
+
+function formatHostContactNumber() {
+    const hostContactInput = document.getElementById("host_contact");
+    if (!hostContactInput) return;
+    
+    const value = hostContactInput.value.trim();
+    
+    // Only format if there's a value
+    if (value) {
+        // Validate the phone number
+        const isValid = validatePhilippineMobileNumber(value);
+        
+        if (isValid) {
+            // Format the number
+            hostContactInput.value = formatPhilippineMobileNumber(value);
+            hostContactInput.classList.remove('input-error');
+            hostContactInput.classList.remove('validation-error');
+        } else {
+            // Show error
+            hostContactInput.classList.add('input-error');
+            hostContactInput.classList.add('validation-error');
+            
+            // Optional: Show error message
+            // You can add an error message element similar to contactError
+        }
+    }
+} 
+
 /* ---------------- Submit head + members ---------------- */
 async function submitHeadAndMembers(){
   // Get current user - try to get full name from localStorage
@@ -6299,7 +6425,15 @@ const head = {
   "Pick-Up Location": insideAssembly === "Yes" ? document.getElementById("pickup").value || "" : "",
   "Assembly Area": insideAssembly === "Yes" ? document.getElementById("assembly_area").value || "" : "",
   "Family/Relative Host": outsideAssembly === "Yes" ? document.getElementById("family_host").value || "" : "",
-  "Host_Contact": outsideAssembly === "Yes" ? document.getElementById("host_contact").value || "" : "",
+  "Host_Contact": outsideAssembly === "Yes" ? 
+    (function() {
+        const value = document.getElementById("host_contact").value || "";
+        // Format the phone number if valid
+        if (value && validatePhilippineMobileNumber(value)) {
+            return formatPhilippineMobileNumber(value);
+        }
+        return value;
+    })() : "",
   "Transportation": document.getElementById("head_transport").value || document.getElementById("outside_transport").value || "",
   "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
   "TUPAD_Date": document.getElementById("ass_tupad_date_input").value ? toSheetDateFormat(document.getElementById("ass_tupad_date_input").value) : "",
