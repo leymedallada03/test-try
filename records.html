@@ -26,6 +26,245 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+
+/* ============ UNIFORM FORM STYLES FOR CHECKBOX SECTIONS ============ */
+
+/* Additional Information checkboxes */
+.additional-info-checkbox-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    border-radius: var(--radius-sm);
+    background: white;
+}
+
+.additional-info-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.additional-info-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent1);
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.additional-info-checkbox-item label {
+    font-weight: 600;
+    color: var(--accent1);
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Member Additional Information checkboxes */
+.member-additional-info-checkbox-container {
+    display: flex;
+    gap: 8px;
+    background: white;
+}
+
+.member-additional-info-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.member-additional-info-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent1);
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.member-additional-info-checkbox-item label {
+    font-weight: 600;
+    color: var(--accent1);
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Displacement checkboxes */
+.displacement-checkbox-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-radius: var(--radius-sm);
+    background: white;
+}
+
+.displacement-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.displacement-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent1);
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.displacement-checkbox-item label {
+    font-weight: 600;
+    color: var(--accent1);
+    cursor: pointer;
+    margin: 0;
+    flex: 1;
+}
+
+/* Member Displacement checkboxes */
+.member-displacement-checkbox-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.member-displacement-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.member-displacement-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent1);
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.member-displacement-checkbox-item label {
+    font-weight: 600;
+    color: var(--accent1);
+    cursor: pointer;
+    margin: 0;
+    flex: 1;
+}
+
+/* PWD Radio buttons with uniform style */
+.radio-line {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 8px 0;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--accent1);
+    cursor: pointer;
+}
+
+.radio-item input[type="radio"] {
+    accent-color: var(--accent1);
+    width: 18px;
+    margin: 0;
+    transform: scale(1.1);
+}
+
+/* Section labels for uniform styling */
+.form-section h5 {
+    margin: 0;
+    color: var(--accent1);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.small-muted {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+/* Ensure Other Reason field looks consistent */
+#edit_displacementOtherField,
+#memberDisplacementOtherField {
+    margin-top: 12px;
+    background: white;
+}
+
+#edit_displacementOtherField label,
+#memberDisplacementOtherField label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    color: var(--accent1);
+}
+
+#edit_displacement_other,
+#member_displacement_other {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#edit_displacement_other:focus,
+#member_displacement_other:focus {
+    outline: none;
+    border-color: var(--accent1);
+    box-shadow: 0 0 0 3px rgba(15,122,74,0.1);
+}
+
+/* Assembly Area options styling */
+#edit_assemblyAreaOptions,
+#memberAssemblyAreaOptions {
+    margin-top: 12px;
+}
+
+#edit_assemblyAreaOptions label,
+#memberAssemblyAreaOptions label {
+    font-weight: 600;
+    color: var(--accent1);
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .additional-info-checkbox-container,
+    .member-additional-info-checkbox-container,
+    .displacement-checkbox-container,
+    .member-displacement-checkbox-container,
+    #edit_displacementOtherField,
+    #memberDisplacementOtherField,
+    #edit_assemblyAreaOptions,
+    #memberAssemblyAreaOptions,
+    #edit_insideAssemblyFields,
+    #edit_outsideAssemblyFields,
+    #memberInsideAssemblyFields,
+    #memberOutsideAssemblyFields {
+        padding: 8px;
+    }
+    
+    .additional-info-checkbox-item,
+    .member-additional-info-checkbox-item,
+    .displacement-checkbox-item,
+    .member-displacement-checkbox-item {
+        padding: 3px 0;
+    }
+    
+    .radio-line {
+        gap: 12px;
+    }
+}
+
    /* Add to your existing CSS */
 .loading-spinner-small {
   width: 16px;
@@ -501,8 +740,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin: 4px 0;
-  padding: 6px 0;
+  padding: 4px 0;
   min-height: 40px;
   width: 100%;
 }
@@ -651,7 +889,7 @@ li.admin-only.admin-visible {
      transform: translateX(110%);
      transition: transform 280ms cubic-bezier(.2,.9,.3,1);
      z-index: 6000;
-     padding: 18px;
+     padding: 10px;
      overflow-y: auto;
    }
    
@@ -1043,7 +1281,6 @@ li.admin-only.admin-visible {
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px;
 }
 
 .member-preview li {
@@ -2241,7 +2478,7 @@ li.admin-only.admin-visible {
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
       <div class="brand-text">
-        <h1>PUROK KALIGTASAN</h1>
+        <h1>PUROK KALIGTASAN 133</h1>
         <p>MDRRMO Alitagtag – Household Records System</p>
       </div>
     </div>
@@ -2460,7 +2697,7 @@ li.admin-only.admin-visible {
           <div>
             <label>Contact no. <span class="required">*</span></label>
             <input type="text" id="edit_contactNo" placeholder="09XXXXXXXXX" required 
-                   pattern="^(09|\+639)\d{9}$" />
+                   pattern="^(09|\+639|0)\d{9,10}$"/>
             <div class="error-message" id="edit_contactError"></div>
           </div>
 
@@ -2490,13 +2727,13 @@ li.admin-only.admin-visible {
           <div>
             <label>No. of Household Member/s</label>
             <input type="number" id="edit_memberCount" min="0" value="0" >
-            <div class="small-muted">Set to 0 if no other members.</div>
+            <div class="small-muted" style="margin-bottom: 0;">Set to 0 if no other members.</div>
           </div>
 
           <!-- FIXED: Additional Information checkboxes -->
           <div style="grid-column: 1 / -1;">
             <label style="margin-bottom: 0;">Additional Information</label>
-            <div class="small-muted1">Please check (✓) all items that apply.</div>
+            <div class="small-muted">Please check (✓) all items that apply.</div>
             <div class="additional-info-checkbox-container">
               <div class="additional-info-checkbox-item">
                 <input type="checkbox" id="edit_soloParenting">
@@ -2821,7 +3058,7 @@ li.admin-only.admin-visible {
           <!-- FIXED: Reason for Displacement - Checkboxes -->
           <div style="grid-column: 1 / -1;">
             <label style="margin-bottom: 0;">Reason for Displacement</label>
-            <div class="small-muted">Please check (✓) all items that apply.</div>
+            <div class="small-muted" style="margin-bottom: 0;">Please check (✓) all items that apply.</div>
             <div class="displacement-checkbox-container">
               <div class="displacement-checkbox-item">
                 <input type="checkbox" id="edit_displacement_taal" class="edit_displacement-reason" value="Taal Volcano (Within 14-15 KM Danger Zone)">
@@ -2857,12 +3094,12 @@ li.admin-only.admin-visible {
             
             <div id="edit_displacementOtherField" class="conditional-field" style="margin-top: 8px;">
               <input type="text" id="edit_displacement_other" placeholder="Please specify other reason for displacement..." />
-              <div class="small-muted">This will be used when none of the listed reasons apply.</div>
+              <div class="small-muted" style="margin-bottom: 0;">This will be used when none of the listed reasons apply.</div>
             </div>
           </div>
 
           <!-- Assembly Area Options -->
-          <div id="edit_assemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; display: none;">
+          <div id="edit_assemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; display: none; margin-top: 0;">
             <label>Assembly Area</label>
             <div style="display: flex; gap: 20px;">
               <div class="displacement-checkbox-item">
@@ -2901,8 +3138,8 @@ li.admin-only.admin-visible {
           </div>
 
           <!-- Outside Assembly Area Fields -->
-          <div id="edit_outsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none;">
-            <div class="form-grid" style="margin-top: 12px;">
+          <div id="edit_outsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none; margin-top: 0x;">
+            <div class="form-grid" style="margin-top: 0x;">
               <div>
                 <label>Family/Relative Host</label>
                 <input type="text" id="edit_family_host" />
@@ -2950,7 +3187,7 @@ li.admin-only.admin-visible {
           <h5>Government Assistance Programs</h5>
         </div>
         
-        <div class="gov-support-grid">
+        <div class="gov-support-grid" style="align-items: center;">
           <!-- TUPAD with Date -->
           <div class="gov-checkbox-with-date">
             <input type="checkbox" id="edit_ass_tupad">
@@ -3062,7 +3299,7 @@ li.admin-only.admin-visible {
       <div class="edit-card">
         <h4>Members</h4>
         <div class="small-muted">Count: <strong id="edit_previewCount">0</strong></div>
-        <ul id="edit_membersPreview" class="member-preview"></ul>
+        <ul id="edit_membersPreview" class="member-preview small-muted"></ul>
         <div style="display:flex;gap:8px; margin-top:10px; justify-content:flex-end;">
           <button id="edit_addMember" class="btn secondary" type="button">
             <i class="fas fa-user-plus"></i> Add / Edit Members
@@ -3121,7 +3358,7 @@ li.admin-only.admin-visible {
           <div>
             <label>Contact no. <span class="required">*</span></label>
             <input type="text" id="memberContact" placeholder="09XXXXXXXXX" required
-                   pattern="^(09|\+639)\d{9}$" />
+                   pattern="^(09|\+639|0)\d{9,10}$"/>
             <div class="error-message" id="memberContactError"></div>
           </div>
 
@@ -3150,7 +3387,7 @@ li.admin-only.admin-visible {
 
           <!-- FIXED: Member Additional Information -->
           <div style="grid-column: 1 / -1;">
-            <label>Additional Information</label>
+            <label style="margin-bottom: 0;">Additional Information</label>
             <div class="small-muted" style="margin-bottom: 8px;">Please check (✓) all items that apply.</div>
             <div class="member-additional-info-checkbox-container">
               <div class="member-additional-info-checkbox-item">
@@ -3182,7 +3419,7 @@ li.admin-only.admin-visible {
           </div>
 
           <!-- NEW: Member Type of Disability Dropdown -->
-          <div id="memberDisabilityTypeField" class="conditional-field" style="grid-column: 1 / -1;">
+          <div id="memberDisabilityTypeField" class="conditional-field" style="grid-column: 1 / -1; margin-top: 0;">
             <label>Type of Disability</label>
             <select id="memberDisabilityType" class="animated">
               <option value="">Select type of disability...</option>
@@ -3439,12 +3676,12 @@ li.admin-only.admin-visible {
             
             <div id="memberDisplacementOtherField" class="conditional-field" style="margin-top: 8px;">
               <input type="text" id="member_displacement_other" placeholder="Please specify other reason for displacement..." />
-              <div class="small-muted">This will be used when none of the listed reasons apply.</div>
+              <div class="small-muted" style="margin-bottom: 0;">This will be used when none of the listed reasons apply.</div>
             </div>
           </div>
 
           <!-- Member Assembly Area Options -->
-          <div id="memberAssemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; margin-top: 16px; display: none;">
+          <div id="memberAssemblyAreaOptions" class="conditional-field" style="grid-column: 1 / -1; margin-top: 0px; display: none;">
             <label>Assembly Area</label>
             <div style="display: flex; gap: 20px; margin-top: 8px;">
               <div class="member-displacement-checkbox-item">
@@ -3459,7 +3696,7 @@ li.admin-only.admin-visible {
           </div>
 
           <!-- Member Inside Assembly Area Fields -->
-          <div id="memberInsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none;">
+          <div id="memberInsideAssemblyFields" class="conditional-field" style="grid-column: 1 / -1; display: none; margin-top: 0;">
             <div class="form-grid" style="margin-top: 12px;">
               <div>
                 <label>Pick-Up Location</label>
@@ -5740,13 +5977,15 @@ function formatDateForDisplay(dateValue) {
 
 /* ============ CONTACT VALIDATION ============ */
 function validatePhilippineMobileNumber(number) {
+    // Remove spaces for validation
     const cleaned = number.replace(/\s+/g, '').replace(/[^\d+]/g, '');
-    const pattern = /^(09|\+639)\d{9}$/;
+    const pattern = /^(09|\+639|0)\d{9,10}$/;
     
     if (!pattern.test(cleaned)) return false;
     
     if (cleaned.startsWith('09') && cleaned.length !== 11) return false;
     if (cleaned.startsWith('+639') && cleaned.length !== 13) return false;
+    if (cleaned.startsWith('0') && !cleaned.startsWith('09') && cleaned.length < 10) return false;
     
     return true;
 }
@@ -5771,19 +6010,21 @@ function validateContactInput(input, errorElement) {
         return false;
     }
     
-    // Format the number as user types
+    // Format the number as 0XXX XXX XXXX
     const formattedValue = formatContactNumber(value);
     if (formattedValue !== value) {
         input.value = formattedValue;
         value = formattedValue;
     }
     
-    const isValid = validatePhilippineMobileNumber(value);
+    // Remove spaces for validation
+    const cleanedForValidation = value.replace(/\s+/g, '');
+    const isValid = validatePhilippineMobileNumber(cleanedForValidation);
     
     if (!isValid) {
         input.classList.add('input-error');
         errorElement.style.display = 'block';
-        errorElement.textContent = 'Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)';
+        errorElement.textContent = 'Please enter a valid Philippine mobile number (e.g., 0998 120 1283 or 09XX XXX XXXX)';
         return false;
     } else {
         input.classList.remove('input-error');
@@ -5873,8 +6114,6 @@ async function loadRecords(){
                 return; 
             }
             
-            // FIXED: Handle the response structure properly
-            // The server returns data.header and data.rows
             header = data.header || [];
             rawRows = data.rows || [];
             
@@ -5885,7 +6124,7 @@ async function loadRecords(){
         }
         
         groupRows();
-        filteredGroups = [...groups];
+        filteredGroups = [...groups]; // Initialize filteredGroups with all groups
         currentPage = 1;
         renderTable();
         renderPagination();
@@ -5897,43 +6136,92 @@ async function loadRecords(){
     showLoading(false);
 }
 
-/* ============ CLIENT-SIDE FILTERING ============ */
+/* ============ ENHANCED CLIENT-SIDE FILTERING ============ */
 function filterRecords() {
     const barangay = document.getElementById("filterBarangay").value || "";
     const q = document.getElementById("searchInput").value.trim().toLowerCase();
     
     currentPage = 1;
     
-    filteredGroups = groups.filter(g => {
-        const head = g.head || {};
-        
-        if (barangay && head["Barangay"] !== barangay) {
-            return false;
-        }
-        
-        if (q) {
-            const searchableFields = [
-                head["Data ID"] || "",
-                head["Name of Head"] || "",
-                head["Barangay"] || "",
-                head["Purok/Street"] || "",
-                head["Contact"] || ""
-            ];
-            
-            const memberNames = g.members.map(m => m["Name of Household Member/s"] || "").join(" ");
-            const searchText = [...searchableFields, memberNames].join(" ").toLowerCase();
-            
-            return searchText.includes(q);
-        }
-        
-        return true;
-    });
+    // Start with all groups
+    filteredGroups = [...groups];
     
+    // Apply barangay filter if selected
+    if (barangay) {
+        filteredGroups = filteredGroups.filter(g => {
+            const head = g.head || {};
+            return (head["Barangay"] === barangay) || (head["barangay"] === barangay);
+        });
+    }
+    
+    // Apply search filter if there's a query
+    if (q) {
+        filteredGroups = filteredGroups.filter(g => {
+            const head = g.head || {};
+            const members = g.members || [];
+            
+            let householdMatches = false;
+            const matchingMembers = [];
+            
+            // Check if HEAD matches
+            for (let i = 0; i < header.length; i++) {
+                const colName = header[i];
+                if (colName === "Data ID") continue;
+                
+                const cellValue = String(head[colName] || "").toLowerCase();
+                if (normalizeSearchText(cellValue).includes(normalizeSearchText(q))) {
+                    householdMatches = true;
+                    break;
+                }
+            }
+            
+            // Check if any MEMBER matches
+            members.forEach(member => {
+                let memberMatches = false;
+                
+                for (let j = 0; j < header.length; j++) {
+                    const colName = header[j];
+                    if (colName === "Data ID") continue;
+                    
+                    const cellValue = String(member[colName] || "").toLowerCase();
+                    if (normalizeSearchText(cellValue).includes(normalizeSearchText(q))) {
+                        memberMatches = true;
+                        break;
+                    }
+                }
+                
+                if (memberMatches) {
+                    matchingMembers.push(member);
+                }
+            });
+            
+            // If household matches OR any member matches, include this household
+            if (householdMatches || matchingMembers.length > 0) {
+                // Store which members should be shown
+                g.showAllMembers = householdMatches; // If head matches, show all members
+                g.matchingMembers = matchingMembers; // Store matching members
+                return true;
+            }
+            
+            return false;
+        });
+    }
+    
+    // Always render table, even if empty
     renderTable();
     renderPagination();
     updateCounts();
 }
 
+function normalizeSearchText(text) {
+    return String(text || "")
+        .toLowerCase()
+        .normalize("NFD") // Normalize diacritics (e.g., converts "é" to "e")
+        .replace(/[\u0300-\u036f]/g, "") // Remove diacritical marks
+        .replace(/[^\w\s]/g, " ") // Replace punctuation with spaces
+        .replace(/\s+/g, " ") // Collapse multiple spaces
+        .trim();
+}
 /* ============ GROUPING ============ */
 function groupRows(){
     const map = {};
@@ -5962,11 +6250,45 @@ function renderTable(){
     const tbody = document.getElementById("tableBody");
     thead.innerHTML = ""; tbody.innerHTML = "";
 
-    // header row - FIXED: Only use header columns that exist in data
+    // Always render header
     let th = `<tr><th class="select-col"><input id="selectAll" type="checkbox"></th>`;
     header.forEach(c => th += `<th>${c}</th>`);
     th += `<th class="actions-col">Members</th><th class="actions-col">Actions</th></tr>`;
     thead.innerHTML = th;
+
+    // Check if there are filtered results
+    if (filteredGroups.length === 0) {
+        // Show "no results" message
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = header.length + 3; // +3 for select, members, and actions columns
+        td.style.textAlign = "center";
+        td.style.padding = "40px 20px";
+        td.style.color = "var(--muted)";
+        td.style.fontSize = "0.9rem";
+        td.style.background = "white"; // ADD THIS LINE - sets background to white
+        td.innerHTML = `
+            <div style="margin-bottom: 10px; font-size: 2rem; opacity: 0.5;">
+                <i class="fas fa-search"></i>
+            </div>
+            <div style="font-weight: 500; margin-bottom: 5px;">No records found</div>
+            <div style="font-size: 0.8rem; opacity: 0.7;">
+                Try adjusting your search or filter criteria
+            </div>
+        `;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        
+        // Clear the select all checkbox
+        const selectAll = document.getElementById("selectAll");
+        if (selectAll) {
+            selectAll.checked = false;
+            selectAll.onchange = null;
+        }
+        
+        updateCounts();
+        return;
+    }
 
     const start = (currentPage-1) * rowsPerPage;
     const pageRows = filteredGroups.slice(start, start + rowsPerPage);
@@ -5974,8 +6296,30 @@ function renderTable(){
 
     pageRows.forEach(g=>{
         const head = g.head || {};
-        const mCount = g.members.length;
-
+        const members = g.members || [];
+        
+        // Original member count for classification (color coding)
+        const mCount = members.length;
+        
+        // Calculate how many members should be visible based on search
+        let visibleMemberCount = 0;
+        const hasSearch = keyword.length > 0;
+        
+        if (hasSearch) {
+            // We're searching - determine which members to show
+            if (g.showAllMembers) {
+                // Head matched search - show ALL members
+                visibleMemberCount = members.length;
+            } else if (g.matchingMembers) {
+                // Only show matching members
+                visibleMemberCount = g.matchingMembers.length;
+            }
+        } else {
+            // No search - show all members
+            visibleMemberCount = members.length;
+        }
+        
+        // Color class based on original member count
         let cls = mCount <= 1 ? "mem-small" : mCount <= 4 ? "mem-normal" : mCount <= 7 ? "mem-large" : "mem-critical";
         const tr = document.createElement("tr"); 
         tr.className = cls;
@@ -5986,7 +6330,7 @@ function renderTable(){
         tdSel.innerHTML = `<input type="checkbox" class="row-select" data-id="${g.dataID}" ${selected.has(g.dataID) ? "checked" : ""}>`;
         tr.appendChild(tdSel);
 
-        // header columns - FIXED: Only render columns from header array
+        // header columns
         header.forEach(col=>{
             const td = document.createElement("td");
             let cellValue = head[col] || "";
@@ -6012,13 +6356,13 @@ function renderTable(){
             tr.appendChild(td);
         });
 
-        // show toggle
+        // show toggle - shows count of visible members
         const tdShow = document.createElement("td"); 
         tdShow.className = "actions-col";
-        tdShow.innerHTML = `<button class="show-toggle" onclick="toggleMembers('${g.dataID}')"><i class="fas fa-eye"></i> Show (${mCount})</button>`;
+        tdShow.innerHTML = `<button class="show-toggle" onclick="toggleMembers('${g.dataID}')"><i class="fas fa-eye"></i> Show (${visibleMemberCount})</button>`;
         tr.appendChild(tdShow);
 
-        // action buttons - MODIFIED FOR IN-PLACE EDITING
+        // action buttons
         const tdAct = document.createElement("td"); 
         tdAct.className = "actions-col";
         tdAct.innerHTML = `
@@ -6033,11 +6377,47 @@ function renderTable(){
 
         tbody.appendChild(tr);
 
-        // member rows
-        g.members.forEach(m=>{
+        // member rows - Show only matching members when searching
+        members.forEach(m=>{
             const mr = document.createElement("tr");
             mr.className = "member-row hidden";
             mr.dataset.parent = g.dataID;
+            
+            // Check if this member should be shown
+            let shouldShowMember = false;
+            
+            if (hasSearch) {
+                // We're searching - check if this member should be visible
+                if (g.showAllMembers) {
+                    // Head matched search - show ALL members
+                    shouldShowMember = true;
+                    mr.classList.add('head-matched-member');
+                } else {
+                    // Check if this member is in matchingMembers
+                    const isMatching = g.matchingMembers?.some(matchingMember => 
+                        matchingMember['Name of Household Member/s'] === m['Name of Household Member/s']
+                    ) || false;
+                    
+                    if (isMatching) {
+                        shouldShowMember = true;
+                        mr.classList.add('search-matched-member');
+                    } else {
+                        // This member doesn't match the search - don't show it at all
+                        mr.style.display = 'none';
+                        mr.classList.add('search-excluded');
+                    }
+                }
+            } else {
+                // No search - show all members
+                shouldShowMember = true;
+            }
+            
+            // If member shouldn't be shown at all, skip rendering its content
+            if (!shouldShowMember) {
+                tbody.appendChild(mr); // Add empty hidden row
+                return; // Skip the rest
+            }
+            
             mr.appendChild(document.createElement("td")); // empty select col
             
             header.forEach(col=>{
@@ -6074,7 +6454,10 @@ function renderTable(){
     // select all logic for page
     const selectAll = document.getElementById("selectAll");
     if(selectAll){
-        selectAll.checked = pageRows.every(g => selected.has(g.dataID));
+        const pageIds = pageRows.map(g => g.dataID);
+        const allSelectedOnPage = pageIds.every(id => selected.has(id));
+        selectAll.checked = allSelectedOnPage;
+        
         selectAll.onchange = function(){
             pageRows.forEach(g => {
                 if(this.checked) selected.add(g.dataID); 
@@ -6109,21 +6492,40 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => map[m]);
 } 
 
-/* ============ TOGGLE MEMBERS ============ */
+/* ============ UPDATED TOGGLE MEMBERS FUNCTION ============ */
 function toggleMembers(id){
-    const memberRows = document.querySelectorAll(`tr.member-row[data-parent="${id}"]`);
-    memberRows.forEach(r => {
-        r.classList.toggle("hidden");
-        const btn = document.querySelector(`.show-toggle[onclick*="${id}"]`);
-        if(btn){
-            const icon = btn.querySelector('i');
-            if(r.classList.contains('hidden')){
-                icon.className = 'fas fa-eye';
-            } else {
-                icon.className = 'fas fa-eye-slash';
-            }
+    // Get all member rows for this household (excluding those hidden by search)
+    const allMemberRows = document.querySelectorAll(`tr.member-row[data-parent="${id}"]:not(.search-excluded)`);
+    
+    // Check if ANY visible member rows are currently hidden
+    const anyHidden = Array.from(allMemberRows).some(r => r.classList.contains('hidden'));
+    
+    if (anyHidden) {
+        // Show all visible member rows
+        allMemberRows.forEach(r => {
+            r.classList.remove("hidden");
+        });
+    } else {
+        // Hide all visible member rows
+        allMemberRows.forEach(r => {
+            r.classList.add("hidden");
+        });
+    }
+    
+    // Update the button icon
+    const btn = document.querySelector(`.show-toggle[onclick*="${id}"]`);
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const visibleCount = allMemberRows.length;
+        
+        if (anyHidden) {
+            icon.className = 'fas fa-eye-slash';
+            btn.innerHTML = `<i class="fas fa-eye-slash"></i> Hide (${visibleCount})`;
+        } else {
+            icon.className = 'fas fa-eye';
+            btn.innerHTML = `<i class="fas fa-eye"></i> Show (${visibleCount})`;
         }
-    });
+    }
 }
 
 /* ============ PAGINATION ============ */
@@ -6152,9 +6554,13 @@ function gotoPage(p){
 
 /* ============ COUNTS ============ */
 function updateCounts(){
+    // Total records in the system
     document.getElementById("rowCount").innerText = groups.length;
+    
+    // Records matching current filters
     document.getElementById("matchCount").innerText = filteredGroups.length;
     
+    // Selected records from current filtered view
     let selectedCount = 0;
     filteredGroups.forEach(g => {
         if (selected.has(g.dataID)) {
@@ -6373,6 +6779,14 @@ function onEdit(id){
       // Show the inside fields
       $('edit_insideAssemblyFields').style.display = 'block';
       $('edit_outsideAssemblyFields').style.display = 'none';
+      
+      // Populate inside assembly fields
+      $('edit_pickup').value = editHead['Pick-Up Location'] || '';
+      $('edit_assembly_area').value = editHead['Assembly Area'] || '';
+      
+      // FIXED: Populate transportation field for inside assembly
+      $('edit_head_transport').value = editHead['Transportation'] || '';
+      
     } else if (outsideAssembly) {
       $('edit_inside_assembly').checked = false;
       $('edit_outside_assembly').checked = true;
@@ -6383,6 +6797,14 @@ function onEdit(id){
       // Show the outside fields
       $('edit_insideAssemblyFields').style.display = 'none';
       $('edit_outsideAssemblyFields').style.display = 'block';
+      
+      // Populate outside assembly fields
+      $('edit_family_host').value = editHead['Family/Relative Host'] || '';
+      $('edit_host_contact').value = editHead['Host_Contact'] || '';
+      
+      // FIXED: Populate transportation field for outside assembly
+      $('edit_outside_transport').value = editHead['Transportation'] || '';
+      
     } else {
       $('edit_inside_assembly').checked = false;
       $('edit_outside_assembly').checked = false;
@@ -6394,14 +6816,19 @@ function onEdit(id){
       $('edit_outsideAssemblyFields').style.display = 'none';
     }
 
-    // Assembly area fields
+    // Assembly area fields (already set above)
     $('edit_family_host').value = editHead['Family/Relative Host'] || '';
     $('edit_host_contact').value = editHead['Host_Contact'] || '';
     $('edit_pickup').value = editHead['Pick-Up Location'] || '';
     $('edit_assembly_area').value = editHead['Assembly Area'] || '';
-    $('edit_head_transport').value = editHead['Transportation'] || editHead['outside_transport'] || '';
-    /* ============ END DISPLACEMENT FIX ============ */
-
+    
+    // FIXED: Set transportation field based on assembly area
+    if (insideAssembly) {
+      $('edit_head_transport').value = editHead['Transportation'] || '';
+    } else if (outsideAssembly) {
+      $('edit_outside_transport').value = editHead['Transportation'] || '';
+    }
+    
     $('edit_head_status').value = editHead['Status'] || '';
     
     // Domestic Animals - FIXED with checkbox sync
@@ -7115,7 +7542,7 @@ function fillMemberPanelFromEdit(idx){
   $('member_displacement_landslide').checked = m['Landslide'] === 'Yes';
   $('member_displacement_earthquake').checked = m['Earthquake'] === 'Yes';
   $('member_displacement_fire').checked = m['Fire'] === 'Yes';
-  
+
   // Check for "Other Reasons" 
   const otherReasons = m['Other Reasons'] || '';
   if (otherReasons && otherReasons.trim() !== '') {
@@ -7127,7 +7554,7 @@ function fillMemberPanelFromEdit(idx){
     $('memberDisplacementOtherField').classList.remove('show');
     $('member_displacement_other').value = '';
   }
-  
+
   // Check if any displacement reason is checked
   const anyDisplacementChecked = 
     $('member_displacement_taal').checked ||
@@ -7137,18 +7564,18 @@ function fillMemberPanelFromEdit(idx){
     $('member_displacement_earthquake').checked ||
     $('member_displacement_fire').checked ||
     $('member_displacement_other_check').checked;
-  
+
   // Show assembly area options if any displacement reason is checked
   if (anyDisplacementChecked) {
     $('memberAssemblyAreaOptions').style.display = 'block';
   } else {
     $('memberAssemblyAreaOptions').style.display = 'none';
   }
-  
+
   // Assembly area - check both Inside and Outside columns
   const insideAssembly = m['Inside Assembly Area'] === 'Yes';
   const outsideAssembly = m['Outside Assembly Area'] === 'Yes';
-  
+
   if (insideAssembly) {
     $('member_inside_assembly').checked = true;
     $('member_outside_assembly').checked = false;
@@ -7159,10 +7586,14 @@ function fillMemberPanelFromEdit(idx){
     // Show the inside fields
     $('memberInsideAssemblyFields').style.display = 'block';
     $('memberOutsideAssemblyFields').style.display = 'none';
+    
     // Populate inside assembly fields
     $('memberPickup').value = m['Pick-Up Location'] || '';
     $('memberAssemblyArea').value = m['Assembly Area'] || '';
+    
+    // FIXED: Populate transportation field for inside assembly
     $('memberTransport').value = m['Transportation'] || '';
+    
   } else if (outsideAssembly) {
     $('member_inside_assembly').checked = false;
     $('member_outside_assembly').checked = true;
@@ -7173,10 +7604,14 @@ function fillMemberPanelFromEdit(idx){
     // Show the outside fields
     $('memberInsideAssemblyFields').style.display = 'none';
     $('memberOutsideAssemblyFields').style.display = 'block';
+    
     // Populate outside assembly fields
     $('memberFamilyHost').value = m['Family/Relative Host'] || '';
     $('memberHostContact').value = m['Host_Contact'] || '';
+    
+    // FIXED: Populate transportation field for outside assembly
     $('memberOutsideTransport').value = m['Transportation'] || '';
+    
   } else {
     $('member_inside_assembly').checked = false;
     $('member_outside_assembly').checked = false;
@@ -7187,7 +7622,7 @@ function fillMemberPanelFromEdit(idx){
     $('memberInsideAssemblyFields').style.display = 'none';
     $('memberOutsideAssemblyFields').style.display = 'none';
   }
-  
+
   // Government Assistance Programs WITH DATE FIELDS - FIXED: Populate all fields
   // TUPAD
   const hasMemberTUPAD = m['TUPAD'] === 'Yes';
@@ -7506,15 +7941,23 @@ function formatContactNumber(phone) {
   let cleaned = phone.replace(/\D/g, '');
   
   // If it starts with 63, convert to 0 format
-  if (cleaned.startsWith('63') && cleaned.length === 11) {
+  if (cleaned.startsWith('63') && cleaned.length === 12) {
     cleaned = '0' + cleaned.substring(2);
   }
   
-  // Format as 09XX XXX XXXX or 09XXX XXX XXX
+  // If it starts with 9 (without 0), add 0
+  if (cleaned.startsWith('9') && cleaned.length === 10) {
+    cleaned = '0' + cleaned;
+  }
+  
+  // Format as 0XXX XXX XXXX
   if (cleaned.length === 11 && cleaned.startsWith('09')) {
     return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
-  } else if (cleaned.length === 10 && cleaned.startsWith('9')) {
-    return '0' + cleaned.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+  } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+    return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
+  } else if (cleaned.length === 10 && cleaned.startsWith('0')) {
+    // For older 10-digit numbers starting with 0
+    return cleaned.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
   }
   
   // Return as is if doesn't match expected formats
@@ -8132,34 +8575,22 @@ function setupContactValidation() {
         // Remove all non-digit characters
         let digits = currentValue.replace(/\D/g, '');
         
+        // Add leading 0 if starts with 9
+        if (digits.startsWith('9') && digits.length <= 10) {
+          digits = '0' + digits;
+        }
+        
         // Don't format until we have at least 4 digits
         if (digits.length >= 4) {
-          // Apply formatting
-          if (digits.startsWith('09') && digits.length <= 11) {
-            // Format as 09XX XXX XXXX
-            if (digits.length <= 4) {
-              this.value = digits;
-            } else if (digits.length <= 7) {
-              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
-            } else {
-              this.value = digits.substring(0, 4) + ' ' + 
-                          digits.substring(4, 7) + ' ' + 
-                          digits.substring(7, 11);
-            }
-          } else if (digits.startsWith('9') && digits.length <= 10) {
-            // Format as 0XXX XXX XXXX
-            digits = '0' + digits;
-            if (digits.length <= 4) {
-              this.value = digits;
-            } else if (digits.length <= 7) {
-              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
-            } else {
-              this.value = digits.substring(0, 4) + ' ' + 
-                          digits.substring(4, 7) + ' ' + 
-                          digits.substring(7, 11);
-            }
+          // Apply formatting as 0XXX XXX XXXX
+          if (digits.length <= 4) {
+            this.value = digits;
+          } else if (digits.length <= 7) {
+            this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
           } else {
-            this.value = digits.substring(0, 13); // Limit to max length
+            this.value = digits.substring(0, 4) + ' ' + 
+                        digits.substring(4, 7) + ' ' + 
+                        digits.substring(7, 11);
           }
         } else {
           this.value = digits;
@@ -8198,34 +8629,22 @@ function setupContactValidation() {
         // Remove all non-digit characters
         let digits = currentValue.replace(/\D/g, '');
         
+        // Add leading 0 if starts with 9
+        if (digits.startsWith('9') && digits.length <= 10) {
+          digits = '0' + digits;
+        }
+        
         // Don't format until we have at least 4 digits
         if (digits.length >= 4) {
-          // Apply formatting
-          if (digits.startsWith('09') && digits.length <= 11) {
-            // Format as 09XX XXX XXXX
-            if (digits.length <= 4) {
-              this.value = digits;
-            } else if (digits.length <= 7) {
-              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
-            } else {
-              this.value = digits.substring(0, 4) + ' ' + 
-                          digits.substring(4, 7) + ' ' + 
-                          digits.substring(7, 11);
-            }
-          } else if (digits.startsWith('9') && digits.length <= 10) {
-            // Format as 0XXX XXX XXXX
-            digits = '0' + digits;
-            if (digits.length <= 4) {
-              this.value = digits;
-            } else if (digits.length <= 7) {
-              this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
-            } else {
-              this.value = digits.substring(0, 4) + ' ' + 
-                          digits.substring(4, 7) + ' ' + 
-                          digits.substring(7, 11);
-            }
+          // Apply formatting as 0XXX XXX XXXX
+          if (digits.length <= 4) {
+            this.value = digits;
+          } else if (digits.length <= 7) {
+            this.value = digits.substring(0, 4) + ' ' + digits.substring(4);
           } else {
-            this.value = digits.substring(0, 13); // Limit to max length
+            this.value = digits.substring(0, 4) + ' ' + 
+                        digits.substring(4, 7) + ' ' + 
+                        digits.substring(7, 11);
           }
         } else {
           this.value = digits;
