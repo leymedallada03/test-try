@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Data Entry — Purok Kaligtasan 133</title>
+<title>Data Entry — Purok Kaligtasan</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/uniform-styles.css">
 <style>
@@ -29,6 +29,16 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
+@keyframes modalSlideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
    .admin-only {
     display: none !important;
 }
@@ -2314,6 +2324,432 @@ textarea.validation-error:focus {
        gap: 6px !important;
      }
    }
+/* ============ CALAMITY SECTION STYLES ============ */
+/* Post-Calamity Impact Assessment - Complete CSS */
+
+/* Head Form - Grid Layout (2 columns) */
+.calamity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.calamity-item {
+  background: #f9fbfa;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  border: 1px solid var(--border);
+}
+
+/* Member Form - Single Column Layout */
+.member-calamity-item {
+  background: #f9fbfa;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.member-calamity-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Common Styles */
+.calamity-question {
+  font-weight: 700;
+  color: var(--accent1);
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+
+.radio-group-inline {
+  display: flex;
+  gap: 20px;
+  margin: 8px 0 12px 0;
+}
+
+/* ============ FILE UPLOAD STYLES ============ */
+
+/* File wrapper - Choose File button + filename + remove button */
+.file-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+/* Choose File Button - SMALLER, white background, green border */
+.choose-file-btn {
+  background: white;
+  color: var(--accent1);
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  border: 1.5px solid var(--accent1);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.choose-file-btn:hover {
+  background: var(--light-green);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(15, 122, 74, 0.1);
+}
+
+.choose-file-btn:active {
+  transform: translateY(0);
+}
+
+/* Filename display */
+.filename-display {
+  font-size: 0.8rem;
+  color: var(--muted);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filename-display i {
+  margin-right: 4px;
+  color: var(--accent1);
+}
+
+/* Remove button - Small X icon */
+.remove-file-btn,
+.member-remove-file-btn {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.remove-file-btn:hover,
+.member-remove-file-btn:hover {
+  background: rgba(220, 38, 38, 0.1);
+  transform: scale(1.1);
+}
+
+.remove-file-btn:active,
+.member-remove-file-btn:active {
+  transform: scale(0.95);
+}
+
+/* Conditional field - shows/hides based on radio selection */
+.conditional-field {
+  display: none;
+}
+
+.conditional-field.show {
+  display: block;
+}
+
+/* ============ TEXTAREA STYLES ============ */
+textarea {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--accent1);
+  box-shadow: 0 0 0 3px rgba(15, 122, 74, 0.1);
+}
+
+/* ============ LABEL STYLES ============ */
+.calamity-item label,
+.member-calamity-item label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--accent1);
+  font-size: 0.85rem;
+}
+
+/* Small muted text */
+.small-muted {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ============ HIDDEN FILE INPUT ============ */
+input[type="file"] {
+  display: none;
+}
+
+/* ============ MOBILE RESPONSIVE ============ */
+@media (max-width: 768px) {
+  .calamity-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .file-wrapper {
+    flex-wrap: wrap;
+  }
+  
+  .choose-file-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 6px 12px;
+  }
+  
+  .filename-display {
+    width: 100%;
+    text-align: center;
+    margin-top: 4px;
+  }
+  
+  .member-calamity-item {
+    position: relative;
+  }
+  
+  .calamity-question {
+    font-size: 0.9rem;
+  }
+  
+  .radio-group-inline {
+    gap: 15px;
+  }
+}
+
+/* ============ TABLET RESPONSIVE ============ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .calamity-grid {
+    gap: 12px;
+  }
+  
+  .choose-file-btn {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+  
+  .filename-display {
+    font-size: 0.75rem;
+  }
+}
+
+/* ============ SMALL MOBILE DEVICES ============ */
+@media (max-width: 480px) {
+  .calamity-item,
+  .member-calamity-item {
+    padding: 10px;
+  }
+  
+  .choose-file-btn {
+    font-size: 0.7rem;
+    padding: 5px 10px;
+  }
+  
+  .filename-display {
+    font-size: 0.7rem;
+  }
+  
+  .radio-group-inline {
+    gap: 12px;
+  }
+  
+  .radio-item {
+    font-size: 0.85rem;
+  }
+}
+
+/* ============ DARK MODE SUPPORT ============ */
+@media (prefers-color-scheme: dark) {
+  .calamity-item,
+  .member-calamity-item {
+    background: #1a1f1e;
+    border-color: #2a302e;
+  }
+  
+  .choose-file-btn {
+    background: #1a1f1e;
+    color: var(--accent2);
+    border-color: var(--accent2);
+  }
+  
+  .choose-file-btn:hover {
+    background: #2a302e;
+  }
+  
+  textarea {
+    background: #1a1f1e;
+    color: #e5e7eb;
+    border-color: #2a302e;
+  }
+  
+  textarea:focus {
+    border-color: var(--accent2);
+  }
+  
+  .filename-display {
+    color: #9ca3af;
+  }
+  
+  .filename-display i {
+    color: var(--accent2);
+  }
+}
+
+/* ============ ANIMATIONS ============ */
+.conditional-field {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ UTILITY CLASSES ============ */
+.text-center {
+  text-align: center;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+/* ============ ICON STYLES ============ */
+.fa-file-image,
+.fa-file-medical,
+.fa-home,
+.fa-briefcase,
+.fa-file-pdf {
+  margin-right: 4px;
+}
+
+/* ============ REMOVE BUTTON ICON ============ */
+.remove-file-btn i,
+.member-remove-file-btn i {
+  pointer-events: none;
+}
+
+/* ============ FOCUS VISIBLE FOR ACCESSIBILITY ============ */
+.choose-file-btn:focus-visible {
+  outline: 2px solid var(--accent1);
+  outline-offset: 2px;
+}
+
+.remove-file-btn:focus-visible,
+.member-remove-file-btn:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
+}
+
+/* ============ PRINT STYLES ============ */
+@media print {
+  .choose-file-btn,
+  .remove-file-btn,
+  .member-remove-file-btn,
+  input[type="file"],
+  .file-wrapper button {
+    display: none;
+  }
+  
+  .filename-display {
+    color: black;
+    font-weight: normal;
+  }
+  
+  .calamity-item,
+  .member-calamity-item {
+    break-inside: avoid;
+    border: 1px solid #ddd;
+    background: white;
+  }
+  
+  .conditional-field {
+    display: block !important;
+  }
+  
+  textarea {
+    border: 1px solid #ddd;
+    background: white;
+  }
+}
+
+/* ============ SCROLLBAR STYLES (Optional) ============ */
+.calamity-item textarea::-webkit-scrollbar,
+.member-calamity-item textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.calamity-item textarea::-webkit-scrollbar-track,
+.member-calamity-item textarea::-webkit-scrollbar-track {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.calamity-item textarea::-webkit-scrollbar-thumb,
+.member-calamity-item textarea::-webkit-scrollbar-thumb {
+  background: var(--accent1);
+  border-radius: 3px;
+}
+
+/* ============ DISABLED STATES ============ */
+.choose-file-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============ LOADING STATE (for future use) ============ */
+.file-uploading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ============ SUCCESS STATE ============ */
+.file-success {
+  color: var(--accent1);
+  font-weight: 500;
+}
+
+/* ============ ERROR STATE ============ */
+.file-error {
+  color: #dc2626;
+  font-size: 0.7rem;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 </style>
 </head>
 <body>
@@ -2329,7 +2765,7 @@ textarea.validation-error:focus {
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
       <div class="brand-text">
-        <h1>PUROK KALIGTASAN 133</h1>
+        <h1>PUROK KALIGTASAN</h1>
         <p>MDRRMO Alitagtag – Household Records System</p>
       </div>
     </div>
@@ -2373,7 +2809,9 @@ textarea.validation-error:focus {
     </div>
 
     <div id="disc">This section captures all key information about the household head, including personal data, contact details, demographic profile, and any government support or programs currently availed. The information will help establish the primary point of contact and provide a clear understanding of the household's overall status.</div>
-
+<div id="uploadStatus" style="display: none; position: fixed; bottom: 20px; right: 20px; background: var(--accent1); color: white; padding: 10px 16px; border-radius: 8px; z-index: 9999;">
+  <i class="fas fa-spinner fa-spin"></i> <span>Uploading files...</span>
+</div>
     <form id="headForm" novalidate onsubmit="return false;">
       <!-- BASIC -->
       <div class="card form-section">
@@ -3031,6 +3469,106 @@ textarea.validation-error:focus {
         </div>
       </div>
 
+<!-- Post-Calamity Impact Assessment Section - HEAD FORM -->
+<div class="card">
+  <div class="section-title"><div class="chip">7</div><h3>Post-Calamity Impact Report</h3></div>
+  <div class="small-muted">Pagtatasa ng Epekto ng Kalamidad at Pagsusumite ng Mga Suportang Dokumento</div>
+  
+  <div class="calamity-grid">
+    <!-- 1. Structural/Property Damage -->
+    <div class="calamity-item">
+      <div class="calamity-question">Structural/Property Damage</div>
+      <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Did your household experience structural or property damage due to the calamity?”<br><span class="small-muted">“Nakaranas ba ang inyong sambahayan ng pinsala sa istruktura o ari-arian dulot ng kalamidad?”</span></div>
+      <div class="radio-group-inline">
+        <label class="radio-item"><input type="radio" name="head_damage" value="Yes"> Yes</label>
+        <label class="radio-item"><input type="radio" name="head_damage" value="No"> No</label>
+      </div>
+      <div id="head_damage_upload_area" class="conditional-field">
+        <label>Upload supporting document (Image or PDF):</label>
+        <div class="file-wrapper">
+          <button type="button" class="choose-file-btn" onclick="document.getElementById('head_damage_file').click();">Choose File</button>
+          <input type="file" id="head_damage_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+          <span id="head_damage_filename" class="filename-display">No file chosen</span>
+          <button type="button" class="remove-file-btn" data-category="damage" style="display: none;">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+      <label style="margin-top: 8px;">Additional Details (Optional):</label>
+      <textarea id="head_damage_details" rows="2" placeholder="Ilarawan ang uri at lawak ng pinsala (hal. nasirang bubong, binaha, sirang appliances)."></textarea>
+    </div>
+
+    <!-- 2. Household Injury -->
+    <div class="calamity-item">
+      <div class="calamity-question">Household Injury</div>
+      <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Did any member of your household sustain physical injuries during or immediately after the calamity?”<br><span class="small-muted">“Mayroon bang miyembro ng inyong sambahayan na nasugatan o napinsala sa panahon o kaagad pagkatapos ng kalamidad?”</span></div>
+      <div class="radio-group-inline">
+        <label class="radio-item"><input type="radio" name="head_injury" value="Yes"> Yes</label>
+        <label class="radio-item"><input type="radio" name="head_injury" value="No"> No</label>
+      </div>
+      <div id="head_injury_upload_area" class="conditional-field">
+        <label>Upload supporting document (Medical certificate, photo):</label>
+        <div class="file-wrapper">
+          <button type="button" class="choose-file-btn" onclick="document.getElementById('head_injury_file').click();">Choose File</button>
+          <input type="file" id="head_injury_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+          <span id="head_injury_filename" class="filename-display">No file chosen</span>
+          <button type="button" class="remove-file-btn" data-category="injury" style="display: none;">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+      <label style="margin-top: 8px;">Additional Details (Optional):</label>
+      <textarea id="head_injury_details" rows="2" placeholder="Detalye ng pinsala, sino ang naapektuhan, at anong gamutan ang natanggap."></textarea>
+    </div>
+
+    <!-- 3. Habitability of House -->
+    <div class="calamity-item">
+      <div class="calamity-question">Habitability of House</div>
+      <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Is your house currently unsafe or unfit for habitation due to the calamity?”<br><span class="small-muted">“Ang inyong bahay ba ay kasalukuyang hindi ligtas o hindi na maaaring tirahan dahil sa kalamidad?”</span></div>
+      <div class="radio-group-inline">
+        <label class="radio-item"><input type="radio" name="head_habitability" value="Yes"> Yes</label>
+        <label class="radio-item"><input type="radio" name="head_habitability" value="No"> No</label>
+      </div>
+      <div id="head_habitability_upload_area" class="conditional-field">
+        <label>Upload supporting document (Photo, assessment report):</label>
+        <div class="file-wrapper">
+          <button type="button" class="choose-file-btn" onclick="document.getElementById('head_habitability_file').click();">Choose File</button>
+          <input type="file" id="head_habitability_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+          <span id="head_habitability_filename" class="filename-display">No file chosen</span>
+          <button type="button" class="remove-file-btn" data-category="habitability" style="display: none;">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+      <label style="margin-top: 8px;">Additional Details (Optional):</label>
+      <textarea id="head_habitability_details" rows="2" placeholder="Ipaliwanag kung bakit hindi na ligtas tirahan (hal. may bitak, lubog sa baha, may panganib na gumuho)."></textarea>
+    </div>
+
+    <!-- 4. Loss of Livelihood -->
+    <div class="calamity-item">
+      <div class="calamity-question">Loss of Livelihood or Assets</div>
+      <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Did your household lose any livelihood, income source, or essential assets due to the calamity?”<br><span class="small-muted">“Nawalan ba ng kabuhayan, pinagkakakitaan, o mahahalagang ari-arian ang inyong sambahayan dahil sa kalamidad?”</span></div>
+      <div class="radio-group-inline">
+        <label class="radio-item"><input type="radio" name="head_livelihood" value="Yes"> Yes</label>
+        <label class="radio-item"><input type="radio" name="head_livelihood" value="No"> No</label>
+      </div>
+      <div id="head_livelihood_upload_area" class="conditional-field">
+        <label>Upload supporting document (Proof of loss):</label>
+        <div class="file-wrapper">
+          <button type="button" class="choose-file-btn" onclick="document.getElementById('head_livelihood_file').click();">Choose File</button>
+          <input type="file" id="head_livelihood_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+          <span id="head_livelihood_filename" class="filename-display">No file chosen</span>
+          <button type="button" class="remove-file-btn" data-category="livelihood" style="display: none;">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+      <label style="margin-top: 8px;">Additional Details (Optional):</label>
+      <textarea id="head_livelihood_details" rows="2" placeholder="Ilarawan ang nawalang kabuhayan o ari-arian (hal. nasirang tindahan, kagamitan, o pananim)."></textarea>
+    </div>
+  </div>
+</div>
+
       <!-- MEMBERS PREVIEW + ACTION -->
       <div class="card">
         <div class="section-title"><div class="chip">7</div><h3>Members to be collected</h3></div>
@@ -3639,6 +4177,106 @@ textarea.validation-error:focus {
         </div>
       </div>
 
+<!-- Member Post-Calamity Impact Assessment Section - SINGLE COLUMN -->
+<div class="edit-card">
+  <div class="form-section">
+    <h5>Post-Calamity Impact Report</h5>
+  </div>
+  <div class="small-muted" style="margin-bottom: 12px;">Pagtatasa ng Epekto ng Kalamidad at Pagsusumite ng Mga Suportang Dokumento</div>
+  
+  <!-- QUESTION 1: Structural/Property Damage -->
+  <div class="member-calamity-item">
+    <div class="calamity-question">Structural/Property Damage</div>
+    <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Did your household experience structural or property damage due to the calamity?”<br><span class="small-muted">“Nakaranas ba ang inyong sambahayan ng pinsala sa istruktura o ari-arian dulot ng kalamidad?”</span></div>
+    <div class="radio-group-inline">
+      <label class="radio-item"><input type="radio" name="member_damage" value="Yes"> Yes</label>
+      <label class="radio-item"><input type="radio" name="member_damage" value="No"> No</label>
+    </div>
+    <div id="member_damage_upload_area" class="conditional-field">
+      <label>Upload supporting document (Image or PDF):</label>
+      <div class="file-wrapper">
+        <button type="button" class="choose-file-btn" onclick="document.getElementById('member_damage_file').click();">Choose File</button>
+        <input type="file" id="member_damage_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+        <span id="member_damage_filename" class="filename-display">No file chosen</span>
+        <button type="button" class="member-remove-file-btn" data-category="damage" style="display: none;">
+          <i class="fas fa-times-circle"></i>
+        </button>
+      </div>
+    </div>
+    <label style="margin-top: 8px;">Additional Details (Optional):</label>
+    <textarea id="member_damage_details" rows="2" placeholder="Ilarawan ang uri at lawak ng pinsala (hal. nasirang bubong, binaha, sirang appliances)."></textarea>
+  </div>
+
+  <!-- QUESTION 2: Household Injury -->
+  <div class="member-calamity-item">
+    <div class="calamity-question">Household Injury</div>
+    <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Did any member of your household sustain physical injuries during or immediately after the calamity?”<br><span class="small-muted">“Mayroon bang miyembro ng inyong sambahayan na nasugatan o napinsala sa panahon o kaagad pagkatapos ng kalamidad?”</span></div>
+    <div class="radio-group-inline">
+      <label class="radio-item"><input type="radio" name="member_injury" value="Yes"> Yes</label>
+      <label class="radio-item"><input type="radio" name="member_injury" value="No"> No</label>
+    </div>
+    <div id="member_injury_upload_area" class="conditional-field">
+      <label>Upload supporting document (Medical certificate, photo):</label>
+      <div class="file-wrapper">
+        <button type="button" class="choose-file-btn" onclick="document.getElementById('member_injury_file').click();">Choose File</button>
+        <input type="file" id="member_injury_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+        <span id="member_injury_filename" class="filename-display">No file chosen</span>
+        <button type="button" class="member-remove-file-btn" data-category="injury" style="display: none;">
+          <i class="fas fa-times-circle"></i>
+        </button>
+      </div>
+    </div>
+    <label style="margin-top: 8px;">Additional Details (Optional):</label>
+    <textarea id="member_injury_details" rows="2" placeholder="Detalye ng pinsala, sino ang naapektuhan, at anong gamutan ang natanggap."></textarea>
+  </div>
+
+  <!-- QUESTION 3: Habitability of House -->
+  <div class="member-calamity-item">
+    <div class="calamity-question">Habitability of House</div>
+    <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Is your house currently unsafe or unfit for habitation due to the calamity?”<br><span class="small-muted">“Ang inyong bahay ba ay kasalukuyang hindi ligtas o hindi na maaaring tirahan dahil sa kalamidad?”</span></div>
+    <div class="radio-group-inline">
+      <label class="radio-item"><input type="radio" name="member_habitability" value="Yes"> Yes</label>
+      <label class="radio-item"><input type="radio" name="member_habitability" value="No"> No</label>
+    </div>
+    <div id="member_habitability_upload_area" class="conditional-field">
+      <label>Upload supporting document (Photo, assessment report):</label>
+      <div class="file-wrapper">
+        <button type="button" class="choose-file-btn" onclick="document.getElementById('member_habitability_file').click();">Choose File</button>
+        <input type="file" id="member_habitability_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+        <span id="member_habitability_filename" class="filename-display">No file chosen</span>
+        <button type="button" class="member-remove-file-btn" data-category="habitability" style="display: none;">
+          <i class="fas fa-times-circle"></i>
+        </button>
+      </div>
+    </div>
+    <label style="margin-top: 8px;">Additional Details (Optional):</label>
+    <textarea id="member_habitability_details" rows="2" placeholder="Ipaliwanag kung bakit hindi na ligtas tirahan (hal. may bitak, lubog sa baha, may panganib na gumuho)."></textarea>
+  </div>
+
+  <!-- QUESTION 4: Loss of Livelihood -->
+  <div class="member-calamity-item">
+    <div class="calamity-question">Loss of Livelihood or Assets</div>
+    <div class="calamity-question" style="font-size: 0.8rem; font-weight: normal;">“Did your household lose any livelihood, income source, or essential assets due to the calamity?”<br><span class="small-muted">“Nawalan ba ng kabuhayan, pinagkakakitaan, o mahahalagang ari-arian ang inyong sambahayan dahil sa kalamidad?”</span></div>
+    <div class="radio-group-inline">
+      <label class="radio-item"><input type="radio" name="member_livelihood" value="Yes"> Yes</label>
+      <label class="radio-item"><input type="radio" name="member_livelihood" value="No"> No</label>
+    </div>
+    <div id="member_livelihood_upload_area" class="conditional-field">
+      <label>Upload supporting document (Proof of loss):</label>
+      <div class="file-wrapper">
+        <button type="button" class="choose-file-btn" onclick="document.getElementById('member_livelihood_file').click();">Choose File</button>
+        <input type="file" id="member_livelihood_file" accept="image/jpeg,image/png,image/gif,image/bmp,image/tiff,application/pdf" style="display: none;">
+        <span id="member_livelihood_filename" class="filename-display">No file chosen</span>
+        <button type="button" class="member-remove-file-btn" data-category="livelihood" style="display: none;">
+          <i class="fas fa-times-circle"></i>
+        </button>
+      </div>
+    </div>
+    <label style="margin-top: 8px;">Additional Details (Optional):</label>
+    <textarea id="member_livelihood_details" rows="2" placeholder="Ilarawan ang nawalang kabuhayan o ari-arian (hal. nasirang tindahan, kagamitan, o pananim)."></textarea>
+  </div>
+</div>
+
       <!-- Card 6: Action Buttons -->
       <div class="edit-card">
         <div class="panel-actions" style="margin-top:5px;">
@@ -3654,158 +4292,133 @@ textarea.validation-error:focus {
   </div>
 </div>
 
-<!-- Success Modal - Updated structure -->
-<div id="successModal" class="modal-overlay">
-  <div class="modal-box modal-success">
-    <div class="modal-header">
-      <h3><i class="fas fa-check-circle"></i> Success!</h3>
-      <button class="icon-btn" onclick="hideModal('successModal')">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-check-circle"></i>
+<!-- Success Modal -->
+<div id="successModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-check-circle" style="font-size: 1.6rem; color: #0f7a4a; opacity: 0.7;"></i>
       </div>
-      <p id="successMessage">Operation completed successfully.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Success!</h3>
+      <p id="successMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Operation completed successfully.</p>
     </div>
-    <div class="modal-actions">
-      <button id="closeSuccess" class="btn">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeSuccess" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-check"></i> OK
       </button>
     </div>
   </div>
 </div>
 
-<!-- Error Modal - Updated structure -->
-<div id="errorModal" class="modal-overlay">
-  <div class="modal-box modal-error">
-    <div class="modal-header">
-      <h3><i class="fas fa-exclamation-circle"></i> Error</h3>
-      <button class="icon-btn" onclick="hideModal('errorModal')">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-exclamation-circle"></i>
+<!-- Error Modal -->
+<div id="errorModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-exclamation-circle" style="font-size: 1.6rem; color: #ef4444; opacity: 0.7;"></i>
       </div>
-      <p id="errorMessage">An error occurred.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Error</h3>
+      <p id="errorMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">An error occurred.</p>
     </div>
-    <div class="modal-actions">
-<button id="closeError" class="btn secondary">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeError" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
         <i class="fas fa-times"></i> Close
       </button>
     </div>
   </div>
 </div>
 
-<!-- Info Modal - Updated structure -->
-<div id="infoModal" class="modal-overlay">
-  <div class="modal-box modal-info">
-    <div class="modal-header">
-      <h3><i class="fas fa-info-circle"></i> Information</h3>
-      <button class="icon-btn" onclick="hideModal('infoModal')">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-info-circle"></i>
+<!-- Info Modal -->
+<div id="infoModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-info-circle" style="font-size: 1.6rem; color: #34b78f; opacity: 0.7;"></i>
       </div>
-      <p id="infoMessage">Information message.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Information</h3>
+      <p id="infoMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Information message.</p>
     </div>
-    <div class="modal-actions">
-      <button id="closeInfo" class="btn">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeInfo" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-check"></i> OK
       </button>
     </div>
   </div>
 </div>
 
-<!-- Reset Confirmation Modal - Updated structure -->
-<div id="resetConfirmationModal" class="modal-overlay">
-  <div class="modal-box modal-warning">
-    <div class="modal-header">
-      <h3><i class="fas fa-exclamation-triangle"></i> Reset Form</h3>
-      <button id="closeResetModal" class="icon-btn">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-exclamation-triangle"></i>
+<!-- Reset Confirmation Modal -->
+<div id="resetConfirmationModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.6rem; color: #ff7a00; opacity: 0.7;"></i>
       </div>
-      <p>Are you sure you want to reset the form? All entered data will be permanently lost.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Reset Form</h3>
+      <p style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Are you sure you want to reset the form? All entered data will be permanently lost.</p>
     </div>
-    <div class="modal-actions">
-      <button id="cancelReset" class="btn secondary">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelReset" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
         <i class="fas fa-times"></i> Cancel
       </button>
-      <button id="confirmReset" class="btn" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">
+      <button id="confirmReset" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px;  border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-redo"></i> Reset Form
       </button>
     </div>
   </div>
 </div>
 
-<!-- Save Confirmation Modal - Updated structure -->
-<div id="saveConfirmationModal" class="modal-overlay">
-  <div class="modal-box modal-info">
-    <div class="modal-header">
-      <h3><i class="fas fa-save"></i> Save Data</h3>
-<button class="icon-btn" onclick="hideModal('saveConfirmationModal')">
-    <i class="fas fa-times"></i>
-</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-save"></i>
+<!-- Save Confirmation Modal -->
+<div id="saveConfirmationModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-save" style="font-size: 1.6rem; color: #34b78f; opacity: 0.7;"></i>
       </div>
-      <p>Are you ready to save the household data? This action cannot be undone.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Save Data</h3>
+      <p style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Are you ready to save the household data? This action cannot be undone.</p>
     </div>
-    <div class="modal-actions">
-<button id="cancelSave" class="btn btn secondary">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelSave" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
         <i class="fas fa-times"></i> Cancel
       </button>
-      <button id="confirmSave" class="btn">
+      <button id="confirmSave" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-check"></i> Save Data
       </button>
     </div>
   </div>
 </div>
 
-<!-- Hazard Hunter Modal - Updated structure -->
-<div id="hazardHunterModal" class="modal-overlay">
-  <div class="modal-box modal-info">
-    <div class="modal-header">
-      <h3><i class="fas fa-map-marked-alt"></i> Pick Coordinates from Hazard Hunter</h3>
-      <button class="icon-btn" onclick="hideModal('hazardHunterModal')">
-        <i class="fas fa-times"></i>
-      </button>
+<!-- Hazard Hunter Modal - LARGER SIZE -->
+<div id="hazardHunterModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 380px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-map-marked-alt" style="font-size: 1.6rem; color: #ef4444; opacity: 0.7;"></i>
+      </div>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Pick Coordinates</h3>
     </div>
-    <div class="modal-body">
-      <div style="background: var(--light-green); padding: 14px; border-radius: var(--radius-sm); margin: 12px 0;">
-        <h4 style="color: var(--hazard-red); margin-top: 0; display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
+    <div style="padding: 0 20px 12px 20px;">
+      <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin: 8px 0; text-align: left; border: 1px solid #e2e8f0;">
+        <h4 style="color: #ef4444; margin: 0 0 8px 0; display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600;">
           <i class="fas fa-map-marked-alt"></i> Instructions:
         </h4>
-        <ol style="margin: 10px 0 0 18px; line-height: 1.5; font-size: 0.9rem; padding-left: 0;">
+        <ol style="margin: 0 0 0 16px; line-height: 1.5; font-size: 0.75rem; color: #1e293b; padding-left: 0;">
           <li>Click the button below to open Hazard Hunter in a new tab</li>
           <li>Navigate to the desired location on the map</li>
           <li>Click on the map to get coordinates</li>
           <li>Copy the coordinates (latitude, longitude)</li>
           <li>Return to this tab and paste them in the coordinate field</li>
         </ol>
-        <div style="margin-top: 12px; padding: 10px; background: white; border-radius: var(--radius-sm); border-left: 3px solid var(--accent1); font-size: 0.85rem;">
-          <strong>📋 Expected format:</strong> <code>14.123456, 121.123456</code>
+        <div style="margin-top: 8px; padding: 6px; background: white; border-radius: 4px; border-left: 2px solid #0f7a4a; font-size: 0.7rem;">
+          <strong>Format:</strong> <code>14.123456, 121.123456</code>
         </div>
       </div>
     </div>
-    <div class="modal-actions">
-<button id="cancelHazardHunter" class="btn secondary">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelHazardHunter" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
         <i class="fas fa-times"></i> Cancel
       </button>
-      <button id="confirmHazardHunter" class="btn hazard-hunter">
+      <button id="confirmHazardHunter" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-external-link-alt"></i> Open Hazard Hunter
       </button>
     </div>
@@ -3814,7 +4427,7 @@ textarea.validation-error:focus {
 
 <script>
 /* final merged client-side script (age, panel, submit). Keep API_URL updated if needed */
-const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbymKmfbcn3uQmsljJlt8V-ziD_wf1H6Pm6ejMqEeRwxhqHB0vktP3My7OcXVCWVMvnhCg/exec";
 
 document.addEventListener('DOMContentLoaded', function() {
   // SESSION IS HANDLED BY session-manager.js - NO NEED TO CHECK HERE
@@ -4992,7 +5605,7 @@ function resetForm() {
 }
 
 /* ============ MODIFIED: PROCEED TO MEMBER PANEL ============ */
-function proceedToMemberPanel() {
+function proceedToMemberPanel(){
     const barangay = document.getElementById("barangay").value.trim();
     const sitio = document.getElementById("sitio").value.trim();
     const headName = document.getElementById("householdHead").value.trim();
@@ -5013,22 +5626,96 @@ function proceedToMemberPanel() {
         return;
     }
 
+    // CRITICAL FIX: Reset collectedMembers and properly count
     membersToCollect = parseInt(document.getElementById("memberCount").value || 0);
     collectedMembers = []; 
     currentMemberIndex = 0;
+    
+    // Initialize empty members array with proper length
+    for (let i = 0; i < membersToCollect; i++) {
+        collectedMembers.push(createEmptyMember());
+    }
+    
     updateMemberPreview();
 
     if(membersToCollect === 0){
-        // MODIFIED: When there are no members to add, submit head only directly
+        // No members to add, submit head only
         submitHeadAndMembers();
         return;
     }
 
-    // MODIFIED: Open member panel directly without showing save confirmation
-    // The save confirmation will appear later after entering at least one member
+    // Open member panel for the first member
     fillMemberPanel(0);
     currentMemberIndex = 0;
     openPanel();
+}
+
+// Helper function to create empty member (add this function if not present)
+function createEmptyMember() {
+    return {
+        "Name of Household Member/s": "",
+        "FishR Registered/RBIS Registered": "",
+        "Contact no.": "",
+        "Sex": "",
+        "Birthdate": "",
+        "Age": "",
+        "Stage": "",
+        "Solo Parenting": "No",
+        "LGBT": "No",
+        "Lactating": "No",
+        "Pregnant": "No",
+        "Persons with Disability (PWD)": "No",
+        "Type of Disability": "",
+        "Status": "",
+        "Educational Attainment": "",
+        "College Graduate Course": "",
+        "Employment": "",
+        "Job Title": "",
+        "Overseas Filipino Worker(OFW)": "No",
+        "Country": "",
+        "Taal Volcano (Within 14-15 KM Danger Zone)": "",
+        "Typhoon": "",
+        "Flood": "",
+        "Landslide": "",
+        "Earthquake": "",
+        "Fire": "",
+        "Other Reasons": "",
+        "Inside Assembly Area": "",
+        "Outside Assembly Area": "",
+        "Pick-Up Location": "",
+        "Assembly Area": "",
+        "Family/Relative Host": "",
+        "Host_Contact": "",
+        "Transportation": "",
+        "TUPAD": "No",
+        "TUPAD_Date": "",
+        "Local 4Ps": "No",
+        "Local 4Ps_Date": "",
+        "National 4Ps": "No",
+        "National 4Ps_Date": "",
+        "Local Social Pension": "No",
+        "Local Social Pension_Date": "",
+        "National Social Pension": "No",
+        "National Social Pension_Date": "",
+        "Solo Parent Assistance": "No",
+        "Solo Parent Assistance_Date": "",
+        "Relief Goods": "No",
+        "Relief Goods_Date": "",
+        "Cash Subsidy": "No",
+        "Cash Subsidy_Date": "",
+        "AICS": "",
+        "AICS_Date": "",
+        
+        // ============ CALAMITY FIELDS ============
+        "Structural Damage": "No",
+        "Structural Damage Details": "",
+        "Household Injury": "No",
+        "Injury Details": "",
+        "Habitability": "No",
+        "Habitability Details": "",
+        "Loss of Livelihood": "No",
+        "Livelihood Details": ""
+    };
 }
 
 /* ---------------- UI + state ---------------- */
@@ -5235,6 +5922,7 @@ function fillMemberPanel(idx){
 
 /* ============ UPDATED: COLLECT MEMBER DATA WITH DATE FIELDS ============ */
 function collectMemberDataFromPanel(){
+  // CRITICAL FIX: Ensure member rows are properly marked as members
   const name = document.getElementById("memberName").value.trim();
   const birth_input = document.getElementById("memberBirthdate").value || "";
   const birth_for_sheet = toSheetDateFormat(birth_input);
@@ -5257,6 +5945,9 @@ function collectMemberDataFromPanel(){
     }
   }
 
+  // CRITICAL FIX: Always ensure member name is set for member rows
+  const memberName = name || "Unnamed Member";
+  
   // Get displacement reasons
   const displacementReasons = {
     "Taal Volcano (Within 14-15 KM Danger Zone)": document.getElementById("member_displacement_taal").checked ? "Yes" : "No",
@@ -5273,8 +5964,21 @@ function collectMemberDataFromPanel(){
   const insideAssembly = document.getElementById("member_inside_assembly").checked ? "Yes" : "No";
   const outsideAssembly = document.getElementById("member_outside_assembly").checked ? "Yes" : "No";
 
+  // ============ GET MEMBER CALAMITY DATA ============
+  const memberCalamityData = {
+    "Structural Damage": document.querySelector('input[name="member_damage"]:checked')?.value || "No",
+    "Structural Damage Details": document.getElementById('member_damage_details')?.value || "",
+    "Household Injury": document.querySelector('input[name="member_injury"]:checked')?.value || "No",
+    "Injury Details": document.getElementById('member_injury_details')?.value || "",
+    "Habitability": document.querySelector('input[name="member_habitability"]:checked')?.value || "No",
+    "Habitability Details": document.getElementById('member_habitability_details')?.value || "",
+    "Loss of Livelihood": document.querySelector('input[name="member_livelihood"]:checked')?.value || "No",
+    "Livelihood Details": document.getElementById('member_livelihood_details')?.value || ""
+  };
+  // ============ END MEMBER CALAMITY DATA ============
+
   return {
-    "Name of Household Member/s": name,
+    "Name of Household Member/s": memberName,
     "FishR Registered/RBIS Registered": registrationValue,
     "Contact no.": document.getElementById("memberContact").value || "",
     "Sex": document.querySelector("input[name='member_sex']:checked")?.value || "",
@@ -5312,7 +6016,6 @@ function collectMemberDataFromPanel(){
     "Host_Contact": outsideAssembly === "Yes" ? 
     (function() {
         const value = document.getElementById("memberHostContact").value || "";
-        // Format the phone number if valid
         if (value && validatePhilippineMobileNumber(value)) {
             return formatPhilippineMobileNumber(value);
         }
@@ -5337,7 +6040,10 @@ function collectMemberDataFromPanel(){
     "Cash Subsidy": document.getElementById("member_cash").checked ? "Yes" : "No",
     "Cash Subsidy_Date": document.getElementById("member_cash_date_input").value ? toSheetDateFormat(document.getElementById("member_cash_date_input").value) : "",
     "AICS": document.getElementById("memberAics").value || "",
-    "AICS_Date": document.getElementById("member_aics_date_input").value ? toSheetDateFormat(document.getElementById("member_aics_date_input").value) : ""
+    "AICS_Date": document.getElementById("member_aics_date_input").value ? toSheetDateFormat(document.getElementById("member_aics_date_input").value) : "",
+    
+    // ============ ADD MEMBER CALAMITY FIELDS ============
+    ...memberCalamityData
   };
 }
 
@@ -6336,14 +7042,51 @@ function formatHostContactNumber() {
 } 
 
 /* ---------------- Submit head + members ---------------- */
-async function submitHeadAndMembers(){
-  // Get current user - try to get full name from localStorage
-  // First, try to get the full name that was saved during login
+async function submitHeadAndMembers() {
+  const startTime = performance.now();
+  
   const currentUserFullName = localStorage.getItem("userFullName") || 
                              localStorage.getItem("staffFullName") || 
                              localStorage.getItem("staffName") || 
                              localStorage.getItem("username") || 
                              "Unknown";
+  
+  // ============ FIRST: UPLOAD CALAMITY FILES TO DRIVE ============
+  // Show uploading status
+  const uploadStatusDiv = document.getElementById('uploadStatus');
+  if (uploadStatusDiv) uploadStatusDiv.style.display = 'flex';
+  
+  const calamityFileIds = {
+    damage: null,
+    injury: null,
+    habitability: null,
+    livelihood: null
+  };
+  
+  // Get temporary dataID (will be replaced by actual ID after save)
+  // For now, use timestamp as temp ID
+  const tempDataID = Date.now();
+  
+  // Upload each file if selected
+  if (headCalamityFiles.damage) {
+    const fileId = await uploadFileToDriveDirect(headCalamityFiles.damage, 'damage', tempDataID);
+    if (fileId) calamityFileIds.damage = fileId;
+  }
+  if (headCalamityFiles.injury) {
+    const fileId = await uploadFileToDriveDirect(headCalamityFiles.injury, 'injury', tempDataID);
+    if (fileId) calamityFileIds.injury = fileId;
+  }
+  if (headCalamityFiles.habitability) {
+    const fileId = await uploadFileToDriveDirect(headCalamityFiles.habitability, 'habitability', tempDataID);
+    if (fileId) calamityFileIds.habitability = fileId;
+  }
+  if (headCalamityFiles.livelihood) {
+    const fileId = await uploadFileToDriveDirect(headCalamityFiles.livelihood, 'livelihood', tempDataID);
+    if (fileId) calamityFileIds.livelihood = fileId;
+  }
+  
+  if (uploadStatusDiv) uploadStatusDiv.style.display = 'none';
+  // ============ END FILE UPLOADS ============
   
   // gather head
   const headBirthInput = document.getElementById("householdBirthdate").value || "";
@@ -6351,22 +7094,17 @@ async function submitHeadAndMembers(){
   const headAgeInfo = computeAgeDetailed(headBirthInput);
   const headAgeVal = headAgeInfo ? headAgeInfo.display : "";
 
-  // Get head registration value only if checkbox is checked
   let headRegistrationValue = "";
   if (document.getElementById("headRegisteredCheckbox").checked) {
     headRegistrationValue = document.getElementById("headRegistration").value || "";
   }
 
-  // Get status value (handle "Others" case)
   let statusValue = document.getElementById("head_status").value || "";
   if (statusValue === "Others") {
     const statusOthers = document.getElementById("statusOthers").value.trim();
-    if (statusOthers) {
-      statusValue = statusOthers;
-    }
+    if (statusOthers) statusValue = statusOthers;
   }
 
-  // Get displacement reasons
   const displacementReasons = {
     "Taal Volcano (Within 14-15 KM Danger Zone)": document.getElementById("displacement_taal").checked ? "Yes" : "No",
     "Typhoon": document.getElementById("displacement_typhoon").checked ? "Yes" : "No",
@@ -6378,268 +7116,523 @@ async function submitHeadAndMembers(){
                      document.getElementById("displacement_other").value.trim() : ""
   };
 
-  // Get assembly area info
   const insideAssembly = document.getElementById("inside_assembly").checked ? "Yes" : "No";
   const outsideAssembly = document.getElementById("outside_assembly").checked ? "Yes" : "No";
 
-const head = {
-  "Coordinate": document.getElementById("coordinate").value || "",
-  "Coordinates": document.getElementById("coordinate").value || "",
-  "Barangay": document.getElementById("barangay").value || "",
-  "Sitio / Purok": document.getElementById("sitio").value || "",
-  "Name of Household Head": document.getElementById("householdHead").value || "",
-  "No. of Household Member/s": document.getElementById("memberCount").value || "0",
-  "FishR Registered/RBIS Registered": headRegistrationValue,
-  "Contact no.": document.getElementById("contactNo").value || "",
-  "Sex": document.querySelector('input[name="head_sex"]:checked')?.value || "",
-  "Birthdate": headBirthForSheet,
-  "Age": headAgeVal,
-  "Name of Household Member/s": "", // head row has this empty
-  "Solo Parenting": document.getElementById("soloParenting").checked ? "Yes" : "No",
-  "LGBT": document.getElementById("lgbt").checked ? "Yes" : "No",
-  "Lactating": document.getElementById("lactating").checked ? "Yes" : "No",
-  "Pregnant": document.getElementById("pregnant").checked ? "Yes" : "No",
-  "Persons with Disability (PWD)": document.querySelector('input[name="head_pwd"]:checked')?.value || "No",
-  "Type of Disability": document.getElementById("disabilityType").value || "",
-  "Stage": headAgeInfo ? headAgeInfo.stage : "",
-  "Status": statusValue,
-  "Educational Attainment": document.getElementById("educationalAttainment").value || "",
-  "College Graduate Course": document.getElementById("collegeCourse").value || "",
-  "Employment": document.getElementById("employment").value || "",
-  "Job Title": document.getElementById("jobTitle").value || "",
-  "Overseas Filipino Worker(OFW)": document.querySelector('input[name="ofw_status"]:checked')?.value || "No",
-  "Country": document.getElementById("country").value || "",
-  
-  // NEW DISPLACEMENT REASONS
-  "Taal Volcano (Within 14-15 KM Danger Zone)": displacementReasons["Taal Volcano (Within 14-15 KM Danger Zone)"],
-  "Typhoon": displacementReasons["Typhoon"],
-  "Flood": displacementReasons["Flood"],
-  "Landslide": displacementReasons["Landslide"],
-  "Earthquake": displacementReasons["Earthquake"],
-  "Fire": displacementReasons["Fire"],
-  "Other Reasons": displacementReasons["Other Reasons"],
-  
-  // NEW ASSEMBLY AREA FIELDS
-  "Inside Assembly Area": insideAssembly,
-  "Outside Assembly Area": outsideAssembly,
-  "Pick-Up Location": insideAssembly === "Yes" ? document.getElementById("pickup").value || "" : "",
-  "Assembly Area": insideAssembly === "Yes" ? document.getElementById("assembly_area").value || "" : "",
-  "Family/Relative Host": outsideAssembly === "Yes" ? document.getElementById("family_host").value || "" : "",
-  "Host_Contact": outsideAssembly === "Yes" ? 
-    (function() {
-        const value = document.getElementById("host_contact").value || "";
-        // Format the phone number if valid
-        if (value && validatePhilippineMobileNumber(value)) {
-            return formatPhilippineMobileNumber(value);
-        }
-        return value;
-    })() : "",
-  "Transportation": document.getElementById("head_transport").value || document.getElementById("outside_transport").value || "",
-  "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
-  "TUPAD_Date": document.getElementById("ass_tupad_date_input").value ? toSheetDateFormat(document.getElementById("ass_tupad_date_input").value) : "",
-  "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
-  "Local 4Ps_Date": document.getElementById("ass_local4ps_date_input").value ? toSheetDateFormat(document.getElementById("ass_local4ps_date_input").value) : "",
-  "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
-  "National 4Ps_Date": document.getElementById("ass_intl4ps_date_input").value ? toSheetDateFormat(document.getElementById("ass_intl4ps_date_input").value) : "",
-  "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
-  "Local Social Pension_Date": document.getElementById("ass_locsp_date_input").value ? toSheetDateFormat(document.getElementById("ass_locsp_date_input").value) : "",
-  "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
-  "National Social Pension_Date": document.getElementById("ass_intlsp_date_input").value ? toSheetDateFormat(document.getElementById("ass_intlsp_date_input").value) : "",
-  "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
-  "Solo Parent Assistance_Date": document.getElementById("ass_solo_date_input").value ? toSheetDateFormat(document.getElementById("ass_solo_date_input").value) : "",
-  "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
-  "Relief Goods_Date": document.getElementById("ass_relief_date_input").value ? toSheetDateFormat(document.getElementById("ass_relief_date_input").value) : "",
-  "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
-  "Cash Subsidy_Date": document.getElementById("ass_cash_date_input").value ? toSheetDateFormat(document.getElementById("ass_cash_date_input").value) : "",
-  "AICS": document.getElementById("ass_aics").value || "",
-  "AICS_Date": document.getElementById("ass_aics_date_input").value ? toSheetDateFormat(document.getElementById("ass_aics_date_input").value) : "",
-  /* Domestic animals — store as separate fields matching your header */
-  "Dog": document.getElementById("dog_chk").checked ? "Yes" : "No",
-  "Dog Qty.": document.getElementById("dog_qty").value || "",
-  "Cat": document.getElementById("cat_chk").checked ? "Yes" : "No",
-  "Cat Qty.": document.getElementById("cat_qty").value || "",
-  "Pig": document.getElementById("pig_chk").checked ? "Yes" : "No",
-  "Pig Qty.": document.getElementById("pig_qty").value || "",
-  "Cow": document.getElementById("cow_chk").checked ? "Yes" : "No",
-  "Cow Qty.": document.getElementById("cow_qty").value || "",
-  "Carabao": document.getElementById("carabao_chk").checked ? "Yes" : "No",
-  "Carabao Qty.": document.getElementById("carabao_qty").value || "",
-  "Chicken": document.getElementById("chicken_chk").checked ? "Yes" : "No",
-  "Chicken Qty.": document.getElementById("chicken_qty").value || "",
-  "Others": document.getElementById("animals_others").value || "",
-  "Submitted By": currentUserFullName, // Use the full name instead of username
-  "Submitted On": new Date().toLocaleString()
-};
+  // Get calamity radio and textarea values (NO FILES in head object)
+  const headCalamityData = {
+    "Structural Damage": document.querySelector('input[name="head_damage"]:checked')?.value || "No",
+    "Structural Damage Details": document.getElementById('head_damage_details')?.value || "",
+    "Structural Damage File ID": calamityFileIds.damage || "",
+    "Household Injury": document.querySelector('input[name="head_injury"]:checked')?.value || "No",
+    "Injury Details": document.getElementById('head_injury_details')?.value || "",
+    "Household Injury File ID": calamityFileIds.injury || "",
+    "Habitability": document.querySelector('input[name="head_habitability"]:checked')?.value || "No",
+    "Habitability Details": document.getElementById('head_habitability_details')?.value || "",
+    "Habitability File ID": calamityFileIds.habitability || "",
+    "Loss of Livelihood": document.querySelector('input[name="head_livelihood"]:checked')?.value || "No",
+    "Livelihood Details": document.getElementById('head_livelihood_details')?.value || "",
+    "Loss of Livelihood File ID": calamityFileIds.livelihood || ""
+  };
 
-  // ensure members length matches selected
+  const head = {
+    "Coordinate": document.getElementById("coordinate").value || "",
+    "Coordinates": document.getElementById("coordinate").value || "",
+    "Barangay": document.getElementById("barangay").value || "",
+    "Sitio / Purok": document.getElementById("sitio").value || "",
+    "Name of Household Head": document.getElementById("householdHead").value || "",
+    "No. of Household Member/s": document.getElementById("memberCount").value || "0",
+    "FishR Registered/RBIS Registered": headRegistrationValue,
+    "Contact no.": document.getElementById("contactNo").value || "",
+    "Sex": document.querySelector('input[name="head_sex"]:checked')?.value || "",
+    "Birthdate": headBirthForSheet,
+    "Age": headAgeVal,
+    "Name of Household Member/s": "",
+    "Solo Parenting": document.getElementById("soloParenting").checked ? "Yes" : "No",
+    "LGBT": document.getElementById("lgbt").checked ? "Yes" : "No",
+    "Lactating": document.getElementById("lactating").checked ? "Yes" : "No",
+    "Pregnant": document.getElementById("pregnant").checked ? "Yes" : "No",
+    "Persons with Disability (PWD)": document.querySelector('input[name="head_pwd"]:checked')?.value || "No",
+    "Type of Disability": document.getElementById("disabilityType").value || "",
+    "Stage": headAgeInfo ? headAgeInfo.stage : "",
+    "Status": statusValue,
+    "Educational Attainment": document.getElementById("educationalAttainment").value || "",
+    "College Graduate Course": document.getElementById("collegeCourse").value || "",
+    "Employment": document.getElementById("employment").value || "",
+    "Job Title": document.getElementById("jobTitle").value || "",
+    "Overseas Filipino Worker(OFW)": document.querySelector('input[name="ofw_status"]:checked')?.value || "No",
+    "Country": document.getElementById("country").value || "",
+    "Taal Volcano (Within 14-15 KM Danger Zone)": displacementReasons["Taal Volcano (Within 14-15 KM Danger Zone)"],
+    "Typhoon": displacementReasons["Typhoon"],
+    "Flood": displacementReasons["Flood"],
+    "Landslide": displacementReasons["Landslide"],
+    "Earthquake": displacementReasons["Earthquake"],
+    "Fire": displacementReasons["Fire"],
+    "Other Reasons": displacementReasons["Other Reasons"],
+    "Inside Assembly Area": insideAssembly,
+    "Outside Assembly Area": outsideAssembly,
+    "Pick-Up Location": insideAssembly === "Yes" ? document.getElementById("pickup").value || "" : "",
+    "Assembly Area": insideAssembly === "Yes" ? document.getElementById("assembly_area").value || "" : "",
+    "Family/Relative Host": outsideAssembly === "Yes" ? document.getElementById("family_host").value || "" : "",
+    "Host_Contact": outsideAssembly === "Yes" ? document.getElementById("host_contact").value || "" : "",
+    "Transportation": document.getElementById("head_transport").value || document.getElementById("outside_transport").value || "",
+    "TUPAD": document.getElementById("ass_tupad").checked ? "Yes" : "No",
+    "TUPAD_Date": document.getElementById("ass_tupad_date_input").value ? toSheetDateFormat(document.getElementById("ass_tupad_date_input").value) : "",
+    "Local 4Ps": document.getElementById("ass_local4ps").checked ? "Yes" : "No",
+    "Local 4Ps_Date": document.getElementById("ass_local4ps_date_input").value ? toSheetDateFormat(document.getElementById("ass_local4ps_date_input").value) : "",
+    "National 4Ps": document.getElementById("ass_intl4ps").checked ? "Yes" : "No",
+    "National 4Ps_Date": document.getElementById("ass_intl4ps_date_input").value ? toSheetDateFormat(document.getElementById("ass_intl4ps_date_input").value) : "",
+    "Local Social Pension": document.getElementById("ass_locsp").checked ? "Yes" : "No",
+    "Local Social Pension_Date": document.getElementById("ass_locsp_date_input").value ? toSheetDateFormat(document.getElementById("ass_locsp_date_input").value) : "",
+    "National Social Pension": document.getElementById("ass_intlsp").checked ? "Yes" : "No",
+    "National Social Pension_Date": document.getElementById("ass_intlsp_date_input").value ? toSheetDateFormat(document.getElementById("ass_intlsp_date_input").value) : "",
+    "Solo Parent Assistance": document.getElementById("ass_solo").checked ? "Yes" : "No",
+    "Solo Parent Assistance_Date": document.getElementById("ass_solo_date_input").value ? toSheetDateFormat(document.getElementById("ass_solo_date_input").value) : "",
+    "Relief Goods": document.getElementById("ass_relief").checked ? "Yes" : "No",
+    "Relief Goods_Date": document.getElementById("ass_relief_date_input").value ? toSheetDateFormat(document.getElementById("ass_relief_date_input").value) : "",
+    "Cash Subsidy": document.getElementById("ass_cash").checked ? "Yes" : "No",
+    "Cash Subsidy_Date": document.getElementById("ass_cash_date_input").value ? toSheetDateFormat(document.getElementById("ass_cash_date_input").value) : "",
+    "AICS": document.getElementById("ass_aics").value || "",
+    "AICS_Date": document.getElementById("ass_aics_date_input").value ? toSheetDateFormat(document.getElementById("ass_aics_date_input").value) : "",
+    "Dog": document.getElementById("dog_chk").checked ? "Yes" : "No",
+    "Dog Qty.": document.getElementById("dog_qty").value || "",
+    "Cat": document.getElementById("cat_chk").checked ? "Yes" : "No",
+    "Cat Qty.": document.getElementById("cat_qty").value || "",
+    "Pig": document.getElementById("pig_chk").checked ? "Yes" : "No",
+    "Pig Qty.": document.getElementById("pig_qty").value || "",
+    "Cow": document.getElementById("cow_chk").checked ? "Yes" : "No",
+    "Cow Qty.": document.getElementById("cow_qty").value || "",
+    "Carabao": document.getElementById("carabao_chk").checked ? "Yes" : "No",
+    "Carabao Qty.": document.getElementById("carabao_qty").value || "",
+    "Chicken": document.getElementById("chicken_chk").checked ? "Yes" : "No",
+    "Chicken Qty.": document.getElementById("chicken_qty").value || "",
+    "Others": document.getElementById("animals_others").value || "",
+    "Submitted By": currentUserFullName,
+    "Submitted On": new Date().toLocaleString(),
+    
+    // ADD CALAMITY FIELDS (File IDs only, NO base64)
+    ...headCalamityData
+  };
+
+  // Build members array
   const expected = parseInt(document.getElementById("memberCount").value || 0);
-  const members = collectedMembers.slice(0);
-  for(let i=0;i<expected;i++){
-    if(!members[i]){
-      members[i] = {
-      "Name of Household Member/s": "",
-      "FishR Registered/RBIS Registered": "",
-      "Contact no.": "",
-      "Sex": "",
-      "Birthdate": "",
-      "Age": "",
-      "Stage": "",
-      "Solo Parenting": "No",
-      "LGBT": "No",
-      "Lactating": "No",
-      "Pregnant": "No",
-      "Persons with Disability (PWD)": "No",
-      "Type of Disability": "",
-      "Status": "",
-      "Educational Attainment": "",
-      "College Graduate Course": "",
-      "Employment": "",
-      "Job Title": "",
-      "Overseas Filipino Worker(OFW)": "No",
-      "Country": "",
-      "Taal Volcano (Within 14-15 KM Danger Zone)": "No",
-      "Typhoon": "No",
-      "Flood": "No",
-      "Landslide": "No",
-      "Earthquake": "No",
-      "Fire": "No",
-      "Other Reasons": "",
-      "Inside Assembly Area": "No",
-      "Outside Assembly Area": "No",
-      "Pick-Up Location": "",
-      "Assembly Area": "",
-      "Family/Relative Host": "",
-      "Host_Contact": "",
-      "Transportation": "",
-      "TUPAD": "No",
-      "TUPAD_Date": "",
-      "Local 4Ps": "No",
-      "Local 4Ps_Date": "",
-      "National 4Ps": "No",
-      "National 4Ps_Date": "",
-      "Local Social Pension": "No",
-      "Local Social Pension_Date": "",
-      "National Social Pension": "No",
-      "National Social Pension_Date": "",
-      "Solo Parent Assistance": "No",
-      "Solo Parent Assistance_Date": "",
-      "Relief Goods": "No",
-      "Relief Goods_Date": "",
-      "Cash Subsidy": "No",
-      "Cash Subsidy_Date": "",
-      "AICS": "",
-      "AICS_Date": ""
-      };
-    }
-    // ensure birthdate format DD/MM/YYYY
-    if(members[i]["Birthdate"]){
-      members[i]["Birthdate"] = (members[i]["Birthdate"].indexOf('/') === -1) ? toSheetDateFormat(members[i]["Birthdate"]) : members[i]["Birthdate"];
-    }
-    // ensure government assistance date format
-    const dateFields = ["TUPAD_Date", "Local 4Ps_Date", "National 4Ps_Date", "Local Social Pension_Date", 
-                       "National Social Pension_Date", "Solo Parent Assistance_Date", "Relief Goods_Date", 
-                       "Cash Subsidy_Date", "AICS_Date"];
-    dateFields.forEach(field => {
-      if(members[i][field]){
-        members[i][field] = (members[i][field].indexOf('/') === -1) ? toSheetDateFormat(members[i][field]) : members[i][field];
+  const members = [];
+  
+  for(let i = 0; i < expected; i++) {
+    if(collectedMembers[i] && collectedMembers[i]["Name of Household Member/s"] && 
+       collectedMembers[i]["Name of Household Member/s"].trim() !== "") {
+      
+      const member = { ...collectedMembers[i] };
+      
+      if(member["Birthdate"]){
+        member["Birthdate"] = (member["Birthdate"].indexOf('/') === -1) ? 
+          toSheetDateFormat(member["Birthdate"]) : member["Birthdate"];
       }
-    });
+      
+      const dateFields = ["TUPAD_Date", "Local 4Ps_Date", "National 4Ps_Date", "Local Social Pension_Date", 
+                         "National Social Pension_Date", "Solo Parent Assistance_Date", "Relief Goods_Date", 
+                         "Cash Subsidy_Date", "AICS_Date"];
+      dateFields.forEach(field => {
+        if(member[field]){
+          member[field] = (member[field].indexOf('/') === -1) ? 
+            toSheetDateFormat(member[field]) : member[field];
+        }
+      });
+      
+      members.push(member);
+    }
   }
 
-  // Build request
-// Get current user
-const currentUser = localStorage.getItem("username") || 
-                   localStorage.getItem("staffName") || 
-                   "System";
+  console.log(`Saving head + ${members.length} members in ONE request`);
 
-// Build request
-  const form = new FormData();
-  form.append("action", "createRecord");
-  form.append("actor", currentUserFullName);  // Use full name for actor
-  form.append("head", JSON.stringify(head));
-  form.append("members", JSON.stringify(members));
-  form.append("submittedBy", currentUserFullName);  // Use full name for submittedBy
-
-  // UI disable
   const submitBtn = document.getElementById("nextToMembers");
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  const originalText = submitBtn ? submitBtn.innerHTML : 'Save';
+  if(submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  }
 
   try{
-    console.log("Submitting HEAD:", head);
-    console.log("Submitting MEMBERS:", members);
-    const res = await fetch(API_URL, { method: "POST", body: form });
+    const form = new FormData();
+    form.append("action", "createRecord");
+    form.append("actor", currentUserFullName);
+    form.append("head", JSON.stringify(head));
+    form.append("members", JSON.stringify(members));
+    form.append("submittedBy", currentUserFullName);
+
+    const res = await fetch(API_URL, { 
+      method: "POST", 
+      body: form,
+      signal: AbortSignal.timeout(30000)
+    });
+    
     const text = await res.text();
-    console.log("RAW RESPONSE:", text);
-
     let data;
-    try { data = JSON.parse(text); } catch (e) {
-      // server returned non-JSON (error). Show raw.
-      throw new Error("Invalid response from server: " + text);
+    try { 
+      data = JSON.parse(text); 
+    } catch (e) {
+      throw new Error("Invalid response from server: " + text.substring(0, 200));
     }
 
-if(data.success){
-    showSuccess("Record saved successfully! (Data ID: " + (data.dataID || "n/a") + ")");
-    
-    // ============ CRITICAL: ADD THIS CODE BLOCK ============
-    // Notify dashboard about the new record creation
-    const headName = document.getElementById("householdHead").value.trim() || "Unknown";
-    const barangay = document.getElementById("barangay").value.trim() || "Unknown";
-    const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
-    
-    // Store activity for dashboard to pick up
-    const activity = {
-        action: 'Create Record',
-        actor: username,
-        details: `Created record for ${headName} in ${barangay} (ID: ${data.dataID || "n/a"})`,
-        timestamp: new Date().toISOString()
-    };
-    
-    // Save to localStorage for dashboard
-    const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
-    activities.push(activity);
-    if (activities.length > 10) activities.shift(); // Keep only last 10
-    localStorage.setItem('crossTabActivities', JSON.stringify(activities));
-    
-    // Also store in sessionStorage for immediate access
-    sessionStorage.setItem('lastActivity', JSON.stringify(activity));
-    
-    // Trigger dashboard refresh
-    localStorage.setItem('lastActivityTrigger', Date.now().toString());
-    localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
-    localStorage.removeItem('dashboardDataCache'); // Clear cache
-    
-    // Log to server audit trail
-    try {
-        const logFormData = new FormData();
-        logFormData.append("action", "logActivity");
-        logFormData.append("username", username);
-        logFormData.append("action", "Create Record");
-        logFormData.append("actor", username);
-        logFormData.append("details", `Created record ID ${data.dataID} for ${headName}`);
-        fetch(API_URL, { method: "POST", body: logFormData }).catch(() => {});
-    } catch (err) {
-        console.log("Activity logging error:", err);
+    if(data.success){
+      const endTime = performance.now();
+      const timeMs = Math.round(endTime - startTime);
+      console.log(`✅ Saved in ${timeMs}ms`);
+      
+      showSuccess(`Record saved! (ID: ${data.dataID || "n/a"}) - ${timeMs}ms`);
+      
+      const headName = document.getElementById("householdHead").value.trim() || "Unknown";
+      const barangay = document.getElementById("barangay").value.trim() || "Unknown";
+      const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
+      
+      const activity = {
+          action: 'Create Record',
+          actor: username,
+          details: `Created record for ${headName} in ${barangay} (ID: ${data.dataID || "n/a"})`,
+          timestamp: new Date().toISOString()
+      };
+      
+      const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
+      activities.unshift(activity);
+      if (activities.length > 10) activities.pop();
+      localStorage.setItem('crossTabActivities', JSON.stringify(activities));
+      localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
+      
+      setTimeout(() => {
+          window.location.href = "records.html";
+      }, 1500);
+      
+    } else {
+      showError("Save failed: " + (data.message || "Unknown error"));
+      console.error("SAVE ERROR:", data);
     }
-    // ============ END OF ADDED CODE ============
-    
-    // Redirect to records page after a delay
-    setTimeout(() => {
-        window.location.href = "records.html";
-    }, 2000);
-} else {
-    showError("Save failed: " + (data.message || "Unknown error"));
-    console.error("SAVE ERROR:", data);
-}
-  }catch(err){
+  } catch(err) {
     console.error("SUBMIT ERROR:", err);
-    showError("Network / Server error: " + (err.message || err));
-  }finally{
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save & Continue to Members';
+    showError("Network error: " + (err.message || err));
+  } finally {
+    if(submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+    }
   }
 }
 
+// Upload file to Google Drive via Apps Script
+async function uploadFileToDriveDirect(file, category, tempDataID) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        // Get base64 data (remove the data:image/png;base64, prefix)
+        let base64Data = e.target.result;
+        if (base64Data.includes('base64,')) {
+          base64Data = base64Data.split('base64,')[1];
+        }
+        
+        // Create form data for upload
+        const formData = new FormData();
+        formData.append("action", "uploadCalamityFile");
+        formData.append("fileData", base64Data);
+        formData.append("fileName", file.name);
+        formData.append("category", category);
+        formData.append("dataID", tempDataID.toString());
+        
+        console.log("Uploading file to Drive:", file.name, "Category:", category);
+        
+        // Send to Apps Script
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: formData
+        });
+        
+        const text = await response.text();
+        console.log("Upload response raw:", text);
+        
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error("Failed to parse response:", text);
+          resolve(null);
+          return;
+        }
+        
+        if (result.success && result.fileId) {
+          console.log("File uploaded successfully. File ID:", result.fileId);
+          resolve(result.fileId);
+        } else {
+          console.error("Upload failed:", result);
+          resolve(null);
+        }
+      } catch (err) {
+        console.error("Upload error:", err);
+        resolve(null);
+      }
+    };
+    reader.onerror = (err) => {
+      console.error("FileReader error:", err);
+      resolve(null);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Convert file to base64 string
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Get head calamity files as base64
+async function getHeadCalamityFilesAsBase64() {
+  const files = {};
+  
+  if (headCalamityFiles && headCalamityFiles.damage) {
+    files["Structural Damage File"] = await fileToBase64(headCalamityFiles.damage);
+    files["Structural Damage File Name"] = headCalamityFiles.damage.name;
+  }
+  if (headCalamityFiles && headCalamityFiles.injury) {
+    files["Household Injury File"] = await fileToBase64(headCalamityFiles.injury);
+    files["Household Injury File Name"] = headCalamityFiles.injury.name;
+  }
+  if (headCalamityFiles && headCalamityFiles.habitability) {
+    files["Habitability File"] = await fileToBase64(headCalamityFiles.habitability);
+    files["Habitability File Name"] = headCalamityFiles.habitability.name;
+  }
+  if (headCalamityFiles && headCalamityFiles.livelihood) {
+    files["Loss of Livelihood File"] = await fileToBase64(headCalamityFiles.livelihood);
+    files["Loss of Livelihood File Name"] = headCalamityFiles.livelihood.name;
+  }
+  
+  return files;
+}
+
+// ============ HEAD CALAMITY FILE HANDLERS ============
+
+const headCalamityFiles = {
+  damage: null,
+  injury: null,
+  habitability: null,
+  livelihood: null
+};
+
+// Setup file input change listeners
+function setupHeadFileInputs() {
+  const categories = ['damage', 'injury', 'habitability', 'livelihood'];
+  
+  categories.forEach(category => {
+    const fileInput = document.getElementById(`head_${category}_file`);
+    const filenameSpan = document.getElementById(`head_${category}_filename`);
+    const removeBtn = document.querySelector(`.remove-file-btn[data-category="${category}"]`);
+    const radios = document.querySelectorAll(`input[name="head_${category === 'damage' ? 'damage' : category === 'injury' ? 'injury' : category === 'habitability' ? 'habitability' : 'livelihood'}"]`);
+    const uploadArea = document.getElementById(`head_${category}_upload_area`);
+    
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files.length > 0) {
+          const file = this.files[0];
+          headCalamityFiles[category] = file;
+          if (filenameSpan) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            let icon = 'fa-file-image';
+            if (ext === 'pdf') icon = 'fa-file-pdf';
+            filenameSpan.innerHTML = `<i class="fas ${icon}"></i> ${file.name}`;
+            filenameSpan.style.color = '#0f7a4a';
+          }
+          if (removeBtn) removeBtn.style.display = 'inline-flex';
+        } else {
+          headCalamityFiles[category] = null;
+          if (filenameSpan) {
+            filenameSpan.innerHTML = 'No file chosen';
+            filenameSpan.style.color = 'var(--muted)';
+          }
+          if (removeBtn) removeBtn.style.display = 'none';
+        }
+      });
+    }
+    
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function() {
+        if (fileInput) {
+          fileInput.value = '';
+          headCalamityFiles[category] = null;
+          if (filenameSpan) {
+            filenameSpan.innerHTML = 'No file chosen';
+            filenameSpan.style.color = 'var(--muted)';
+          }
+          removeBtn.style.display = 'none';
+        }
+      });
+    }
+    
+    if (radios.length && uploadArea) {
+      radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+          if (this.value === 'Yes') {
+            uploadArea.classList.add('show');
+          } else {
+            uploadArea.classList.remove('show');
+            if (fileInput) {
+              fileInput.value = '';
+              headCalamityFiles[category] = null;
+              if (filenameSpan) {
+                filenameSpan.innerHTML = 'No file chosen';
+                filenameSpan.style.color = 'var(--muted)';
+              }
+              if (removeBtn) removeBtn.style.display = 'none';
+            }
+          }
+        });
+      });
+      
+      const checkedRadio = Array.from(radios).find(r => r.checked);
+      if (checkedRadio && checkedRadio.value === 'Yes') {
+        uploadArea.classList.add('show');
+      }
+    }
+  });
+}
+
+// ============ MEMBER CALAMITY FILE HANDLERS ============
+
+const memberCalamityFiles = {
+  damage: null,
+  injury: null,
+  habitability: null,
+  livelihood: null
+};
+
+function setupMemberFileInputs() {
+  const categories = ['damage', 'injury', 'habitability', 'livelihood'];
+  
+  categories.forEach(category => {
+    const fileInput = document.getElementById(`member_${category}_file`);
+    const filenameSpan = document.getElementById(`member_${category}_filename`);
+    const removeBtn = document.querySelector(`.member-remove-file-btn[data-category="${category}"]`);
+    const radios = document.querySelectorAll(`input[name="member_${category === 'damage' ? 'damage' : category === 'injury' ? 'injury' : category === 'habitability' ? 'habitability' : 'livelihood'}"]`);
+    const uploadArea = document.getElementById(`member_${category}_upload_area`);
+    
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files.length > 0) {
+          const file = this.files[0];
+          memberCalamityFiles[category] = file;
+          if (filenameSpan) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            let icon = 'fa-file-image';
+            if (ext === 'pdf') icon = 'fa-file-pdf';
+            filenameSpan.innerHTML = `<i class="fas ${icon}"></i> ${file.name}`;
+            filenameSpan.style.color = '#0f7a4a';
+          }
+          if (removeBtn) removeBtn.style.display = 'inline-flex';
+        } else {
+          memberCalamityFiles[category] = null;
+          if (filenameSpan) {
+            filenameSpan.innerHTML = 'No file chosen';
+            filenameSpan.style.color = 'var(--muted)';
+          }
+          if (removeBtn) removeBtn.style.display = 'none';
+        }
+      });
+    }
+    
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function() {
+        if (fileInput) {
+          fileInput.value = '';
+          memberCalamityFiles[category] = null;
+          if (filenameSpan) {
+            filenameSpan.innerHTML = 'No file chosen';
+            filenameSpan.style.color = 'var(--muted)';
+          }
+          removeBtn.style.display = 'none';
+        }
+      });
+    }
+    
+    if (radios.length && uploadArea) {
+      radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+          if (this.value === 'Yes') {
+            uploadArea.classList.add('show');
+          } else {
+            uploadArea.classList.remove('show');
+            if (fileInput) {
+              fileInput.value = '';
+              memberCalamityFiles[category] = null;
+              if (filenameSpan) {
+                filenameSpan.innerHTML = 'No file chosen';
+                filenameSpan.style.color = 'var(--muted)';
+              }
+              if (removeBtn) removeBtn.style.display = 'none';
+            }
+          }
+        });
+      });
+      
+      const checkedRadio = Array.from(radios).find(r => r.checked);
+      if (checkedRadio && checkedRadio.value === 'Yes') {
+        uploadArea.classList.add('show');
+      }
+    }
+  });
+}
+
+// Initialize member handlers when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  setupMemberFileInputs();
+});
+
+// Call this when opening member panel to reset files
+function resetMemberCalamityOnPanelOpen() {
+  const categories = ['damage', 'injury', 'habitability', 'livelihood'];
+  categories.forEach(category => {
+    memberCalamityFiles[category] = null;
+    const filenameSpan = document.getElementById(`member_${category}_filename`);
+    const removeBtn = document.querySelector(`.member-remove-file-btn[data-category="${category}"]`);
+    const fileInput = document.getElementById(`member_${category}_file`);
+    const uploadArea = document.getElementById(`member_${category}_upload_area`);
+    
+    if (filenameSpan) {
+      filenameSpan.innerHTML = 'No file chosen';
+      filenameSpan.style.color = 'var(--muted)';
+    }
+    if (removeBtn) removeBtn.style.display = 'none';
+    if (fileInput) fileInput.value = '';
+    
+    // Also reset radio to "No" and hide upload area
+    const radioNo = document.querySelector(`input[name="member_${category === 'damage' ? 'damage' : category === 'injury' ? 'injury' : category === 'habitability' ? 'habitability' : 'livelihood'}"][value="No"]`);
+    if (radioNo) radioNo.checked = true;
+    if (uploadArea) uploadArea.classList.remove('show');
+  });
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  setupHeadFileInputs();
+  setupMemberFileInputs();
+});
+
+// Call this when opening member panel
+function resetMemberCalamityOnPanelOpen() {
+  const categories = ['damage', 'injury', 'habitability', 'livelihood'];
+  categories.forEach(category => {
+    memberCalamityFiles[category] = null;
+    const filenameSpan = document.getElementById(`member_${category}_filename`);
+    const removeBtn = document.querySelector(`.member-remove-file-btn[data-category="${category}"]`);
+    const fileInput = document.getElementById(`member_${category}_file`);
+    if (filenameSpan) {
+      filenameSpan.innerHTML = 'No file chosen';
+      filenameSpan.style.color = 'var(--muted)';
+    }
+    if (removeBtn) removeBtn.style.display = 'none';
+    if (fileInput) fileInput.value = '';
+  });
+}
 /* ============ SIDEBAR COLLAPSE ============ */
 function toggleSidebar() {
     const pageContainer = document.querySelector('.page-container');
@@ -6744,6 +7737,7 @@ function handleLogout() {
   window.location.href = 'index.html';
 }
 </script>
+<script src="js/guest-redirect.js"></script>
 <script src="js/data-broadcaster.js"></script>
 <script src="js/form-notifier.js"></script>
 <script src="js/common-utils.js"></script>
@@ -6752,4 +7746,3 @@ function handleLogout() {
 <script src="js/activity-tracking-final.js"></script>
 </body>
 </html>
-
