@@ -4441,6 +4441,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // FORM INITIALIZATION CONTINUES BELOW (your existing code after this block)
 });
 
+// ============ HEAD CALAMITY FILE STORAGE ============
+const headCalamityFiles = {
+  damage: null,
+  injury: null,
+  habitability: null,
+  livelihood: null
+};
+   
 /* ============ MODAL MANAGEMENT FUNCTIONS ============ */
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -7051,11 +7059,7 @@ async function submitHeadAndMembers() {
                              localStorage.getItem("username") || 
                              "Unknown";
   
-  // ============ FIRST: UPLOAD CALAMITY FILES TO DRIVE ============
-  // Show uploading status
-  const uploadStatusDiv = document.getElementById('uploadStatus');
-  if (uploadStatusDiv) uploadStatusDiv.style.display = 'flex';
-  
+  // ============ STEP 1: UPLOAD CALAMITY FILES TO DRIVE ============
   const calamityFileIds = {
     damage: null,
     injury: null,
@@ -7063,32 +7067,34 @@ async function submitHeadAndMembers() {
     livelihood: null
   };
   
-  // Get temporary dataID (will be replaced by actual ID after save)
-  // For now, use timestamp as temp ID
   const tempDataID = Date.now();
   
-  // Upload each file if selected
+  // Upload files and store returned file IDs
   if (headCalamityFiles.damage) {
-    const fileId = await uploadFileToDriveDirect(headCalamityFiles.damage, 'damage', tempDataID);
-    if (fileId) calamityFileIds.damage = fileId;
+    console.log("Uploading damage file...");
+    calamityFileIds.damage = await uploadFileToDriveDirect(headCalamityFiles.damage, 'damage', tempDataID);
+    console.log("Damage file ID result:", calamityFileIds.damage);
   }
   if (headCalamityFiles.injury) {
-    const fileId = await uploadFileToDriveDirect(headCalamityFiles.injury, 'injury', tempDataID);
-    if (fileId) calamityFileIds.injury = fileId;
+    console.log("Uploading injury file...");
+    calamityFileIds.injury = await uploadFileToDriveDirect(headCalamityFiles.injury, 'injury', tempDataID);
+    console.log("Injury file ID result:", calamityFileIds.injury);
   }
   if (headCalamityFiles.habitability) {
-    const fileId = await uploadFileToDriveDirect(headCalamityFiles.habitability, 'habitability', tempDataID);
-    if (fileId) calamityFileIds.habitability = fileId;
+    console.log("Uploading habitability file...");
+    calamityFileIds.habitability = await uploadFileToDriveDirect(headCalamityFiles.habitability, 'habitability', tempDataID);
+    console.log("Habitability file ID result:", calamityFileIds.habitability);
   }
   if (headCalamityFiles.livelihood) {
-    const fileId = await uploadFileToDriveDirect(headCalamityFiles.livelihood, 'livelihood', tempDataID);
-    if (fileId) calamityFileIds.livelihood = fileId;
+    console.log("Uploading livelihood file...");
+    calamityFileIds.livelihood = await uploadFileToDriveDirect(headCalamityFiles.livelihood, 'livelihood', tempDataID);
+    console.log("Livelihood file ID result:", calamityFileIds.livelihood);
   }
   
-  if (uploadStatusDiv) uploadStatusDiv.style.display = 'none';
+  console.log("Final calamityFileIds:", calamityFileIds);
   // ============ END FILE UPLOADS ============
   
-  // gather head
+  // ============ STEP 2: GATHER HEAD DATA ============
   const headBirthInput = document.getElementById("householdBirthdate").value || "";
   const headBirthForSheet = toSheetDateFormat(headBirthInput);
   const headAgeInfo = computeAgeDetailed(headBirthInput);
@@ -7119,20 +7125,24 @@ async function submitHeadAndMembers() {
   const insideAssembly = document.getElementById("inside_assembly").checked ? "Yes" : "No";
   const outsideAssembly = document.getElementById("outside_assembly").checked ? "Yes" : "No";
 
-  // Get calamity radio and textarea values (NO FILES in head object)
+  // Get calamity radio and textarea values WITH FILE IDs
   const headCalamityData = {
     "Structural Damage": document.querySelector('input[name="head_damage"]:checked')?.value || "No",
     "Structural Damage Details": document.getElementById('head_damage_details')?.value || "",
-    "Structural Damage File ID": calamityFileIds.damage || "",
+    "Structural Damage File": calamityFileIds.damage || "",
+    "Structural Damage File Name": headCalamityFiles.damage?.name || "",
     "Household Injury": document.querySelector('input[name="head_injury"]:checked')?.value || "No",
     "Injury Details": document.getElementById('head_injury_details')?.value || "",
-    "Household Injury File ID": calamityFileIds.injury || "",
+    "Household Injury File": calamityFileIds.injury || "",
+    "Household Injury File Name": headCalamityFiles.injury?.name || "",
     "Habitability": document.querySelector('input[name="head_habitability"]:checked')?.value || "No",
     "Habitability Details": document.getElementById('head_habitability_details')?.value || "",
-    "Habitability File ID": calamityFileIds.habitability || "",
+    "Habitability File": calamityFileIds.habitability || "",
+    "Habitability File Name": headCalamityFiles.habitability?.name || "",
     "Loss of Livelihood": document.querySelector('input[name="head_livelihood"]:checked')?.value || "No",
     "Livelihood Details": document.getElementById('head_livelihood_details')?.value || "",
-    "Loss of Livelihood File ID": calamityFileIds.livelihood || ""
+    "Loss of Livelihood File": calamityFileIds.livelihood || "",
+    "Loss of Livelihood File Name": headCalamityFiles.livelihood?.name || ""
   };
 
   const head = {
@@ -7210,11 +7220,11 @@ async function submitHeadAndMembers() {
     "Submitted By": currentUserFullName,
     "Submitted On": new Date().toLocaleString(),
     
-    // ADD CALAMITY FIELDS (File IDs only, NO base64)
+    // ADD CALAMITY FIELDS WITH FILE IDs
     ...headCalamityData
   };
 
-  // Build members array
+  // ============ STEP 3: BUILD MEMBERS ARRAY ============
   const expected = parseInt(document.getElementById("memberCount").value || 0);
   const members = [];
   
@@ -7243,8 +7253,16 @@ async function submitHeadAndMembers() {
     }
   }
 
-  console.log(`Saving head + ${members.length} members in ONE request`);
+  console.log("Final head object being sent:", head);
+  console.log("Calamity File IDs in head:", {
+    damage: head["Structural Damage File"],
+    injury: head["Household Injury File"],
+    habitability: head["Habitability File"],
+    livelihood: head["Loss of Livelihood File"]
+  });
+  console.log(`Saving head + ${members.length} members`);
 
+  // ============ STEP 4: SUBMIT TO SERVER ============
   const submitBtn = document.getElementById("nextToMembers");
   const originalText = submitBtn ? submitBtn.innerHTML : 'Save';
   if(submitBtn) {
@@ -7319,17 +7337,18 @@ async function submitHeadAndMembers() {
 
 // Upload file to Google Drive via Apps Script
 async function uploadFileToDriveDirect(file, category, tempDataID) {
+  console.log("=== uploadFileToDriveDirect START ===");
+  console.log("File:", file.name, "Size:", file.size, "Category:", category);
+  
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async function(e) {
       try {
-        // Get base64 data (remove the data:image/png;base64, prefix)
         let base64Data = e.target.result;
         if (base64Data.includes('base64,')) {
           base64Data = base64Data.split('base64,')[1];
         }
         
-        // Create form data for upload
         const formData = new FormData();
         formData.append("action", "uploadCalamityFile");
         formData.append("fileData", base64Data);
@@ -7337,16 +7356,15 @@ async function uploadFileToDriveDirect(file, category, tempDataID) {
         formData.append("category", category);
         formData.append("dataID", tempDataID.toString());
         
-        console.log("Uploading file to Drive:", file.name, "Category:", category);
+        console.log("Sending upload request for:", category);
         
-        // Send to Apps Script
         const response = await fetch(API_URL, {
           method: "POST",
           body: formData
         });
         
         const text = await response.text();
-        console.log("Upload response raw:", text);
+        console.log("Upload response:", text);
         
         let result;
         try {
@@ -7358,14 +7376,14 @@ async function uploadFileToDriveDirect(file, category, tempDataID) {
         }
         
         if (result.success && result.fileId) {
-          console.log("File uploaded successfully. File ID:", result.fileId);
+          console.log("✅ Upload success! File ID:", result.fileId);
           resolve(result.fileId);
         } else {
-          console.error("Upload failed:", result);
+          console.error("❌ Upload failed:", result);
           resolve(null);
         }
       } catch (err) {
-        console.error("Upload error:", err);
+        console.error("❌ Upload error:", err);
         resolve(null);
       }
     };
