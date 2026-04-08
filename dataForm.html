@@ -5123,8 +5123,7 @@ function validateContactInput(input, errorElement) {
         return true;
     }
 }
-
-/* ---------------- helpers ---------------- */
+   
 /* ---------------- helpers ---------------- */
 function toSheetDateFormat(inputVal){
   if(!inputVal) return "";
@@ -5741,6 +5740,26 @@ function updateMemberPreview(){
   }
 }
 
+const headCalamityFiles = {
+  damage: null,
+  injury: null,
+  habitability: null,
+  livelihood: null
+};
+
+let memberCalamityFiles = {
+  damage: null,
+  injury: null,
+  habitability: null,
+  livelihood: null
+};
+
+// Store calamity files for each member
+window.memberCalamityFilesArray = [];
+
+// Store uploaded file links for members
+window.memberCalamityFileIdsUploaded = [];
+   
 /* ============ UPDATED: FILL MEMBER PANEL WITH DATE FIELD HANDLING ============ */
 function fillMemberPanel(idx){
   const mem = collectedMembers[idx] || {};
@@ -5915,6 +5934,45 @@ function fillMemberPanel(idx){
   // Setup member government assistance date handlers
   setupMemberGovernmentAssistanceDateHandlers();
   
+  // ============ RESTORE MEMBER CALAMITY FILES FOR THIS MEMBER ============
+  if (window.memberCalamityFilesArray && window.memberCalamityFilesArray[idx]) {
+    const savedFiles = window.memberCalamityFilesArray[idx];
+    memberCalamityFiles.damage = savedFiles.damage;
+    memberCalamityFiles.injury = savedFiles.injury;
+    memberCalamityFiles.habitability = savedFiles.habitability;
+    memberCalamityFiles.livelihood = savedFiles.livelihood;
+    
+    // Update UI to show filenames
+    const categories = ['damage', 'injury', 'habitability', 'livelihood'];
+    categories.forEach(category => {
+      const file = memberCalamityFiles[category];
+      const filenameSpan = document.getElementById(`member_${category}_filename`);
+      const removeBtn = document.querySelector(`.member-remove-file-btn[data-category="${category}"]`);
+      const radioYes = document.querySelector(`input[name="member_${category === 'damage' ? 'damage' : category === 'injury' ? 'injury' : category === 'habitability' ? 'habitability' : 'livelihood'}"][value="Yes"]`);
+      const uploadArea = document.getElementById(`member_${category}_upload_area`);
+      
+      if (file && filenameSpan) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        let icon = 'fa-file-image';
+        if (ext === 'pdf') icon = 'fa-file-pdf';
+        filenameSpan.innerHTML = `<i class="fas ${icon}"></i> ${file.name}`;
+        filenameSpan.style.color = '#0f7a4a';
+        if (removeBtn) removeBtn.style.display = 'inline-flex';
+        // Show upload area and check Yes radio
+        if (radioYes) radioYes.checked = true;
+        if (uploadArea) uploadArea.classList.add('show');
+      } else if (filenameSpan) {
+        filenameSpan.innerHTML = 'No file chosen';
+        filenameSpan.style.color = 'var(--muted)';
+        if (removeBtn) removeBtn.style.display = 'none';
+      }
+    });
+  } else {
+    // Reset member calamity files for new member
+    resetMemberCalamityOnPanelOpen();
+  }
+  // ============ END RESTORE MEMBER CALAMITY FILES ============
+  
   // Update panel title
   const total = Math.max(1, membersToCollect);
   document.getElementById("panelTitle").textContent = `Member ${idx + 1} of ${total}`;
@@ -5968,14 +6026,33 @@ function collectMemberDataFromPanel(){
   const memberCalamityData = {
     "Structural Damage": document.querySelector('input[name="member_damage"]:checked')?.value || "No",
     "Structural Damage Details": document.getElementById('member_damage_details')?.value || "",
+    "Structural Damage File": "",  // Will be filled during upload
+    "Structural Damage File Name": memberCalamityFiles.damage?.name || "",
     "Household Injury": document.querySelector('input[name="member_injury"]:checked')?.value || "No",
     "Injury Details": document.getElementById('member_injury_details')?.value || "",
+    "Household Injury File": "",   // Will be filled during upload
+    "Household Injury File Name": memberCalamityFiles.injury?.name || "",
     "Habitability": document.querySelector('input[name="member_habitability"]:checked')?.value || "No",
     "Habitability Details": document.getElementById('member_habitability_details')?.value || "",
+    "Habitability File": "",       // Will be filled during upload
+    "Habitability File Name": memberCalamityFiles.habitability?.name || "",
     "Loss of Livelihood": document.querySelector('input[name="member_livelihood"]:checked')?.value || "No",
-    "Livelihood Details": document.getElementById('member_livelihood_details')?.value || ""
+    "Livelihood Details": document.getElementById('member_livelihood_details')?.value || "",
+    "Loss of Livelihood File": "", // Will be filled during upload
+    "Loss of Livelihood File Name": memberCalamityFiles.livelihood?.name || ""
   };
   // ============ END MEMBER CALAMITY DATA ============
+
+  // Store member files for later upload
+  if (!window.memberCalamityFilesArray) {
+    window.memberCalamityFilesArray = [];
+  }
+  window.memberCalamityFilesArray[currentMemberIndex] = {
+    damage: memberCalamityFiles.damage,
+    injury: memberCalamityFiles.injury,
+    habitability: memberCalamityFiles.habitability,
+    livelihood: memberCalamityFiles.livelihood
+  };
 
   return {
     "Name of Household Member/s": memberName,
@@ -7051,8 +7128,8 @@ async function submitHeadAndMembers() {
                              localStorage.getItem("username") || 
                              "Unknown";
   
-  // ============ STEP 1: UPLOAD CALAMITY FILES TO DRIVE ============
-  const calamityFileIds = {
+  // ============ STEP 1: UPLOAD HEAD CALAMITY FILES TO DRIVE ============
+  const headCalamityFileIds = {
     damage: null,
     injury: null,
     habitability: null,
@@ -7061,30 +7138,67 @@ async function submitHeadAndMembers() {
   
   const tempDataID = Date.now();
   
-  // Upload files and store returned file IDs
+  // Upload HEAD files
   if (headCalamityFiles.damage) {
-    console.log("Uploading damage file...");
-    calamityFileIds.damage = await uploadFileToDriveDirect(headCalamityFiles.damage, 'damage', tempDataID);
-    console.log("Damage file ID result:", calamityFileIds.damage);
+    console.log("Uploading HEAD damage file...");
+    headCalamityFileIds.damage = await uploadFileToDriveDirect(headCalamityFiles.damage, 'damage', tempDataID);
+    console.log("HEAD damage file link:", headCalamityFileIds.damage);
   }
   if (headCalamityFiles.injury) {
-    console.log("Uploading injury file...");
-    calamityFileIds.injury = await uploadFileToDriveDirect(headCalamityFiles.injury, 'injury', tempDataID);
-    console.log("Injury file ID result:", calamityFileIds.injury);
+    console.log("Uploading HEAD injury file...");
+    headCalamityFileIds.injury = await uploadFileToDriveDirect(headCalamityFiles.injury, 'injury', tempDataID);
+    console.log("HEAD injury file link:", headCalamityFileIds.injury);
   }
   if (headCalamityFiles.habitability) {
-    console.log("Uploading habitability file...");
-    calamityFileIds.habitability = await uploadFileToDriveDirect(headCalamityFiles.habitability, 'habitability', tempDataID);
-    console.log("Habitability file ID result:", calamityFileIds.habitability);
+    console.log("Uploading HEAD habitability file...");
+    headCalamityFileIds.habitability = await uploadFileToDriveDirect(headCalamityFiles.habitability, 'habitability', tempDataID);
+    console.log("HEAD habitability file link:", headCalamityFileIds.habitability);
   }
   if (headCalamityFiles.livelihood) {
-    console.log("Uploading livelihood file...");
-    calamityFileIds.livelihood = await uploadFileToDriveDirect(headCalamityFiles.livelihood, 'livelihood', tempDataID);
-    console.log("Livelihood file ID result:", calamityFileIds.livelihood);
+    console.log("Uploading HEAD livelihood file...");
+    headCalamityFileIds.livelihood = await uploadFileToDriveDirect(headCalamityFiles.livelihood, 'livelihood', tempDataID);
+    console.log("HEAD livelihood file link:", headCalamityFileIds.livelihood);
   }
   
-  console.log("Final calamityFileIds:", calamityFileIds);
-  // ============ END FILE UPLOADS ============
+  // ============ STEP 1.5: UPLOAD MEMBER CALAMITY FILES TO DRIVE ============
+  const memberCalamityFileLinks = [];
+  
+  // Loop through each member to upload their files
+  for (let i = 0; i < collectedMembers.length; i++) {
+    const memberFileLinks = {
+      damage: null,
+      injury: null,
+      habitability: null,
+      livelihood: null
+    };
+    
+    // Check if this member has calamity files
+    if (window.memberCalamityFilesArray && window.memberCalamityFilesArray[i]) {
+      const memberFiles = window.memberCalamityFilesArray[i];
+      
+      if (memberFiles.damage) {
+        console.log(`Uploading MEMBER ${i+1} damage file...`);
+        memberFileLinks.damage = await uploadFileToDriveDirect(memberFiles.damage, `member_${i+1}_damage`, tempDataID);
+      }
+      if (memberFiles.injury) {
+        console.log(`Uploading MEMBER ${i+1} injury file...`);
+        memberFileLinks.injury = await uploadFileToDriveDirect(memberFiles.injury, `member_${i+1}_injury`, tempDataID);
+      }
+      if (memberFiles.habitability) {
+        console.log(`Uploading MEMBER ${i+1} habitability file...`);
+        memberFileLinks.habitability = await uploadFileToDriveDirect(memberFiles.habitability, `member_${i+1}_habitability`, tempDataID);
+      }
+      if (memberFiles.livelihood) {
+        console.log(`Uploading MEMBER ${i+1} livelihood file...`);
+        memberFileLinks.livelihood = await uploadFileToDriveDirect(memberFiles.livelihood, `member_${i+1}_livelihood`, tempDataID);
+      }
+    }
+    
+    memberCalamityFileLinks.push(memberFileLinks);
+  }
+  
+  console.log("Final HEAD calamity file links:", headCalamityFileIds);
+  console.log("Final MEMBER calamity file links:", memberCalamityFileLinks);
   
   // ============ STEP 2: GATHER HEAD DATA ============
   const headBirthInput = document.getElementById("householdBirthdate").value || "";
@@ -7117,23 +7231,23 @@ async function submitHeadAndMembers() {
   const insideAssembly = document.getElementById("inside_assembly").checked ? "Yes" : "No";
   const outsideAssembly = document.getElementById("outside_assembly").checked ? "Yes" : "No";
 
-  // Get calamity radio and textarea values WITH FILE IDs
+  // Get calamity radio and textarea values WITH FILE LINKS
   const headCalamityData = {
     "Structural Damage": document.querySelector('input[name="head_damage"]:checked')?.value || "No",
     "Structural Damage Details": document.getElementById('head_damage_details')?.value || "",
-    "Structural Damage File": calamityFileIds.damage || "",
+    "Structural Damage File": headCalamityFileIds.damage || "",
     "Structural Damage File Name": headCalamityFiles.damage?.name || "",
     "Household Injury": document.querySelector('input[name="head_injury"]:checked')?.value || "No",
     "Injury Details": document.getElementById('head_injury_details')?.value || "",
-    "Household Injury File": calamityFileIds.injury || "",
+    "Household Injury File": headCalamityFileIds.injury || "",
     "Household Injury File Name": headCalamityFiles.injury?.name || "",
     "Habitability": document.querySelector('input[name="head_habitability"]:checked')?.value || "No",
     "Habitability Details": document.getElementById('head_habitability_details')?.value || "",
-    "Habitability File": calamityFileIds.habitability || "",
+    "Habitability File": headCalamityFileIds.habitability || "",
     "Habitability File Name": headCalamityFiles.habitability?.name || "",
     "Loss of Livelihood": document.querySelector('input[name="head_livelihood"]:checked')?.value || "No",
     "Livelihood Details": document.getElementById('head_livelihood_details')?.value || "",
-    "Loss of Livelihood File": calamityFileIds.livelihood || "",
+    "Loss of Livelihood File": headCalamityFileIds.livelihood || "",
     "Loss of Livelihood File Name": headCalamityFiles.livelihood?.name || ""
   };
 
@@ -7212,11 +7326,11 @@ async function submitHeadAndMembers() {
     "Submitted By": currentUserFullName,
     "Submitted On": new Date().toLocaleString(),
     
-    // ADD CALAMITY FIELDS WITH FILE IDs
+    // ADD CALAMITY FIELDS WITH FILE LINKS
     ...headCalamityData
   };
 
-  // ============ STEP 3: BUILD MEMBERS ARRAY ============
+  // ============ STEP 3: BUILD MEMBERS ARRAY WITH FILE LINKS ============
   const expected = parseInt(document.getElementById("memberCount").value || 0);
   const members = [];
   
@@ -7225,6 +7339,14 @@ async function submitHeadAndMembers() {
        collectedMembers[i]["Name of Household Member/s"].trim() !== "") {
       
       const member = { ...collectedMembers[i] };
+      
+      // Add calamity file links to member
+      if (memberCalamityFileLinks[i]) {
+        member["Structural Damage File"] = memberCalamityFileLinks[i].damage || "";
+        member["Household Injury File"] = memberCalamityFileLinks[i].injury || "";
+        member["Habitability File"] = memberCalamityFileLinks[i].habitability || "";
+        member["Loss of Livelihood File"] = memberCalamityFileLinks[i].livelihood || "";
+      }
       
       if(member["Birthdate"]){
         member["Birthdate"] = (member["Birthdate"].indexOf('/') === -1) ? 
@@ -7246,12 +7368,6 @@ async function submitHeadAndMembers() {
   }
 
   console.log("Final head object being sent:", head);
-  console.log("Calamity File IDs in head:", {
-    damage: head["Structural Damage File"],
-    injury: head["Household Injury File"],
-    habitability: head["Habitability File"],
-    livelihood: head["Loss of Livelihood File"]
-  });
   console.log(`Saving head + ${members.length} members`);
 
   // ============ STEP 4: SUBMIT TO SERVER ============
@@ -7327,7 +7443,7 @@ async function submitHeadAndMembers() {
   }
 }
 
-// Upload file to Google Drive via Apps Script
+// Upload file to Google Drive via Apps Script and return FULL VIEW LINK
 async function uploadFileToDriveDirect(file, category, tempDataID) {
   console.log("=== uploadFileToDriveDirect START ===");
   console.log("File:", file.name, "Size:", file.size, "Category:", category);
@@ -7368,8 +7484,10 @@ async function uploadFileToDriveDirect(file, category, tempDataID) {
         }
         
         if (result.success && result.fileId) {
-          console.log("✅ Upload success! File ID:", result.fileId);
-          resolve(result.fileId);
+          // RETURN FULL GOOGLE DRIVE VIEW LINK
+          const fileLink = `https://drive.google.com/file/d/${result.fileId}/view`;
+          console.log("✅ Upload success! File Link:", fileLink);
+          resolve(fileLink);
         } else {
           console.error("❌ Upload failed:", result);
           resolve(null);
@@ -7597,50 +7715,35 @@ document.addEventListener('DOMContentLoaded', function() {
   setupMemberFileInputs();
 });
 
-// Call this when opening member panel to reset files
+// Reset member calamity files when opening a new member panel
 function resetMemberCalamityOnPanelOpen() {
   const categories = ['damage', 'injury', 'habitability', 'livelihood'];
   categories.forEach(category => {
+    // Clear stored file objects
     memberCalamityFiles[category] = null;
-    const filenameSpan = document.getElementById(`member_${category}_filename`);
-    const removeBtn = document.querySelector(`.member-remove-file-btn[data-category="${category}"]`);
-    const fileInput = document.getElementById(`member_${category}_file`);
-    const uploadArea = document.getElementById(`member_${category}_upload_area`);
     
+    // Clear filename display
+    const filenameSpan = document.getElementById(`member_${category}_filename`);
     if (filenameSpan) {
       filenameSpan.innerHTML = 'No file chosen';
       filenameSpan.style.color = 'var(--muted)';
     }
+    
+    // Hide remove button
+    const removeBtn = document.querySelector(`.member-remove-file-btn[data-category="${category}"]`);
     if (removeBtn) removeBtn.style.display = 'none';
+    
+    // Clear file input value
+    const fileInput = document.getElementById(`member_${category}_file`);
     if (fileInput) fileInput.value = '';
     
-    // Also reset radio to "No" and hide upload area
+    // Reset radio button to "No"
     const radioNo = document.querySelector(`input[name="member_${category === 'damage' ? 'damage' : category === 'injury' ? 'injury' : category === 'habitability' ? 'habitability' : 'livelihood'}"][value="No"]`);
     if (radioNo) radioNo.checked = true;
+    
+    // Hide upload area
+    const uploadArea = document.getElementById(`member_${category}_upload_area`);
     if (uploadArea) uploadArea.classList.remove('show');
-  });
-}
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-  setupHeadFileInputs();
-  setupMemberFileInputs();
-});
-
-// Call this when opening member panel
-function resetMemberCalamityOnPanelOpen() {
-  const categories = ['damage', 'injury', 'habitability', 'livelihood'];
-  categories.forEach(category => {
-    memberCalamityFiles[category] = null;
-    const filenameSpan = document.getElementById(`member_${category}_filename`);
-    const removeBtn = document.querySelector(`.member-remove-file-btn[data-category="${category}"]`);
-    const fileInput = document.getElementById(`member_${category}_file`);
-    if (filenameSpan) {
-      filenameSpan.innerHTML = 'No file chosen';
-      filenameSpan.style.color = 'var(--muted)';
-    }
-    if (removeBtn) removeBtn.style.display = 'none';
-    if (fileInput) fileInput.value = '';
   });
 }
 /* ============ SIDEBAR COLLAPSE ============ */
