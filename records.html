@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Records & Management — Purok Kaligtasan 133</title>
+<title>Records & Management — Purok Kaligtasans</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/uniform-styles.css">
 <style>
@@ -26,7 +26,16 @@
     --radius-sm:8px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
-
+@keyframes modalSlideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 /* ============ UNIFORM FORM STYLES FOR CHECKBOX SECTIONS ============ */
 
 /* Additional Information checkboxes */
@@ -1755,18 +1764,58 @@ li.admin-only.admin-visible {
     overflow: hidden;
    }
 
-   /* Content Area - Fixed Size */
-   .content-area{
+/* Content Area - Fixed Size */
+.content-area{
     background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
     border-radius:var(--radius);
     padding:18px;
     box-shadow:0 8px 22px rgba(10,20,16,0.06);
-    min-height:72vh;
-    height: calc(100vh - 120px);
+    min-height:110vh; /* Increased to give more space */
+    height: calc(100vh - 50px); /* Reduced subtraction to maximize height */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-   }
+}
+/* Make records wrapper take all available space */
+.records-wrapper {
+    flex: 1 1 auto;
+    min-height: 0; /* Critical for flex children */
+    background: rgba(255,255,255,0.95);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: auto;
+    position: relative;
+    border: 1px solid var(--border);
+}
+
+/* Ensure the table can scroll properly */
+.records-table {
+    width:100%;
+    min-width:1400px;
+    border-collapse:collapse;
+    font-size: 14px;
+}
+
+.content-header {
+    margin-bottom: 8px !important; /* REDUCED from 16px */
+}
+
+#disc {
+    margin-bottom: 8px !important; /* REDUCED from 10px */
+    padding: 8px 12px !important; /* REDUCED from 12px */
+}
+
+.stats-container {
+    margin-bottom: 8px !important; /* REDUCED from 16px */
+}
+
+.toolbar {
+    margin-bottom: 8px !important; /* REDUCED from 16px */
+}
+
+.legend-container {
+    padding: 6px 12px !important; /* REDUCED from 10px 16px */
+}
 
    /* Content Header - Fixed */
    .content-header {
@@ -1928,7 +1977,7 @@ li.admin-only.admin-visible {
     box-shadow:var(--shadow);
     overflow:auto;
     position: relative;
-    margin-bottom: 16px;
+    margin-bottom: 3px;
     border: 1px solid var(--border);
    }
 
@@ -1939,34 +1988,34 @@ li.admin-only.admin-visible {
     font-size: 14px;
    }
 
-   .records-table th{
+.records-table th{
     background: var(--light-green);
-    padding: 10px 8px;
+    padding: 6px 4px; /* REDUCED from 10px 8px */
     text-align: center;
     font-weight: 600;
     position: sticky;
     top: 0;
     z-index: 100;
-    font-size: 14px;
+    font-size: 12px; /* REDUCED from 14px */
     color: var(--accent1);
     border-bottom: 2px solid rgba(15,122,74,0.15);
     white-space: nowrap;
     vertical-align: middle;
-    height: 40px;
+    height: 32px; /* REDUCED from 40px */
     box-sizing: border-box;
-   }
+}
 
-   .records-table td{
-    padding: 8px 6px;
-    font-size: 14px;
+.records-table td{
+    padding: 4px 4px; /* REDUCED from 8px 6px */
+    font-size: 13px; /* REDUCED from 14px */
     border-bottom: 1px solid rgba(15,122,74,0.08);
     vertical-align: middle;
     color: var(--muted);
     text-align: center;
-    height: 36px;
+    height: 28px; /* REDUCED from 36px */
     box-sizing: border-box;
-    line-height: 1.3;
-   }
+    line-height: 1.2; /* Tighter line height */
+}
 
    .records-table tbody tr:hover{
     background:rgba(52,183,143,0.05);
@@ -2169,42 +2218,48 @@ li.admin-only.admin-visible {
     display:none;
    }
 
-   /* Pagination - Fixed Position */
-   #paginationArea {
-    margin-top: 16px;
+   /* Pagination - More Compact Version */
+#paginationArea {
+    margin-top: 0px;
+    margin-bottom: 2px; /* REDUCED from 5px */
     display: flex;
     justify-content: center;
-    gap: 6px;
+    gap: 3px; /* REDUCED from 6px */
     flex-wrap: wrap;
-   }
+}
 
-   #paginationArea button{
-    padding:5px 8px;
-    margin:0 2px;
-    border-radius:4px;
-    border:1px solid var(--border);
-    background:#fff;
-    cursor:pointer;
+#paginationArea button {
+    padding: 2px 4px; /* REDUCED from 5px 8px */
+    margin: 0 1px; /* REDUCED from 0 2px */
+    border-radius: 3px; /* REDUCED from 4px */
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
     color: var(--muted);
-    font-size: 0.8rem;
-    min-width: 28px;
+    font-size: 0.7rem; /* REDUCED from 0.8rem */
+    min-width: 20px; /* REDUCED from 28px */
+    height: 22px; /* ADDED fixed height for consistency */
     transition: all 0.2s ease;
-   }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
 
-   #paginationArea button:hover{
-    border-color:var(--accent1);
+#paginationArea button:hover {
+    border-color: var(--accent1);
     color: var(--accent1);
-   }
+}
 
-   #paginationArea button.active{
-    background:var(--accent1);
-    color:#fff;
-    border-color:var(--accent1);
-    font-weight:700;
-   }
+#paginationArea button.active {
+    background: var(--accent1);
+    color: #fff;
+    border-color: var(--accent1);
+    font-weight: 700;
+}
 
-   /* Legend - Compact Horizontal Layout */
-   .legend-container {
+  /* Legend - Compact Horizontal Layout */
+.legend-container {
     background: #fff;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -2212,45 +2267,68 @@ li.admin-only.admin-visible {
     box-shadow: 0 2px 8px rgba(6,30,20,0.04);
     margin-top: 0;
     border-top: 2px solid var(--accent1);
-   }
+}
 
-   .legend-box {
+.legend-box {
     display: flex;
     flex-direction: column;
     gap: 6px;
-   }
+}
 
-   .legend-box h4 {
+.legend-box h4 {
     margin: 0;
     font-size: 0.9rem;
     color: var(--muted);
     display: flex;
     align-items: center;
     gap: 6px;
-   }
+}
 
-   .legend-items {
+.legend-items {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
     align-items: center;
-   }
+}
 
-   .legend-item{
-    display:flex;
-    gap:6px;
-    align-items:center;
-    font-size:0.8rem;
+.legend-item {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 0.8rem;
     white-space: nowrap;
-   }
+}
 
-   .legend-swatch{
-    width:14px;
-    height:14px;
-    border-radius:3px;
+.legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
     flex-shrink: 0;
     border: 1px solid rgba(0,0,0,0.1);
-   }
+}
+
+/* New color for No Members (Head only) */
+.legend-swatch.no-members {
+    background: #f0f0f0; /* Light gray */
+    border-color: #cccccc;
+}
+
+/* Existing colors - keep these for reference */
+.legend-swatch.small {
+    background: #d4f6ff; /* 1 Member */
+}
+
+.legend-swatch.normal {
+    background: #d9ffd9; /* 2–4 Members */
+}
+
+.legend-swatch.large {
+    background: #fff7c2; /* 5–7 Members */
+}
+
+.legend-swatch.critical {
+    background: #ffd6d6; /* 8+ Members */
+}
 
    /* Loading overlay */
    #loading {
@@ -2389,24 +2467,20 @@ li.admin-only.admin-visible {
         align-items: flex-start;
     }
     
-    .records-table {
-        font-size: 12px;
-        min-width: 1200px;
-    }
-    
-    .records-table th,
-    .records-table td {
-        font-size: 12px;
-        padding: 6px 5px;
-    }
-    
-    .records-table th {
-        height: 36px;
-    }
-    
-    .records-table td {
-        height: 32px;
-    }
+.records-table {
+    font-size: 12px;
+    min-width: 1200px;
+}
+
+.records-table th,
+.records-table td {
+    font-size: 12px;
+    padding: 2px 4px !important;     /* ← REDUCED from 6px to 2px */
+}
+
+.records-table th {
+    height: 28px !important;          /* ← REDUCED from 36px to 28px */
+}
 }
 /* Desktop Styles */
 @media (min-width: 1025px) {
@@ -2430,12 +2504,6 @@ li.admin-only.admin-visible {
     
     .records-table {
         min-width: 1300px;
-    }
-    
-    .records-table th,
-    .records-table td {
-        font-size: 13px;
-        padding: 8px 6px;
     }
    }
 
@@ -2463,6 +2531,7 @@ li.admin-only.admin-visible {
    .records-wrapper::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
    }
+   
 </style>
 </head>
 <body>
@@ -2590,17 +2659,29 @@ li.admin-only.admin-visible {
     <div id="paginationArea"></div>
 
     <!-- Legend - Compact Horizontal Layout -->
-    <div class="legend-container">
-      <div class="legend-box">
-        <h4><i class="fas fa-palette"></i> Household Color Legend:</h4>
-        <div class="legend-items">
-          <div class="legend-item"><div class="legend-swatch" style="background:#d4f6ff"></div>1 Member</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#d9ffd9"></div>2–4 Members</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#fff7c2"></div>5–7 Members</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#ffd6d6"></div>8+ Members</div>
-        </div>
+<!-- Legend - Compact Horizontal Layout -->
+<div class="legend-container">
+  <div class="legend-box">
+    <h4><i class="fas fa-palette"></i> Household Color Legend:</h4>
+    <div class="legend-items">
+      <div class="legend-item">
+        <div class="legend-swatch no-members"></div>No Members (Head only)
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch small"></div>1 Member
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch normal"></div>2–4 Members
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch large"></div>5–7 Members
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch critical"></div>8+ Members
       </div>
     </div>
+  </div>
+</div>
 
   </main>
 </div>
@@ -3917,21 +3998,21 @@ li.admin-only.admin-visible {
   </div>
 </div>
 <!-- MODALS FROM DATAFORM.HTML -->
-<!-- Reset Confirmation Modal - Updated Structure -->
-<div id="resetConfirmationModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-warning">
-    <div class="modal-header">
-      <h3><i class="fas fa-exclamation-triangle"></i> Reset Form</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-exclamation-triangle"></i>
+<!-- Reset Confirmation Modal -->
+<div id="resetConfirmationModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.6rem; color: #ff7a00; opacity: 0.7;"></i>
       </div>
-      <p>Are you sure you want to reset the edit form? All entered changes will be permanently lost.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Reset Form</h3>
+      <p style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Are you sure you want to reset the edit form? All entered changes will be permanently lost.</p>
     </div>
-    <div class="modal-actions">
-      <button id="cancelReset" class="btn btn-secondary">Cancel</button>
-      <button id="confirmReset" class="btn btn-reset">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelReset" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmReset" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-redo"></i> Reset Form
       </button>
     </div>
@@ -3939,20 +4020,20 @@ li.admin-only.admin-visible {
 </div>
 
 <!-- Save Confirmation Modal -->
-<div id="saveConfirmationModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-info">
-    <div class="modal-header">
-      <h3><i class="fas fa-save"></i> Save Data</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-save"></i>
+<div id="saveConfirmationModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-save" style="font-size: 1.6rem; color: #34b78f; opacity: 0.7;"></i>
       </div>
-      <p>Are you ready to save the household data? This action cannot be undone.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Save Data</h3>
+      <p style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Are you ready to save the household data? This action cannot be undone.</p>
     </div>
-    <div class="modal-actions">
-      <button id="cancelSave" class="btn btn-secondary">Cancel</button>
-      <button id="confirmSave" class="btn">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelSave" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmSave" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-check"></i> Save Data
       </button>
     </div>
@@ -3960,19 +4041,17 @@ li.admin-only.admin-visible {
 </div>
 
 <!-- Success Modal -->
-<div id="successModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-success">
-    <div class="modal-header">
-      <h3><i class="fas fa-check-circle"></i> Success!</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-check-circle"></i>
+<div id="successModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-check-circle" style="font-size: 1.6rem; color: #0f7a4a; opacity: 0.7;"></i>
       </div>
-      <p id="successMessage">Operation completed successfully.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Success!</h3>
+      <p id="successMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Operation completed successfully.</p>
     </div>
-    <div class="modal-actions">
-      <button id="closeSuccess" class="btn">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeSuccess" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-check"></i> OK
       </button>
     </div>
@@ -3980,19 +4059,17 @@ li.admin-only.admin-visible {
 </div>
 
 <!-- Error Modal -->
-<div id="errorModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-error">
-    <div class="modal-header">
-      <h3><i class="fas fa-exclamation-circle"></i> Error</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-exclamation-circle"></i>
+<div id="errorModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-exclamation-circle" style="font-size: 1.6rem; color: #ef4444; opacity: 0.7;"></i>
       </div>
-      <p id="errorMessage">An error occurred.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Error</h3>
+      <p id="errorMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">An error occurred.</p>
     </div>
-    <div class="modal-actions">
-      <button id="closeError" class="btn btn-secondary">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeError" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-times"></i> Close
       </button>
     </div>
@@ -4000,19 +4077,17 @@ li.admin-only.admin-visible {
 </div>
 
 <!-- Info Modal -->
-<div id="infoModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-info">
-    <div class="modal-header">
-      <h3><i class="fas fa-info-circle"></i> Information</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-info-circle"></i>
+<div id="infoModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-info-circle" style="font-size: 1.6rem; color: #34b78f; opacity: 0.7;"></i>
       </div>
-      <p id="infoMessage">Information message.</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Information</h3>
+      <p id="infoMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Information message.</p>
     </div>
-    <div class="modal-actions">
-      <button id="closeInfo" class="btn">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeInfo" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-check"></i> OK
       </button>
     </div>
@@ -4020,24 +4095,23 @@ li.admin-only.admin-visible {
 </div>
 
 <!-- Remove Member Modal -->
-<div id="removeMemberModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-warning">
-    <div class="modal-header">
-      <h3><i class="fas fa-user-minus"></i> Remove Member</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-user-minus"></i>
+<div id="removeMemberModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-user-minus" style="font-size: 1.6rem; color: #ff7a00; opacity: 0.7;"></i>
       </div>
-      <p id="removeMemberMessage">Enter the number of the member to remove (1-<span id="memberTotalCount">0</span>):</p>
-      <input type="number" id="memberToRemove" class="search-box" style="width: 120px; text-align: center;" 
-             min="1" max="1" placeholder="Enter number" />
-      <div class="small-muted" style="margin-top: 8px;">Members:</div>
-      <div id="currentMembersList"></div>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Remove Member</h3>
+      <p id="removeMemberMessage" style="margin: 0 0 8px 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Enter the number of the member to remove (1-<span id="memberTotalCount">0</span>):</p>
+      <input type="number" id="memberToRemove" style="width: 100%; padding: 6px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; margin: 8px 0; box-sizing: border-box; text-align: center;" min="1" max="1" placeholder="Enter number" />
+      <div style="font-size: 0.7rem; color: #64748b; margin-bottom: 4px; text-align: left;">Members:</div>
+      <div id="currentMembersList" style="display: block; max-height: 100px; overflow-y: auto; text-align: left; margin: 8px 0; padding: 8px; background: #f8fafc; border-radius: 6px; font-size: 0.75rem; line-height: 1.4; color: #1e293b; border: 1px solid #e2e8f0;"></div>
     </div>
-    <div class="modal-actions">
-      <button id="cancelRemoveMember" class="btn btn-secondary">Cancel</button>
-      <button id="confirmRemoveMember" class="btn btn-reset">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelRemoveMember" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmRemoveMember" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-user-minus"></i> Remove Member
       </button>
     </div>
@@ -4045,20 +4119,20 @@ li.admin-only.admin-visible {
 </div>
 
 <!-- Delete Member Confirmation Modal -->
-<div id="deleteMemberConfirmationModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-error">
-    <div class="modal-header">
-      <h3><i class="fas fa-user-times"></i> Delete Member</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-user-times"></i>
+<div id="deleteMemberConfirmationModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-user-times" style="font-size: 1.6rem; color: #ef4444; opacity: 0.7;"></i>
       </div>
-      <p id="deleteMemberMessage">Are you sure you want to delete this member?</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Delete Member</h3>
+      <p id="deleteMemberMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Are you sure you want to delete this member?</p>
     </div>
-    <div class="modal-actions">
-      <button id="cancelDeleteMember" class="btn btn-secondary">Cancel</button>
-      <button id="confirmDeleteMember" class="btn btn-reset">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelDeleteMember" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmDeleteMember" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-trash"></i> Delete Member
       </button>
     </div>
@@ -4066,48 +4140,47 @@ li.admin-only.admin-visible {
 </div>
 
 <!-- Delete Household Confirmation Modal -->
-<div id="deleteConfirmationModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-error">
-    <div class="modal-header">
-      <h3><i class="fas fa-trash-alt"></i> Delete Household</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-trash-alt"></i>
+<div id="deleteConfirmationModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-trash-alt" style="font-size: 1.6rem; color: #ef4444; opacity: 0.7;"></i>
       </div>
-      <p id="deleteMessage">Are you sure you want to delete this household?</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Delete Household</h3>
+      <p id="deleteMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">Are you sure you want to delete this household?</p>
     </div>
-    <div class="modal-actions">
-      <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
-<button id="confirmDelete" class="btn btn-reset">
-  <i class="fas fa-trash" id="deleteIcon"></i>
-  <span id="deleteText">Delete Household</span>
-  <div id="deleteSpinner" class="loading-spinner-small" style="display: none;"></div>
-</button>
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelDelete" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmDelete" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
+        <i class="fas fa-trash"></i> Delete Household
+      </button>
     </div>
   </div>
 </div>
 
 <!-- Edit Confirmation Modal -->
-<div id="editConfirmationModal" class="modal" aria-hidden="true">
-  <div class="modal-content modal-warning">
-    <div class="modal-header">
-      <h3><i class="fas fa-exclamation-triangle"></i> Unsaved Changes</h3>
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon">
-        <i class="fas fa-exclamation-triangle"></i>
+<div id="editConfirmationModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px;">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.6rem; color: #ff7a00; opacity: 0.7;"></i>
       </div>
-      <p id="editMessage">You have unsaved changes. Are you sure you want to close the edit panel?</p>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">Unsaved Changes</h3>
+      <p id="editMessage" style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">You have unsaved changes. Are you sure you want to close the edit panel?</p>
     </div>
-    <div class="modal-actions">
-      <button id="cancelEditClose" class="btn btn-secondary">Cancel</button>
-      <button id="confirmEditClose" class="btn btn-reset">
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelEditClose" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmEditClose" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
         <i class="fas fa-times"></i> Discard Changes
       </button>
     </div>
   </div>
 </div>
+
 <!-- Mobile Bottom Navigation - Fixed Position -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
   <div class="mobile-nav-items">
@@ -4135,7 +4208,7 @@ li.admin-only.admin-visible {
 </nav>
 <script>
 /* ============ CONFIG ============ */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvHCGEcQVD020RuGxug3-O8aq3DBPbvFPsNNdcia_FuT81EdICrxKnotHVF2o-59utzg/exec";
 const HAZARD_HUNTER_URL = "https://hazardhunter.georisk.gov.ph/map#";
 
 /* ============ IMPROVED MODAL MANAGEMENT ============ */
@@ -4917,6 +4990,105 @@ let selected = new Set();
 let currentPage = 1;
 const rowsPerPage = 25;
 
+/* ============ SIMPLE SAVE QUEUE ============ */
+const saveQueue = {
+  queue: [],
+  isProcessing: false,
+  
+  async add(saveFunction) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ fn: saveFunction, resolve, reject, name: saveFunction.name || 'Save' });
+      this.showStatus();
+      this.process();
+    });
+  },
+  
+  async process() {
+    if (this.isProcessing || this.queue.length === 0) return;
+    
+    this.isProcessing = true;
+    
+    while (this.queue.length > 0) {
+      const item = this.queue.shift();
+      
+      try {
+        console.log(`Processing save: ${item.name}`);
+        const result = await item.fn();
+        item.resolve(result);
+        // Small delay between saves
+        await new Promise(r => setTimeout(r, 500));
+      } catch (error) {
+        console.error("Save failed:", error);
+        item.reject(error);
+      }
+      
+      this.updateStatus();
+    }
+    
+    this.isProcessing = false;
+    this.hideStatus();
+  },
+  
+  showStatus() {
+    let el = document.getElementById('saveStatus');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'saveStatus';
+      el.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: #0f7a4a;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        display: none;
+      `;
+      document.body.appendChild(el);
+    }
+    if (this.queue.length > 0) {
+      el.innerHTML = `<i class="fas fa-clock"></i> Saving... (${this.queue.length} pending)`;
+      el.style.display = 'block';
+    }
+  },
+  
+  updateStatus() {
+    const el = document.getElementById('saveStatus');
+    if (el && this.queue.length > 0) {
+      el.innerHTML = `<i class="fas fa-clock"></i> Saving... (${this.queue.length} pending)`;
+    } else if (el && this.queue.length === 0) {
+      el.innerHTML = `<i class="fas fa-check"></i> All saves complete!`;
+      setTimeout(() => this.hideStatus(), 2000);
+    }
+  },
+  
+  hideStatus() {
+    const el = document.getElementById('saveStatus');
+    if (el) {
+      el.style.display = 'none';
+    }
+  }
+};
+
+// Override your save function to use queue
+if (typeof saveEditedHousehold === 'function') {
+  const originalEditSave = saveEditedHousehold;
+  saveEditedHousehold = function(silentReload = false) {
+    return saveQueue.add(() => originalEditSave(silentReload));
+  };
+}
+/* ============ END QUEUE CODE ============ */
+
+/* ============ NEW PAGINATION STATE VARIABLES ============ */
+let paginationTotalPages = 1;
+let paginationTotalRecords = 0;
+let currentBarangay = '';
+let currentSearch = '';
+const PAGE_SIZE = 500; // Adjust this number as needed (500-1000 recommended)
+
 /* ============ EDIT STATE ============ */
 let editDataID = null;
 let editHead = {};
@@ -4924,6 +5096,128 @@ let editMembers = [];
 let memberEditIndex = 0;
 let sequenceMode = false;
 
+/* ============ FAST UPDATE QUEUE FOR records.html ============ */
+const updateQueue = {
+  queue: [],
+  isProcessing: false,
+  batchSize: 3, // Update 3 at a time
+  
+  async add(updateFunction, householdId) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ 
+        fn: updateFunction, 
+        resolve, 
+        reject,
+        id: householdId || Date.now()
+      });
+      this.showStatus();
+      this.process();
+    });
+  },
+  
+  async process() {
+    if (this.isProcessing || this.queue.length === 0) return;
+    
+    this.isProcessing = true;
+    
+    // Take a batch from queue
+    const batch = this.queue.splice(0, this.batchSize);
+    
+    try {
+      console.log(`⚡ Updating ${batch.length} household(s) in parallel...`);
+      
+      // Run batch in PARALLEL for speed
+      const promises = batch.map(item => item.fn());
+      const results = await Promise.all(promises);
+      
+      // Resolve all promises
+      batch.forEach((item, index) => item.resolve(results[index]));
+      
+      console.log(`✅ Updates completed`);
+      
+    } catch (error) {
+      console.error("Batch update failed:", error);
+      // Put failed items back
+      this.queue = [...batch, ...this.queue];
+      batch.forEach(item => item.reject(error));
+    }
+    
+    this.isProcessing = false;
+    
+    // Small delay between batches
+    await new Promise(r => setTimeout(r, 300));
+    
+    // Process next batch
+    if (this.queue.length > 0) {
+      this.process();
+    } else {
+      this.hideStatus();
+    }
+  },
+  
+  showStatus() {
+    let el = document.getElementById('updateStatus');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'updateStatus';
+      el.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: linear-gradient(135deg, #0f7a4a, #34b78f);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-size: 0.95rem;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        display: none;
+        border-left: 4px solid #34b78f;
+      `;
+      document.body.appendChild(el);
+    }
+    
+    if (this.queue.length > 0 || this.isProcessing) {
+      const batchCount = Math.min(this.batchSize, this.queue.length + this.batchSize);
+      el.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-sync-alt fa-spin" style="color: white;"></i>
+          <div>
+            <div><strong>Updating ${batchCount} household(s)...</strong></div>
+            <div style="font-size: 0.8rem; opacity: 0.9;">${this.queue.length} waiting</div>
+          </div>
+        </div>
+      `;
+      el.style.display = 'block';
+    }
+  },
+  
+  hideStatus() {
+    const el = document.getElementById('updateStatus');
+    if (el) {
+      el.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-check-circle" style="color: #aaffaa;"></i>
+          <div><strong>All updates complete!</strong></div>
+        </div>
+      `;
+      setTimeout(() => {
+        if (el) el.style.display = 'none';
+      }, 2000);
+    }
+  }
+};
+
+// Override update function to use queue
+if (typeof saveEditedHousehold === 'function') {
+  const originalUpdate = saveEditedHousehold;
+  saveEditedHousehold = function(silentReload = false) {
+    const householdId = editDataID || 'unknown';
+    return updateQueue.add(() => originalUpdate(silentReload), householdId);
+  };
+}
+/* ============ END QUEUE CODE ============ */
 /* ============ UTIL ============ */
 const $ = id => document.getElementById(id);
 const q = sel => document.querySelector(sel);
@@ -6089,128 +6383,159 @@ function handleLogout() {
       window.location.replace(logoutUrl);
     });
 }
+/* ============ NEW PAGINATION FUNCTIONS ============ */
 
-/* ============ LOAD RECORDS WITH CACHING ============ */
-async function loadRecords(){
-    console.log("loadRecords() called");
-    showLoading(true);
-    try{
-        const cachedData = localStorage.getItem('recordsCache');
-        const cacheTime = localStorage.getItem('recordsCacheTime');
-        const now = Date.now();
-        
-        if(cachedData && cacheTime && (now - parseInt(cacheTime)) < 300000) {
-            const data = JSON.parse(cachedData);
-            header = data.header || [];
-            rawRows = data.rows || [];
-            console.log("Using cached data");
-        } else {
-            const res = await fetch(`${SCRIPT_URL}?action=getRecords&barangay=&q=`);
-            const data = await res.json();
-            
-            if(!data.success){ 
-                alert("Load failed: " + (data.message||"")); 
-                showLoading(false); 
-                return; 
-            }
-            
-            header = data.header || [];
-            rawRows = data.rows || [];
-            
-            // Cache the data
-            localStorage.setItem('recordsCache', JSON.stringify(data));
-            localStorage.setItem('recordsCacheTime', now.toString());
-            console.log("Loaded fresh data from server");
-        }
-        
-        groupRows();
-        filteredGroups = [...groups]; // Initialize filteredGroups with all groups
-        currentPage = 1;
-        renderTable();
-        renderPagination();
-        updateCounts();
-    } catch(err){
-        console.error("Load records error:", err);
-        alert("Error loading records: " + err.message);
+async function prefetchNextPage() {
+  const nextPage = currentPage + 1;
+  let url = `${SCRIPT_URL}?action=getRecords&page=${nextPage}&limit=${PAGE_SIZE}`;
+  
+  if (currentBarangay) {
+    url += `&filterBarangay=${encodeURIComponent(currentBarangay)}`;
+  }
+  
+  if (currentSearch) {
+    url += `&q=${encodeURIComponent(currentSearch)}`;
+  }
+  
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.success) {
+      localStorage.setItem(`page_${nextPage}_${currentBarangay || 'master'}`, 
+                          JSON.stringify(data.rows));
     }
-    showLoading(false);
+  } catch (err) {
+    // Silently fail - user can still click Next
+  }
 }
 
-/* ============ ENHANCED CLIENT-SIDE FILTERING ============ */
-function filterRecords() {
-    const barangay = document.getElementById("filterBarangay").value || "";
-    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+function nextPage() {
+  if (currentPage < paginationTotalPages) {
+    currentPage++;
     
-    currentPage = 1;
+    // Check cache first
+    const cacheKey = `page_${currentPage}_${currentBarangay || 'master'}`;
+    const cached = localStorage.getItem(cacheKey);
     
-    // Start with all groups
-    filteredGroups = [...groups];
-    
-    // Apply barangay filter if selected
-    if (barangay) {
-        filteredGroups = filteredGroups.filter(g => {
-            const head = g.head || {};
-            return (head["Barangay"] === barangay) || (head["barangay"] === barangay);
-        });
+    if (cached) {
+      try {
+        rawRows = JSON.parse(cached);
+        groupRows();
+        filteredGroups = [...groups];
+        renderTable();
+        updatePaginationUI();
+        updateCounts();
+      } catch (e) {
+        loadRecords();
+      }
+    } else {
+      loadRecords();
     }
+  }
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    loadRecords();
+  }
+}
+
+function updatePaginationUI() {
+  document.getElementById('pageInfo').innerHTML = 
+    `Page ${currentPage} of ${paginationTotalPages} | ` +
+    `Showing records`;
+  
+  document.getElementById('prevPage').disabled = currentPage <= 1;
+  document.getElementById('nextPage').disabled = currentPage >= paginationTotalPages;
+}
+
+function addPaginationControls() {
+  // Check if controls already exist
+  if (document.getElementById('paginationControls')) return;
+  
+  const paginationDiv = document.getElementById('paginationArea');
+  paginationDiv.innerHTML = `
+    <div id="paginationControls" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 5px; flex-wrap: wrap;">
+      <button id="prevPage" class="btn" style="padding: 4px 8px; font-size: 0.75rem; height: 28px; min-width: 60px;" disabled>← Previous</button>
+      <span id="pageInfo" style="font-size: 0.8rem; color: var(--muted); background: var(--light-green); padding: 4px 10px; border-radius: var(--radius-sm);">Loading...</span>
+      <button id="nextPage" class="btn" style="padding: 4px 8px; font-size: 0.75rem; height: 28px; min-width: 60px;" disabled>Next →</button>
+    </div>
+  `;
+  
+  document.getElementById('prevPage').addEventListener('click', prevPage);
+  document.getElementById('nextPage').addEventListener('click', nextPage);
+}
+/* ============ NEW LOAD RECORDS WITH PAGINATION ============ */
+async function loadRecords() {
+    showLoading(true);
     
-    // Apply search filter if there's a query
-    if (q) {
-        filteredGroups = filteredGroups.filter(g => {
-            const head = g.head || {};
-            const members = g.members || [];
+    try {
+        // Build URL with pagination and filters
+        let url = `${SCRIPT_URL}?action=getRecords&page=${currentPage}&limit=${PAGE_SIZE}`;
+        
+        if (currentBarangay) {
+            url += `&filterBarangay=${encodeURIComponent(currentBarangay)}`;
+        }
+        
+        if (currentSearch) {
+            url += `&q=${encodeURIComponent(currentSearch)}`;
+        }
+        
+        console.log("Fetching:", url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (!data.success) {
+            showError("Failed to load records: " + (data.message || "Unknown error"));
+            return;
+        }
+        
+        // Store header
+        header = data.header || [];
+        
+        /* ============ PAGINATION SECTION ============ */
+        if (data.pagination) {
+            paginationTotalPages = data.pagination.pages;
+            paginationTotalRecords = data.pagination.total;
             
-            let householdMatches = false;
-            const matchingMembers = [];
+            // Show "End of page" if this is the last page
+            const endOfPageText = !data.pagination.hasNext ? ' (End of page)' : '';
             
-            // Check if HEAD matches
-            for (let i = 0; i < header.length; i++) {
-                const colName = header[i];
-                if (colName === "Data ID") continue;
-                
-                const cellValue = String(head[colName] || "").toLowerCase();
-                if (normalizeSearchText(cellValue).includes(normalizeSearchText(q))) {
-                    householdMatches = true;
-                    break;
-                }
-            }
+            document.getElementById('pageInfo').innerHTML = 
+                `Page ${data.pagination.page} of ${data.pagination.pages}${endOfPageText} | ` +
+                `Showing ${data.rows.length} of ${data.pagination.total} records`;
             
-            // Check if any MEMBER matches
-            members.forEach(member => {
-                let memberMatches = false;
-                
-                for (let j = 0; j < header.length; j++) {
-                    const colName = header[j];
-                    if (colName === "Data ID") continue;
-                    
-                    const cellValue = String(member[colName] || "").toLowerCase();
-                    if (normalizeSearchText(cellValue).includes(normalizeSearchText(q))) {
-                        memberMatches = true;
-                        break;
-                    }
-                }
-                
-                if (memberMatches) {
-                    matchingMembers.push(member);
-                }
-            });
-            
-            // If household matches OR any member matches, include this household
-            if (householdMatches || matchingMembers.length > 0) {
-                // Store which members should be shown
-                g.showAllMembers = householdMatches; // If head matches, show all members
-                g.matchingMembers = matchingMembers; // Store matching members
-                return true;
-            }
-            
-            return false;
-        });
+            document.getElementById('prevPage').disabled = !data.pagination.hasPrev;
+            document.getElementById('nextPage').disabled = !data.pagination.hasNext;
+        }
+        /* ============ END PAGINATION SECTION ============ */
+        
+        // Convert rows to your existing group format
+        rawRows = data.rows || [];
+        groupRows(); // Your existing grouping function
+        
+        // filteredGroups now contains the filtered results from server
+        filteredGroups = [...groups];
+        
+        // Render the table
+        renderTable();
+        updateCounts();
+        
+        // Preload next page in background
+        if (currentPage < paginationTotalPages) {
+            prefetchNextPage();
+        }
+        
+        console.log(`Loaded page ${currentPage} of ${paginationTotalPages} (${rawRows.length} rows)`);
+        
+    } catch (err) {
+        console.error("Error loading records:", err);
+        showError("Failed to load records: " + err.message);
+    } finally {
+        showLoading(false);
     }
-    
-    // Always render table, even if empty
-    renderTable();
-    renderPagination();
-    updateCounts();
 }
 
 function normalizeSearchText(text) {
@@ -6320,7 +6645,10 @@ function renderTable(){
         }
         
         // Color class based on original member count
-        let cls = mCount <= 1 ? "mem-small" : mCount <= 4 ? "mem-normal" : mCount <= 7 ? "mem-large" : "mem-critical";
+        let cls = mCount === 0 ? "mem-none" : 
+          mCount === 1 ? "mem-small" : 
+          mCount <= 4 ? "mem-normal" : 
+          mCount <= 7 ? "mem-large" : "mem-critical";
         const tr = document.createElement("tr"); 
         tr.className = cls;
 
@@ -7792,12 +8120,11 @@ function openMemberPanelForEdit(index){
   setTimeout(() => $('memberName')?.focus(), 100);
 }
 
-/* ============ FIXED: collectHeadFromEditForm() FUNCTION ============ */
 function collectHeadFromEditForm() {
   console.log("Collecting head from edit form...");
   
   const bd_input = $('edit_householdBirthdate').value || '';
-  const headBirthForSheet = toSheetDate(bd_input);
+  const headBirthForSheet = toSheetDateFormat(bd_input);
   const headAgeInfo = computeAgeDetailed(bd_input);
   const headAgeVal = headAgeInfo ? headAgeInfo.display : '';
 
@@ -7809,10 +8136,7 @@ function collectHeadFromEditForm() {
 
   // Preserve the original submittedBy value
   const originalSubmittedBy = editHead['Submitted By'] || editHead['submittedBy'] || '';
-  // FIXED: Preserve original Submitted On date
   const originalSubmittedOn = editHead['Submitted On'] || '';
-  
-  // FIXED: Preserve original Data ID to prevent duplication
   const originalDataID = editHead['Data ID'] || editDataID;
   
   editHead = {
@@ -7831,19 +8155,17 @@ function collectHeadFromEditForm() {
     'Stage': headAgeInfo ? headAgeInfo.stage : '',
     'No. of Household Member/s': String($('edit_memberCount').value || '0'),
     
-    // Additional Information fields - FIXED: Properly collect checkbox values
+    // Additional Information fields
     'Solo Parenting': $('edit_soloParenting')?.checked ? 'Yes' : 'No',
     'LGBT': $('edit_lgbt')?.checked ? 'Yes' : 'No',
     'Lactating': $('edit_lactating')?.checked ? 'Yes' : 'No',
     'Pregnant': $('edit_pregnant')?.checked ? 'Yes' : 'No',
     
-    // PWD to Basic Information
+    // PWD
     'Persons with Disability (PWD)': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
-    'PWD': document.querySelector("input[name='edit_head_pwd']:checked")?.value || 'No',
     'Type of Disability': $('edit_disabilityType')?.value || '',
     
     'Status': $('edit_head_status').value || '',
-    'Status Others': $('edit_statusOthers')?.value || '',
     'Educational Attainment': $('edit_educationalAttainment').value || '',
     'College Graduate Course': $('edit_collegeCourse').value || '',
     'Employment': $('edit_employment').value || '',
@@ -7851,8 +8173,7 @@ function collectHeadFromEditForm() {
     'Overseas Filipino Worker(OFW)': document.querySelector("input[name='edit_ofw_status']:checked")?.value || 'No',
     'Country': $('edit_country').value || '',
     
-    /* ============ DISPLACEMENT & EVACUATION FIELDS ============ */
-    // Displacement reasons - INDIVIDUAL COLUMNS - FIXED: Ensure all checkboxes are collected
+    // Displacement reasons
     'Taal Volcano (Within 14-15 KM Danger Zone)': $('edit_displacement_taal').checked ? 'Yes' : '',
     'Typhoon': $('edit_displacement_typhoon').checked ? 'Yes' : '',
     'Flood': $('edit_displacement_flood').checked ? 'Yes' : '',
@@ -7870,20 +8191,6 @@ function collectHeadFromEditForm() {
     'Assembly Area': $('edit_assembly_area').value || '',
     'Transportation': $('edit_inside_assembly').checked ? $('edit_head_transport').value || '' : 
                      ($('edit_outside_assembly').checked ? $('edit_outside_transport').value || '' : ''),
-    /* ============ END DISPLACEMENT FIELDS ============ */
-    
-    // Old fields for backward compatibility (keep these for now)
-    'Designated Pick-Up Point': $('edit_pickup').value || '',
-    'Drop-Off Point': $('edit_dropoff').value || '',
-    'Drop-Off Location': $('edit_dropoff').value || '',
-    'Name of Camp': $('edit_campName').value || '',
-    'Evacuation Camp Name': $('edit_campName').value || '',
-    'Capacity': $('edit_capacity').value || '',
-    'No. of Individuals Inside Camp': $('edit_insideCamp').value || '',
-    'Individuals Currently in Camp': $('edit_insideCamp').value || '',
-    'No. of Individuals Outside Camp': $('edit_outsideCamp').value || '',
-    'Individuals Outside Camp': $('edit_outsideCamp').value || '',
-    'Reasons for Displacement': $('edit_reasons').value || '',
     
     // Domestic Animals
     'Dog': $('edit_dog_chk').checked ? 'Yes' : 'No',
@@ -7900,39 +8207,41 @@ function collectHeadFromEditForm() {
     'Chicken Qty.': $('edit_chicken_qty').value || '',
     'Others': $('edit_animals_others').value || '',
     
-    // Government Assistance Programs with Date Fields
+    // Government Assistance Programs
     'TUPAD': $('edit_ass_tupad').checked ? 'Yes' : 'No',
-    'TUPAD_Date': $('edit_ass_tupad_date_input').value ? toSheetDate($('edit_ass_tupad_date_input').value) : '',
+    'TUPAD_Date': $('edit_ass_tupad_date_input').value ? toSheetDateFormat($('edit_ass_tupad_date_input').value) : '',
     'Local 4Ps': $('edit_ass_local4ps').checked ? 'Yes' : 'No',
-    'Local 4Ps_Date': $('edit_ass_local4ps_date_input').value ? toSheetDate($('edit_ass_local4ps_date_input').value) : '',
+    'Local 4Ps_Date': $('edit_ass_local4ps_date_input').value ? toSheetDateFormat($('edit_ass_local4ps_date_input').value) : '',
     'National 4Ps': $('edit_ass_intl4ps').checked ? 'Yes' : 'No',
-    'National 4Ps_Date': $('edit_ass_intl4ps_date_input').value ? toSheetDate($('edit_ass_intl4ps_date_input').value) : '',
+    'National 4Ps_Date': $('edit_ass_intl4ps_date_input').value ? toSheetDateFormat($('edit_ass_intl4ps_date_input').value) : '',
     'Local Social Pension': $('edit_ass_locsp').checked ? 'Yes' : 'No',
-    'Local Social Pension_Date': $('edit_ass_locsp_date_input').value ? toSheetDate($('edit_ass_locsp_date_input').value) : '',
+    'Local Social Pension_Date': $('edit_ass_locsp_date_input').value ? toSheetDateFormat($('edit_ass_locsp_date_input').value) : '',
     'National Social Pension': $('edit_ass_intlsp').checked ? 'Yes' : 'No',
-    'National Social Pension_Date': $('edit_ass_intlsp_date_input').value ? toSheetDate($('edit_ass_intlsp_date_input').value) : '',
+    'National Social Pension_Date': $('edit_ass_intlsp_date_input').value ? toSheetDateFormat($('edit_ass_intlsp_date_input').value) : '',
     'Solo Parent Assistance': $('edit_ass_solo').checked ? 'Yes' : 'No',
-    'Solo Parent Assistance_Date': $('edit_ass_solo_date_input').value ? toSheetDate($('edit_ass_solo_date_input').value) : '',
+    'Solo Parent Assistance_Date': $('edit_ass_solo_date_input').value ? toSheetDateFormat($('edit_ass_solo_date_input').value) : '',
     'Relief Goods': $('edit_ass_relief').checked ? 'Yes' : 'No',
-    'Relief Goods_Date': $('edit_ass_relief_date_input').value ? toSheetDate($('edit_ass_relief_date_input').value) : '',
+    'Relief Goods_Date': $('edit_ass_relief_date_input').value ? toSheetDateFormat($('edit_ass_relief_date_input').value) : '',
     'Cash Subsidy': $('edit_ass_cash').checked ? 'Yes' : 'No',
-    'Cash Subsidy_Date': $('edit_ass_cash_date_input').value ? toSheetDate($('edit_ass_cash_date_input').value) : '',
+    'Cash Subsidy_Date': $('edit_ass_cash_date_input').value ? toSheetDateFormat($('edit_ass_cash_date_input').value) : '',
     'AICS': $('edit_ass_aics').value || '',
-    'AICS_Date': $('edit_ass_aics_date_input').value ? toSheetDate($('edit_ass_aics_date_input').value) : '',
+    'AICS_Date': $('edit_ass_aics_date_input').value ? toSheetDateFormat($('edit_ass_aics_date_input').value) : '',
     
-    // Preserve the Submitted By and Submitted On fields
+    // Preserve original dates
     'Submitted By': originalSubmittedBy || getUserFullName(),
     'Submitted On': originalSubmittedOn || formatTimestampPH_(new Date()),
-    
-    // Add Updated By and Updated On fields
     'Updated By': getUserFullName(),
     'Updated On': formatTimestampPH_(new Date()),
-    
-    // FIXED: Preserve original row index to prevent duplication
-    '_originalRowIndex': editHead['_originalRowIndex'] || null
   };
 }
 
+function getUserFullName() {
+  return localStorage.getItem('staffName') || 
+         localStorage.getItem('userFullName') || 
+         localStorage.getItem('fullName') || 
+         localStorage.getItem('username') || 
+         'System';
+}
 /* ============ CONTACT NUMBER FORMATTING ============ */
 function formatContactNumber(phone) {
   if (!phone) return '';
@@ -8133,7 +8442,7 @@ function memberPanelBack() {
     }
 }
 
-/* ============ FIXED: saveEditedHousehold() FUNCTION WITH PREVENTION OF DUPLICATION ============ */
+/* ============ FAST SAVE EDITED HOUSEHOLD ============ */
 async function saveEditedHousehold(silentReload = false) {
   // Validate the form first
   if (!validateHeadFormForEdit()) {
@@ -8141,7 +8450,7 @@ async function saveEditedHousehold(silentReload = false) {
     return;
   }
 
-  console.log("=== DEBUG: Starting save process ===");
+  console.log("=== FAST SAVE: Starting update process ===");
   console.log("Data ID:", editDataID);
   
   const btn = $('saveEditBtn');
@@ -8150,11 +8459,6 @@ async function saveEditedHousehold(silentReload = false) {
   try {
     console.log("Collecting head data...");
     collectHeadFromEditForm();
-    
-    console.log("Checking government assistance date fields in editHead:");
-    console.log("TUPAD_Date:", editHead['TUPAD_Date']);
-    console.log("Local 4Ps_Date:", editHead['Local 4Ps_Date']);
-    console.log("AICS_Date:", editHead['AICS_Date']);
     
     const expected = Number($('edit_memberCount')?.value || 0);
     console.log("Expected members:", expected);
@@ -8219,44 +8523,27 @@ async function saveEditedHousehold(silentReload = false) {
       return cleanMember;
     });
 
-    console.log("Cleaned head data keys:", Object.keys(cleanHead));
-    console.log("Sample government assistance fields in cleanHead:", {
-      TUPAD: cleanHead['TUPAD'],
-      TUPAD_Date: cleanHead['TUPAD_Date'],
-      Local_4Ps: cleanHead['Local 4Ps'],
-      Local_4Ps_Date: cleanHead['Local 4Ps_Date']
-    });
-
-    console.log("Cleaned head data keys:", Object.keys(cleanHead));
-    console.log("Cleaned members count:", cleanMembers.length);
-
-    const fd = new FormData();
-    fd.append('action', 'updateHousehold');
-    fd.append('dataID', editDataID);
-    fd.append('actor', userFullName);
-    fd.append('preserveHeadRow', 'true'); // CRITICAL FIX: Prevent head duplication
-    fd.append('updateOnly', 'true'); // CRITICAL FIX: Update existing rows instead of creating new
-    
-    // CRITICAL FIX: Use clean data instead of original
-    fd.append('head', JSON.stringify(cleanHead));
-    fd.append('members', JSON.stringify(cleanMembers || []));
-    
-    fd.append('submittedBy', cleanHead['Submitted By'] || userFullName);
-    fd.append('barangay', cleanHead['Barangay']);
-
-    // CRITICAL: Add clearExisting flag to tell server to clear existing rows
-    fd.append('clearExisting', 'true');
-
-    // Set loading state AFTER validation
+    // Set loading state
     if (btn) {
       btn.disabled = true;
       btn.innerText = 'Saving...';
     }
 
-    console.log("Sending request to:", SCRIPT_URL);
+    // SINGLE API CALL - NO EXTRA FLAGS NEEDED (server handles it)
+    const fd = new FormData();
+    fd.append('action', 'updateHousehold');
+    fd.append('dataID', editDataID);
+    fd.append('actor', userFullName);
+    fd.append('head', JSON.stringify(cleanHead));
+    fd.append('members', JSON.stringify(cleanMembers || []));
+    fd.append('submittedBy', cleanHead['Submitted By'] || userFullName);
+    fd.append('barangay', cleanHead['Barangay']);
+    fd.append('clearExisting', 'true');
+
+    console.log("Sending update request...");
     
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000);
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout (reduced from 45)
 
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -8266,20 +8553,10 @@ async function saveEditedHousehold(silentReload = false) {
 
     clearTimeout(timeoutId);
 
-    console.log("Response status:", res.status, res.statusText);
+    console.log("Response status:", res.status);
     
     if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Server error response:", errorText);
-      
-      // Try to parse as JSON first
-      try {
-        const errorJson = JSON.parse(errorText);
-        throw new Error(`Server error: ${errorJson.message || JSON.stringify(errorJson)}`);
-      } catch (parseError) {
-        // If not JSON, use raw text
-        throw new Error(`Server responded with status: ${res.status} - ${res.statusText}. Response: ${errorText.substring(0, 200)}`);
-      }
+      throw new Error(`Server responded with status: ${res.status}`);
     }
 
     const text = await res.text();
@@ -8288,99 +8565,53 @@ async function saveEditedHousehold(silentReload = false) {
     let json;
     try {
       json = JSON.parse(text);
-      console.log("Parsed server response:", json);
     } catch (e) {
-      console.error("Failed to parse server response as JSON:", e);
-      console.error("Response text that failed to parse:", text);
-      throw new Error(`Server returned invalid JSON: ${e.message}. Response: ${text.substring(0, 200)}`);
+      throw new Error(`Server returned invalid JSON: ${e.message}`);
     }
 
-    if (!json.success) {
-      console.error("Server returned success=false:", json);
-      
-      // Check for specific error messages
-      let errorMessage = json.message || 'Unknown server error';
-      if (typeof errorMessage === 'object') {
-        errorMessage = JSON.stringify(errorMessage);
-      }
-      
-      showError(`Save failed: ${errorMessage}`);
-      
-      // If there's a specific error about serialization, provide more info
-      if (errorMessage.includes('JSON') || errorMessage.includes('serializ')) {
-        console.error("Possible data serialization issue. Data sent:", {
-          headKeys: Object.keys(cleanHead),
-          membersCount: cleanMembers.length,
-          headSample: Object.keys(cleanHead).slice(0, 5).map(key => `${key}: ${cleanHead[key]}`)
-        });
-      }
-} else {
-  console.log("Save successful! Response:", json);
-  if (!silentReload) showSuccess(`Household updated (Data ID: ${editDataID || ''})`);
-  closeEditPanel();
-  resetFormTracking();
+    if (json.success) {
+      console.log("Save successful!");
+      if (!silentReload) showSuccess(`Household updated (ID: ${editDataID}) - ${json.timeMs || 'fast'}ms`);
+      closeEditPanel();
+      resetFormTracking();
 
-  // Clear cache and reload
-  localStorage.removeItem('recordsCache');
-  localStorage.removeItem('recordsCacheTime');
-  loadRecords();
-  
-  // ============ CRITICAL: ADD THIS CODE FOR DASHBOARD NOTIFICATION ============
-  // Notify dashboard about the update
-  const headName = $('edit_householdHead')?.value?.trim() || editHead['Name of Household Head'] || 'Unknown';
-  const barangay = $('edit_barangay')?.value || editHead['Barangay'] || 'Unknown';
-  const username = localStorage.getItem("staffName") || localStorage.getItem("username") || "Unknown User";
-  
-  // Store activity for dashboard to pick up
-  const activity = {
-    action: 'Update Household',
-    actor: username,
-    details: `Updated household ${headName} in ${barangay} (ID: ${editDataID})`,
-    timestamp: new Date().toISOString()
-  };
-  
-  // Save to localStorage for dashboard
-  const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
-  activities.push(activity);
-  if (activities.length > 10) activities.shift(); // Keep only last 10
-  localStorage.setItem('crossTabActivities', JSON.stringify(activities));
-  
-  // Trigger dashboard refresh
-  localStorage.setItem('lastActivityTrigger', Date.now().toString());
-  localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
-  localStorage.removeItem('dashboardDataCache'); // Clear dashboard cache
-  
-  // Record activity to server audit trail
-  try {
-    const logFormData = new FormData();
-    logFormData.append("action", "logActivity");
-    logFormData.append("username", username);
-    logFormData.append("action", "Update Household");
-    logFormData.append("actor", username);
-    logFormData.append("details", `Updated household ID ${editDataID} for ${headName}`);
-    fetch(SCRIPT_URL, { method: "POST", body: logFormData }).catch(() => {});
-  } catch (err) {
-    console.log("Activity logging error:", err);
-  }
-  // ============ END OF ADDED CODE ============
-  
-  // Record activity for local tracking
-  recordPageActivity('Household Updated', `Updated household ${editDataID} (${editHead['Name of Household Head'] || 'Unknown'})`);
-}
-  } catch (err) {
-    console.error('Detailed save error:', {
-      name: err.name,
-      message: err.message,
-      stack: err.stack,
-      fullError: err
-    });
-    
-    if (err.name === 'AbortError') {
-      showError('Request timed out after 45 seconds. Please check your internet connection and try again.');
-    } else if (err.message.includes('JSON')) {
-      showError('Data format error. Please contact the administrator. Details: ' + err.message.substring(0, 100));
+      // Clear cache and reload
+      localStorage.removeItem('recordsCache');
+      localStorage.removeItem('recordsCacheTime');
+      
+      // Reload records
+      if (typeof loadRecords === 'function') {
+        loadRecords();
+      } else {
+        window.location.reload();
+      }
+      
+      // Notify dashboard
+      const headName = $('edit_householdHead')?.value?.trim() || editHead['Name of Household Head'] || 'Unknown';
+      const barangay = $('edit_barangay')?.value || editHead['Barangay'] || 'Unknown';
+      
+      const activity = {
+        action: 'Update Household',
+        actor: userFullName,
+        details: `Updated household ${headName} in ${barangay} (ID: ${editDataID})`,
+        timestamp: new Date().toISOString()
+      };
+      
+      const activities = JSON.parse(localStorage.getItem('crossTabActivities') || '[]');
+      activities.unshift(activity);
+      if (activities.length > 10) activities.pop();
+      localStorage.setItem('crossTabActivities', JSON.stringify(activities));
+      localStorage.setItem('dashboardUpdateTrigger', Date.now().toString());
+      
     } else {
-      showError(`Error saving data: ${err.message}\nPlease try again.`);
+      showError("Update failed: " + (json.message || "Unknown error"));
+    }
+  } catch (err) {
+    console.error('Save error:', err);
+    if (err.name === 'AbortError') {
+      showError('Request timed out. Please try again.');
+    } else {
+      showError(`Error saving data: ${err.message}`);
     }
   } finally {
     if (btn) {
@@ -9294,14 +9525,14 @@ function toggleMobileSidebar() {
 document.getElementById("refreshBtn").onclick = function() {
     localStorage.removeItem('recordsCache');
     localStorage.removeItem('recordsCacheTime');
+    currentPage = 1; // Reset to first page on refresh
     loadRecords();
 };
 
-// Client-side filtering for search and barangay dropdown
-document.getElementById("filterBarangay").onchange = filterRecords;
-
-// Real-time search filtering
-document.getElementById("searchInput").addEventListener("input", filterRecords);
+// FIXED: Remove reference to filterRecords - use new event listeners instead
+// These lines are now handled in DOMContentLoaded
+// document.getElementById("filterBarangay").onchange = filterRecords;
+// document.getElementById("searchInput").addEventListener("input", filterRecords);
 
 // Export dropdown toggle
 document.getElementById("exportBtn").onclick = (e) => {
@@ -9407,7 +9638,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     
     // Load data if authenticated
     const userName = localStorage.getItem("staffName") || localStorage.getItem("username") || "User";
-    // Remove 👤 emoji from user display
     document.getElementById("userName").innerText = userName;
     
     // Check if user is admin
@@ -9455,8 +9685,34 @@ window.addEventListener("DOMContentLoaded", async () => {
     // Check if returning from Hazard Hunter
     checkReturnFromHazardHunter();
     
-    // CRITICAL: Load the records
-    console.log("Calling loadRecords()");
+    /* ============ NEW: ADD PAGINATION CONTROLS FIRST ============ */
+    addPaginationControls();
+    
+    /* ============ NEW: UPDATE EVENT LISTENERS FOR FILTERING ============ */
+    
+    // Barangay filter - triggers server-side filter
+    document.getElementById("filterBarangay").addEventListener('change', function() {
+      currentBarangay = this.value;
+      currentPage = 1; // Reset to first page
+      loadRecords();
+    });
+    
+    // Search input with debounce - triggers server-side search
+    let searchTimeout;
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentSearch = e.target.value;
+        currentPage = 1; // Reset to first page
+        loadRecords();
+      }, 500); // Wait 500ms after user stops typing
+    });
+    
+    // Remove old filterRecords references
+    // The old filterRecords function is no longer used
+    
+    // CRITICAL: Load the records with pagination
+    console.log("Calling loadRecords() with pagination");
     loadRecords();
     
     // Setup activity tracking
@@ -9468,6 +9724,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 });
 </script>
+<script src="js/guest-redirect.js"></script>
 <script src="js/data-broadcaster.js"></script>
 <script src="js/form-notifier.js"></script>
 <script src="js/common-utils.js"></script>
@@ -9476,4 +9733,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 <script src="js/activity-tracking-final.js"></script>
 </body>
 </html>
-
