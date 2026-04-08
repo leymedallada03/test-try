@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Dashboard — Purok Kaligtasan 133</title>
+<title>Dashboard — Purok Kaligtasan</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/uniform-styles.css">
 <style>
@@ -67,7 +67,7 @@
 .admin-only {
     display: none !important;
 }
-
+ 
 /* Class to show admin elements - applied by JavaScript */
 .admin-only.admin-visible {
     display: block !important;
@@ -852,7 +852,7 @@ li.admin-only.admin-visible {
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
       <div class="brand-text">
-        <h1>PUROK KALIGTASAN 133</h1>
+        <h1>PUROK KALIGTASAN</h1>
         <p>MDRRMO Alitagtag – Household Records System</p>
       </div>
     </div>
@@ -1291,7 +1291,7 @@ li.admin-only.admin-visible {
 // Define allowed actions for Last Activity display - DECLARE AT TOP LEVEL
 //const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
 /* CONFIG */
-const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbymKmfbcn3uQmsljJlt8V-ziD_wf1H6Pm6ejMqEeRwxhqHB0vktP3My7OcXVCWVMvnhCg/exec";
 let chart = null;
 let lastUpdatedTime = null;
 let refreshInterval = null;
@@ -3422,7 +3422,71 @@ document.addEventListener('visibilitychange', function() {
     loadDashboard(false);
   }
 });
+// Add this at the end of your dashboard.html script section
+// Force hide all non-dashboard tabs for guest users
+function enforceGuestVisibility() {
+    const isGuest = localStorage.getItem('isGuest') === 'true';
+    
+    if (isGuest) {
+        console.log('Guest user detected - hiding all tabs except Dashboard');
+        
+        // Hide ALL navigation items first
+        document.querySelectorAll('.nav-item, .mobile-nav-item, .sidebar li, .sidebar a, .main-nav a').forEach(el => {
+            if (el.closest) {
+                const link = el.closest('a') || el;
+                const parent = link.closest('li') || link;
+                
+                // Hide everything by default
+                if (parent) parent.style.display = 'none';
+                if (link) link.style.display = 'none';
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'none';
+            }
+        });
+        
+        // ONLY show dashboard tab
+        document.querySelectorAll('a[href="dashboard.html"], a[href*="dashboard.html"]').forEach(el => {
+            const link = el.closest('a') || el;
+            const parent = link.closest('li') || link;
+            
+            if (parent) parent.style.display = '';
+            if (link) link.style.display = '';
+            el.style.display = '';
+            
+            console.log('Showing dashboard tab:', el);
+        });
+        
+        // Also show by data-page attribute
+        document.querySelectorAll('[data-page="dashboard"]').forEach(el => {
+            const link = el.closest('a') || el;
+            const parent = link.closest('li') || link;
+            
+            if (parent) parent.style.display = '';
+            if (link) link.style.display = '';
+            el.style.display = '';
+        });
+        
+        // For mobile nav, check by text content
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            const text = item.textContent || '';
+            if (text.includes('Dashboard')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+}
+
+// Run immediately
+enforceGuestVisibility();
+
+// Also run after a short delay to catch dynamically loaded elements
+setTimeout(enforceGuestVisibility, 100);
+setTimeout(enforceGuestVisibility, 500);
 </script>
+<script src="js/guest-redirect.js"></script>
 <script src="js/data-broadcaster.js"></script>
 <script src="js/dashboard-listener.js"></script>
 <script src="js/common-utils.js"></script>
@@ -3431,8 +3495,3 @@ document.addEventListener('visibilitychange', function() {
 <script src="js/activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
-
