@@ -1,10 +1,104 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbymKmfbcn3uQmsljJlt8V-ziD_wf1H6Pm6ejMqEeRwxhqHB0vktP3My7OcXVCWVMvnhCg/exec";
 
 
 // Session timeout (30 minutes = 1800000 ms)
 const SESSION_TIMEOUT = 30 * 60 * 1000;
 let sessionCheckInterval = null;
 let sessionActivityInterval = null;
+
+// ===== AGGRESSIVE LOGIN FIELD CLEARING =====
+(function() {
+    'use strict';
+    
+    console.log("Login field cleaner loaded");
+    
+    // Method 1: Clear immediately
+    function clearFields() {
+        const usernameField = document.getElementById('username');
+        const passwordField = document.getElementById('password');
+        
+        if (usernameField) {
+            usernameField.value = '';
+            usernameField.removeAttribute('value'); // Remove any hardcoded value attribute
+        }
+        if (passwordField) {
+            passwordField.value = '';
+            passwordField.removeAttribute('value');
+        }
+        console.log("Fields cleared immediately");
+    }
+    
+    // Method 3: Clear on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        clearFields();
+        console.log("Fields cleared on DOMContentLoaded");
+    });
+    
+    // Method 4: Clear after a short delay (for slow browsers)
+    setTimeout(function() {
+        clearFields();
+        console.log("Fields cleared after timeout");
+    }, 500);
+    
+    // Method 5: Clear on window load (after all resources loaded)
+    window.addEventListener('load', function() {
+        clearFields();
+        console.log("Fields cleared on window load");
+    });
+    
+    // Method 6: Clear on page show (for back/forward cache)
+    window.addEventListener('pageshow', function(event) {
+        clearFields();
+        console.log("Fields cleared on pageshow");
+    });
+    
+    // Method 7: Clear when the page becomes visible (for mobile browsers)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            clearFields();
+            console.log("Fields cleared on visibility change");
+        }
+    });
+    
+    // Method 8: Force clear with MutationObserver (detects when browser changes the field)
+    function setupMutationObserver() {
+        const usernameField = document.getElementById('username');
+        const passwordField = document.getElementById('password');
+        
+        if (usernameField) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                        // Browser changed the value, clear it again
+                        setTimeout(() => {
+                            usernameField.value = '';
+                        }, 10);
+                    }
+                });
+            });
+            
+            observer.observe(usernameField, { attributes: true });
+        }
+        
+        if (passwordField) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                        // Browser changed the value, clear it again
+                        setTimeout(() => {
+                            passwordField.value = '';
+                        }, 10);
+                    }
+                });
+            });
+            
+            observer.observe(passwordField, { attributes: true });
+        }
+    }
+    
+    // Try to setup MutationObserver after a delay
+    setTimeout(setupMutationObserver, 200);
+})();
 
 // Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
@@ -31,7 +125,96 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check if user was previously logged in
     checkPreviousSession();
 });
+// Guest login handler
+document.addEventListener('DOMContentLoaded', function() {
+    const guestBtn = document.getElementById('guestLoginBtn');
+    if (guestBtn) {
+        guestBtn.addEventListener('click', handleGuestLogin);
+    }
+});
 
+async function handleGuestLogin() {
+    console.log("=== Guest login attempt started ===");
+    
+    const msg = document.getElementById("statusText");
+    const loginBtn = document.getElementById("loginButton");
+    const guestBtn = document.getElementById("guestLoginBtn");
+    
+    if (msg) msg.innerText = "Logging in as guest...";
+    if (msg) msg.style.color = "green";
+    
+    // Disable buttons
+    if (loginBtn) loginBtn.disabled = true;
+    if (guestBtn) guestBtn.disabled = true;
+    
+    try {
+        // Generate a unique guest session ID
+        const sessionId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Store guest session data
+        storeGuestSessionData(sessionId);
+        
+        // ADD THIS: Set a flag that guest should still show logout confirmation
+        localStorage.setItem('guestShowConfirmation', 'true');
+        
+        // Log guest login to API (fire and forget)
+        try {
+            const formData = new FormData();
+            formData.append('action', 'logActivity');
+            formData.append('username', 'guest_user');
+            formData.append('actor', 'Guest User');
+            formData.append('action', 'Guest Login');
+            
+            fetch(API_URL, {
+                method: 'POST',
+                body: formData
+            }).catch(() => {});
+        } catch (e) {
+            // Ignore API logging errors
+        }
+        
+        // Redirect DIRECTLY to dashboard.html (NOT main.html)
+        console.log("Redirecting guest directly to dashboard.html...");
+        setTimeout(() => {
+            window.location.replace("dashboard.html");
+        }, 1000);
+        
+    } catch (error) {
+        console.error("Guest login error:", error);
+        showError("Guest login failed. Please try again.");
+        
+        // Re-enable buttons
+        if (loginBtn) loginBtn.disabled = false;
+        if (guestBtn) guestBtn.disabled = false;
+    }
+}
+
+function storeGuestSessionData(sessionId) {
+    // Clear any existing storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Store in sessionStorage
+    sessionStorage.setItem('sessionId', sessionId);
+    sessionStorage.setItem('sessionExpiry', (Date.now() + SESSION_TIMEOUT).toString());
+    sessionStorage.setItem('authenticated', 'true');
+    sessionStorage.setItem('isGuest', 'true');
+    
+    // Store in localStorage
+    localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('username', 'guest_user');
+    localStorage.setItem('staffName', 'Guest User');
+    localStorage.setItem('userRole', 'Guest');
+    localStorage.setItem('role', 'Guest');
+    localStorage.setItem('assignedBarangay', 'All Barangays (View Only)');
+    localStorage.setItem('pwHash', 'guest_' + Date.now());
+    localStorage.setItem('loginTime', Date.now().toString());
+    localStorage.setItem('lastActivity', Date.now().toString());
+    localStorage.setItem('isGuest', 'true');
+    localStorage.setItem('deviceInfo', JSON.stringify(getDeviceInfo()));
+
+    console.log("Guest session data stored");
+}
 // --------------------------
 // Browser Compatibility Check
 // --------------------------
@@ -411,63 +594,230 @@ setTimeout(() => {
 }
 
 // --------------------------
-// Handle "Already Logged In" Error
+// Handle "Already Logged In" Error - UPDATED with modal
 // --------------------------
 async function showAlreadyLoggedInError(username, password, errorResponse) {
     const errorDiv = document.getElementById("loginError");
     const loginBtn = document.getElementById("loginButton");
     
-    if (!errorDiv) return;
+    // Hide the inline error div
+    if (errorDiv) {
+        errorDiv.style.display = "none";
+    }
     
-    // Create custom error message
-    let errorMessage = `
-        <div class="already-logged-in-error">
-            <div style="margin-bottom: 10px;">
-                <i class="fas fa-exclamation-triangle" style="color: #ff9800; margin-right: 8px;"></i>
-                <strong>Account Already in Use</strong>
-            </div>
-            <div style="margin-bottom: 10px; color: #666; font-size: 14px;">
-                ${errorResponse.message}
-            </div>
+    // Remove any existing modal
+    const existingModal = document.getElementById('alreadyLoggedInModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal overlay
+    const modalOverlay = document.createElement('div');
+    modalOverlay.id = 'alreadyLoggedInModal';
+    modalOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000000;
+        padding: 16px;
+        animation: modalFadeIn 0.15s ease;
     `;
-    
-    // Add session details if available
+
+    // Create modal box
+    const modalBox = document.createElement('div');
+    modalBox.style.cssText = `
+        background: white;
+        border-radius: 12px;
+        max-width: 300px;
+        width: 100%;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        animation: modalSlideUp 0.2s ease;
+        overflow: hidden;
+    `;
+
+    // Format session details if available
+    let sessionDetailsHtml = '';
     if (errorResponse.lastActivity || errorResponse.sessionStarted) {
-        errorMessage += `
-            <div style="margin-bottom: 15px; color: #666; font-size: 13px; background: #fff9e6; padding: 8px; border-radius: 4px;">
-                <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
-                ${errorResponse.sessionStarted ? `Session started: ${errorResponse.sessionStarted}<br>` : ''}
-                ${errorResponse.lastActivity ? `Last activity: ${errorResponse.lastActivity}<br>` : ''}
-                ${errorResponse.inactiveMinutes ? `Inactive for: ${errorResponse.inactiveMinutes} minutes` : ''}
+        sessionDetailsHtml = `
+            <div style="margin: 12px 0; padding: 10px; background: #fff9e6; border-radius: 8px; border-left: 3px solid #ff9800; font-size: 0.75rem; text-align: left;">
+                ${errorResponse.sessionStarted ? `<div style="margin-bottom: 4px;"><i class="fas fa-calendar-alt" style="color: #ff9800; width: 16px; margin-right: 6px;"></i> <strong>Session started:</strong> ${errorResponse.sessionStarted}</div>` : ''}
+                ${errorResponse.lastActivity ? `<div style="margin-bottom: 4px;"><i class="fas fa-clock" style="color: #ff9800; width: 16px; margin-right: 6px;"></i> <strong>Last activity:</strong> ${errorResponse.lastActivity}</div>` : ''}
+                ${errorResponse.inactiveMinutes ? `<div><i class="fas fa-hourglass-half" style="color: #ff9800; width: 16px; margin-right: 6px;"></i> <strong>Inactive for:</strong> ${errorResponse.inactiveMinutes} minutes</div>` : ''}
             </div>
         `;
     }
-    
-    errorMessage += `
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button type="button" class="force-logout-btn" onclick="handleForceLogout('${username}', '${password}')" style="padding: 8px 16px; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>
-                    Force Logout from Other Device
-                </button>
-                <button type="button" class="cancel-btn" onclick="closeError()" style="padding: 8px 16px; background: #f0f0f0; color: #666; border: none; border-radius: 4px; cursor: pointer;">
-                    Cancel
-                </button>
+
+    // Modal content
+    modalBox.innerHTML = `
+        <div style="padding: 20px 20px 12px 20px; text-align: center;">
+            <div style="margin-bottom: 8px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 1.8rem; color: #ff9800; opacity: 0.7;"></i>
             </div>
+            <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">
+                Account Already in Use
+            </h3>
+            <p style="margin: 0 0 8px 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">
+                ${errorResponse.message || 'This account is currently logged in on another device.'}
+            </p>
+            ${sessionDetailsHtml}
+            <p style="margin: 8px 0 0 0; color: #64748b; font-size: 0.75rem; font-style: italic;">
+                You can force logout from the other device to continue.
+            </p>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+            <button id="modalCancelBtn" style="
+                flex: 1;
+                padding: 8px 10px;
+                border-radius: 6px;
+                font-weight: 500;
+                font-size: 0.75rem;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                transition: all 0.15s ease;
+                outline: none;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                letter-spacing: 0.3px;
+                border: 1.5px solid #ef4444;
+                background: transparent;
+                color: #ef4444;
+            ">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button id="modalForceLogoutBtn" style="
+                flex: 1;
+                padding: 8px 10px;
+                border-radius: 6px;
+                font-weight: 500;
+                font-size: 0.75rem;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                transition: all 0.15s ease;
+                outline: none;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                letter-spacing: 0.3px;
+                border: 1.5px solid #ff9800;
+                background: transparent;
+                color: #ff9800;
+            ">
+                <i class="fas fa-sign-out-alt"></i> Force Logout
+            </button>
         </div>
     `;
-    
-    errorDiv.innerHTML = errorMessage;
-    errorDiv.style.display = "block";
-    
-    // Re-enable login button
-    if (loginBtn) {
-        loginBtn.classList.remove("btn-loading");
-        loginBtn.disabled = false;
+
+    // Add animations if not already present
+    if (!document.getElementById('modalAnimations')) {
+        const style = document.createElement('style');
+        style.id = 'modalAnimations';
+        style.textContent = `
+            @keyframes modalFadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes modalSlideUp {
+                from { 
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+                to { 
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
     }
+
+    modalOverlay.appendChild(modalBox);
+    document.body.appendChild(modalOverlay);
+
+    // Get buttons
+    const cancelBtn = document.getElementById('modalCancelBtn');
+    const forceBtn = document.getElementById('modalForceLogoutBtn');
+
+    // Add hover effects
+    // Cancel button hover (red)
+    cancelBtn.addEventListener('mouseenter', () => {
+        cancelBtn.style.background = '#ef4444';
+        cancelBtn.style.color = 'white';
+    });
+    cancelBtn.addEventListener('mouseleave', () => {
+        cancelBtn.style.background = 'transparent';
+        cancelBtn.style.color = '#ef4444';
+    });
+
+    // Force logout button hover (orange)
+    forceBtn.addEventListener('mouseenter', () => {
+        forceBtn.style.background = '#ff9800';
+        forceBtn.style.color = 'white';
+    });
+    forceBtn.addEventListener('mouseleave', () => {
+        forceBtn.style.background = 'transparent';
+        forceBtn.style.color = '#ff9800';
+    });
+
+    // Button click handlers
+    cancelBtn.addEventListener('click', () => {
+        modalOverlay.remove();
+        // Re-enable login button
+        if (loginBtn) {
+            loginBtn.classList.remove("btn-loading");
+            loginBtn.disabled = false;
+        }
+    });
+
+    forceBtn.addEventListener('click', () => {
+        modalOverlay.remove();
+        // Show loading state on login button
+        if (loginBtn) {
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Force Logging Out...';
+            loginBtn.disabled = true;
+        }
+        // Call the force logout function
+        handleForceLogout(username, password);
+    });
+
+    // Close on overlay click
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+            modalOverlay.remove();
+            // Re-enable login button
+            if (loginBtn) {
+                loginBtn.classList.remove("btn-loading");
+                loginBtn.disabled = false;
+            }
+        }
+    });
+
+    // Handle ESC key
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') {
+            modalOverlay.remove();
+            document.removeEventListener('keydown', handleEsc);
+            // Re-enable login button
+            if (loginBtn) {
+                loginBtn.classList.remove("btn-loading");
+                loginBtn.disabled = false;
+            }
+        }
+    };
+    document.addEventListener('keydown', handleEsc);
 }
 
 // --------------------------
-// Force Logout Handler - UPDATED WITH TIMEOUT
+// Force Logout Handler - UPDATED with better feedback
 // --------------------------
 async function handleForceLogout(username, password) {
     console.log("Force logout requested for:", username);
@@ -475,16 +825,12 @@ async function handleForceLogout(username, password) {
     const errorDiv = document.getElementById("loginError");
     const loginBtn = document.getElementById("loginButton");
     
-    if (!errorDiv) return;
-    
     try {
-        // Show loading state
-        errorDiv.innerHTML = `
-            <div style="text-align: center; padding: 10px;">
-                <div class="btn-loading" style="margin: 0 auto;"></div>
-                <div style="margin-top: 10px; color: #666;">Terminating other session...</div>
-            </div>
-        `;
+        // Show loading state in login button
+        if (loginBtn) {
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Terminating session...';
+            loginBtn.disabled = true;
+        }
         
         // Set timeout for force logout
         const controller = new AbortController();
@@ -501,25 +847,15 @@ async function handleForceLogout(username, password) {
         if (response.success) {
             console.log("Force logout successful. Request ID:", response.invalidationRequestId);
             
-            // Wait 2 seconds for the other device to detect logout
-            errorDiv.innerHTML = `
-                <div style="text-align: center; padding: 10px;">
-                    <div style="margin: 10px 0; color: green;">
-                        <i class="fas fa-check-circle"></i> Other session terminated
-                    </div>
-                    <div style="color: #666; font-size: 14px;">
-                        Attempting to login...
-                    </div>
-                </div>
-            `;
+            // Show success message
+            if (loginBtn) {
+                loginBtn.innerHTML = '<i class="fas fa-check"></i> Session terminated! Logging in...';
+            }
             
+            // Wait 2 seconds for the other device to detect logout
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            // Close error message
-            errorDiv.style.display = "none";
-            errorDiv.innerHTML = "";
-            
-            // Now retry login with timeout
+            // Now retry login
             const loginController = new AbortController();
             const loginTimeoutId = setTimeout(() => loginController.abort(), 15000);
             
@@ -540,11 +876,19 @@ async function handleForceLogout(username, password) {
                     // Login successful
                     storeSessionData(loginResponse.user, pwHash, loginResponse.sessionId);
                     startSessionManagement(username, loginResponse.sessionId);
-                    window.location.replace("main.html");
+                    
+                    // Show success before redirect
+                    if (loginBtn) {
+                        loginBtn.innerHTML = '<i class="fas fa-check-circle"></i> Login successful! Redirecting...';
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.replace("main.html");
+                    }, 1000);
                 } else {
                     showError("Login failed after force logout: " + loginResponse.message);
                     if (loginBtn) {
-                        loginBtn.classList.remove("btn-loading");
+                        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to System';
                         loginBtn.disabled = false;
                     }
                 }
@@ -556,14 +900,14 @@ async function handleForceLogout(username, password) {
                     showError("Login error after force logout: " + loginErr.message);
                 }
                 if (loginBtn) {
-                    loginBtn.classList.remove("btn-loading");
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to System';
                     loginBtn.disabled = false;
                 }
             }
         } else {
             showError("Force logout failed: " + response.message);
             if (loginBtn) {
-                loginBtn.classList.remove("btn-loading");
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to System';
                 loginBtn.disabled = false;
             }
         }
@@ -575,7 +919,7 @@ async function handleForceLogout(username, password) {
             showError("Error during force logout: " + err.message);
         }
         if (loginBtn) {
-            loginBtn.classList.remove("btn-loading");
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to System';
             loginBtn.disabled = false;
         }
     }
