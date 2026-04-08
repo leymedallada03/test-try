@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>User Management — Purok Kaligtasan 133</title>
+<title>User Management — Purok Kaligtasan</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/uniform-styles.css">
 <style>
@@ -24,84 +24,65 @@
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    }
    
+   /* Modal Animation */
+   @keyframes modalSlideUp {
+     from { 
+         opacity: 0;
+         transform: translateY(8px);
+     }
+     to { 
+         opacity: 1;
+         transform: translateY(0);
+     }
+   }
+   
    /* Enhanced tooltips for protected admin buttons */
-.actions-cell button[disabled] {
-  position: relative;
-}
+   .actions-cell button[disabled] {
+     position: relative;
+   }
 
-.actions-cell button[disabled]:hover::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  white-space: nowrap;
-  z-index: 1000;
-  margin-bottom: 5px;
-}
+   .actions-cell button[disabled]:hover::after {
+     content: attr(title);
+     position: absolute;
+     bottom: 100%;
+     left: 50%;
+     transform: translateX(-50%);
+     background: #333;
+     color: white;
+     padding: 4px 8px;
+     border-radius: 4px;
+     font-size: 0.7rem;
+     white-space: nowrap;
+     z-index: 1000;
+     margin-bottom: 5px;
+   }
 
-.actions-cell button[disabled]:hover::before {
-  content: "";
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: #333;
-  z-index: 1000;
-  margin-bottom: -5px;
-}
+   .actions-cell button[disabled]:hover::before {
+     content: "";
+     position: absolute;
+     bottom: 100%;
+     left: 50%;
+     transform: translateX(-50%);
+     border: 5px solid transparent;
+     border-top-color: #333;
+     z-index: 1000;
+     margin-bottom: -5px;
+   }
 
-/* Protected admin row styling */
-.users-table tbody tr:hover {
-  background: rgba(52,183,143,0.05);
-}
+   /* Protected admin row styling */
+   .users-table tbody tr:hover {
+     background: rgba(52,183,143,0.05);
+   }
 
-/* Special styling for protected admin row */
-.users-table tbody tr:has(.actions-cell button[disabled]) {
-  background: rgba(255, 245, 204, 0.1); /* Light yellow background */
-}
+   /* Special styling for protected admin row */
+   .users-table tbody tr:has(.actions-cell button[disabled]) {
+     background: rgba(255, 245, 204, 0.1);
+   }
 
-.users-table tbody tr:has(.actions-cell button[disabled]):hover {
-  background: rgba(255, 245, 204, 0.2);
-}
-   /* Tooltip for protected admin button */
-.actions-cell button[disabled] {
-  position: relative;
-}
-
-.actions-cell button[disabled]:hover::after {
-  content: "Protected admin account cannot be deleted";
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  white-space: nowrap;
-  z-index: 1000;
-  margin-bottom: 5px;
-}
-
-.actions-cell button[disabled]:hover::before {
-  content: "";
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: #333;
-  z-index: 1000;
-  margin-bottom: -5px;
-}
+   .users-table tbody tr:has(.actions-cell button[disabled]):hover {
+     background: rgba(255, 245, 204, 0.2);
+   }
+   
    /* Background decorative elements */
    .bg-pattern {
      position: absolute;
@@ -174,7 +155,7 @@ li.admin-only.admin-visible {
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-text-size-adjust: 100%;
-    padding-bottom: 70px; /* Space for fixed bottom nav */
+    padding-bottom: 70px;
    }
 
    .page-container{
@@ -355,7 +336,7 @@ li.admin-only.admin-visible {
 
    /* REMOVED: Mobile Logout Button in Sidebar */
    .mobile-logout-container {
-    display: none !important; /* Remove logout button from sidebar */
+    display: none !important;
    }
 
    /* Content Area */
@@ -389,7 +370,7 @@ li.admin-only.admin-visible {
     gap: 8px;
    }
 
-   /* Mobile Bottom Navigation - Fixed Position - REMOVED LOGOUT */
+   /* Mobile Bottom Navigation - Fixed Position */
    .mobile-bottom-nav {
     display: none;
     position: fixed;
@@ -413,7 +394,7 @@ li.admin-only.admin-visible {
     height: 100%;
    }
 
-.mobile-nav-item {
+   .mobile-nav-item {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -426,56 +407,52 @@ li.admin-only.admin-visible {
     flex: 1 !important;
     height: 100% !important;
     justify-content: center !important;
-}
+   }
 
-/* Admin items - initially hidden */
-.mobile-nav-item.admin-only {
+   /* Admin items - initially hidden */
+   .mobile-nav-item.admin-only {
     display: none !important;
-}
+   }
 
-/* Show admin items when user is admin */
-.mobile-nav-item.admin-only.admin-visible {
+   /* Show admin items when user is admin */
+   .mobile-nav-item.admin-only.admin-visible {
     display: flex !important;
-}
+   }
 
-/* Active state for all tabs */
-.mobile-nav-item.active {
+   /* Active state for all tabs */
+   .mobile-nav-item.active {
     color: var(--accent1) !important;
     background: var(--light-green) !important;
-}
+   }
 
-/* REMOVED: Logout button styling */
-
-/* Icon and text for all tabs */
-.mobile-nav-icon {
+   /* Icon and text for all tabs */
+   .mobile-nav-icon {
     font-size: 1.2rem !important;
     margin-bottom: 4px !important;
     display: block !important;
     text-align: center !important;
     width: 100% !important;
-}
+   }
 
-.mobile-nav-text {
+   .mobile-nav-text {
     font-size: 0.7rem !important;
     font-weight: 500 !important;
     display: block !important;
     text-align: center !important;
     width: 100% !important;
-}
-
-   /* REMOVED: Mobile Logout Item CSS */
+   }
 
    /* Mobile Styles */
    @media (max-width: 768px) {
     body {
-        padding-bottom: 70px; /* Space for fixed bottom nav */
+        padding-bottom: 70px;
     }
     
     .page-container {
         grid-template-columns: 1fr !important;
         padding: 8px;
         gap: 12px;
-        margin-bottom: 0; /* Remove margin since we have body padding */
+        margin-bottom: 0;
     }
     
     .page-container.collapsed {
@@ -483,22 +460,16 @@ li.admin-only.admin-visible {
     }
     
     .sidebar {
-        display: none !important; /* Hide sidebar on mobile */
-    }
-    
-    .mobile-bottom-nav {
-        display: flex !important; /* Show bottom nav on mobile */
-        flex-direction: column;
-    }
-    
-    /* Remove mobile menu toggle button */
-    .mobile-menu-toggle {
         display: none !important;
     }
     
-    /* Show mobile logout button in sidebar when sidebar is forced to show */
-    .mobile-logout-container {
-        display: none !important; /* REMOVED: Hide logout in sidebar */
+    .mobile-bottom-nav {
+        display: flex !important;
+        flex-direction: column;
+    }
+    
+    .mobile-menu-toggle {
+        display: none !important;
     }
     
     .content-area {
@@ -508,7 +479,6 @@ li.admin-only.admin-visible {
         margin-bottom: 0;
     }
     
-    /* Optimize for mobile */
     .user-info {
         gap: 8px;
     }
@@ -523,9 +493,151 @@ li.admin-only.admin-visible {
         font-size: 0.85rem;
     }
     
-    /* Adjust content area for bottom nav */
     .content-area {
         margin-bottom: 70px;
+    }
+    
+    .users-table-wrap {
+        overflow-x: auto;
+        min-width: 100%;
+    }
+    
+    .users-table {
+        table-layout: auto;
+        min-width: 700px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        font-size: 12px;
+        padding: 10px 8px;
+    }
+    
+    .users-table th:nth-child(1),
+    .users-table th:nth-child(2),
+    .users-table th:nth-child(3),
+    .users-table th:nth-child(4),
+    .users-table th:nth-child(5),
+    #activityTable th:nth-child(1),
+    #activityTable th:nth-child(2),
+    #activityTable th:nth-child(3),
+    #activityTable th:nth-child(4),
+    #activityTable th:nth-child(5),
+    #activityTable th:nth-child(6),
+    #logsTable th:nth-child(1),
+    #logsTable th:nth-child(2),
+    #logsTable th:nth-child(3),
+    #logsTable th:nth-child(4),
+    #logsTable th:nth-child(5) {
+        width: auto !important;
+        min-width: auto !important;
+    }
+    
+    .users-table td {
+        white-space: nowrap;
+    }
+    
+    #logsTable td:nth-child(5) {
+        white-space: normal;
+        min-width: 150px;
+        max-width: 200px;
+    }
+    
+    .modal-overlay {
+        padding: 8px;
+    }
+    
+    .modal-box {
+        max-width: 92%;
+        padding: 12px;
+        margin: 8px;
+    }
+    
+    .modal-header {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+    
+    .modal-delete .modal-header,
+    .modal-reset .modal-header {
+        margin: -12px -12px 12px -12px;
+        padding: 10px 12px;
+    }
+    
+    .modal-delete .warning-icon,
+    .modal-reset .reset-icon {
+        font-size: 1.8rem;
+    }
+    
+    .modal-delete .warning-text,
+    .modal-reset .reset-text {
+        font-size: 0.85rem;
+    }
+    
+    .form-group {
+        margin-bottom: 8px;
+    }
+    
+    .form-control {
+        padding: 6px 8px;
+        height: 34px;
+        font-size: 0.82rem;
+    }
+    
+    .btn {
+        padding: 6px 10px;
+        height: 34px;
+        font-size: 0.8rem;
+    }
+    
+    #logsModal .modal-box {
+        max-width: 98%;
+        max-height: 85vh;
+    }
+    
+    #logsModal .modal-header h3 {
+        font-size: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .toolbar-row-1 {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .toggle-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .toolbar-row-2 {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    
+    .cards-row {
+        flex-direction: column;
+    }
+    
+    .card {
+        min-width: 100%;
+    }
+    
+    .actions-cell {
+        justify-content: flex-start;
     }
    }
 
@@ -558,7 +670,7 @@ li.admin-only.admin-visible {
     }
    }
 
-   /* Print styles - Fixed for no stretching */
+   /* Print styles */
    @media print {
     body * {
         visibility: hidden;
@@ -601,7 +713,6 @@ li.admin-only.admin-visible {
     }
    }
 
-   /* Additional existing styles for users.html */
    /* Stats - Made Smaller */
    .stats-container {
     display: flex;
@@ -944,194 +1055,40 @@ li.admin-only.admin-visible {
     100% { transform: rotate(360deg); }
    }
 
-   /* Modal styles - ALL MODALS SMALLER */
+   /* Modal overlay styles */
    .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
-    padding: 12px;
+    z-index: 10000;
+    padding: 16px;
    }
 
-   .modal-box {
-    background: #fff;
-    padding: 16px; /* Reduced from 20px */
-    border-radius: var(--radius);
-    max-width: 420px; /* Smaller width */
-    width: 100%;
-    box-shadow: var(--shadow-dark);
-    animation: modalSlideIn 0.3s ease;
-    max-height: 85vh;
-    overflow-y: auto;
-   }
-
-   /* Smaller modal content */
-   .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px; /* Reduced */
-    padding-bottom: 10px; /* Reduced */
-    border-bottom: 1px solid var(--border);
-   }
-
-   .modal-header h3 {
-    margin: 0;
-    color: var(--accent1);
-    font-size: 1.1rem; /* Smaller font */
-    display: flex;
-    align-items: center;
-    gap: 6px; /* Reduced */
-   }
-
-   .modal-body {
-    margin-bottom: 12px; /* Reduced */
-    padding: 0 2px; /* Reduced */
-   }
-
-   /* Delete confirmation modal */
-   .modal-delete .modal-header {
-    background: #ffeaea;
-    margin: -16px -16px 16px -16px; /* Reduced margins */
-    padding: 12px 16px; /* Reduced padding */
-    border-radius: var(--radius) var(--radius) 0 0;
-    border-bottom: 1px solid #ffcccc;
-   }
-
-   .modal-delete .modal-header h3 {
-    color: #ff4444;
-   }
-
-   .modal-delete .modal-body {
-    padding: 8px 0; /* Reduced */
-   }
-
-   .modal-delete .warning-icon {
-    font-size: 2.2rem; /* Smaller icon */
-    color: #ff7a00;
-    text-align: center;
-    margin-bottom: 10px; /* Reduced */
-   }
-
-   .modal-delete .warning-text {
-    text-align: center;
-    font-size: 0.9rem; /* Smaller font */
-    color: var(--muted);
-    margin-bottom: 8px; /* Reduced */
-    line-height: 1.4;
-   }
-
-   .modal-delete .user-details {
-    background: var(--light-green);
-    padding: 10px; /* Reduced */
-    border-radius: var(--radius-sm);
-    margin: 10px 0; /* Reduced */
-    text-align: center;
-    font-size: 0.85rem; /* Smaller */
-   }
-
-   .modal-delete .user-details strong {
-    color: var(--accent1);
-    font-size: 0.95rem; /* Smaller */
-   }
-
-   .modal-delete .info-note {
-    text-align: center;
-    font-size: 0.8rem; /* Smaller */
-    color: #666;
-    margin-top: 8px; /* Reduced */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px; /* Reduced */
-   }
-
-   /* Reset password modal */
-   .modal-reset .modal-header {
-    background: #fff8e1;
-    margin: -16px -16px 16px -16px; /* Reduced */
-    padding: 12px 16px; /* Reduced */
-    border-radius: var(--radius) var(--radius) 0 0;
-    border-bottom: 1px solid #ffecb3;
-   }
-
-   .modal-reset .modal-header h3 {
-    color: #ff9800;
-   }
-
-   .modal-reset .modal-body {
-    padding: 8px 0; /* Reduced */
-   }
-
-   .modal-reset .reset-icon {
-    font-size: 2.2rem; /* Smaller icon */
-    color: #ff9800;
-    text-align: center;
-    margin-bottom: 10px; /* Reduced */
-   }
-
-   .modal-reset .reset-text {
-    text-align: center;
-    font-size: 0.9rem; /* Smaller font */
-    color: var(--muted);
-    margin-bottom: 8px; /* Reduced */
-    line-height: 1.4;
-   }
-
-   .modal-reset .user-details {
-    background: var(--light-green);
-    padding: 10px; /* Reduced */
-    border-radius: var(--radius-sm);
-    margin: 10px 0; /* Reduced */
-    text-align: center;
-    font-size: 0.85rem; /* Smaller */
-   }
-
-   .modal-reset .user-details strong {
-    color: var(--accent1);
-    font-size: 0.95rem; /* Smaller */
-   }
-
-   .modal-reset .password-info {
-    background: #e9f7f2;
-    padding: 8px; /* Reduced */
-    border-radius: var(--radius-sm);
-    margin-top: 12px; /* Reduced */
-    text-align: center;
-    font-size: 0.8rem; /* Smaller */
-    color: var(--accent1);
-    border-left: 3px solid var(--accent1);
-   }
-
-   @keyframes modalSlideIn {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-   }
-
-   /* Form styles - Even Smaller */
+   /* Form styles */
    .form-group {
-    margin-bottom: 10px; /* Reduced */
+    margin-bottom: 10px;
    }
 
    .form-group label {
     display: block;
     margin-bottom: 4px;
-    font-size: 0.82rem; /* Smaller */
+    font-size: 0.82rem;
     color: var(--muted);
     font-weight: 500;
    }
 
    .form-control {
     width: 100%;
-    padding: 7px 10px; /* Smaller padding */
+    padding: 7px 10px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: 0.85rem; /* Smaller */
+    font-size: 0.85rem;
     box-sizing: border-box;
-    height: 36px; /* Fixed height for consistency */
+    height: 36px;
    }
 
    .form-control:focus {
@@ -1141,90 +1098,43 @@ li.admin-only.admin-visible {
    }
 
    .form-hint {
-    font-size: 0.72rem; /* Smaller */
+    font-size: 0.72rem;
     color: var(--muted);
-    margin-top: 3px; /* Reduced */
+    margin-top: 3px;
    }
 
    .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 16px; /* Reduced */
-    padding-top: 12px; /* Reduced */
+    margin-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
    }
 
-   /* Adjust select elements to match height */
-   .form-control select {
-    height: 36px;
-    padding: 0 10px;
-   }
-
-   /* Password toggle in modal - adjusted for smaller size */
+   /* Modal body input with icon */
    .modal-body .input-with-icon {
     position: relative;
    }
 
    .modal-body .input-with-icon .password-toggle {
     position: absolute;
-    right: 8px; /* Reduced */
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--muted);
     cursor: pointer;
-    font-size: 0.9rem; /* Smaller */
-    padding: 3px; /* Reduced */
+    font-size: 0.9rem;
+    padding: 3px;
    }
 
    .modal-body .input-with-icon input {
-    padding-right: 32px !important; /* Reduced */
+    padding-right: 32px !important;
    }
 
-   /* Make button heights consistent with inputs */
-   .btn {
-    border: 0;
-    padding: 7px 12px; /* Adjusted */
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-weight: 600;
-    background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    color: #fff;
-    font-size: 0.82rem; /* Smaller */
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    height: 36px; /* Fixed height */
-    box-sizing: border-box;
-    position: relative;
-   }
-
-   /* Adjust icon sizes in modals */
-   .modal-header .icon-btn {
-    font-size: 0.9rem; /* Smaller */
-    padding: 4px; /* Reduced */
-   }
-
-   /* Adjust logs modal size too */
-   #logsModal .modal-box {
-    max-width: 1100px; /* Reduced from 1200px */
-    max-height: 75vh;
-   }
-
-   #logsModal .modal-header {
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-   }
-
-   #logsModal .modal-header h3 {
-    font-size: 1.1rem;
-   }
-
-   /* Tabs styling for logs modal */
+   /* Tabs styling */
    .tabs {
     display: flex;
     gap: 8px;
@@ -1317,154 +1227,6 @@ li.admin-only.admin-visible {
     color: #ff9800;
     border: 1px solid #ff9800;
    }
-
-   /* Mobile fixes for tables */
-   @media (max-width: 768px) {
-       .users-table-wrap {
-           overflow-x: auto;
-           min-width: 100%;
-       }
-       
-       .users-table {
-           table-layout: auto;
-           min-width: 700px;
-       }
-       
-       .users-table th,
-       .users-table td {
-           font-size: 12px;
-           padding: 10px 8px;
-       }
-       
-       .users-table th:nth-child(1),
-       .users-table th:nth-child(2),
-       .users-table th:nth-child(3),
-       .users-table th:nth-child(4),
-       .users-table th:nth-child(5),
-       #activityTable th:nth-child(1),
-       #activityTable th:nth-child(2),
-       #activityTable th:nth-child(3),
-       #activityTable th:nth-child(4),
-       #activityTable th:nth-child(5),
-       #activityTable th:nth-child(6),
-       #logsTable th:nth-child(1),
-       #logsTable th:nth-child(2),
-       #logsTable th:nth-child(3),
-       #logsTable th:nth-child(4),
-       #logsTable th:nth-child(5) {
-           width: auto !important;
-           min-width: auto !important;
-       }
-       
-       .users-table td {
-           white-space: nowrap;
-       }
-       
-       #logsTable td:nth-child(5) {
-           white-space: normal;
-           min-width: 150px;
-           max-width: 200px;
-       }
-
-       /* Mobile modal adjustments - make even smaller on mobile */
-       .modal-overlay {
-           padding: 8px;
-       }
-       
-       .modal-box {
-           max-width: 92%;
-           padding: 12px;
-           margin: 8px;
-       }
-       
-       .modal-header {
-           margin-bottom: 10px;
-           padding-bottom: 8px;
-       }
-       
-       .modal-header h3 {
-           font-size: 1rem;
-       }
-       
-       .modal-delete .modal-header,
-       .modal-reset .modal-header {
-           margin: -12px -12px 12px -12px;
-           padding: 10px 12px;
-       }
-       
-       .modal-delete .warning-icon,
-       .modal-reset .reset-icon {
-           font-size: 1.8rem;
-       }
-       
-       .modal-delete .warning-text,
-       .modal-reset .reset-text {
-           font-size: 0.85rem;
-       }
-       
-       .form-group {
-           margin-bottom: 8px;
-       }
-       
-       .form-control {
-           padding: 6px 8px;
-           height: 34px;
-           font-size: 0.82rem;
-       }
-       
-       .btn {
-           padding: 6px 10px;
-           height: 34px;
-           font-size: 0.8rem;
-       }
-       
-       /* Logs modal on mobile */
-       #logsModal .modal-box {
-           max-width: 98%;
-           max-height: 85vh;
-       }
-       
-       #logsModal .modal-header h3 {
-           font-size: 1rem;
-       }
-       
-       .form-actions {
-           flex-direction: column;
-           gap: 8px;
-       }
-       
-       .form-actions .btn {
-           width: 100%;
-           justify-content: center;
-       }
-       
-       .toolbar-row-1 {
-        flex-direction: column;
-        gap: 8px;
-       }
-       
-       .toggle-buttons {
-           width: 100%;
-           justify-content: center;
-       }
-       
-       .toolbar-row-2 {
-           justify-content: space-between;
-           flex-wrap: wrap;
-       }
-       
-       .cards-row {
-           flex-direction: column;
-       }
-       
-       .card {
-           min-width: 100%;
-       }
-       
-       .actions-cell {
-           justify-content: flex-start;
-       }
-   }
 </style>
 </head>
 <body>
@@ -1480,13 +1242,12 @@ li.admin-only.admin-visible {
     <div class="brand">
       <img src="assets/MDRRMO Logo.png" class="logo" alt="Logo"/>
       <div class="brand-text">
-        <h1>PUROK KALIGTASAN 133</h1>
+        <h1>PUROK KALIGTASAN</h1>
         <p>MDRRMO Alitagtag – Household Records System</p>
       </div>
     </div>
 
 <div class="user-info">
-    <!-- ADD THIS LINE: -->
     <button class="mobile-menu-toggle" id="mobileMenuToggle">
         <i class="fas fa-bars"></i>
     </button>
@@ -1498,7 +1259,7 @@ li.admin-only.admin-visible {
 </div>
   </header>
 
-  <!-- Error Message (for consistency with charts.html) -->
+  <!-- Error Message -->
   <div class="error-message" id="errorMessage" style="display: none;">
     <i class="fas fa-exclamation-triangle"></i> 
     <span id="errorText">Failed to fetch data. Please check your connection.</span>
@@ -1520,8 +1281,6 @@ li.admin-only.admin-visible {
         <li><a href="charts.html" title="Charts"><span class="menu-icon">📈</span> <span class="menu-text">Charts & Analytics</span></a></li>
         <li class="admin-only"><a href="users.html" class="active" title="User Management"><span class="menu-icon">👥</span> <span class="menu-text">User Management</span></a></li>
       </ul>
-      
-      <!-- REMOVED: Mobile Logout Button in Sidebar -->
     </div>
   </aside>
 
@@ -1596,7 +1355,7 @@ li.admin-only.admin-visible {
   </main>
 </div>
 
-<!-- Mobile Bottom Navigation - Fixed - REMOVED LOGOUT BUTTON -->
+<!-- Mobile Bottom Navigation - Fixed -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
   <div class="mobile-nav-items">
     <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
@@ -1619,20 +1378,21 @@ li.admin-only.admin-visible {
       <span class="mobile-nav-icon">👥</span>
       <span class="mobile-nav-text">Users</span>
     </a>
-    <!-- REMOVED: Logout button in mobile nav -->
   </div>
 </nav>
 
 <!-- Add/Edit User Modal -->
 <div id="userModal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h3 id="modalTitle"><i class="fas fa-user"></i> Add New User</h3>
-      <button id="closeModal" class="icon-btn">
+  <div class="modal-box" style="background: white; border-radius: 12px; max-width: 420px; width: 100%; box-shadow: 0 15px 30px rgba(0,0,0,0.1); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border);">
+      <h3 id="modalTitle" style="margin: 0; color: var(--accent1); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-user-plus"></i> Add New User
+      </h3>
+      <button id="closeModal" class="icon-btn" style="background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--muted);">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="padding: 20px;">
       <form id="userForm">
         <div class="form-group">
           <label for="user_username">Username *</label>
@@ -1676,7 +1436,7 @@ li.admin-only.admin-visible {
         </div>
       </form>
     </div>
-    <div class="form-actions">
+    <div class="form-actions" style="display: flex; gap: 8px; justify-content: flex-end; padding: 16px 20px; border-top: 1px solid var(--border);">
       <button id="cancelModal" class="btn btn-secondary">Cancel</button>
       <button id="saveUserBtn" class="btn">
         <i class="fas fa-save"></i> Save
@@ -1685,36 +1445,83 @@ li.admin-only.admin-visible {
   </div>
 </div>
 
-<!-- Reset Password Modal -->
-<div id="resetModal" class="modal-overlay">
-  <div class="modal-box modal-reset">
-    <div class="modal-header">
-      <h3><i class="fas fa-key"></i> Reset Password</h3>
-      <button id="closeResetModal" class="icon-btn">
-        <i class="fas fa-times"></i>
+<!-- User Saved Success Modal -->
+<div id="userSavedSuccessModal" class="modal-overlay">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-check-circle" style="font-size: 1.6rem; color: #0f7a4a; opacity: 0.7;"></i>
+      </div>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;" id="userSavedTitle">
+        User Saved Successfully!
+      </h3>
+      <p style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;" id="userSavedMessage">
+        The user has been successfully saved to the system.
+      </p>
+    </div>
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeUserSavedSuccess" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
+        <i class="fas fa-check"></i> OK
       </button>
     </div>
-    <div class="modal-body">
-      <div class="reset-icon">
-        <i class="fas fa-unlock-alt"></i>
+  </div>
+</div>
+
+<!-- Reset Password Modal - Confirmation -->
+<div id="resetModal" class="modal-overlay">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-key" style="font-size: 1.6rem; color: #ff9800; opacity: 0.7;"></i>
       </div>
-      <div class="reset-text">
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">
+        Reset Password
+      </h3>
+      <p style="margin: 0 0 8px 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">
         Are you sure you want to reset the password for this user?
+      </p>
+      <div style="margin: 8px 0; padding: 6px; background: #e9f7f2; border-radius: 6px; font-size: 0.75rem;">
+        <span style="color: #0f7a4a; font-weight: 600;">User:</span> <span id="resetUserName" style="color: #1e293b;">user</span>
       </div>
-      <div class="user-details">
-        User: <strong id="resetUserName"></strong>
-      </div>
-      <div class="password-info">
-        <i class="fas fa-info-circle"></i> The password will be reset to: <strong>password123</strong>
-      </div>
-      <div style="text-align: center; font-size: 0.85rem; color: #666; margin-top: 15px;">
-        <i class="fas fa-exclamation-triangle"></i> User will need to change their password on next login.
+      <div style="margin-top: 8px; padding: 6px; background: #f8fafc; border-radius: 6px; border-left: 2px solid #ff9800; font-size: 0.7rem; text-align: left;">
+        <i class="fas fa-info-circle" style="color: #ff9800; margin-right: 4px;"></i>
+        Password will be reset to: <code style="background: #fff8e1; padding: 2px 4px; border-radius: 4px;">password123</code>
       </div>
     </div>
-    <div class="form-actions">
-      <button id="cancelReset" class="btn btn-secondary">Cancel</button>
-      <button id="confirmReset" class="btn" style="background: linear-gradient(90deg, #ff9800, #ffb74d);">
-        <i class="fas fa-redo"></i> Reset Password
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelReset" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmReset" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
+        <i class="fas fa-redo-alt"></i> Reset
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Success Modal -->
+<div id="resetSuccessModal" class="modal-overlay">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-check-circle" style="font-size: 1.6rem; color: #0f7a4a; opacity: 0.7;"></i>
+      </div>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">
+        Password Reset Successful!
+      </h3>
+      <p style="margin: 0 0 8px 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">
+        The password has been successfully reset to:
+      </p>
+      <div style="margin: 8px 0; padding: 8px; background: #e9f7f2; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #0f7a4a;">
+        password123
+      </div>
+      <p style="margin: 8px 0 0 0; color: #64748b; font-size: 0.7rem; line-height: 1.4;">
+        <i class="fas fa-info-circle"></i> User will need to change this on next login.
+      </p>
+    </div>
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeResetSuccess" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
+        <i class="fas fa-check"></i> OK
       </button>
     </div>
   </div>
@@ -1722,31 +1529,53 @@ li.admin-only.admin-visible {
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal-overlay">
-  <div class="modal-box modal-delete">
-    <div class="modal-header">
-      <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
-      <button id="closeDeleteModal" class="icon-btn">
-        <i class="fas fa-times"></i>
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.6rem; color: #ef4444; opacity: 0.7;"></i>
+      </div>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">
+        Delete User
+      </h3>
+      <p style="margin: 0 0 8px 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">
+        Are you sure you want to delete this user? This action cannot be undone.
+      </p>
+      <div style="margin: 8px 0; padding: 6px; background: #e9f7f2; border-radius: 6px; font-size: 0.75rem;">
+        <span style="color: #0f7a4a; font-weight: 600;">User:</span> <span id="deleteUserName" style="color: #1e293b;">user</span>
+      </div>
+      <div style="margin-top: 8px; padding: 6px; background: #ffeaea; border-radius: 6px; border-left: 2px solid #ef4444; font-size: 0.7rem; text-align: left;">
+        <i class="fas fa-exclamation-circle" style="color: #ef4444; margin-right: 4px;"></i>
+        All associated data will be permanently removed.
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="cancelDelete" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #ef4444; background: transparent; color: #ef4444;">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button id="confirmDelete" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
+        <i class="fas fa-trash-alt"></i> Delete
       </button>
     </div>
-    <div class="modal-body">
-      <div class="warning-icon">
-        <i class="fas fa-exclamation-circle"></i>
+  </div>
+</div>
+
+<!-- Delete Success Modal -->
+<div id="deleteSuccessModal" class="modal-overlay">
+  <div style="background: white; border-radius: 12px; max-width: 280px; width: 100%; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.05); animation: modalSlideUp 0.2s ease; overflow: hidden;">
+    <div style="padding: 20px 20px 12px 20px; text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <i class="fas fa-trash-alt" style="font-size: 1.6rem; color: #ef4444; opacity: 0.7;"></i>
       </div>
-      <div class="warning-text">
-        Are you sure you want to delete this user? This action cannot be undone.
-      </div>
-      <div class="user-details">
-        Deleting user: <strong id="deleteUserName"></strong>
-      </div>
-      <div class="info-note">
-        <i class="fas fa-info-circle"></i> All associated data will be permanently removed.
-      </div>
+      <h3 style="margin: 0 0 4px 0; color: #1e293b; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em;">
+        User Deleted
+      </h3>
+      <p style="margin: 0; color: #64748b; font-size: 0.8rem; line-height: 1.4; font-weight: 400;">
+        The user has been successfully deleted from the system.
+      </p>
     </div>
-    <div class="form-actions">
-      <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
-      <button id="confirmDelete" class="btn" style="background: linear-gradient(90deg, var(--accent3), var(--accent4));">
-        <i class="fas fa-trash"></i> Delete User
+    <div style="display: flex; gap: 8px; padding: 4px 20px 20px 20px;">
+      <button id="closeDeleteSuccess" style="flex: 1; padding: 6px 10px; border-radius: 6px; font-weight: 500; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease; outline: none; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); letter-spacing: 0.3px; border: 1.5px solid #0f7a4a; background: transparent; color: #0f7a4a;">
+        <i class="fas fa-check"></i> OK
       </button>
     </div>
   </div>
@@ -1754,104 +1583,108 @@ li.admin-only.admin-visible {
 
 <!-- Enhanced Logs Modal with User Activity -->
 <div id="logsModal" class="modal-overlay">
-  <div class="modal-box" style="max-width: 1100px; max-height: 75vh; overflow-y: auto;">
-    <div class="modal-header">
-      <h3><i class="fas fa-user-clock"></i> User Activity & Audit Logs</h3>
-      <button id="closeLogsModal" class="icon-btn">
+  <div class="modal-box" style="background: white; border-radius: 12px; max-width: 1100px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 15px 30px rgba(0,0,0,0.1); animation: modalSlideUp 0.2s ease;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border);">
+      <h3 style="margin: 0; color: var(--accent1); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-user-clock"></i> User Activity & Audit Logs
+      </h3>
+      <button id="closeLogsModal" class="icon-btn" style="background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--muted);">
         <i class="fas fa-times"></i>
       </button>
     </div>
     
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="activity">User Activity</button>
-      <button class="tab-btn" data-tab="audit">Audit Logs</button>
-    </div>
-    
-    <!-- User Activity Tab - FIXED TABLE -->
-    <div class="tab-content active" id="activityTab">
-      <div class="stats-container" style="justify-content: flex-start; margin-bottom: 16px;">
-        <div class="stat-item">
-          <span>Online Now</span>
-          <div id="statOnline" class="value" style="color: #0f7a4a;">0</div>
+    <div class="modal-body" style="padding: 20px;">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="activity">User Activity</button>
+        <button class="tab-btn" data-tab="audit">Audit Logs</button>
+      </div>
+      
+      <!-- User Activity Tab -->
+      <div class="tab-content active" id="activityTab">
+        <div class="stats-container" style="justify-content: flex-start; margin-bottom: 16px;">
+          <div class="stat-item">
+            <span>Online Now</span>
+            <div id="statOnline" class="value" style="color: #0f7a4a;">0</div>
+          </div>
+          <div class="stat-item">
+            <span>Active Today</span>
+            <div id="statToday" class="value">0</div>
+          </div>
+          <div class="stat-item">
+            <span>Total Users</span>
+            <div id="statTotalUsers" class="value">0</div>
+          </div>
         </div>
-        <div class="stat-item">
-          <span>Active Today</span>
-          <div id="statToday" class="value">0</div>
+        
+        <div class="search-container" style="margin-bottom: 16px;">
+          <i class="fas fa-search"></i>
+          <input id="searchActivity" class="search-box" placeholder="Search users..." />
         </div>
-        <div class="stat-item">
-          <span>Total Users</span>
-          <div id="statTotalUsers" class="value">0</div>
+        
+        <div class="users-table-wrap" style="min-height: 300px;">
+          <table class="users-table" id="activityTable">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Last Activity</th>
+                <th>Active Time</th>
+                <th>Session Duration</th>
+              </tr>
+            </thead>
+            <tbody id="activityBody">
+              <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading activity data...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
       
-      <div class="search-container" style="margin-bottom: 16px;">
-        <i class="fas fa-search"></i>
-        <input id="searchActivity" class="search-box" placeholder="Search users..." />
+      <!-- Audit Logs Tab -->
+      <div class="tab-content" id="auditTab">
+        <div class="tabs" style="margin-bottom: 16px; border-bottom: 1px solid var(--border);">
+          <button class="tab-btn-small active" data-category="all">All Logs</button>
+          <button class="tab-btn-small" data-category="today">Today</button>
+          <button class="tab-btn-small" data-category="yesterday">Yesterday</button>
+          <button class="tab-btn-small" data-category="older">Older</button>
+        </div>
+        
+        <div class="search-container" style="margin-bottom: 16px;">
+          <i class="fas fa-search"></i>
+          <input id="searchAudit" class="search-box" placeholder="Search audit logs..." />
+        </div>
+        
+        <div class="users-table-wrap" style="min-height: 300px;">
+          <table class="users-table" id="logsTable">
+            <thead>
+              <tr>
+                <th style="width: 20%;">Timestamp</th>
+                <th style="width: 15%;">Action</th>
+                <th style="width: 15%;">Actor</th>
+                <th style="width: 15%;">Target</th>
+                <th style="width: 35%; text-align: left;">Details</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody">
+              <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading logs...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       
-      <div class="users-table-wrap" style="min-height: 300px;">
-        <table class="users-table" id="activityTable">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Status</th>
-              <th>Last Login</th>
-              <th>Last Activity</th>
-              <th>Active Time</th>
-              <th>Session Duration</th>
-            </tr>
-          </thead>
-          <tbody id="activityBody">
-            <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading activity data...</td></tr>
-          </tbody>
-        </table>
+      <div class="form-actions" style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+        <button id="refreshLogs" class="btn btn-secondary">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+        <button id="closeLogsBtn" class="btn">Close</button>
       </div>
-    </div>
-    
-    <!-- Audit Logs Tab - WITH CATEGORIES -->
-    <div class="tab-content" id="auditTab">
-      <div class="tabs" style="margin-bottom: 16px; border-bottom: 1px solid var(--border);">
-        <button class="tab-btn-small active" data-category="all">All Logs</button>
-        <button class="tab-btn-small" data-category="today">Today</button>
-        <button class="tab-btn-small" data-category="yesterday">Yesterday</button>
-        <button class="tab-btn-small" data-category="older">Older</button>
-      </div>
-      
-      <div class="search-container" style="margin-bottom: 16px;">
-        <i class="fas fa-search"></i>
-        <input id="searchAudit" class="search-box" placeholder="Search audit logs..." />
-      </div>
-      
-<div class="users-table-wrap" style="min-height: 300px;">
-  <table class="users-table" id="logsTable">
-    <thead>
-      <tr>
-        <th style="width: 20%;">Timestamp</th>
-        <th style="width: 15%;">Action</th>
-        <th style="width: 15%;">Actor</th>
-        <th style="width: 15%;">Target</th>
-        <th style="width: 35%; text-align: left;">Details</th>
-      </tr>
-    </thead>
-    <tbody id="logsBody">
-      <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading logs...</td></tr>
-    </tbody>
-  </table>
-      </div>
-    </div>
-    
-    <div class="form-actions">
-      <button id="refreshLogs" class="btn btn-secondary">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
-      <button id="closeLogsBtn" class="btn">Close</button>
     </div>
   </div>
 </div>
 
 <script>
 /* ============ CONFIG ============ */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx855bvwL5GABW5Xfmuytas3FbBikE1R44I7vNuhXNhfTly-MGMonkqPfeSngIt-7OMNA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKmfbcn3uQmsljJlt8V-ziD_wf1H6Pm6ejMqEeRwxhqHB0vktP3My7OcXVCWVMvnhCg/exec";
 
 /* ============ STATE ============ */
 let ALL_USERS = [];
@@ -1901,7 +1734,6 @@ async function sessionCheck(){
 
 function isProtectedAdmin(user) {
   // Check if it's the specific admin with username 'admin'
-  // You can also verify the password hash if available
   return user && user.Username.toLowerCase() === 'admin';
 }
 
@@ -1938,6 +1770,21 @@ function showToast(message, type = 'info') {
     toast.style.transform = 'translateX(100%)';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+/* ============ MODAL FUNCTIONS ============ */
+function showModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+function hideModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
 /* ============ LOAD USERS ============ */
@@ -2222,8 +2069,21 @@ async function saveUser() {
     }
     
     if (data.success) {
-      showToast(data.message || 'User saved successfully', 'success');
-      closeUserModal();
+      hideModal('userModal');
+      
+      // Set appropriate message based on action
+      const titleEl = document.getElementById('userSavedTitle');
+      const messageEl = document.getElementById('userSavedMessage');
+      
+      if (EDIT_TARGET) {
+        titleEl.textContent = 'User Updated Successfully!';
+        messageEl.textContent = `User "${username}" has been successfully updated.`;
+      } else {
+        titleEl.textContent = 'User Created Successfully!';
+        messageEl.textContent = `User "${username}" has been successfully added to the system.`;
+      }
+      
+      showModal('userSavedSuccessModal');
       loadUsers();
     } else {
       showToast(data.message || 'Failed to save user', 'error');
@@ -2236,6 +2096,10 @@ async function saveUser() {
     saveBtn.innerHTML = originalText;
     saveBtn.classList.remove('btn-saving');
   }
+}
+
+function closeUserSavedSuccess() {
+  hideModal('userSavedSuccessModal');
 }
 
 /* ============ RESET PASSWORD WITH MODAL ============ */
@@ -2256,7 +2120,7 @@ function showResetModal(username) {
     document.getElementById('resetUserName').textContent = username;
   }
   
-  document.getElementById('resetModal').style.display = 'flex';
+  showModal('resetModal');
 }
 
 async function resetPassword() {
@@ -2303,8 +2167,9 @@ async function resetPassword() {
     }
     
     if (data.success) {
-      showToast(data.message || 'Password reset successfully', 'success');
-      closeResetModal();
+      hideModal('resetModal');
+      showModal('resetSuccessModal');
+      loadUsers();
     } else {
       showToast(data.message || 'Failed to reset password', 'error');
     }
@@ -2318,8 +2183,12 @@ async function resetPassword() {
 }
 
 function closeResetModal() {
-  document.getElementById('resetModal').style.display = 'none';
+  hideModal('resetModal');
   RESET_TARGET_USER = null;
+}
+
+function closeResetSuccess() {
+  hideModal('resetSuccessModal');
 }
 
 /* ============ DELETE USER WITH MODAL ============ */
@@ -2340,7 +2209,7 @@ function showDeleteModal(username) {
     document.getElementById('deleteUserName').textContent = username;
   }
   
-  document.getElementById('deleteModal').style.display = 'flex';
+  showModal('deleteModal');
 }
 
 async function deleteUser() {
@@ -2387,8 +2256,8 @@ async function deleteUser() {
     }
     
     if (data.success) {
-      showToast(data.message || 'User deleted successfully', 'success');
-      closeDeleteModal();
+      hideModal('deleteModal');
+      showModal('deleteSuccessModal');
       loadUsers();
     } else {
       showToast(data.message || 'Failed to delete user', 'error');
@@ -2403,8 +2272,12 @@ async function deleteUser() {
 }
 
 function closeDeleteModal() {
-  document.getElementById('deleteModal').style.display = 'none';
+  hideModal('deleteModal');
   DELETE_TARGET_USER = null;
+}
+
+function closeDeleteSuccess() {
+  hideModal('deleteSuccessModal');
 }
 
 /* ============ LOAD USER ACTIVITY ============ */
@@ -2672,12 +2545,12 @@ function setupPasswordToggle() {
 
 /* ============ MODAL CONTROLS ============ */
 function closeUserModal() {
-  document.getElementById('userModal').style.display = 'none';
+  hideModal('userModal');
   EDIT_TARGET = null;
 }
 
 function closeLogsModal() {
-  document.getElementById('logsModal').style.display = 'none';
+  hideModal('logsModal');
 }
 
 /* ============ SIDEBAR TOGGLE ============ */
@@ -2772,16 +2645,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Event listeners
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     
-    // REMOVED: Mobile logout button event listeners
-    // document.getElementById('mobileLogoutBtn').addEventListener('click', handleLogout);
-    // document.getElementById('mobileNavLogoutBtn').addEventListener('click', function(e) {
-    //     e.preventDefault();
-    //     handleLogout();
-    // });
-    
     document.getElementById('openAddUser').addEventListener('click', () => openUserModal('add'));
     document.getElementById('viewLogsBtn').addEventListener('click', function() {
-      document.getElementById('logsModal').style.display = 'flex';
+      showModal('logsModal');
       loadUserActivity();
       loadAuditLogs();
     });
@@ -2803,32 +2669,98 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
     document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
     
+    // User saved success modal
+    const closeUserSavedSuccessBtn = document.getElementById('closeUserSavedSuccess');
+    if (closeUserSavedSuccessBtn) {
+      closeUserSavedSuccessBtn.addEventListener('click', closeUserSavedSuccess);
+    }
+    
     // Reset modal events
-    document.getElementById('cancelReset').addEventListener('click', closeResetModal);
-    document.getElementById('closeResetModal').addEventListener('click', closeResetModal);
-    document.getElementById('confirmReset').addEventListener('click', resetPassword);
+    const cancelResetBtn = document.getElementById('cancelReset');
+    const confirmResetBtn = document.getElementById('confirmReset');
+    
+    if (cancelResetBtn) {
+      cancelResetBtn.addEventListener('click', closeResetModal);
+    }
+    
+    if (confirmResetBtn) {
+      confirmResetBtn.addEventListener('click', resetPassword);
+    }
+    
+    // Reset success modal
+    const closeResetSuccessBtn = document.getElementById('closeResetSuccess');
+    if (closeResetSuccessBtn) {
+      closeResetSuccessBtn.addEventListener('click', closeResetSuccess);
+    }
     
     // Delete modal events
-    document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
-    document.getElementById('closeDeleteModal').addEventListener('click', closeDeleteModal);
-    document.getElementById('confirmDelete').addEventListener('click', deleteUser);
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    
+    if (cancelDeleteBtn) {
+      cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+    }
+    
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.addEventListener('click', deleteUser);
+    }
+    
+    // Delete success modal
+    const closeDeleteSuccessBtn = document.getElementById('closeDeleteSuccess');
+    if (closeDeleteSuccessBtn) {
+      closeDeleteSuccessBtn.addEventListener('click', closeDeleteSuccess);
+    }
     
     // Close modals on overlay click
-    document.getElementById('userModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('userModal')) closeUserModal();
-    });
+    const userSavedSuccessModal = document.getElementById('userSavedSuccessModal');
+    const resetModal = document.getElementById('resetModal');
+    const resetSuccessModal = document.getElementById('resetSuccessModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteSuccessModal = document.getElementById('deleteSuccessModal');
+    const userModal = document.getElementById('userModal');
+    const logsModal = document.getElementById('logsModal');
     
-    document.getElementById('logsModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('logsModal')) closeLogsModal();
-    });
+    if (userSavedSuccessModal) {
+      userSavedSuccessModal.addEventListener('click', (e) => {
+        if (e.target === userSavedSuccessModal) closeUserSavedSuccess();
+      });
+    }
     
-    document.getElementById('resetModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('resetModal')) closeResetModal();
-    });
+    if (resetModal) {
+      resetModal.addEventListener('click', (e) => {
+        if (e.target === resetModal) closeResetModal();
+      });
+    }
     
-    document.getElementById('deleteModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
-    });
+    if (resetSuccessModal) {
+      resetSuccessModal.addEventListener('click', (e) => {
+        if (e.target === resetSuccessModal) closeResetSuccess();
+      });
+    }
+    
+    if (deleteModal) {
+      deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) closeDeleteModal();
+      });
+    }
+    
+    if (deleteSuccessModal) {
+      deleteSuccessModal.addEventListener('click', (e) => {
+        if (e.target === deleteSuccessModal) closeDeleteSuccess();
+      });
+    }
+    
+    if (userModal) {
+      userModal.addEventListener('click', (e) => {
+        if (e.target === userModal) closeUserModal();
+      });
+    }
+    
+    if (logsModal) {
+      logsModal.addEventListener('click', (e) => {
+        if (e.target === logsModal) closeLogsModal();
+      });
+    }
     
     // Auto-refresh
     setInterval(loadUsers, 30000);
@@ -2855,14 +2787,10 @@ window.addEventListener('pageshow', function(event) {
   }
 });
 </script>
+<script src="js/guest-redirect.js"></script>
 <script src="js/common-utils.js"></script>
 <script src="js/session-manager.js"></script>
 <script src="js/common-session.js"></script>
 <script src="js/activity-tracking-final.js"></script>
 </body>
 </html>
-
-
-
-
-
