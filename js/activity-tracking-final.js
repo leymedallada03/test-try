@@ -3,7 +3,7 @@
     'use strict';
     
     // API URL for logging - ADD THIS AT THE TOP
-    const ACTIVITY_API_URL = "https://script.google.com/macros/s/AKfycbxvHCGEcQVD020RuGxug3-O8aq3DBPbvFPsNNdcia_FuT81EdICrxKnotHVF2o-59utzg/exec";
+    const ACTIVITY_API_URL = "https://script.google.com/macros/s/AKfycbymKmfbcn3uQmsljJlt8V-ziD_wf1H6Pm6ejMqEeRwxhqHB0vktP3My7OcXVCWVMvnhCg/exec";
     const ALLOWED_ACTIONS = ['Update Household', 'Create Record', 'Delete Household'];
 
     /* Main function to record user activity - COMPATIBLE WITH DASHBOARD */
