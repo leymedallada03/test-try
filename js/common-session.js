@@ -1,5 +1,5 @@
 // common-session.js - Instant Logout Handler with Professional Modal Confirmation
-const COMMON_API_URL = window.SCRIPT_URL || "https://script.google.com/macros/s/AKfycbymKmfbcn3uQmsljJlt8V-ziD_wf1H6Pm6ejMqEeRwxhqHB0vktP3My7OcXVCWVMvnhCg/exec";
+const COMMON_API_URL = window.SCRIPT_URL || "https://script.google.com/macros/s/AKfycbwGFL1xNeJ4E78CVpnaQKMdx_RFYDm0jVMbVJ-KnWTE2NbNrhin6bIgr5_R8sEgC4ZGeA/exec";
 
 // ===== DEBUG LOGOUT FLOW =====
 console.log("=== common-session.js LOADED ===");
