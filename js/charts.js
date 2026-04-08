@@ -7,7 +7,7 @@
    - Assistance (combined horizontal bar)
 */
 
-const API_URL = "https://script.google.com/macros/s/AKfycbymKmfbcn3uQmsljJlt8V-ziD_wf1H6Pm6ejMqEeRwxhqHB0vktP3My7OcXVCWVMvnhCg/exec"; // your deployment
+const API_URL = "https://script.google.com/macros/s/AKfycbwGFL1xNeJ4E78CVpnaQKMdx_RFYDm0jVMbVJ-KnWTE2NbNrhin6bIgr5_R8sEgC4ZGeA/exec"; // your deployment
 
 let charts = {};
 
