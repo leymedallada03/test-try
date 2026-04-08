@@ -48,6 +48,38 @@ function updateAdminUI() {
         });
     });
 }
+// Global hover effect for modal buttons
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('mouseover', function(e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        
+        // Check if this button is inside any modal
+        const isModalButton = btn.closest('.modal-overlay') || 
+                             btn.closest('[id$="Modal"]') || 
+                             (btn.id && (btn.id.includes('cancel') || btn.id.includes('confirm') || btn.id.includes('close') || btn.id.includes('reset') || btn.id.includes('delete')));
+        
+        if (isModalButton) {
+            // Get the button's border color
+            const borderColor = window.getComputedStyle(btn).borderColor;
+            
+            // Only apply if not already handled
+            if (!btn.hasAttribute('data-hover-initialized')) {
+                btn.setAttribute('data-hover-initialized', 'true');
+                
+                btn.addEventListener('mouseenter', function() {
+                    this.style.background = borderColor;
+                    this.style.color = 'white';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.background = 'transparent';
+                    this.style.color = borderColor;
+                });
+            }
+        }
+    });
+});
 
 /* Setup auto-logout for inactivity - Common across all pages */
 function setupAutoLogout() {
