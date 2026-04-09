@@ -7211,25 +7211,25 @@ async function submitHeadAndMembers() {
   const insideAssembly = document.getElementById("inside_assembly").checked ? "Yes" : "No";
   const outsideAssembly = document.getElementById("outside_assembly").checked ? "Yes" : "No";
 
-  // Get calamity radio and textarea values WITH FILE LINKS
-  const headCalamityData = {
-    "Structural Damage": document.querySelector('input[name="head_damage"]:checked')?.value || "No",
-    "Structural Damage Details": document.getElementById('head_damage_details')?.value || "",
-    "Structural Damage File": headCalamityFileIds.damage || "",
-    "Structural Damage File Name": headCalamityFiles.damage?.name || "",
-    "Household Injury": document.querySelector('input[name="head_injury"]:checked')?.value || "No",
-    "Injury Details": document.getElementById('head_injury_details')?.value || "",
-    "Household Injury File": headCalamityFileIds.injury || "",
-    "Household Injury File Name": headCalamityFiles.injury?.name || "",
-    "Habitability": document.querySelector('input[name="head_habitability"]:checked')?.value || "No",
-    "Habitability Details": document.getElementById('head_habitability_details')?.value || "",
-    "Habitability File": headCalamityFileIds.habitability || "",
-    "Habitability File Name": headCalamityFiles.habitability?.name || "",
-    "Loss of Livelihood": document.querySelector('input[name="head_livelihood"]:checked')?.value || "No",
-    "Livelihood Details": document.getElementById('head_livelihood_details')?.value || "",
-    "Loss of Livelihood File": headCalamityFileIds.livelihood || "",
-    "Loss of Livelihood File Name": headCalamityFiles.livelihood?.name || ""
-  };
+// Get calamity radio and textarea values WITH FILE LINKS
+const headCalamityData = {
+  "Structural Damage": document.querySelector('input[name="head_damage"]:checked')?.value || "No",
+  "Structural Damage Details": document.getElementById('head_damage_details')?.value || "",
+  "Structural Damage File Link": headCalamityFileIds.damage || "",  // ← Use "File Link" not "File"
+  "Structural Damage File Name": headCalamityFiles.damage?.name || "",
+  "Household Injury": document.querySelector('input[name="head_injury"]:checked')?.value || "No",
+  "Injury Details": document.getElementById('head_injury_details')?.value || "",
+  "Household Injury File Link": headCalamityFileIds.injury || "",   // ← Use "File Link" not "File"
+  "Household Injury File Name": headCalamityFiles.injury?.name || "",
+  "Habitability": document.querySelector('input[name="head_habitability"]:checked')?.value || "No",
+  "Habitability Details": document.getElementById('head_habitability_details')?.value || "",
+  "Habitability File Link": headCalamityFileIds.habitability || "", // ← Use "File Link" not "File"
+  "Habitability File Name": headCalamityFiles.habitability?.name || "",
+  "Loss of Livelihood": document.querySelector('input[name="head_livelihood"]:checked')?.value || "No",
+  "Livelihood Details": document.getElementById('head_livelihood_details')?.value || "",
+  "Loss of Livelihood File Link": headCalamityFileIds.livelihood || "", // ← Use "File Link" not "File"
+  "Loss of Livelihood File Name": headCalamityFiles.livelihood?.name || ""
+};
 
   const head = {
     "Coordinate": document.getElementById("coordinate").value || "",
