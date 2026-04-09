@@ -7452,10 +7452,13 @@ async function uploadFileToDriveDirect(file, category, tempDataID) {
         
         console.log("Sending request to:", API_URL);
         
+        // IMPORTANT: NO 'mode: no-cors' HERE
         const response = await fetch(API_URL, {
           method: "POST",
           body: formData
         });
+        
+        console.log("Response status:", response.status);
         
         const text = await response.text();
         console.log("Raw response:", text);
@@ -7469,12 +7472,12 @@ async function uploadFileToDriveDirect(file, category, tempDataID) {
           return;
         }
         
-        if (result.success && result.fileId) {
+        if (result && result.success && result.fileId) {
           const fileLink = `https://drive.google.com/file/d/${result.fileId}/view`;
           console.log("✅ Upload success! File Link:", fileLink);
           resolve(fileLink);
         } else {
-          console.error("❌ Upload failed:", result);
+          console.error("❌ Upload failed. Result:", result);
           resolve(null);
         }
       } catch (err) {
@@ -7618,97 +7621,6 @@ function setupHeadFileInputs() {
       }
     }
     // ============ END CRITICAL FIX ============
-  });
-}
-// Upload file to Google Drive via Apps Script and return FULL VIEW LINK
-async function uploadFileToDriveDirect(file, category, tempDataID) {
-  console.log("=== uploadFileToDriveDirect START ===");
-  console.log("File:", file);
-  console.log("File name:", file?.name);
-  console.log("File size:", file?.size);
-  console.log("File type:", file?.type);
-  console.log("Category:", category);
-  console.log("tempDataID:", tempDataID);
-  
-  if (!file) {
-    console.error("❌ No file provided! File is null or undefined");
-    return null;
-  }
-  
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    
-    reader.onload = async function(e) {
-      try {
-        console.log("✅ FileReader loaded successfully");
-        let base64Data = e.target.result;
-        console.log("Base64 data length:", base64Data.length);
-        console.log("Base64 starts with:", base64Data.substring(0, 50));
-        
-        if (base64Data.includes('base64,')) {
-          base64Data = base64Data.split('base64,')[1];
-          console.log("After split, base64 length:", base64Data.length);
-        }
-        
-        const formData = new FormData();
-        formData.append("action", "uploadCalamityFile");
-        formData.append("fileData", base64Data);
-        formData.append("fileName", file.name);
-        formData.append("category", category);
-        formData.append("dataID", tempDataID.toString());
-        
-        console.log("Sending request to:", API_URL);
-        console.log("FormData entries:");
-        for (let pair of formData.entries()) {
-          console.log("  ", pair[0], "=", pair[1]?.substring?.(0, 100) || pair[1]);
-        }
-        
-        const response = await fetch(API_URL, {
-          method: "POST",
-          body: formData,
-          mode: 'no-cors' // ← TEMPORARY: Add this to test
-        });
-        
-        console.log("Response status:", response.status);
-        console.log("Response ok:", response.ok);
-        
-        const text = await response.text();
-        console.log("Raw response text:", text);
-        
-        let result;
-        try {
-          result = JSON.parse(text);
-        } catch (e) {
-          console.error("❌ Failed to parse JSON:", e);
-          console.error("Raw response was:", text);
-          resolve(null);
-          return;
-        }
-        
-        console.log("Parsed result:", result);
-        
-        if (result && result.success && result.fileId) {
-          const fileLink = `https://drive.google.com/file/d/${result.fileId}/view`;
-          console.log("✅ Upload success! File Link:", fileLink);
-          resolve(fileLink);
-        } else {
-          console.error("❌ Upload failed. Result:", result);
-          resolve(null);
-        }
-      } catch (err) {
-        console.error("❌ Upload error in promise:", err);
-        console.error("Error stack:", err.stack);
-        resolve(null);
-      }
-    };
-    
-    reader.onerror = (err) => {
-      console.error("❌ FileReader error:", err);
-      resolve(null);
-    };
-    
-    console.log("Starting FileReader...");
-    reader.readAsDataURL(file);
   });
 }
 
