@@ -7545,74 +7545,115 @@ function setupHeadFileInputs() {
   
   categories.forEach(category => {
     const fileInput = document.getElementById(`head_${category}_file`);
-    const filenameSpan = document.getElementById(`head_${category}_filename`);
-    const removeBtn = document.querySelector(`.remove-file-btn[data-category="${category}"]`);
-    const radios = document.querySelectorAll(`input[name="head_${category === 'damage' ? 'damage' : category === 'injury' ? 'injury' : category === 'habitability' ? 'habitability' : 'livelihood'}"]`);
-    const uploadArea = document.getElementById(`head_${category}_upload_area`);
     
     if (fileInput) {
       fileInput.addEventListener('change', function(e) {
+        console.log(`=== FILE SELECTED FOR ${category} ===`);
+        console.log("Files:", this.files);
         if (this.files && this.files.length > 0) {
+          console.log("File name:", this.files[0].name);
+          console.log("File size:", this.files[0].size);
+          console.log("File type:", this.files[0].type);
           const file = this.files[0];
           headCalamityFiles[category] = file;
-          if (filenameSpan) {
-            const ext = file.name.split('.').pop().toLowerCase();
-            let icon = 'fa-file-image';
-            if (ext === 'pdf') icon = 'fa-file-pdf';
-            filenameSpan.innerHTML = `<i class="fas ${icon}"></i> ${file.name}`;
-            filenameSpan.style.color = '#0f7a4a';
-          }
-          if (removeBtn) removeBtn.style.display = 'inline-flex';
+          console.log(`headCalamityFiles.${category} set to:`, headCalamityFiles[category]);
         } else {
+          console.log(`No file selected for ${category}`);
           headCalamityFiles[category] = null;
-          if (filenameSpan) {
-            filenameSpan.innerHTML = 'No file chosen';
-            filenameSpan.style.color = 'var(--muted)';
-          }
-          if (removeBtn) removeBtn.style.display = 'none';
         }
       });
     }
+  });
+}
+// Upload file to Google Drive via Apps Script and return FULL VIEW LINK
+async function uploadFileToDriveDirect(file, category, tempDataID) {
+  console.log("=== uploadFileToDriveDirect START ===");
+  console.log("File:", file);
+  console.log("File name:", file?.name);
+  console.log("File size:", file?.size);
+  console.log("File type:", file?.type);
+  console.log("Category:", category);
+  console.log("tempDataID:", tempDataID);
+  
+  if (!file) {
+    console.error("❌ No file provided! File is null or undefined");
+    return null;
+  }
+  
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
     
-    if (removeBtn) {
-      removeBtn.addEventListener('click', function() {
-        if (fileInput) {
-          fileInput.value = '';
-          headCalamityFiles[category] = null;
-          if (filenameSpan) {
-            filenameSpan.innerHTML = 'No file chosen';
-            filenameSpan.style.color = 'var(--muted)';
-          }
-          removeBtn.style.display = 'none';
+    reader.onload = async function(e) {
+      try {
+        console.log("✅ FileReader loaded successfully");
+        let base64Data = e.target.result;
+        console.log("Base64 data length:", base64Data.length);
+        console.log("Base64 starts with:", base64Data.substring(0, 50));
+        
+        if (base64Data.includes('base64,')) {
+          base64Data = base64Data.split('base64,')[1];
+          console.log("After split, base64 length:", base64Data.length);
         }
-      });
-    }
-    
-    if (radios.length && uploadArea) {
-      radios.forEach(radio => {
-        radio.addEventListener('change', function() {
-          if (this.value === 'Yes') {
-            uploadArea.classList.add('show');
-          } else {
-            uploadArea.classList.remove('show');
-            if (fileInput) {
-              fileInput.value = '';
-              headCalamityFiles[category] = null;
-              if (filenameSpan) {
-                filenameSpan.innerHTML = 'No file chosen';
-                filenameSpan.style.color = 'var(--muted)';
-              }
-              if (removeBtn) removeBtn.style.display = 'none';
-            }
-          }
+        
+        const formData = new FormData();
+        formData.append("action", "uploadCalamityFile");
+        formData.append("fileData", base64Data);
+        formData.append("fileName", file.name);
+        formData.append("category", category);
+        formData.append("dataID", tempDataID.toString());
+        
+        console.log("Sending request to:", API_URL);
+        console.log("FormData entries:");
+        for (let pair of formData.entries()) {
+          console.log("  ", pair[0], "=", pair[1]?.substring?.(0, 100) || pair[1]);
+        }
+        
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: formData,
+          mode: 'no-cors' // ← TEMPORARY: Add this to test
         });
-      });
-      
-      const checkedRadio = Array.from(radios).find(r => r.checked);
-      if (checkedRadio && checkedRadio.value === 'Yes') {
-        uploadArea.classList.add('show');
+        
+        console.log("Response status:", response.status);
+        console.log("Response ok:", response.ok);
+        
+        const text = await response.text();
+        console.log("Raw response text:", text);
+        
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error("❌ Failed to parse JSON:", e);
+          console.error("Raw response was:", text);
+          resolve(null);
+          return;
+        }
+        
+        console.log("Parsed result:", result);
+        
+        if (result && result.success && result.fileId) {
+          const fileLink = `https://drive.google.com/file/d/${result.fileId}/view`;
+          console.log("✅ Upload success! File Link:", fileLink);
+          resolve(fileLink);
+        } else {
+          console.error("❌ Upload failed. Result:", result);
+          resolve(null);
+        }
+      } catch (err) {
+        console.error("❌ Upload error in promise:", err);
+        console.error("Error stack:", err.stack);
+        resolve(null);
       }
-    }
+    };
+    
+    reader.onerror = (err) => {
+      console.error("❌ FileReader error:", err);
+      resolve(null);
+    };
+    
+    console.log("Starting FileReader...");
+    reader.readAsDataURL(file);
   });
 }
 
