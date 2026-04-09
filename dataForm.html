@@ -7426,24 +7426,24 @@ const headCalamityData = {
 // Upload file to Google Drive via Apps Script and return FULL VIEW LINK
 async function uploadFileToDriveDirect(file, category, tempDataID) {
   console.log("=== uploadFileToDriveDirect START ===");
-  console.log("File:", file.name, "Size:", file.size, "Category:", category);
-  console.log("API_URL:", API_URL);
+  console.log("File name:", file?.name);
+  console.log("File size:", file?.size);
+  console.log("Category:", category);
   
   if (!file) {
-    console.error("No file provided!");
+    console.error("❌ No file provided!");
     return null;
   }
   
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    
     reader.onload = async function(e) {
       try {
-        console.log("FileReader loaded, converting to base64...");
         let base64Data = e.target.result;
         if (base64Data.includes('base64,')) {
           base64Data = base64Data.split('base64,')[1];
         }
-        console.log("Base64 length:", base64Data.length);
         
         const formData = new FormData();
         formData.append("action", "uploadCalamityFile");
@@ -7453,16 +7453,17 @@ async function uploadFileToDriveDirect(file, category, tempDataID) {
         formData.append("dataID", tempDataID.toString());
         
         console.log("Sending upload request for:", category);
-        console.log("Request URL:", API_URL);
         
+        // IMPORTANT: Do NOT add mode: 'no-cors' here
         const response = await fetch(API_URL, {
           method: "POST",
           body: formData
         });
         
         console.log("Response status:", response.status);
+        
         const text = await response.text();
-        console.log("Raw response:", text.substring(0, 500));
+        console.log("Response text:", text);
         
         let result;
         try {
@@ -7473,25 +7474,25 @@ async function uploadFileToDriveDirect(file, category, tempDataID) {
           return;
         }
         
-        console.log("Parsed result:", result);
-        
         if (result.success && result.fileId) {
           const fileLink = `https://drive.google.com/file/d/${result.fileId}/view`;
           console.log("✅ Upload success! File Link:", fileLink);
           resolve(fileLink);
         } else {
-          console.error("❌ Upload failed:", result.error || result.message || "Unknown error");
+          console.error("❌ Upload failed:", result);
           resolve(null);
         }
       } catch (err) {
-        console.error("❌ Upload error in promise:", err);
+        console.error("❌ Upload error:", err);
         resolve(null);
       }
     };
+    
     reader.onerror = (err) => {
       console.error("FileReader error:", err);
       resolve(null);
     };
+    
     reader.readAsDataURL(file);
   });
 }
