@@ -106,7 +106,7 @@ class SessionManager {
     }
     
     try {
-        const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbwGFL1xNeJ4E78CVpnaQKMdx_RFYDm0jVMbVJ-KnWTE2NbNrhin6bIgr5_R8sEgC4ZGeA/exec";
+        const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbxdAGmjmDECdLxCsXCvnnnLktsGXLpUKrrM7t_ZZ9aEwiJ_mB0k-CVF57khbAqU2hlX2w/exec";
         
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -152,7 +152,7 @@ class SessionManager {
     // Update user info from server
     async updateUserInfo(username) {
         try {
-            const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbwGFL1xNeJ4E78CVpnaQKMdx_RFYDm0jVMbVJ-KnWTE2NbNrhin6bIgr5_R8sEgC4ZGeA/exec";
+            const API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbxdAGmjmDECdLxCsXCvnnnLktsGXLpUKrrM7t_ZZ9aEwiJ_mB0k-CVF57khbAqU2hlX2w/exec";
             
             const response = await fetch(`${API_URL}?action=users&t=${Date.now()}`);
             const data = await response.json();
