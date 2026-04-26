@@ -9324,7 +9324,7 @@ function setupModalHandlers() {
     });
   }
 
-// Edit Lock Modal
+// Edit Lock Modal Close Handler
 const editLockModal = document.getElementById('editLockModal');
 const closeEditLockModal = document.getElementById('closeEditLockModal');
 
@@ -9995,7 +9995,42 @@ function startLockChecking(dataID, currentUsername) {
     }
   }, 3000);
 }
-
+// Check lock from local cache first (0ms if cached)
+async function getLockStatusFast(dataID, username) {
+  const now = Date.now();
+  
+  // Clean cache every 30 seconds
+  if (now - lastCacheCleanup > 30000) {
+    localLockCache.clear();
+    lastCacheCleanup = now;
+  }
+  
+  // Check local cache first (1-2ms)
+  const cached = localLockCache.get(dataID);
+  if (cached && (now - cached.timestamp) < 2000) { // Cache valid for 2 seconds
+    console.log(`⚡ Cache hit for ${dataID}: locked=${cached.isLocked}`);
+    return cached;
+  }
+  
+  // Not in cache or expired, check server (10-30ms)
+  const formData = new FormData();
+  formData.append('action', 'checkEditLockStatus');
+  formData.append('dataID', dataID);
+  formData.append('username', username);
+  
+  const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+  const result = await response.json();
+  
+  // Store in cache
+  const cacheEntry = {
+    isLocked: result.isLocked || false,
+    lockedBy: result.lockedBy || null,
+    timestamp: now
+  };
+  localLockCache.set(dataID, cacheEntry);
+  
+  return cacheEntry;
+}
 /* ============ COORDINATE FUNCTIONS ============ */
 function openCoordinateModal() {
   const modal = $('coordinateModal');
@@ -11363,8 +11398,19 @@ async function onEdit(id) {
   const username = localStorage.getItem('username');
   const sessionId = localStorage.getItem('sessionId');
   
-  showLoading(true);
+  // Show spinner on button immediately
+  let editBtn = null;
+  let originalIcon = '';
+  try {
+    editBtn = document.querySelector(`.edit-btn[data-id="${id}"]`);
+    if (editBtn) {
+      originalIcon = editBtn.innerHTML;
+      editBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      editBtn.disabled = true;
+    }
+  } catch(e) {}
   
+  // ============ LOCK CHECK - SIMPLE AND FAST ============
   try {
     const lockFormData = new FormData();
     lockFormData.append('action', 'lockHousehold');
@@ -11376,326 +11422,368 @@ async function onEdit(id) {
     const lockResponse = await fetch(SCRIPT_URL, { method: 'POST', body: lockFormData });
     const lockResult = await lockResponse.json();
     
+    // Restore button
+    if (editBtn) {
+      editBtn.innerHTML = originalIcon;
+      editBtn.disabled = false;
+    }
+    
+    // If locked, show modal and STOP
     if (!lockResult.success && lockResult.isLocked) {
-      showLoading(false);
-      
       const messageEl = document.getElementById('editLockMessage');
       if (messageEl) {
-        messageEl.innerHTML = `This household is currently being edited by <strong>${escapeHtml(lockResult.lockedBy)}</strong>.<br><br>Please wait a moment and try again.`;
+        messageEl.innerHTML = `This household is currently being edited by <strong>${escapeHtml(lockResult.lockedBy)}</strong>.`;
       }
       showModal('editLockModal');
       return;
     }
     
-    startLockChecking(id, username);
-    
-    const household = virtualState.allHouseholds.find(h => h.id === id);
-    
-    if (!household) {
-      console.error('Record not found:', id);
-      showError('Record not found');
-      showLoading(false);
-      return;
+  } catch (err) {
+    if (editBtn) {
+      editBtn.innerHTML = originalIcon;
+      editBtn.disabled = false;
     }
+    showError('Unable to check lock. Please try again.');
+    return;
+  }
+  
+  // ============ OPEN PANEL (only if lock acquired) ============
+  const household = virtualState.allHouseholds.find(h => h.id === id);
+  if (!household) {
+    showError('Record not found.');
+    return;
+  }
+  
+  resetEditState();
+  resetFormTracking();
+  
+  editDataID = id;
+  editHead = JSON.parse(JSON.stringify(household.head || {}));
+  editMembers = household.members && household.members.length > 0 ? JSON.parse(JSON.stringify(household.members)) : [];
+  
+  populateEditFormFields(editHead, editMembers);
+  openEditPanel();
+  startLockChecking(id, username);
+  
+  setTimeout(() => $('edit_householdHead')?.focus(), 100);
+}
+
+// Separate function for background lock check
+async function checkAndAcquireLockInBackground(id, username, sessionId, currentUserFullName) {
+  try {
+    const lockFormData = new FormData();
+    lockFormData.append('action', 'lockHousehold');
+    lockFormData.append('dataID', id);
+    lockFormData.append('username', username);
+    lockFormData.append('sessionId', sessionId);
+    lockFormData.append('fullName', currentUserFullName);
     
-    resetEditState();
-    resetFormTracking();
+    // Set a short timeout to prevent long waits
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     
-    editDataID = id;
-    
-    editHead = JSON.parse(JSON.stringify(household.head || {}));
-    
-    editMembers = [];
-    if (household.members && household.members.length > 0) {
-      editMembers = JSON.parse(JSON.stringify(household.members));
-      console.log(`Loaded ${editMembers.length} members for editing`);
-    } else {
-      console.log("No members found for this household");
-    }
-    
-    if ($('editDataIdDisplay')) {
-      $('editDataIdDisplay').textContent = editDataID;
-    }
-    
-    const originalSubmittedBy = editHead['Submitted By'] || editHead['submittedBy'] || '';
-    
-    if (!originalSubmittedBy) {
-      editHead['Submitted By'] = getUserFullName();
-    }
-    
-    $('edit_coordinate').value = editHead['Coordinate'] || editHead['Coordinates'] || '';
-    $('edit_barangay').value = editHead['Barangay'] || '';
-    restrictEditPanelBarangay();
-    $('edit_sitio').value = editHead['Sitio / Purok'] || '';
-    $('edit_householdHead').value = editHead['Name of Household Head'] || '';
-    
-    let headRegistrationValue = '';
-    if (editHead['FishR & RSBSA'] && editHead['FishR & RSBSA'] !== '') {
-      headRegistrationValue = editHead['FishR & RSBSA'];
-    } else if (editHead['FishR Registered/RSBSA Registered'] && editHead['FishR Registered/RSBSA Registered'] !== '') {
-      headRegistrationValue = editHead['FishR Registered/RSBSA Registered'];
-    }
-    
-    $('edit_headRegisteredCheckbox').checked = headRegistrationValue !== '';
-    if (headRegistrationValue !== '') {
-      $('edit_headRegistrationField').classList.add('show');
-      $('edit_headRegistration').value = headRegistrationValue;
-    } else {
-      $('edit_headRegistrationField').classList.remove('show');
-      $('edit_headRegistration').value = '';
-    }
-    
-    $('edit_contactNo').value = formatContactForDisplay(editHead['Contact no.'] || '');
-    
-    qAll("input[name='edit_head_gender']").forEach(r => r.checked = (r.value === (editHead['Gender'] || '')));
-    $('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
-    updateEditHeadAgeStage();
-    
-    const actualMemberCount = editMembers.length;
-    $('edit_memberCount').value = actualMemberCount;
-    
-    $('edit_educationalAttainment').value = editHead['Educational Attainment'] || '';
-    if (editHead['Educational Attainment'] === 'College Graduate') {
-      $('edit_collegeCourseField').classList.add('show');
-      $('edit_collegeCourse').value = editHead['College Graduate Course'] || '';
-    } else {
-      $('edit_collegeCourseField').classList.remove('show');
-      $('edit_collegeCourse').value = '';
-    }
-    
-    $('edit_employment').value = editHead['Employment'] || '';
-    if (editHead['Employment'] === 'Employed') {
-      $('edit_jobTitleField').classList.add('show');
-      $('edit_jobTitle').value = editHead['Job Title'] || '';
-    } else {
-      $('edit_jobTitleField').classList.remove('show');
-      $('edit_jobTitle').value = '';
-    }
-    
-    qAll("input[name='edit_ofw_status']").forEach(r => r.checked = (r.value === (editHead['Overseas Filipino Worker(OFW)'] || 'No')));
-    if (editHead['Overseas Filipino Worker(OFW)'] === 'Yes') {
-      $('edit_countryField').classList.add('show');
-      $('edit_country').value = editHead['Country'] || '';
-    } else {
-      $('edit_countryField').classList.remove('show');
-      $('edit_country').value = '';
-    }
-    
-    $('edit_soloParenting').checked = editHead['Solo Parenting'] === 'Yes';
-    $('edit_lactating').checked = editHead['Lactating'] === 'Yes';
-    $('edit_pregnant').checked = editHead['Pregnant'] === 'Yes';
-    
-    const pwdValue = editHead['Persons with Disability (PWD)'] || editHead['PWD'] || 'No';
-    qAll("input[name='edit_head_pwd']").forEach(r => {
-      r.checked = (r.value === pwdValue);
+    const lockResponse = await fetch(SCRIPT_URL, { 
+      method: 'POST', 
+      body: lockFormData,
+      signal: controller.signal
     });
     
-    $('edit_disabilityType').value = editHead['Type of Disability'] || '';
+    clearTimeout(timeoutId);
+    const lockResult = await lockResponse.json();
     
-    const disabilityTypeField = document.getElementById('edit_disabilityTypeField');
-    if (pwdValue === 'Yes') {
-      if (disabilityTypeField) disabilityTypeField.classList.add('show');
+    if (!lockResult.success && lockResult.isLocked) {
+      // Lock was taken by someone else - show warning
+      const messageEl = document.getElementById('editLockMessage');
+      if (messageEl) {
+        messageEl.innerHTML = `⚠️ Warning: This household is currently being edited by <strong>${escapeHtml(lockResult.lockedBy)}</strong>.<br><br>Your changes may be overwritten. Save with caution.`;
+      }
+      showModal('editLockModal');
+      
+      // Disable save button to prevent accidental overwrites
+      const saveBtn = document.getElementById('saveEditBtn');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = '0.5';
+        saveBtn.title = 'Another user is editing this household';
+      }
     } else {
-      if (disabilityTypeField) disabilityTypeField.classList.remove('show');
+      // Lock acquired successfully - start lock checking
+      startLockChecking(id, username);
+      
+      // Enable save button
+      const saveBtn = document.getElementById('saveEditBtn');
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = '1';
+        saveBtn.title = 'Save changes';
+      }
     }
-    
-    const statusValue = editHead['Status'] || '';
-    if (statusValue === 'Others') {
-      $('edit_head_status').value = 'Others';
-      $('edit_statusOthersField').classList.add('show');
-      $('edit_statusOthers').value = editHead['Status Others'] || editHead['Status'] || '';
-    } else {
-      $('edit_head_status').value = statusValue;
+  } catch (err) {
+    console.error('Background lock check error:', err);
+    // Don't block editing if lock check fails - just warn
+    const saveBtn = document.getElementById('saveEditBtn');
+    if (saveBtn) {
+      saveBtn.disabled = false;
     }
-    
-    $('edit_displacement_taal').checked = editHead['Taal Volcano (Within 14-15 KM Danger Zone)'] === 'Yes';
-    $('edit_displacement_typhoon').checked = editHead['Typhoon'] === 'Yes';
-    $('edit_displacement_flood').checked = editHead['Flood'] === 'Yes';
-    $('edit_displacement_landslide').checked = editHead['Landslide'] === 'Yes';
-    $('edit_displacement_earthquake').checked = editHead['Earthquake'] === 'Yes';
-    $('edit_displacement_fire').checked = editHead['Fire'] === 'Yes';
-    
-    const otherReasons = editHead['Other Reasons'] || '';
-    if (otherReasons && otherReasons.trim() !== '') {
-      $('edit_displacement_other_check').checked = true;
-      $('edit_displacementOtherField').classList.add('show');
-      $('edit_displacement_other').value = otherReasons;
-    } else {
-      $('edit_displacement_other_check').checked = false;
-      $('edit_displacementOtherField').classList.remove('show');
-      $('edit_displacement_other').value = '';
+  }
+}
+
+// Extract form population to a separate function for clarity
+function populateEditFormFields(editHead, editMembers) {
+  // Display Data ID
+  if ($('editDataIdDisplay')) {
+    $('editDataIdDisplay').textContent = editDataID;
+  }
+  
+  // Preserve submitted info
+  if (!editHead['Submitted By']) {
+    editHead['Submitted By'] = getUserFullName();
+  }
+  
+  // Basic Information
+  $('edit_coordinate').value = editHead['Coordinate'] || editHead['Coordinates'] || '';
+  $('edit_barangay').value = editHead['Barangay'] || '';
+  restrictEditPanelBarangay();
+  $('edit_sitio').value = editHead['Sitio / Purok'] || '';
+  $('edit_householdHead').value = editHead['Name of Household Head'] || '';
+  
+  // FishR Registration
+  let headRegistrationValue = editHead['FishR & RSBSA'] || editHead['FishR Registered/RSBSA Registered'] || '';
+  $('edit_headRegisteredCheckbox').checked = headRegistrationValue !== '';
+  if (headRegistrationValue !== '') {
+    $('edit_headRegistrationField').classList.add('show');
+    $('edit_headRegistration').value = headRegistrationValue;
+  } else {
+    $('edit_headRegistrationField').classList.remove('show');
+    $('edit_headRegistration').value = '';
+  }
+  
+  // Contact & Basic Info
+  $('edit_contactNo').value = formatContactForDisplay(editHead['Contact no.'] || '');
+  qAll("input[name='edit_head_gender']").forEach(r => r.checked = (r.value === (editHead['Gender'] || '')));
+  $('edit_householdBirthdate').value = toInputDate(editHead['Birthdate'] || '');
+  updateEditHeadAgeStage();
+  $('edit_memberCount').value = editMembers.length;
+  
+  // Educational & Economic Status
+  $('edit_educationalAttainment').value = editHead['Educational Attainment'] || '';
+  if (editHead['Educational Attainment'] === 'College Graduate') {
+    $('edit_collegeCourseField').classList.add('show');
+    $('edit_collegeCourse').value = editHead['College Graduate Course'] || '';
+  } else {
+    $('edit_collegeCourseField').classList.remove('show');
+    $('edit_collegeCourse').value = '';
+  }
+  
+  $('edit_employment').value = editHead['Employment'] || '';
+  if (editHead['Employment'] === 'Employed') {
+    $('edit_jobTitleField').classList.add('show');
+    $('edit_jobTitle').value = editHead['Job Title'] || '';
+  } else {
+    $('edit_jobTitleField').classList.remove('show');
+    $('edit_jobTitle').value = '';
+  }
+  
+  // OFW Status
+  qAll("input[name='edit_ofw_status']").forEach(r => r.checked = (r.value === (editHead['Overseas Filipino Worker(OFW)'] || 'No')));
+  if (editHead['Overseas Filipino Worker(OFW)'] === 'Yes') {
+    $('edit_countryField').classList.add('show');
+    $('edit_country').value = editHead['Country'] || '';
+  } else {
+    $('edit_countryField').classList.remove('show');
+    $('edit_country').value = '';
+  }
+  
+  // Additional Information
+  $('edit_soloParenting').checked = editHead['Solo Parenting'] === 'Yes';
+  $('edit_lactating').checked = editHead['Lactating'] === 'Yes';
+  $('edit_pregnant').checked = editHead['Pregnant'] === 'Yes';
+  
+  // PWD
+  const pwdValue = editHead['Persons with Disability (PWD)'] || editHead['PWD'] || 'No';
+  qAll("input[name='edit_head_pwd']").forEach(r => r.checked = (r.value === pwdValue));
+  $('edit_disabilityType').value = editHead['Type of Disability'] || '';
+  
+  const disabilityTypeField = document.getElementById('edit_disabilityTypeField');
+  if (pwdValue === 'Yes') {
+    disabilityTypeField?.classList.add('show');
+  } else {
+    disabilityTypeField?.classList.remove('show');
+  }
+  
+  // Status
+  const statusValue = editHead['Status'] || '';
+  if (statusValue === 'Others') {
+    $('edit_head_status').value = 'Others';
+    $('edit_statusOthersField').classList.add('show');
+    $('edit_statusOthers').value = editHead['Status Others'] || editHead['Status'] || '';
+  } else {
+    $('edit_head_status').value = statusValue;
+    $('edit_statusOthersField').classList.remove('show');
+  }
+  
+  // Displacement Reasons
+  $('edit_displacement_taal').checked = editHead['Taal Volcano (Within 14-15 KM Danger Zone)'] === 'Yes';
+  $('edit_displacement_typhoon').checked = editHead['Typhoon'] === 'Yes';
+  $('edit_displacement_flood').checked = editHead['Flood'] === 'Yes';
+  $('edit_displacement_landslide').checked = editHead['Landslide'] === 'Yes';
+  $('edit_displacement_earthquake').checked = editHead['Earthquake'] === 'Yes';
+  $('edit_displacement_fire').checked = editHead['Fire'] === 'Yes';
+  
+  const otherReasons = editHead['Other Reasons'] || '';
+  if (otherReasons && otherReasons.trim() !== '') {
+    $('edit_displacement_other_check').checked = true;
+    $('edit_displacementOtherField').classList.add('show');
+    $('edit_displacement_other').value = otherReasons;
+  } else {
+    $('edit_displacement_other_check').checked = false;
+    $('edit_displacementOtherField').classList.remove('show');
+    $('edit_displacement_other').value = '';
+  }
+  
+  const anyDisplacementChecked = 
+    $('edit_displacement_taal').checked ||
+    $('edit_displacement_typhoon').checked ||
+    $('edit_displacement_flood').checked ||
+    $('edit_displacement_landslide').checked ||
+    $('edit_displacement_earthquake').checked ||
+    $('edit_displacement_fire').checked ||
+    $('edit_displacement_other_check').checked;
+  
+  $('edit_assemblyAreaOptions').style.display = anyDisplacementChecked ? 'block' : 'none';
+  
+  // Assembly Area
+  const insideAssembly = editHead['Inside Assembly Area'] === 'Yes';
+  const outsideAssembly = editHead['Outside Assembly Area'] === 'Yes';
+  
+  if (insideAssembly) {
+    $('edit_inside_assembly').checked = true;
+    $('edit_outside_assembly').checked = false;
+    $('edit_insideAssemblyFields').style.display = 'block';
+    $('edit_outsideAssemblyFields').style.display = 'none';
+    $('edit_pickup').value = editHead['Pick-Up Location'] || '';
+    $('edit_assembly_area').value = editHead['Assembly Area'] || '';
+    $('edit_head_transport').value = editHead['Transportation'] || '';
+  } else if (outsideAssembly) {
+    $('edit_inside_assembly').checked = false;
+    $('edit_outside_assembly').checked = true;
+    $('edit_insideAssemblyFields').style.display = 'none';
+    $('edit_outsideAssemblyFields').style.display = 'block';
+    $('edit_family_host').value = editHead['Family/Relative Host'] || '';
+    $('edit_host_contact').value = editHead['Host_Contact'] || '';
+    $('edit_outside_transport').value = editHead['Transportation'] || '';
+  } else {
+    $('edit_inside_assembly').checked = false;
+    $('edit_outside_assembly').checked = false;
+    $('edit_insideAssemblyFields').style.display = 'none';
+    $('edit_outsideAssemblyFields').style.display = 'none';
+  }
+  
+  // Domestic Animals
+  $('edit_dog_chk').checked = (editHead['Dog'] === 'Yes');
+  $('edit_dog_qty').value = editHead['Dog Qty.'] || '';
+  $('edit_cat_chk').checked = (editHead['Cat'] === 'Yes');
+  $('edit_cat_qty').value = editHead['Cat Qty.'] || '';
+  $('edit_pig_chk').checked = (editHead['Pig'] === 'Yes');
+  $('edit_pig_qty').value = editHead['Pig Qty.'] || '';
+  $('edit_cow_chk').checked = (editHead['Cow'] === 'Yes');
+  $('edit_cow_qty').value = editHead['Cow Qty.'] || '';
+  $('edit_carabao_chk').checked = (editHead['Carabao'] === 'Yes');
+  $('edit_carabao_qty').value = editHead['Carabao Qty.'] || '';
+  $('edit_chicken_chk').checked = (editHead['Chicken'] === 'Yes');
+  $('edit_chicken_qty').value = editHead['Chicken Qty.'] || '';
+  $('edit_animals_others').value = editHead['Others'] || '';
+  
+  syncAnimalCheckboxes();
+  
+  // Government Assistance
+  const hasTUPAD = editHead['TUPAD'] === 'Yes';
+  $('edit_ass_tupad').checked = hasTUPAD;
+  $('edit_ass_tupad_date_input').value = toInputDate(editHead['TUPAD_Date'] || '');
+  if (hasTUPAD) $('edit_ass_tupad_date').classList.add('show');
+  
+  const hasLocal4Ps = editHead['Local 4Ps'] === 'Yes';
+  $('edit_ass_local4ps').checked = hasLocal4Ps;
+  $('edit_ass_local4ps_date_input').value = toInputDate(editHead['Local 4Ps_Date'] || '');
+  if (hasLocal4Ps) $('edit_ass_local4ps_date').classList.add('show');
+  
+  const hasNational4Ps = editHead['National 4Ps'] === 'Yes';
+  $('edit_ass_intl4ps').checked = hasNational4Ps;
+  $('edit_ass_intl4ps_date_input').value = toInputDate(editHead['National 4Ps_Date'] || '');
+  if (hasNational4Ps) $('edit_ass_intl4ps_date').classList.add('show');
+  
+  const hasLocalSP = editHead['Local Social Pension'] === 'Yes';
+  $('edit_ass_locsp').checked = hasLocalSP;
+  $('edit_ass_locsp_date_input').value = toInputDate(editHead['Local Social Pension_Date'] || '');
+  if (hasLocalSP) $('edit_ass_locsp_date').classList.add('show');
+  
+  const hasNationalSP = editHead['National Social Pension'] === 'Yes';
+  $('edit_ass_intlsp').checked = hasNationalSP;
+  $('edit_ass_intlsp_date_input').value = toInputDate(editHead['National Social Pension_Date'] || '');
+  if (hasNationalSP) $('edit_ass_intlsp_date').classList.add('show');
+  
+  const hasSoloParent = editHead['Solo Parent Assistance'] === 'Yes';
+  $('edit_ass_solo').checked = hasSoloParent;
+  $('edit_ass_solo_date_input').value = toInputDate(editHead['Solo Parent Assistance_Date'] || '');
+  if (hasSoloParent) $('edit_ass_solo_date').classList.add('show');
+  
+  const hasReliefGoods = editHead['Relief Goods'] === 'Yes';
+  $('edit_ass_relief').checked = hasReliefGoods;
+  $('edit_ass_relief_date_input').value = toInputDate(editHead['Relief Goods_Date'] || '');
+  if (hasReliefGoods) $('edit_ass_relief_date').classList.add('show');
+  
+  const hasCashSubsidy = editHead['Cash Subsidy'] === 'Yes';
+  $('edit_ass_cash').checked = hasCashSubsidy;
+  $('edit_ass_cash_date_input').value = toInputDate(editHead['Cash Subsidy_Date'] || '');
+  if (hasCashSubsidy) $('edit_ass_cash_date').classList.add('show');
+  
+  const hasAICS = editHead['AICS'] && editHead['AICS'] !== '';
+  $('edit_ass_aics').value = editHead['AICS'] || '';
+  $('edit_ass_aics_date_input').value = toInputDate(editHead['AICS_Date'] || '');
+  if (hasAICS) $('edit_ass_aics_date').classList.add('show');
+  
+  // Update members preview
+  updateEditMembersPreview();
+  
+  // Load calamity files in background (non-blocking)
+  setTimeout(() => {
+    loadHeadCalamityFiles(editHead);
+    if (editMembers.length > 0) {
+      loadMemberCalamityFiles(editMembers, 0);
     }
+  }, 100);
+  
+  // Setup event handlers
+  setTimeout(() => {
+    setupRealTimeValidationForEdit();
+    setupContactValidation();
+    setupEditGovernmentAssistanceDateHandlers();
     
-    const anyDisplacementChecked = 
-      $('edit_displacement_taal').checked ||
-      $('edit_displacement_typhoon').checked ||
-      $('edit_displacement_flood').checked ||
-      $('edit_displacement_landslide').checked ||
-      $('edit_displacement_earthquake').checked ||
-      $('edit_displacement_fire').checked ||
-      $('edit_displacement_other_check').checked;
+    // Trigger change events for conditional fields
+    if (hasTUPAD) $('edit_ass_tupad').dispatchEvent(new Event('change'));
+    if (hasLocal4Ps) $('edit_ass_local4ps').dispatchEvent(new Event('change'));
+    if (hasNational4Ps) $('edit_ass_intl4ps').dispatchEvent(new Event('change'));
+    if (hasLocalSP) $('edit_ass_locsp').dispatchEvent(new Event('change'));
+    if (hasNationalSP) $('edit_ass_intlsp').dispatchEvent(new Event('change'));
+    if (hasSoloParent) $('edit_ass_solo').dispatchEvent(new Event('change'));
+    if (hasReliefGoods) $('edit_ass_relief').dispatchEvent(new Event('change'));
+    if (hasCashSubsidy) $('edit_ass_cash').dispatchEvent(new Event('change'));
+    if (hasAICS) $('edit_ass_aics').dispatchEvent(new Event('change'));
     
     if (anyDisplacementChecked) {
       $('edit_assemblyAreaOptions').style.display = 'block';
-    } else {
-      $('edit_assemblyAreaOptions').style.display = 'none';
     }
-    
-    const insideAssembly = editHead['Inside Assembly Area'] === 'Yes';
-    const outsideAssembly = editHead['Outside Assembly Area'] === 'Yes';
-    
     if (insideAssembly) {
-      $('edit_inside_assembly').checked = true;
-      $('edit_outside_assembly').checked = false;
-      if (anyDisplacementChecked) {
-        $('edit_assemblyAreaOptions').style.display = 'block';
-      }
-      $('edit_insideAssemblyFields').style.display = 'block';
-      $('edit_outsideAssemblyFields').style.display = 'none';
-      $('edit_pickup').value = editHead['Pick-Up Location'] || '';
-      $('edit_assembly_area').value = editHead['Assembly Area'] || '';
-      $('edit_head_transport').value = editHead['Transportation'] || '';
+      $('edit_inside_assembly').dispatchEvent(new Event('change'));
     } else if (outsideAssembly) {
-      $('edit_inside_assembly').checked = false;
-      $('edit_outside_assembly').checked = true;
-      if (anyDisplacementChecked) {
-        $('edit_assemblyAreaOptions').style.display = 'block';
-      }
-      $('edit_insideAssemblyFields').style.display = 'none';
-      $('edit_outsideAssemblyFields').style.display = 'block';
-      $('edit_family_host').value = editHead['Family/Relative Host'] || '';
-      $('edit_host_contact').value = editHead['Host_Contact'] || '';
-      $('edit_outside_transport').value = editHead['Transportation'] || '';
-    } else {
-      $('edit_inside_assembly').checked = false;
-      $('edit_outside_assembly').checked = false;
-      if (!anyDisplacementChecked) {
-        $('edit_assemblyAreaOptions').style.display = 'none';
-      }
-      $('edit_insideAssemblyFields').style.display = 'none';
-      $('edit_outsideAssemblyFields').style.display = 'none';
+      $('edit_outside_assembly').dispatchEvent(new Event('change'));
     }
-    
-    $('edit_dog_chk').checked = (editHead['Dog'] === 'Yes');
-    $('edit_dog_qty').value = editHead['Dog Qty.'] || '';
-    $('edit_cat_chk').checked = (editHead['Cat'] === 'Yes');
-    $('edit_cat_qty').value = editHead['Cat Qty.'] || '';
-    $('edit_pig_chk').checked = (editHead['Pig'] === 'Yes');
-    $('edit_pig_qty').value = editHead['Pig Qty.'] || '';
-    $('edit_cow_chk').checked = (editHead['Cow'] === 'Yes');
-    $('edit_cow_qty').value = editHead['Cow Qty.'] || '';
-    $('edit_carabao_chk').checked = (editHead['Carabao'] === 'Yes');
-    $('edit_carabao_qty').value = editHead['Carabao Qty.'] || '';
-    $('edit_chicken_chk').checked = (editHead['Chicken'] === 'Yes');
-    $('edit_chicken_qty').value = editHead['Chicken Qty.'] || '';
-    $('edit_animals_others').value = editHead['Others'] || '';
-    
-    syncAnimalCheckboxes();
-    
-    const hasTUPAD = editHead['TUPAD'] === 'Yes';
-    $('edit_ass_tupad').checked = hasTUPAD;
-    $('edit_ass_tupad_date_input').value = toInputDate(editHead['TUPAD_Date'] || '');
-    if (hasTUPAD) $('edit_ass_tupad_date').classList.add('show');
-    
-    const hasLocal4Ps = editHead['Local 4Ps'] === 'Yes';
-    $('edit_ass_local4ps').checked = hasLocal4Ps;
-    $('edit_ass_local4ps_date_input').value = toInputDate(editHead['Local 4Ps_Date'] || '');
-    if (hasLocal4Ps) $('edit_ass_local4ps_date').classList.add('show');
-    
-    const hasNational4Ps = editHead['National 4Ps'] === 'Yes';
-    $('edit_ass_intl4ps').checked = hasNational4Ps;
-    $('edit_ass_intl4ps_date_input').value = toInputDate(editHead['National 4Ps_Date'] || '');
-    if (hasNational4Ps) $('edit_ass_intl4ps_date').classList.add('show');
-    
-    const hasLocalSP = editHead['Local Social Pension'] === 'Yes';
-    $('edit_ass_locsp').checked = hasLocalSP;
-    $('edit_ass_locsp_date_input').value = toInputDate(editHead['Local Social Pension_Date'] || '');
-    if (hasLocalSP) $('edit_ass_locsp_date').classList.add('show');
-    
-    const hasNationalSP = editHead['National Social Pension'] === 'Yes';
-    $('edit_ass_intlsp').checked = hasNationalSP;
-    $('edit_ass_intlsp_date_input').value = toInputDate(editHead['National Social Pension_Date'] || '');
-    if (hasNationalSP) $('edit_ass_intlsp_date').classList.add('show');
-    
-    const hasSoloParent = editHead['Solo Parent Assistance'] === 'Yes';
-    $('edit_ass_solo').checked = hasSoloParent;
-    $('edit_ass_solo_date_input').value = toInputDate(editHead['Solo Parent Assistance_Date'] || '');
-    if (hasSoloParent) $('edit_ass_solo_date').classList.add('show');
-    
-    const hasReliefGoods = editHead['Relief Goods'] === 'Yes';
-    $('edit_ass_relief').checked = hasReliefGoods;
-    $('edit_ass_relief_date_input').value = toInputDate(editHead['Relief Goods_Date'] || '');
-    if (hasReliefGoods) $('edit_ass_relief_date').classList.add('show');
-    
-    const hasCashSubsidy = editHead['Cash Subsidy'] === 'Yes';
-    $('edit_ass_cash').checked = hasCashSubsidy;
-    $('edit_ass_cash_date_input').value = toInputDate(editHead['Cash Subsidy_Date'] || '');
-    if (hasCashSubsidy) $('edit_ass_cash_date').classList.add('show');
-    
-    const hasAICS = editHead['AICS'] && editHead['AICS'] !== '';
-    $('edit_ass_aics').value = editHead['AICS'] || '';
-    $('edit_ass_aics_date_input').value = toInputDate(editHead['AICS_Date'] || '');
-    if (hasAICS) $('edit_ass_aics_date').classList.add('show');
-    
-    updateEditMembersPreview();
-    openEditPanel();
-    
-    setTimeout(() => {
-      loadHeadCalamityFiles(editHead);
-    }, 100);
-    
-    if (editMembers.length > 0) {
-      setTimeout(() => {
-        loadMemberCalamityFiles(editMembers, 0);
-      }, 150);
+    if ($('edit_displacement_other_check').checked) {
+      $('edit_displacement_other_check').dispatchEvent(new Event('change'));
     }
-    
-    setTimeout(() => {
-      forceRefreshThumbnails();
-    }, 250);
-    
-    setTimeout(() => {
-      captureOriginalFormState();
-    }, 200);
-    
-    setTimeout(() => $('edit_householdHead')?.focus(), 120);
-    setTimeout(() => {
-      setupRealTimeValidationForEdit();
-      setupContactValidation();
-      setupEditGovernmentAssistanceDateHandlers();
-      
-      setTimeout(() => {
-        if (hasTUPAD) $('edit_ass_tupad').dispatchEvent(new Event('change'));
-        if (hasLocal4Ps) $('edit_ass_local4ps').dispatchEvent(new Event('change'));
-        if (hasNational4Ps) $('edit_ass_intl4ps').dispatchEvent(new Event('change'));
-        if (hasLocalSP) $('edit_ass_locsp').dispatchEvent(new Event('change'));
-        if (hasNationalSP) $('edit_ass_intlsp').dispatchEvent(new Event('change'));
-        if (hasSoloParent) $('edit_ass_solo').dispatchEvent(new Event('change'));
-        if (hasReliefGoods) $('edit_ass_relief').dispatchEvent(new Event('change'));
-        if (hasCashSubsidy) $('edit_ass_cash').dispatchEvent(new Event('change'));
-        if (hasAICS) $('edit_ass_aics').dispatchEvent(new Event('change'));
-        
-        if (anyDisplacementChecked) {
-          $('edit_assemblyAreaOptions').style.display = 'block';
-        }
-        if (insideAssembly) {
-          $('edit_inside_assembly').dispatchEvent(new Event('change'));
-        } else if (outsideAssembly) {
-          $('edit_outside_assembly').dispatchEvent(new Event('change'));
-        }
-        if ($('edit_displacement_other_check').checked) {
-          $('edit_displacement_other_check').dispatchEvent(new Event('change'));
-        }
-      }, 300);
-    }, 100);
-    
-    showLoading(false);
-    
-  } catch (err) {
-    console.error('Edit error:', err);
-    showError('Failed to start editing: ' + err.message);
-    showLoading(false);
-  }
+  }, 50);
+  
+  captureOriginalFormState();
 }
 
 function getUserFullName() {
