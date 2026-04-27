@@ -13415,7 +13415,7 @@ async function uploadPendingHeadFilesOnSave() {
 }
 
 /* ============ FAST SAVE EDITED HOUSEHOLD ============ */
-async function saveEditedHousehold(silentReload = false) {
+async function saveEditedHouseholdActual(silentReload = false) {
     const startTime = performance.now();
     console.log('🟢 SAVE STARTED:', editDataID);
     
@@ -13655,7 +13655,79 @@ if (json.success) {
         }
     }
 }
+// ============ FAST SAVE QUEUE SYSTEM ============
+let isSaving = false;
+let saveQueue = [];
 
+async function saveEditedHousehold(silentReload = false) {
+  // Return a promise that will resolve when save completes
+  return new Promise((resolve, reject) => {
+    saveQueue.push({ resolve, reject, silentReload });
+    processSaveQueue();
+  });
+}
+
+async function processSaveQueue() {
+  if (isSaving || saveQueue.length === 0) return;
+  
+  isSaving = true;
+  const { resolve, reject, silentReload } = saveQueue.shift();
+  
+  // Show saving indicator on button
+  const btn = document.getElementById('saveEditBtn');
+  const originalText = btn ? btn.innerText : 'Save changes';
+  const originalDisabled = btn ? btn.disabled : false;
+  
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Saving...';
+  }
+  
+  try {
+    const result = await saveEditedHouseholdActual(silentReload);
+    resolve(result);
+    
+    // Show success briefly
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = originalText;
+          btn.disabled = originalDisabled;
+        }
+      }, 1500);
+    }
+  } catch (err) {
+    reject(err);
+    if (btn) {
+      btn.innerHTML = originalText;
+      btn.disabled = originalDisabled;
+    }
+    showError('Save failed: ' + err.message);
+  } finally {
+    isSaving = false;
+    // Process next save after 300ms gap
+    setTimeout(processSaveQueue, 300);
+  }
+}
+
+// Add rate limiting
+const userUpdateTimes = new Map();
+
+function checkUpdateRateLimit() {
+  const username = localStorage.getItem('username') || 'unknown';
+  const now = Date.now();
+  const lastUpdate = userUpdateTimes.get(username);
+  
+  if (lastUpdate && (now - lastUpdate) < 2000) { // 2 seconds cooldown
+    const wait = Math.ceil((2000 - (now - lastUpdate)) / 1000);
+    showError(`Please wait ${wait} second(s) before saving again.`);
+    return false;
+  }
+  
+  userUpdateTimes.set(username, now);
+  return true;
+}
 // Add this helper function to refresh data without page reload
 async function refreshRecordsData() {
     console.log(`🔄 refreshRecordsData called - FORCING FRESH DATA`);
@@ -14431,15 +14503,19 @@ if(overlay) overlay.addEventListener('click', ()=>{
   });
 
   // Save edit button - Show confirmation modal first
+// Save edit button - USING QUEUE SYSTEM
 if($('saveEditBtn')) $('saveEditBtn').addEventListener('click', (ev)=> { 
     ev.preventDefault();
     
-    // Validate head data FIRST
-    if (!validateHeadFormForEdit()) {
-        return; // Stop if validation fails - validation summary will show automatically
+    // Check rate limit first
+    if (!checkUpdateRateLimit()) {
+        return;
     }
     
-    // Validate all members if there are any
+    if (!validateHeadFormForEdit()) {
+        return;
+    }
+    
     if (editMembers.length > 0) {
         const invalidMembers = [];
         editMembers.forEach((member, index) => {
@@ -14450,15 +14526,15 @@ if($('saveEditBtn')) $('saveEditBtn').addEventListener('click', (ev)=> {
         
         if (invalidMembers.length > 0) {
             if (confirm(`Members #${invalidMembers.join(', ')} are missing names. Save anyway?`)) {
-                // Proceed to save confirmation
-                showSaveConfirmation();
+                // USE THE QUEUE SYSTEM
+                saveEditedHousehold(true);
             }
             return;
         }
     }
     
-    // Show confirmation modal instead of saving directly
-    showSaveConfirmation();
+    // USE THE QUEUE SYSTEM - NOT showSaveConfirmation
+    saveEditedHousehold(true);
 });
   
   // Setup government assistance date field handlers for edit panel
