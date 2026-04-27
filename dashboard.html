@@ -1382,7 +1382,7 @@ body.guest-user .mobile-nav-item.mobile-nav-dashboard {
       <div class="breakdown-table-container">
         <h4><i class="fas fa-graduation-cap"></i> Educational Attainment</h4>
         <table class="breakdown-table" id="tblBarangayEducation">
-          <thead><tr><th>Barangay</th><th>No Formal</th><th>Elem Level</th><th>Elem Grad</th><th>JHS Level</th><th>JHS Grad</th><th>SHS Level</th><th>SHS Grad</th><th>College Level</th><th>College Grad</th></tr></thead>
+          <thead><tr><th>Barangay</th><th>No Formal</th><th>Elem Level</th><th>Elem Grad</th><th>JHS Level</th><th>JHS Grad</th><th>SHS Level</th><th>SHS Grad</th><th>ALS Grad</th><th>SPED Grad</th><th>Vocational Grad</th><th>College Level</th><th>College Grad</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -1677,7 +1677,7 @@ function processDashboardData(data) {
     const disabilityTypeTotals = {};
     const calamityImpactStats = { structuralDamage: 0, householdInjury: 0, habitability: 0, lossOfLivelihood: 0 };
     
-    const overallEducation = { noFormalEducation: 0, elementaryLevel: 0, elementaryGraduate: 0, juniorHighSchoolLevel: 0, juniorHighSchoolGraduate: 0, seniorHighSchoolLevel: 0, seniorHighSchoolGraduate: 0, collegeLevel: 0, collegeGraduate: 0 };
+    const overallEducation = { noFormalEducation: 0, elementaryLevel: 0, elementaryGraduate: 0, juniorHighSchoolLevel: 0, juniorHighSchoolGraduate: 0, seniorHighSchoolLevel: 0, seniorHighSchoolGraduate: 0, alsGraduate: 0, spedGraduate: 0, vocationalGraduate: 0, collegeLevel: 0, collegeGraduate: 0 };
     const overallEmployment = { employed: 0, unemployed: 0 };
     const fishrStats = { fishrRegistered: 0, rbisRegistered: 0, bothRegistered: 0, notRegistered: 0 };
     
@@ -1703,7 +1703,7 @@ function processDashboardData(data) {
                 ageBuckets: { '0-5':0, '6-17':0, '18-59':0, '60+':0 }, 
                 sitio: { I:0, II:0, III:0, IV:0, V:0, VI:0, VII:0 },
                 support: { "TUPAD":0, "Local 4Ps":0, "National 4Ps":0, "Local Social Pension":0, "National Social Pension":0, "Solo Parent Assistance":0, "Relief Goods":0, "Cash Subsidy":0 },
-                education: { noFormalEducation:0, elementaryLevel:0, elementaryGraduate:0, juniorHighSchoolLevel:0, juniorHighSchoolGraduate:0, seniorHighSchoolLevel:0, seniorHighSchoolGraduate:0, collegeLevel:0, collegeGraduate:0 },
+                education: { noFormalEducation:0, elementaryLevel:0, elementaryGraduate:0, juniorHighSchoolLevel:0, juniorHighSchoolGraduate:0, seniorHighSchoolLevel:0, seniorHighSchoolGraduate:0, alsGraduate:0, spedGraduate:0, vocationalGraduate:0, collegeLevel:0, collegeGraduate:0 },
                 employment: { employed:0, unemployed:0 },
                 fishr: { fishrRegistered:0, rbisRegistered:0, bothRegistered:0, notRegistered:0 },
                 ofw: { saudiArabia:0, uae:0, qatar:0, kuwait:0, bahrain:0, oman:0, hongKong:0, singapore:0, japan:0, taiwan:0, malaysia:0, australia:0, newZealand:0, italy:0, uk:0, germany:0, cyprus:0, canada:0, usa:0, libya:0 },
@@ -1920,6 +1920,18 @@ else if(gender && gender !== '') {
             else if(eduLower.includes('senior high school graduate') || eduLower.includes('senior high graduate')) { 
                 overallEducation.seniorHighSchoolGraduate++; 
                 b.education.seniorHighSchoolGraduate++; 
+            }
+            else if(eduLower.includes('alternative learning system') || eduLower.includes('als graduate')) { 
+                overallEducation.alsGraduate++; 
+                b.education.alsGraduate++; 
+            }
+            else if(eduLower.includes('special education') || eduLower.includes('sped graduate')) { 
+                overallEducation.spedGraduate++; 
+                b.education.spedGraduate++; 
+            }
+            else if(eduLower.includes('vocational') || eduLower.includes('technical graduate')) { 
+                overallEducation.vocationalGraduate++; 
+                b.education.vocationalGraduate++; 
             }
             else if(eduLower.includes('college level') || eduLower === 'college undergraduate') { 
                 overallEducation.collegeLevel++; 
@@ -2169,7 +2181,7 @@ console.log(`  Running totals - Employed: ${overallEmployment.employed}, Unemplo
     const educationStatsDiv = document.getElementById('educationStats');
     if (educationStatsDiv) {
         educationStatsDiv.innerHTML = '';
-        const educationLabels = { noFormalEducation: 'No Formal', elementaryLevel: 'Elem Level', elementaryGraduate: 'Elem Grad', juniorHighSchoolLevel: 'JHS Level', juniorHighSchoolGraduate: 'JHS Grad', seniorHighSchoolLevel: 'SHS Level', seniorHighSchoolGraduate: 'SHS Grad', collegeLevel: 'College Level', collegeGraduate: 'College Grad' };
+        const educationLabels = { noFormalEducation: 'No Formal', elementaryLevel: 'Elem Level', elementaryGraduate: 'Elem Grad', juniorHighSchoolLevel: 'JHS Level', juniorHighSchoolGraduate: 'JHS Grad', seniorHighSchoolLevel: 'SHS Level', seniorHighSchoolGraduate: 'SHS Grad', alsGraduate: 'ALS Graduate', spedGraduate: 'SPED Graduate', vocationalGraduate: 'Vocational Grad', collegeLevel: 'College Level', collegeGraduate: 'College Grad' };
         Object.entries(educationLabels).forEach(([key, label]) => {
             const count = overallEducation[key];
             if(count > 0) {
@@ -2339,8 +2351,9 @@ populateTable('#tblSummary tbody', (l, s) => `<tr><td>${l}<\/td><td>${s.male||0}
             s.education.noFormalEducation || 0, s.education.elementaryLevel || 0,
             s.education.elementaryGraduate || 0, s.education.juniorHighSchoolLevel || 0,
             s.education.juniorHighSchoolGraduate || 0, s.education.seniorHighSchoolLevel || 0,
-            s.education.seniorHighSchoolGraduate || 0, s.education.collegeLevel || 0,
-            s.education.collegeGraduate || 0
+            s.education.seniorHighSchoolGraduate || 0, s.education.alsGraduate || 0,
+            s.education.spedGraduate || 0, s.education.vocationalGraduate || 0,
+            s.education.collegeLevel || 0, s.education.collegeGraduate || 0
         ];
         return `<tr><td>${l}</td>${cells.map(c => `<td>${c}</td>`).join('')}</tr>`;
     });
