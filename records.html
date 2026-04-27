@@ -5462,6 +5462,36 @@ let deletePendingHeadName = '';
 let deletePendingBarangay = '';
 window.pendingHeadFiles = {};
 
+// ============ RETRY FUNCTION FOR CONCURRENT UPDATES ============
+async function saveWithRetry(saveFunction, maxRetries = 3, delay = 1500) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const result = await saveFunction();
+      
+      // Check if it's a lock timeout error
+      if (result && result.error === "LOCK_TIMEOUT") {
+        console.log(`⚠️ Another user is updating. Retry attempt ${i + 1}/${maxRetries} in ${delay}ms...`);
+        
+        if (i < maxRetries - 1) {
+          // Show user that we're retrying
+          showInfo(`Another user is updating. Retrying (${i + 1}/${maxRetries})...`);
+          await new Promise(r => setTimeout(r, delay));
+          continue;
+        } else {
+          showError("This household is being updated by another user. Please try again in a moment.");
+          return { success: false, message: result.message };
+        }
+      }
+      
+      return result;
+    } catch (err) {
+      console.error(`Save attempt ${i + 1} failed:`, err);
+      if (i === maxRetries - 1) throw err;
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+}
+
 /* ============ MODAL FUNCTIONS - MUST BE DEFINED EARLY ============ */
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -10438,12 +10468,18 @@ function validateMemberFormForEdit() {
     const element = document.getElementById(field.id);
     if (element) {
       const value = element.value.trim();
-      if (!value) {
+      // Skip validation for empty member names - they will be filtered out on save
+      if (!value && field.id === 'memberName') {
+        return;
+      }
+      if (!value && field.id !== 'memberName') {
         element.classList.add('validation-error');
         const label = element.closest('div')?.querySelector('label');
         if (label) label.classList.add('validation-error-label');
         errors.push(`${field.name} is required`);
         hasErrors = true;
+      } else if (value && field.id === 'memberName') {
+        element.classList.remove('validation-error');
       }
     }
   });
@@ -10466,29 +10502,29 @@ function validateMemberFormForEdit() {
     }
   }
 
-const validationSummary = document.getElementById('validationSummaryMember');
-const errorsList = document.getElementById('memberValidationErrors');
+  const validationSummary = document.getElementById('validationSummaryMember');
+  const errorsList = document.getElementById('memberValidationErrors');
 
-if (hasErrors) {
-  if (errorsList) {
-    errorsList.innerHTML = '';
-    errors.forEach(error => {
-      const li = document.createElement('li');
-      li.textContent = error;
-      errorsList.appendChild(li);
-    });
+  if (hasErrors) {
+    if (errorsList) {
+      errorsList.innerHTML = '';
+      errors.forEach(error => {
+        const li = document.createElement('li');
+        li.textContent = error;
+        errorsList.appendChild(li);
+      });
+    }
+    if (validationSummary) {
+      validationSummary.classList.add('show');
+      validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return false;
+  } else {
+    if (validationSummary) {
+      validationSummary.classList.remove('show');
+    }
+    return true;
   }
-  if (validationSummary) {
-    validationSummary.classList.add('show');  // USE classList
-    validationSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-  return false;
-} else {
-  if (validationSummary) {
-    validationSummary.classList.remove('show');  // USE classList
-  }
-  return true;
-}
 }
 function clearValidationErrors(formId) {
   let elements;
@@ -13205,7 +13241,7 @@ function formatTimestampPH_(date) {
   return `${month}/${day}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
 }
 
-function collectMemberPanelToEdit(){
+function collectMemberPanelToEdit() {
   const name = $('memberName').value.trim();
   const birthdate_input = $('memberBirthdate').value || '';
   const birth_for_sheet = toSheetDate(birthdate_input);
@@ -13234,16 +13270,13 @@ function collectMemberPanelToEdit(){
     'Age': ageVal,
     'Stage': stageVal,
     
-// Additional Information - FIXED: Properly set checkbox values
-'Solo Parenting': $('member_soloParenting').checked ? 'Yes' : 'No',
-'Lactating': $('member_lactating').checked ? 'Yes' : 'No',
-'Pregnant': $('member_pregnant').checked ? 'Yes' : 'No',
+    'Solo Parenting': $('member_soloParenting').checked ? 'Yes' : 'No',
+    'Lactating': $('member_lactating').checked ? 'Yes' : 'No',
+    'Pregnant': $('member_pregnant').checked ? 'Yes' : 'No',
     
-    // PWD and Disability Type
     'Persons with Disability (PWD)': document.querySelector("input[name='member_pwd']:checked")?.value || 'No',
     'Type of Disability': $('memberDisabilityType').value || '',
     
-    // Status with Others option
     'Status': $('memberStatus').value === 'Others' ? $('memberStatusOthers').value || '' : $('memberStatus').value || '',
     
     'Educational Attainment': $('memberEducationalAttainment').value || '',
@@ -13253,7 +13286,6 @@ function collectMemberPanelToEdit(){
     'Overseas Filipino Worker(OFW)': document.querySelector("input[name='member_ofw_status']:checked")?.value || 'No',
     'Country': $('memberCountry').value || '',
     
-    // Displacement reasons - FIXED: Include all checkbox values as separate columns
     'Taal Volcano (Within 14-15 KM Danger Zone)': $('member_displacement_taal').checked ? 'Yes' : '',
     'Typhoon': $('member_displacement_typhoon').checked ? 'Yes' : '',
     'Flood': $('member_displacement_flood').checked ? 'Yes' : '',
@@ -13262,7 +13294,6 @@ function collectMemberPanelToEdit(){
     'Fire': $('member_displacement_fire').checked ? 'Yes' : '',
     'Other Reasons': $('member_displacement_other_check').checked ? $('member_displacement_other').value || '' : '',
     
-    // Assembly area - FIXED: Set proper values
     'Inside Assembly Area': $('member_inside_assembly').checked ? 'Yes' : '',
     'Outside Assembly Area': $('member_outside_assembly').checked ? 'Yes' : '',
     'Pick-Up Location': $('memberPickup').value || '',
@@ -13270,11 +13301,9 @@ function collectMemberPanelToEdit(){
     'Family/Relative Host': $('memberFamilyHost').value || '',
     'Host_Contact': $('memberHostContact').value || '',
     
-    // Transportation - FIXED: Use correct field based on assembly area
     'Transportation': $('member_inside_assembly').checked ? $('memberTransport').value || '' : 
                      ($('member_outside_assembly').checked ? $('memberOutsideTransport').value || '' : ''),
     
-    // Government Assistance with Date Fields
     'TUPAD': $('member_tupad').checked ? 'Yes' : 'No',
     'TUPAD_Date': $('member_tupad_date_input').value ? toSheetDate($('member_tupad_date_input').value) : '',
     'Local 4Ps': $('member_local4ps').checked ? 'Yes' : 'No',
@@ -13294,14 +13323,12 @@ function collectMemberPanelToEdit(){
     'AICS': $('memberAics').value || '',
     'AICS_Date': $('member_aics_date_input').value ? toSheetDate($('member_aics_date_input').value) : '',
     
-    // Preserve existing submittedBy or use current user's full name
     'Submitted By': existingSubmittedBy || getUserFullName()
   };
   
-  // ============ ADD THIS: Include calamity data for member ============
+  // Include calamity data for member
   const memberCalamityData = collectMemberCalamityData(memberEditIndex);
   Object.assign(obj, memberCalamityData);
-  // ============ END ADD ============
   
   editMembers[memberEditIndex] = obj;
 }
@@ -13433,90 +13460,100 @@ async function saveEditedHouseholdActual(silentReload = false) {
     }
 
     try {
+// ============ FIXED: Check for lock before proceeding ============
+// Only block if locked by a DIFFERENT user
+const username = localStorage.getItem('username');
+const sessionId = localStorage.getItem('sessionId');
+
+const checkLockFormData = new FormData();
+checkLockFormData.append('action', 'checkEditLockStatus');
+checkLockFormData.append('dataID', editDataID);
+checkLockFormData.append('username', username);
+
+const lockCheckResponse = await fetch(SCRIPT_URL, { method: 'POST', body: checkLockFormData });
+const lockCheckResult = await lockCheckResponse.json();
+
+console.log('Lock check result before save:', lockCheckResult);
+
+// CRITICAL FIX: Only block if locked by SOMEONE ELSE
+// If it's locked by current user, allow save (refresh the lock)
+if (lockCheckResult.success && lockCheckResult.isLocked && !lockCheckResult.isCurrentUser) {
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+    showError(`This household is currently being edited by ${lockCheckResult.lockedBy}. Please try again later.`);
+    return;
+}
+
+// If locked by current user, refresh the lock timestamp
+if (lockCheckResult.success && lockCheckResult.isLocked && lockCheckResult.isCurrentUser) {
+    console.log('🔄 Lock owned by current user, refreshing...');
+    const refreshLockData = new FormData();
+    refreshLockData.append('action', 'lockHousehold');
+    refreshLockData.append('dataID', editDataID);
+    refreshLockData.append('username', username);
+    refreshLockData.append('sessionId', sessionId);
+    refreshLockData.append('fullName', getUserFullName());
+    await fetch(SCRIPT_URL, { method: 'POST', body: refreshLockData });
+}
+// ============ END FIXED LOCK CHECK ============
         // Upload pending files
         const pendingFiles = window.pendingHeadFiles || {};
         const categories = Object.keys(pendingFiles);
-        const totalFiles = categories.length;
-        const uploadedFileLinks = {};
         
-        if (totalFiles > 0) {
-            let uploadedCount = 0;
-            
-            for (const category of categories) {
-                const file = pendingFiles[category];
-                if (!file) continue;
-                
-                uploadedCount++;
-                const progress = Math.round((uploadedCount / totalFiles) * 100);
-                
-                if (btn) {
-                    btn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Uploading ${uploadedCount}/${totalFiles} (${progress}%)`;
-                }
-                
-                try {
-                    let fileToUpload = file;
-                    if (file.type.startsWith('image/')) {
-                        fileToUpload = await compressImage(file, 800, 0.7);
-                    }
-                    
-                    const dataID = editDataID || Date.now();
-                    const uploadResult = await uploadFileToDrive(fileToUpload, category, dataID);
-                    
-                    if (uploadResult && uploadResult.success) {
-                        uploadedFileLinks[category] = {
-                            link: uploadResult.fileLink,
-                            name: file.name,
-                            fileId: uploadResult.fileId,
-                            uploadTimestamp: uploadResult.uploadTimestamp
-                        };
-                        
-                        const fileLinkInput = document.getElementById(`edit_head_${category}_file_link_head`);
-                        if (fileLinkInput) fileLinkInput.value = uploadResult.fileLink;
-                        
-                        const fileNameInput = document.getElementById(`edit_head_${category}_file_name_head`);
-                        if (fileNameInput) fileNameInput.value = file.name;
-                    }
-                } catch (err) {
-                    console.error(`Upload error for ${category}:`, err);
-                }
-            }
-            
-            window.pendingHeadFiles = {};
+        if (categories.length > 0 && btn) {
+            btn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Uploading files...`;
         }
         
+        for (const category of categories) {
+            const file = pendingFiles[category];
+            if (!file) continue;
+            
+            try {
+                let fileToUpload = file;
+                if (file.type.startsWith('image/')) {
+                    fileToUpload = await compressImage(file, 800, 0.7);
+                }
+                
+                const dataID = editDataID || Date.now();
+                const uploadResult = await uploadFileToDrive(fileToUpload, category, dataID);
+                
+                if (uploadResult && uploadResult.success) {
+                    const fileLinkInput = document.getElementById(`edit_head_${category}_file_link_head`);
+                    if (fileLinkInput) fileLinkInput.value = uploadResult.fileLink;
+                    
+                    const fileNameInput = document.getElementById(`edit_head_${category}_file_name_head`);
+                    if (fileNameInput) fileNameInput.value = file.name;
+                }
+            } catch (err) {
+                console.error(`Upload error for ${category}:`, err);
+            }
+        }
+        
+        window.pendingHeadFiles = {};
+        
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Updating data...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Saving data...';
         }
         
         // Collect head data
         collectHeadFromEditForm();
         
-        // Update editHead with uploaded file links
-        if (Object.keys(uploadedFileLinks).length > 0) {
-            const fieldMap = {
-                damage: { link: 'Structural Damage File Link', name: 'Structural Damage File Name', radio: 'Structural Damage' },
-                injury: { link: 'Household Injury File Link', name: 'Household Injury File Name', radio: 'Household Injury' },
-                habitability: { link: 'Habitability File Link', name: 'Habitability File Name', radio: 'Habitability' },
-                livelihood: { link: 'Loss of Livelihood File Link', name: 'Loss of Livelihood File Name', radio: 'Loss of Livelihood' },
-                additional: { link: 'Additional Attachment File Link', name: 'Additional Attachment File Name', radio: null }
-            };
-            
-            for (const [category, result] of Object.entries(uploadedFileLinks)) {
-                if (fieldMap[category]) {
-                    editHead[fieldMap[category].link] = result.link;
-                    editHead[fieldMap[category].name] = result.name;
-                    if (fieldMap[category].radio) {
-                        editHead[fieldMap[category].radio] = 'Yes';
-                    }
-                }
-            }
+        // ============ CRITICAL: Filter out empty members BEFORE sending ============
+        const validMembers = editMembers.filter(member => {
+            const name = member['Name of Household Member/s'];
+            return name && String(name).trim() !== "";
+        });
+        
+        console.log(`📊 Sending ${validMembers.length} valid members (filtered from ${editMembers.length})`);
+        
+        // Update member count to match valid members
+        const memberCountInput = $('edit_memberCount');
+        if (memberCountInput) {
+            memberCountInput.value = validMembers.length;
         }
         
-        const expected = Number($('edit_memberCount')?.value || 0);
-        
-        while (editMembers.length < expected) editMembers.push(createEmptyMember());
-        if (editMembers.length > expected) editMembers = editMembers.slice(0, expected);
-
         const userFullName = getUserFullName();
         const now = new Date();
         const formattedDate = formatTimestampPH_(now);
@@ -13526,6 +13563,7 @@ async function saveEditedHouseholdActual(silentReload = false) {
         if (!editHead['Submitted On']) editHead['Submitted On'] = formattedDate;
         editHead['Updated By'] = userFullName;
         editHead['Updated On'] = formattedDate;
+        editHead['No. of Household Member/s'] = validMembers.length;
 
         // Clean data
         const cleanHead = {};
@@ -13535,7 +13573,7 @@ async function saveEditedHouseholdActual(silentReload = false) {
             }
         }
 
-        const cleanMembers = editMembers.map(member => {
+        const cleanMembers = validMembers.map(member => {
             const cleanMember = {};
             for (const key in member) {
                 if (member[key] !== undefined && member[key] !== null && member[key] !== '') {
@@ -13551,7 +13589,7 @@ async function saveEditedHouseholdActual(silentReload = false) {
         fd.append('dataID', editDataID);
         fd.append('actor', userFullName);
         fd.append('head', JSON.stringify(cleanHead));
-        fd.append('members', JSON.stringify(cleanMembers || []));
+        fd.append('members', JSON.stringify(cleanMembers));
         fd.append('submittedBy', cleanHead['Submitted By'] || userFullName);
         fd.append('barangay', cleanHead['Barangay']);
         fd.append('clearExisting', 'true');
@@ -13578,59 +13616,52 @@ async function saveEditedHouseholdActual(silentReload = false) {
             throw new Error(`Server returned invalid JSON: ${e.message}`);
         }
 
-if (json.success) {
-    const totalTime = Math.round(performance.now() - startTime);
-    console.log(`✅ Update successful! ${totalTime}ms`);
-    
-    // Release the lock after successful save
-    await releaseEditLock(editDataID);
-    stopLockChecking();
-    
-    showSuccess(`Household updated (ID: ${editDataID})`);
+        // ============ HANDLE LOCK TIMEOUT ============
+        if (json.error === "LOCK_TIMEOUT") {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+            showError("Another user is updating this household. Please try again in a moment.");
+            return;
+        }
+
+        if (json.success) {
+            const totalTime = Math.round(performance.now() - startTime);
+            console.log(`✅ Update successful! ${totalTime}ms`);
             
-            // ========== OPTION 2: UPDATE IN-MEMORY DATA ==========
-            // Find the household in virtualState and replace with updated data
+            await releaseEditLock(editDataID);
+            stopLockChecking();
+            
+            showSuccess(`Household updated (ID: ${editDataID})`);
+            
+            // Update in-memory data
             const existingIndex = virtualState.allHouseholds.findIndex(h => h.id === editDataID);
             
             if (existingIndex !== -1) {
-                // Update the household in memory with the latest data
                 virtualState.allHouseholds[existingIndex] = {
                     id: editDataID,
                     head: cleanHead,
-                    members: cleanMembers || []
+                    members: cleanMembers
                 };
                 
-                console.log(`✅ Updated household ${editDataID} in memory at index ${existingIndex}`);
-                
-                // Refresh the virtual scroller to show changes
                 if (virtualScroller) {
-                    // Store current scroll position
                     const scrollTop = virtualScroller.scrollContainer?.scrollTop || 0;
-                    
-                    // Refresh the view
                     virtualScroller.refresh();
-                    
-                    // Restore scroll position
                     if (virtualScroller.scrollContainer) {
                         virtualScroller.scrollContainer.scrollTop = scrollTop;
                     }
                 }
                 
-                // Update counts if needed
                 updateCounts();
-            } else {
-                console.log(`Household ${editDataID} not in current view, UI update skipped`);
             }
-            // ========== END OPTION 2 ==========
             
-            // Close edit panel
             closeEditPanel();
             resetFormTracking();
 
             localStorage.removeItem('recordsCache');
             localStorage.removeItem('recordsCacheTime');
             
-            // Force refresh thumbnails
             setTimeout(() => {
                 forceRefreshThumbnails();
             }, 100);
@@ -13640,8 +13671,6 @@ if (json.success) {
         }
     } catch (err) {
         console.error('Save error:', err);
-        
-        showLoading(false);
         
         if (err.name === 'AbortError') {
             showError('Request timed out. Please try again.');
